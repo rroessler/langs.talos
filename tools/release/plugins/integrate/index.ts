@@ -33,7 +33,12 @@ export class Integrate extends Task {
             ref: context.branch,
             owner: Product.owner,
             workflow_id: 'release.yml',
-            inputs: { version: context.version.tag },
+
+            // prepare the necessary inputs
+            inputs: {
+                release: context.branch,
+                version: context.version.tag,
+            },
         });
     }
 

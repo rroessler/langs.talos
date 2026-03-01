@@ -3,6 +3,10 @@ name: Release Talos
 on:
     workflow_dispatch:
         inputs:
+            release:
+                type: choice
+                description: Release Type
+                options: [nightly, stable]
             version:
                 type: string
                 required: true
@@ -16,7 +20,7 @@ jobs:
     release-deploy:
         name: Deploy Website
         needs: [release-build]
-        if: contains(github.ref, 'stable')
+        if: inputs.release == 'stable'
         uses: ./.github/workflows/deploy.yml
 
     release-create:
@@ -29,7 +33,7 @@ jobs:
             - name: Generate Changelog
               uses: elieahd/templater@v1
               with:
-                  template: ".github/templates/release-${{ github.ref }}.md"
+                  template: ".github/templates/release-${{ inputs.release }}.md"
                   file: "CHANGELOG.md"
                   variables: "version=${{ inputs.version }}"
 
