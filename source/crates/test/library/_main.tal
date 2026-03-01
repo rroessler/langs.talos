@@ -1,0 +1,42 @@
+//!
+//! Crate: "test"
+//! Description: Setup functions for testing suites.
+//!
+
+// Dynamic Modules
+import "dylib:test" as test;
+
+// Talos Modules
+import "talos:_detail" as Detail;
+
+// - PROPERTIES - //
+
+//! Brief: Internal helper to reduce bytecode output.
+let m_cast = Detail.Unsafe.cast;
+
+// - PUBLIC METHODS - //
+
+//! Brief: Declares a test-case to be executed.
+//! Param: name                 Testing case name.
+//! Param: callback             Executor callback.
+export let case = m_cast[fn (name: String, callback?: Function) -> Void](test.case);
+
+//! Brief: Declares a test-case to be skipped.
+//! Param: name                 Testing case name.
+//! Param: callback             Executor callback.
+export let skip = m_cast[fn (name: String, callback?: Function) -> Void](test.skip);
+
+//! Brief: Declares a test-case to be implemented later.
+//! Param: name                 Testing case name.
+//! Param: callback             Executor callback.
+export let todo = m_cast[fn (name: String, callback?: Function) -> Void](test.todo);
+
+//! Brief: Declares a test-benchmark to be executed.
+//! Param: name                 Testing benchmark name.
+//! Param: callback             Benchmark callback.
+export let bench = m_cast[fn (name: String, callback?: Function) -> Void](test.bench);
+
+//! Brief: Groups tests into a singular section.
+//! Param: name                 Testing suite name.
+//! Param: callback             Registration callback.
+export let suite = m_cast[fn (name: String, callback?: Function) -> Void](test.suite);

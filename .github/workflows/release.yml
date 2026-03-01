@@ -1,0 +1,48 @@
+name: Release Talos
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                type: string
+                required: true
+                description: Release Version
+
+jobs:
+    release-build:
+        name: Build Releases
+        uses: ./.github/workflows/build.yml
+
+    release-deploy:
+        name: Deploy Website
+        needs: [release-build]
+        if: contains(github.ref, 'stable')
+        uses: ./.github/workflows/deploy.yml
+
+    release-create:
+        name: Release GitHub
+        runs-on: ubuntu-latest
+        needs: [release-build]
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Generate Changelog
+              uses: elieahd/templater@v1
+              with:
+                  template: ".github/templates/release-${{ github.ref }}.md"
+                  file: "CHANGELOG.md"
+                  variables: "version=${{ inputs.version }}"
+
+            - name: Download Artifacts
+              uses: actions/download-artifact@v6
+              with:
+                  path: dist
+                  pattern: talos-*
+                  merge-multiple: true
+
+            - name: Generate Release
+              run: |
+                  gh release create ${{ inputs.version }} "dist/talos-*" \
+                    --repo "${{ github.repository }}" \
+                    --title "Talos ${{ inputs.version }}"
+                    --body-file "CHANGELOG.md"

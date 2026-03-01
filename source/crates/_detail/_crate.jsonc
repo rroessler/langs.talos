@@ -1,0 +1,10 @@
+{
+    "version": "0.1.0",
+    "name": "@talos/_detail",
+    "main": "library/_main.tal",
+    "lint": {
+        "overrides": {
+            "3000360": "none"
+        }
+    }
+}

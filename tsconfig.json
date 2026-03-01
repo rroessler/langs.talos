@@ -1,0 +1,13 @@
+{
+    "extends": "./configs/tsconfig.base.json",
+    "include": ["configs", "docs", "tools", "source/vscode"],
+    "exclude": ["dist", "node_modules"],
+    "compilerOptions": {
+        "outDir": "dist",
+        "paths": {
+            "~/*": ["./*"],
+            "@/talos/*": ["./source/vscode/*"],
+            "@/website/*": ["./source/website/library/*"]
+        }
+    }
+}

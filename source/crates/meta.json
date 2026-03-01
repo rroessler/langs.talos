@@ -1,0 +1,7 @@
+{
+    "root": true,
+    "icon": "Package",
+    "title": "Crates",
+    "description": "Builtin package references for Talos",
+    "pages": ["index", "---Standard Library---", "..."]
+}

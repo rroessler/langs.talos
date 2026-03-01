@@ -1,0 +1,74 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "request": "launch",
+            "type": "extensionHost",
+            "name": "Talos: VSC Extension",
+            "outFiles": ["${workspaceFolder}/dist/vscode/**/*.js"],
+            "args": ["${workspaceFolder}/examples", "--extensionDevelopmentPath=${workspaceFolder}/dist/vscode"]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Talos: Test Natives",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/source/testing/testing",
+            "windows": { "program": "${workspaceFolder}/build/source/testing/testing.exe" }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Talos: Test Builtins",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/dist/bin/talos",
+            "args": ["test", "--internal-hardware-vprocs", "4"],
+            "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Talos: Task 'build'",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/dist/bin/talos",
+            "args": ["task", "build"],
+            "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Talos: Lint Sandbox",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/dist/bin/talos",
+            "args": ["lint", "--internal-hardware-vprocs", "4", "${workspaceFolder}"],
+            "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Talos: Format Sandbox",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/dist/bin/talos",
+            "args": ["format", "${workspaceFolder}/examples/sandbox.tal"],
+            "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Talos: Bundle Sandbox",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/dist/bin/talos",
+            "args": ["bundle", "--internal-hardware-vprocs", "4", "${workspaceFolder}"],
+            "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Talos: Launch Sandbox",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/dist/bin/talos",
+            "args": ["run", "--internal-hardware-vprocs", "4", "${workspaceFolder}"],
+            "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
+        }
+    ]
+}

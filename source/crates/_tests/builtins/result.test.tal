@@ -1,0 +1,50 @@
+//!
+//! Testing: Builtin "Result" Functionality.
+//! Description: Coordinates testing the builtin "Result".
+//!
+
+// Talos Modules
+import "talos:test" as Test;
+import "talos:assert" as Assert;
+
+// - TEST MOCKS - //
+
+namespace Mock {
+    //! Prepare a consistent value.
+    export let value: Any = 42;
+
+    //! Prepare a consistent error.
+    export let error: Any = Void;
+
+    //! Prepare a success result value.
+    export let success = Result.okay(value);
+
+    //! Prepare a failure result value.
+    export let failure = Result.error(error);
+};
+
+// - TEST CASES - //
+
+Test.suite("Methods", fn {
+    Test.case("Result.is_okay", fn {
+        Assert.truthy(Mock.success.is_okay());
+        Assert.falsey(Mock.failure.is_okay());
+    });
+
+    Test.case("Result.is_error", fn {
+        Assert.falsey(Mock.success.is_error());
+        Assert.truthy(Mock.failure.is_error());
+    });
+
+    Test.case("Result.unwrap_okay", fn {
+        Assert.equals(Mock.success.unwrap_okay(), Mock.value);
+        Assert.panics(fn => Mock.failure.unwrap_okay());
+    });
+
+    Test.case("Result.unwrap_error", fn {
+        Assert.panics(fn => Mock.success.unwrap_error());
+        Assert.equals(Mock.failure.unwrap_error(), Mock.error);
+    });
+});
+
+Test.todo("Statics", fn => Todo());

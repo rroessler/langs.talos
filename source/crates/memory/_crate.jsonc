@@ -1,0 +1,6 @@
+{
+    "version": "0.1.0",
+    "name": "@talos/memory",
+    "main": "library/_main.tal",
+    "describe": "Utility functions for reading current memory usage"
+}

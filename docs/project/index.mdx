@@ -1,0 +1,72 @@
+---
+icon: Eye
+title: Overview
+description: Why write another programming language?
+---
+
+import { Anchor, Callout } from '@/website/components';
+
+In short, curiosity.
+
+When I first wanted to start writing a programming language <Anchor.Super index="1"/>, I slowly became enthralled with how to implement tooling. Many language tutorials are incredible (see: [Credits](#credits)), however they all lacked solid foundations for implementing and incorporating end-to-end development tools. Even the most popular of today's programming languages previously treated workflow as separate to the runtime <Anchor.Super index="2"/>.
+
+With this in mind, I began designing Talos in 2024 under the original name of Ember <Anchor.Super index="3"/>. What was initially an attempt to get any sort of programming language written, led me down a rabbit-hole of ideas, shortcomings and possibilities. The result of which taught me many differing aspects of programming and software and ultimately culminated into the current state that Talos is in today.
+
+## Goals
+
+The core goals that Talos has from a project perspective can be split into two categories:
+
+<Callout title="Modular C++ Backend:">
+
+    - **Monorepo Architecture** &nbsp;&mdash;&nbsp; A bespoke CMake monorepo design.
+    - **Language-Server Framework** &nbsp;&mdash;&nbsp; A transport-agnostic LSP library.
+    - **Custom Testing Library** &nbsp;&mdash;&nbsp; Builtin unit-testing for both C++ and Talos.
+    - **Dependency Injection** &nbsp;&mdash;&nbsp; A simplistic DI library for runtime fixtures.
+    - **Green-Threads Library** &nbsp;&mdash;&nbsp; A fast, reliable concurrency framework.
+
+</Callout>
+
+<Callout title="Language Runtime Design:">
+
+    - **Familiar Modern Syntax** &nbsp;&mdash;&nbsp; Rust/TypeScript inspired structure.
+    - **Performant Interpreter** &nbsp;&mdash;&nbsp; A performant bytecode/jitted* virtual-machine.
+    - **Expressive Type System** &nbsp;&mdash;&nbsp; Static typings to improve dynamic performance.
+    - **Monadic Error Handling** &nbsp;&mdash;&nbsp; Distinct error-handling for recoverable/unrecoverable states.
+    - **Colorless Functions** &nbsp;&mdash;&nbsp; Scalable concurrency without the headaches and overhead.
+
+</Callout>
+
+## Status
+
+Talos is currently an experimental language, and with that comes a few things to keep in mind. There is a working installer and upgrade command, however until these have been adequately tested, they may not work on all machines. Although the core aspects of the underlying language design have been roughly decided, they may also still change.
+
+> **Strictly Speaking**: There will be bugs!
+
+Regardless, the project is now at a point where it has more substance than thought, and as such should _mostly_ work. The project is not currently at a stage where it is taking contribution, but this will be possible in the future. See the [contribution](/docs/project/contributing) section for the current status and eventual process to do so.
+
+For more information regarding _rough_ estimates for the project, take a look at the [working roadmap](/docs/project/roadmap) for more details.
+
+## Credits
+
+A massive thank you to the following people/projects. Although I would love to claim everything I have done, I couldn't have undertaken this project without some clarity and help from the work of others.
+
+- [Leonard Schütz](https://leonard.swiss/)
+- [Max Bernstein](https://bernsteinbear.com/)
+- [Yorick Peterse](https://yorickpeterse.com/)
+- [David Timms](https://davidtimms.github.io/)
+
+## Footnotes
+
+<Anchor.Footnote index="1" /> &nbsp;&mdash;&nbsp; Around 2021 I started attempting to write a programming language, but
+not until recently did I finally decide to release something more substantial.
+
+<Anchor.Footnote index="2" /> &nbsp;&mdash;&nbsp; Until the past few years, all-in-one runtime and toolkit programming
+languages were few and far between. JavaScript didn't have a full all-in-one runtime and toolkit until
+[Deno](https://deno.com/) in 2018. Although Node did come before this, it shipped `npm` seperately. Of any recent major
+language, [Dart](https://dart.dev/) has probably been the most complete in terms of accomodating all development
+aspects.
+
+<Anchor.Footnote index="3" /> &nbsp;&mdash;&nbsp; Although I still think Ember could have worked as a name, it felt to
+similar to other large-scale projects. Because of this I ended up doing a deep dive into Greek mythology to try find an
+alternative spelling. This led me to the story of Talos, a man of bronze who protected Crete. I thought this was neat
+and so ended up using it as the name instead.

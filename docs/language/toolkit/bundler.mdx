@@ -1,0 +1,39 @@
+---
+icon: Blocks
+title: Bundler
+description: Compile Talos scripts into native executables
+---
+
+import { Callout } from '@/website/components';
+
+## Basic Usage
+
+```shell title="Terminal"
+talos bundle [options...] [script]
+```
+
+This subcommand, compiles the given script into a standalone executable. Any flags specified which affect the runtime behaviour will also be applied to the resulting binary.
+
+Under the hood, it compiles all imports into their respective bytecode ahead-of-time, and injects them into a simplified Talos runtime. When the binary is executed, it reloads the compiled modules into memory as they are requested.
+
+## Bundle Options
+
+### `--quiet`
+
+Disables verbose type-analysis and compilation diagnostics.
+
+### `--outfile`
+
+This specifies the output file to write the resulting executable. It currently defaults to the directory and name of the given script, however with a platform appropriate extension.
+
+## Typing Options
+
+All declared [typing options](/docs/language/toolkit/runtime) can be used when running tests.
+
+## Runtime Options
+
+Most declared [runtime options](/docs/language/toolkit/runtime) can be used when running tests.
+
+<Callout title="Note:">
+    The `--env` option will manually inject the desired environment variables into the resulting executable.
+</Callout>

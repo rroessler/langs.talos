@@ -1,0 +1,30 @@
+//!
+//! Crate: "memory"
+//! Description: Utility functions for reading memory usage.
+//!
+
+// Dynamic Modules
+import "dylib:memory" as memory;
+
+// Talos Modules
+import "talos:_detail" as Detail;
+
+// - PROPERTIES - //
+
+//! Brief: Internal helper to reduce bytecode output.
+let m_cast = Detail.Unsafe.cast;
+
+// - NAMESPACES - //
+
+export namespace Heap {
+    // - PUBLIC METHODS - //
+
+    //! Brief: Gets the total heap memory.
+    export let total = m_cast[fn -> Number](memory.heap_total);
+
+    //! Brief: Gets the current heap memory usage.
+    export let usage = m_cast[fn -> Number](memory.heap_usage);
+
+    //! Brief: Gets the current heap memory available.
+    export let avail = m_cast[fn -> Number](memory.heap_avail);
+};

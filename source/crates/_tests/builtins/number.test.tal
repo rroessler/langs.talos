@@ -1,0 +1,20 @@
+//!
+//! Testing: Builtin "Number" Functionality.
+//! Description: Coordinates testing the builtin "Number".
+//!
+
+// Talos Modules
+import "talos:test" as Test;
+import "talos:assert" as Assert;
+
+// - TEST CASES - //
+
+Test.suite("Traits", fn {
+    Test.case("Operator '+'", fn => Assert.equals(1 + 2, 3));
+
+    Test.case("Equality '=='", fn => Assert.equals(123.456, 123.456));
+    Test.case("Equality '!='", fn => Assert.differs(0.1 + 0.2, 0.3));
+});
+
+Test.todo("Methods", fn => Todo());
+Test.todo("Statics", fn => Todo());

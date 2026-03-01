@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "noEmit": true,
+        "alwaysStrict": true,
+        "strictNullChecks": true,
+
+        "noImplicitAny": true,
+        "noImplicitOverride": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+
+        "target": "ESNext",
+        "module": "preserve",
+
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "moduleResolution": "bundler",
+        "skipDefaultLibCheck": true,
+        "resolveJsonModule": false,
+
+        "sourceMap": false,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true
+    }
+}

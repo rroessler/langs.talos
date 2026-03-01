@@ -1,0 +1,9 @@
+---
+icon: Diff
+title: Contributing
+description: How you can contribute to Talos
+---
+
+Contribution is not yet available for Talos as it is still an experimental project. Once a version `x.x.x` language can be shipped, contribution will become available. Talos can be [built natively](./docs/project/development.mdx) for those that want to get their hands dirty.
+
+> **Note**: The `x.x.x` version is currently arbitrary to denote that contribution will come, just once the project is stable enough to accomodate doing so.

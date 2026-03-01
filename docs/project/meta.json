@@ -1,0 +1,7 @@
+{
+    "root": true,
+    "icon": "GitBranch",
+    "title": "Project",
+    "description": "Information about the project itself",
+    "pages": ["index", "roadmap", "development", "contributing", "releases", "license"]
+}

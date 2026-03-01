@@ -1,0 +1,6 @@
+{
+    "version": "0.1.0",
+    "name": "@talos/jit",
+    "main": "library/_main.tal",
+    "describe": "Utility functions for forcing jitted functions"
+}

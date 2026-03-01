@@ -1,0 +1,36 @@
+---
+title: Welcome
+icon: Sword
+description: A quick insight to the Talos programming language
+---
+
+import { Portal } from '@/website/components';
+
+This is the official documentation for the Talos programming language &nbsp;&mdash;&nbsp; a statically typed, dynamic programming language that aims to improve development workflow through extension builtin tooling.
+
+```talos
+// A simple welcome application
+Debug.println("Hello, World!");
+```
+
+## Fast Links
+
+<div className="mt-8 grid grid-cols-1 gap-4 text-start md:grid-cols-2 w-full">
+
+    <Portal name="Install" icon="download" href="/docs/language/development/installation" description="Download Talos to get started." />
+    <Portal name="Tutorial" icon="rocket" href="/docs/language/development/quick-start" description="A beginners introduction to Talos." />
+    <Portal name="Syntax" icon="whole-word" href="/docs/language/fundamentals/syntax" description="Get familiar with the fundamental syntax of Talos." />
+    <Portal name="Toolkit" icon="toolbox" href="/docs/language/toolkit/commands" description="An overview of the toolkit commands shipped with Talos." />
+
+</div>
+
+## Why Talos?
+
+Many dynamic programming languages prioritize performance, syntax and paradigms over development workflow. Although this produces incredible applications, writing and maintaining programs can be a chore. Typically developers will reach for open source tooling to alleviate these headaches, however this comes at the cost of additional overhead.
+
+As such, Talos was designed from the ground-up to work with developers and not against them. This lead to the following design goals in mind.
+
+- **Speed**. Talos features a dynamic asynchronous runtime that aims to be as performant as it can without compromising functionality.
+- **Familiarity**. With a familiar modern syntax, Talos programs can be written with relative and intuitive ease.
+- **Correctness**. Statically typed with optionaly linting support to ensure that your programs behave as expected.
+- **E2E Tooling**. Talos ships with a builtin formatter, bundler, linter, task-runner and more.

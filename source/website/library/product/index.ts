@@ -1,0 +1,36 @@
+/// JSON Modules
+import { version as v } from '~/package.json';
+import { description as d } from '../../package.json';
+import { publisher, displayName } from '~/configs/extension.json';
+
+/** The Product Details. */
+export namespace Product {
+    //  PROPERTIES  //
+
+    /** Underlying product identifier. */
+    export const identifier = publisher;
+
+    /** Available extension typing. */
+    export const extension = '.tal';
+
+    /** The baseline domain value. */
+    export const domain = 'https://talos.rroessler.io';
+
+    /** The baseline github URL. */
+    export const github = 'https://github.com/rroessler/langs.talos';
+
+    /** Assign the associated website description. */
+    export const description = d;
+
+    /** Short descriptor name. */
+    export const shortName = identifier[0].toUpperCase() + identifier.slice(1);
+
+    /** Long descriptor name. */
+    export const longName = displayName;
+
+    /** The version of the extension. */
+    export const version = v.split('-').at(0) ?? '0.0.0';
+
+    /** The current version-branch included. */
+    export const branch = v.split('-').at(1) ?? '';
+}

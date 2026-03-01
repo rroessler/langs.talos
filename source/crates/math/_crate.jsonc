@@ -1,0 +1,6 @@
+{
+    "version": "0.1.0",
+    "name": "@talos/math",
+    "main": "library/_main.tal",
+    "describe": "Mathematics library for complex algorithms"
+}

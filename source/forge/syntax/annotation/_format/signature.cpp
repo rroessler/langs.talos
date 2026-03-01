@@ -1,0 +1,41 @@
+/// Forge Modules
+#include "forge/format/dispatch.hpp"
+
+/// Syntax Modules
+#include "forge/syntax/_inline/annotation.ipp"
+
+//  PRIVATE METHODS  //
+
+Forge::Format::Node* Forge::Format::Dispatch::m_signature(Reader* reader) {
+    return m_annotation<Syntax::Signature>(reader);
+}
+
+FORGE_MM_FORMAT_HINT(Signature, reader) {
+    // ensure we have a leading "fn" keyword
+    if (!reader->match(Lexer::Kind::DECL_FUNC)) return nullptr;
+
+    // attempt constructing the base prototype now
+    auto* prototype = m_constructor(reader);
+    if (prototype == nullptr) return nullptr;
+
+    // prepare the storage instance now
+    auto* storage = reader->storage();
+
+    // rebuild the prototype to include the "fn" keyword
+    prototype = storage->group(storage->unicode("fn"), prototype);
+
+    // prepare the incoming colon-typing now
+    Node* colon = nullptr;
+
+    // if we do not have a colon, then ignore the return value
+    if (reader->match(Lexer::Kind::PUNC_COLON)) colon = storage->colon();
+    else if (!reader->match(Lexer::Kind::ARROW_THIN)) return prototype;
+    else colon = storage->list(storage->space().hard(), storage->arrow().thin());
+
+    // otherwise we want to parse the incoming annotation again
+    auto callback = [](Reader* reader) { return m_annotation(reader); };
+    auto* returns = m_leading(reader, Callback(callback));  // and parse
+
+    // update the returns instance to be it's own grouping
+    return returns ? storage->append(prototype, colon, storage->space().hard(), returns) : nullptr;
+}

@@ -1,0 +1,48 @@
+#ifndef _XJCT_TARGET_DARWIN_HPP
+#define _XJCT_TARGET_DARWIN_HPP
+
+/// XJCT Modules
+#include "xjct/target/abstract.hpp"
+
+namespace XJCT::Target {
+
+    /// @brief Darwin Imbuable Target.
+    struct Darwin : public Abstract {
+        //  CONSTRUCTORS  //
+
+        /// @brief Inherit the base constructor.
+        using Abstract::Abstract;
+
+       protected:
+        //  PRIVATE METHODS  //
+
+        /// @brief Gets the underlying format.
+        inline constexpr Archive::Format m_format() const noexcept { return Archive::Format::DARWIN; }
+
+#if $_PLATFORM_DARWIN && defined(__MACH__)
+
+        /**
+         * @brief Handles codesigning a file.
+         * @param binary            Binary file-path.
+         */
+        bool m_codesign(const $::Filesystem::Path& binary) const noexcept final;
+
+        /**
+         * @brief Gets a "Mach-O" resource.
+         * @param name                  Resource name.
+         */
+        Archive::Blob m_resource(const $::String::View& name) const noexcept final;
+
+#endif
+
+        /**
+         * @brief Handles imbuing "Mach-O" executables.
+         * @param binary                Binary to imbue.
+         * @param options               Imbument options.
+         */
+        bool m_imbue(Archive::Binary& binary, const Imbue::Options& options) const noexcept final;
+    };
+
+}  // namespace XJCT::Target
+
+#endif

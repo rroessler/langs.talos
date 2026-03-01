@@ -1,0 +1,42 @@
+{
+    "private": true,
+    "type": "module",
+    "license": "MIT",
+    "name": "talos-docs",
+    "version": "0.3.0-nightly",
+    "description": "A forward-thinking, programming language that puts developers first",
+    "scripts": {
+        "//  START  //": "",
+        "start": "next dev . --turbopack",
+        "serve": "run-s bundle serve:impl",
+        "serve:impl": "bunx serve -l 3000 out",
+        "//  BUNDLE  //": "",
+        "bundle": "next build . --turbopack"
+    },
+    "dependencies": {
+        "@fumadocs/ui": "^16.5.0",
+        "@fumadocs/base-ui": "^16.6.5",
+        "@orama/orama": "^3.1.16",
+        "@paper-design/shaders-react": "^0.0.71",
+        "@tailwindcss/postcss": "^4.2.1",
+        "clsx": "^2.1.1",
+        "fumadocs-core": "^16.6.5",
+        "fumadocs-mdx": "^14.2.8",
+        "hast-util-to-jsx-runtime": "^2.3.6",
+        "lucide-react": "^0.562.0",
+        "next": "^16.1.6",
+        "next-themes": "^0.4.6",
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4",
+        "shiki": "^3.22.0",
+        "zod": "^4.3.6"
+    },
+    "devDependencies": {
+        "@types/hast": "^3.0.4",
+        "@types/mdx": "^2.0.13",
+        "@types/react": "^19.2.14",
+        "postcss": "^8.5.6",
+        "tailwindcss": "^4.2.1",
+        "typescript": "^5.9.3"
+    }
+}

@@ -1,0 +1,78 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+
+    "type": "object",
+    "title": "Talos Crate File",
+    "description": "Talos Crate Manifest Schema",
+
+    "$defs": {
+        "test.reporter": { "type": "string", "default": "console", "enum": ["tap", "xml", "json", "junit", "console"] },
+
+        "diagnostic.severity": { "type": "string", "enum": ["none", "hint", "info", "warn", "error"] },
+        "diagnostic.overrides": {
+            "type": "object",
+            "patternProperties": "\\d+",
+            "additionalProperties": { "$ref": "#/$defs/diagnostic.severity" }
+        }
+    },
+
+    "properties": {
+        "name": { "type": "string", "pattern": "^(?:@[\\w-]+/)?[\\w-]+$", "description": "The name of the crate." },
+        "version": { "type": "string", "description": "Semantic version of the crate." },
+
+        "main": { "type": "string", "description": "The main entry-point to the crate." },
+        "title": { "type": "string", "description": "The display-name for the crate." },
+        "describe": { "type": "string", "description": "A description of the crate's functionality." },
+
+        "issues": { "type": "string", "description": "The URL to the crate's issue tracker." },
+        "homepage": { "type": "string", "description": "The URL to the homepage of the crate." },
+        "repository": { "type": "string", "description": "The URL to the repository of the crate." },
+        "documentation": { "type": "string", "description": "The URL to the documentation of the crate." },
+
+        "tasks": { "type": "object", "additionalProperties": { "type": "string" } },
+        "constraints": { "type": "object", "additionalProperties": { "type": "string" } },
+        "dependencies": { "type": "object", "additionalProperties": { "type": "string" } },
+
+        "lint": {
+            "type": "object",
+            "properties": {
+                "recommended": { "type": "boolean", "default": true },
+                "plugins": { "type": "array", "items": { "type": "string" }, "default": [] },
+                "rules": { "type": "object", "additionalProperties": { "$ref": "#/$defs/diagnostic.severity" } }
+            }
+        },
+
+        "test": {
+            "type": "object",
+            "properties": {
+                "pattern": { "type": "string", "default": "**/*.test.tal" },
+                "filters": { "type": "array", "items": { "type": "string" }, "default": [] },
+
+                "bailout": { "type": "integer", "minimum": 1, "default": 0 },
+                "timeout": { "type": "integer", "minimum": 0, "default": 5000 },
+
+                "seed": { "type": "string" },
+                "randomize": { "type": "boolean", "default": false },
+
+                "outfile": { "type": "string" },
+                "reporter": { "$ref": "#/$defs/test.reporter" }
+            }
+        },
+
+        "format": {
+            "type": "object",
+            "properties": {
+                "line.width": { "type": "integer", "default": 120, "minimum": 0 },
+                "indent.width": { "type": "integer", "default": 4, "minimum": 0 },
+
+                "indent.spaces": { "type": "boolean", "default": true },
+                "newline.final": { "type": "boolean", "default": true },
+                "arrow.compress": { "type": "boolean", "default": true },
+                "commas.trailing": { "type": "boolean", "default": true },
+                "braces.compress": { "type": "boolean", "default": true },
+                "braces.preserve": { "type": "boolean", "default": true },
+                "terminator.insert": { "type": "boolean", "default": true }
+            }
+        }
+    }
+}

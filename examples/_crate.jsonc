@@ -1,0 +1,9 @@
+{
+    "version": "0.1.0",
+    "name": "@talos/sandbox",
+    "main": "sandbox.tal",
+    "tasks": {
+        "start": "talos run ./sandbox.tal",
+        "test:bench": "talos test --benchmarks --pattern *.bench.tal"
+    }
+}

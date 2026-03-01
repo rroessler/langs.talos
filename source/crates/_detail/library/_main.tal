@@ -1,0 +1,7 @@
+//!
+//! Crate: "_detail"
+//! Description: Internal implementation details.
+//!
+
+// Detail Modules
+export "./unsafe.tal" as Unsafe;

@@ -1,0 +1,14 @@
+//!
+//! Testing: Builtin "List" Functionality.
+//! Description: Coordinates testing the builtin "List".
+//!
+
+// Talos Modules
+import "talos:test" as Test;
+import "talos:assert" as Assert;
+
+// - TEST CASES - //
+
+Test.todo("Traits", fn => Todo());
+Test.todo("Methods", fn => Todo());
+Test.todo("Statics", fn => Todo());

@@ -1,0 +1,6 @@
+//!
+//! Example: "hello.tal"
+//! Description: Prints "Hello, World!" to `stdout`.
+//!
+
+Debug.println("Hello, World!");

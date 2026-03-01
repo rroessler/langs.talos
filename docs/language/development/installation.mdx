@@ -1,0 +1,49 @@
+---
+title: Installation
+icon: Download
+description: How to begin developing with Talos
+---
+
+import { Callout, Install } from '@/website/components';
+
+Talos ships as a single, dependency-free executable. It can be installed through the scripts below for Linux, Darwin and Windows.
+
+<Install />
+
+To check that Talos was installed successfully, open a new terminal window and run:
+
+```shell title="Terminal"
+talos --version # should output "vx.y.z-build"
+```
+
+<Callout type="warning">
+    **Note**: If you receive a `command not found` error, you may have to manually add the installation directory
+    (`~/.talos/bin`) to your `$PATH`.
+</Callout>
+
+<Callout>
+    **Building Natively**: Talos can be built natively by following the [instructions available
+    here](/docs/project/development).
+</Callout>
+
+## Upgrading / Removing
+
+Once installed, the Talos binary can upgrade or remove itself:
+
+```shell title="Terminal"
+talos upgrade --tag latest  # upgrades to the latest version
+talos upgrade --remove      # removes Talos from your system
+```
+
+<Callout>
+    **Note**: To manually remove Talos:
+
+    ```shell tab="Linux / Darwin"
+    rm -rf ~/.talos
+    ```
+
+    ```powershell tab="Windows"
+    powershell -c ~\.talos\remove.ps1
+    ```
+
+</Callout>

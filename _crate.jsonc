@@ -1,0 +1,15 @@
+{
+    "version": "0.1.0",
+    "name": "@talos/monorepo",
+    "main": "./examples",
+    "tasks": {
+        "build": "talos task clean tools:tsc -p build:*",
+        "build:icons": "bun run ./tools/icons",
+        "build:syntax": "bun run ./tools/syntax",
+        "build:extension": "bun run ./tools/builder",
+        "tools:test": "talos test",
+        "tools:tsc": "tsc --noEmit --project .",
+        "clean": "talos task -p clean:*",
+        "clean:extension": "rimraf dist/vscode"
+    }
+}

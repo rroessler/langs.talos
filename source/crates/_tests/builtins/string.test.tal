@@ -1,0 +1,20 @@
+//!
+//! Testing: Builtin "String" Functionality.
+//! Description: Coordinates testing the builtin "String".
+//!
+
+// Talos Modules
+import "talos:test" as Test;
+import "talos:assert" as Assert;
+
+// - TEST CASES - //
+
+Test.suite("Traits", fn {
+    Test.case("Operator '+'", fn => Assert.equals("foo" + "bar", "foobar"));
+
+    Test.case("Equality '=='", fn => Assert.equals("abc", "abc"));
+    Test.case("Equality '!='", fn => Assert.differs("foo", "bar"));
+});
+
+Test.todo("Methods", fn => Todo());
+Test.todo("Statics", fn => Todo());

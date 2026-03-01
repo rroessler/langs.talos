@@ -1,0 +1,64 @@
+---
+icon: Terminal
+title: Commands
+description: Reference guide for the command-line interface
+---
+
+import { Callout } from '@/website/components';
+
+Since Talos is a command-line program, functionality is invoked by it's various available subcommands.
+
+- [`run`](/docs/language/toolkit/runtime) &nbsp;&mdash;&nbsp; Execute a script/project with Talos.
+- [`tasks`](/docs/language/toolkit/tasks) &nbsp;&mdash;&nbsp; Runs pre-defined crate manifest tasks.
+- [`test`](/docs/language/toolkit/testing) &nbsp;&mdash;&nbsp; Runs all available unit tests with Talos.
+- [`bundle`](/docs/language/toolkit/bundler) &nbsp;&mdash;&nbsp; Bundles scripts/projects into executables.
+- [`format`](/docs/language/toolkit/formatter) &nbsp;&mdash;&nbsp; Formats scripts/projects with the builtin styler.
+- [`lint`](/docs/language/toolkit/linting) &nbsp;&mdash;&nbsp; Lints scripts/projects for enhanced static analysis.
+- [`upgrade`](/docs/language/toolkit/upgrade) &nbsp;&mdash;&nbsp; Upgrades to the latest version of Talos available.
+
+Additionally, the following flags retrieve additional information about the runtime.
+
+```shell
+# Shows the usage prompt for Talos
+talos --help
+
+# Gets the current executable version
+talos --version
+
+# Lists all the vendors used by Talos
+talos --vendors
+```
+
+## Environment Variables
+
+The following environment variables are available across all subcommands.
+
+### `TALOS_LOGGING_LEVEL`
+
+This variable allows setting the debug logging level, which can provide additional debugging information for the underlying runtime and subcommands. It can be one of theses levels: `trace`, `debug`, `warn`, `error`, `fatal` and is currently preset to `warn`.
+
+### `TALOS_HARDWARE_VPROCS`
+
+This variable allows declaring the total underlying virtual processors to be used. By default, Talos will use the maximum available hardware processors.
+
+```shell title="Terminal"
+# A arbitrary number can be used.
+export TALOS_HARDWARE_VPROCS=8
+
+# This forces Talos into a "single-threaded" mode.
+export TALOS_HARDWARE_VPROCS=1
+
+# For when you want to ensure the maximum processors.
+export TALOS_HARDWARE_VPROCS=0
+```
+
+<Callout title="Note:">
+    Although Talos can be ran in a single-threaded context, additional threads will still be used internally for
+    type-analysis and garbage collection.
+</Callout>
+
+## Pretty Printing
+
+Talos is shipped with the informal [`NO_COLOR`](https://no-color.org/) standard. This environment variable can be assigned a value other than `0` to disable all colored outputs. Furthermore, this will also forcibly toggle the enablement of the builtin ANSI crate.
+
+In future, Talos hopes to also implement an experimental `NO_PROGRESS` environment variable. Similar to the `NO_COLOR` standard, it will ensure that progress bars/spinners can be safely disabled whilst still maintaining limited outputs.

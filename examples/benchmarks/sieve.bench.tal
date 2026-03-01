@@ -1,0 +1,36 @@
+//!
+//! Example: "benchmarks/sieve.bench.tal"
+//! Description: Traces different "sieve" benchmarks.
+//!
+
+// Talos Modules
+import "talos:test" as Test;
+
+// - TEST SETUP - //
+
+export let sieve = fn (n: Number): List[Boolean] {
+    // prepare the output list to be used
+    let primes = List.filled(n, False);
+
+    // stop early if necessary
+    if (n < 2) return primes;
+
+    // iterate over the available numbers now
+    for (ii in List.range(2, n)) {
+        // prepare an accumulator
+        mut sum = 2 * ii;
+
+        // iterate whilst possible to do so
+        loop (sum < n) {
+            primes.set(sum, True);
+            sum += ii; // bump now
+        }
+    }
+
+    // return the resulting primes now
+    return primes;
+};
+
+// - TEST CASES - //
+
+Test.bench("sieve", fn => sieve(1024));

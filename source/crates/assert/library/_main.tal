@@ -1,0 +1,58 @@
+//!
+//! Crate: "assert"
+//! Description: Assertion functions for verifying invariants.
+//!
+
+// Dynamic Modules
+import "dylib:assert" as assert;
+
+// Talos Modules
+import "talos:_detail" as Detail;
+
+// - PROPERTIES - //
+
+//! Brief: Internal helper to reduce bytecode output.
+let m_cast = Detail.Unsafe.cast;
+
+// - PUBLIC METHODS - //
+
+//! Brief: Throws an immediate failure.
+//! Param: msg                  Optional message.
+export let fail = m_cast[fn (msg?: String) -> Never](assert.fail);
+
+//! Brief: Asserts that a value is truthy.
+//! Param: value                Value to assert.
+//! Param: msg                  Optional message.
+export let okay = m_cast[fn (value: Any, msg?: String)](assert.okay);
+
+//! Brief: Asserts that a value is truthy.
+//! Param: value                Value to assert.
+//! Param: msg                  Optional message.
+export let truthy = m_cast[fn (value: Any, msg?: String)](assert.truthy);
+
+//! Brief: Asserts that a value is falsey.
+//! Param: value                Value to assert.
+//! Param: msg                  Optional message.
+export let falsey = m_cast[fn (value: Any, msg?: String)](assert.falsey);
+
+//! Brief: Asserts that a value is not `Void`.
+//! Param: value                Value to assert.
+//! Param: msg                  Optional message.
+export let exists = m_cast[fn (value: Any, msg?: String)](assert.exists);
+
+//! Brief: Asserts the equality of two values.
+//! Param: actual               Value to assert.
+//! Param: expected             Expected value.
+//! Param: msg                  Optional message.
+export let equals = m_cast[fn (actual: Any, expected: Any, msg?: String)](assert.equals);
+
+//! Brief: Asserts the inequality of two values.
+//! Param: actual               Value to assert.
+//! Param: unexpected           Unexpected value.
+//! Param: msg                  Optional message.
+export let differs = m_cast[fn (actual: Any, unexpected: Any, msg?: String)](assert.differs);
+
+//! Brief: Expects the incoming function to panic.
+//! Param: callback             Callback to execute.
+//! Param: msg                  Optional message.
+export let panics = m_cast[fn (callback: fn -> Any, msg?: String)](assert.panics);

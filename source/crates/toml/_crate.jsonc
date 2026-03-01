@@ -1,0 +1,6 @@
+{
+    "version": "0.1.0",
+    "name": "@talos/toml",
+    "main": "library/_main.tal",
+    "describe": "Utilities for parsing and serializing TOML"
+}

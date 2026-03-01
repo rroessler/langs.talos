@@ -1,0 +1,87 @@
+---
+title: Configuration
+icon: Settings
+description: Reference guide for configuring development Talos tools
+---
+
+import { Callout } from '@/website/components';
+
+Talos' behaviour can be configured by utilizing `_crate.jsonc` configuration files. Although it's design is similar to `package.json`, this new format was built to accomodate features specific to Talos. Additionally, since crate-files use the JSONC format, comments are enabled by default and trailing commas are allowed.
+
+## Crate Properties
+
+### `name`
+
+All crates should specify a designated name that is used to identify itself. Alongside the `version` field, it is the unique identifier for the crate. Because of this, there are some rules with associated with naming a crate.
+
+<Callout title="Rules:">
+
+    - The name must be of the format `[\w-]+` or `@[\\w-]+/[\\w-]+`.
+    - The total length of a published name must be less than or equal to 50 characters.
+
+</Callout>
+
+<Callout title="Tips:">
+
+    - It is best to use short descriptive naming.
+    - It is recommended to use a scoping such as `@author/...`.
+    - Do not put "tal" or "talos" in the name. This is already implied.
+
+</Callout>
+
+### `version`
+
+If you plan to publish your crate, then a version will be required alongside the `name` field. Versions are formatted [semantically](https://semver.org/) and should describe the intent behind different crate revisions.
+
+### `main`
+
+This field designates the primary entry-point to your crate. This means that if this crate is imported, then the main script will be the one that will be returned. It is recommended that this script be relative to the root of the crate folder.
+
+### `tasks`
+
+Tasks allow a developer to define custom commands that can be executed with the `talos task` command. It is similar to the `scripts` field in a `package.json` file, however it allows chaining tasks by glob patterns similar to the [`npm-run-all`](https://github.com/bcomnes/npm-run-all2) package for JavaScript.
+
+```jsonc
+{
+    "tasks": {
+        "start": "talos run library/_main.tal",
+        "test": "talos test --pattern tests/*.tal",
+        "lint": "talos lint --hints",
+
+        "build": "talos task build:*",
+        "build:clean": "rm -rf dist",
+        "build:bundle": "talos bundle --outfile dist/app",
+    },
+}
+```
+
+To execute a task, use the `talos task` command followed by the tasks. For example:
+
+```shell
+# run singular tasks
+talos task start
+talos task test
+talos task lint
+
+# or run tasks sequentially
+talos task build:*
+```
+
+Read more about [`talos task`](/docs/language/toolkit/tasks).
+
+### `test`
+
+The testing framework can be configured using the `test` field. More specifically, this configuration point allows defining where to find tests and the appropriate reporter to be used. See the [testing](/docs/language/toolkit/testing) section for more information.
+
+### `lint`
+
+The builtin linter can be configured using the `lint` field. For now, this only allows toggling the linter rules that Talos is shipped with. See the [linting](/docs/language/toolkit/linting) section for more information.
+
+<Callout>
+    **Note:** Builtin rules are still actively being developed and as such may be subject to change. Additionally,
+    plugin support is planned for a future release.
+</Callout>
+
+### `format`
+
+The builtin formatter can be configured using the `format` field. This allows more targetted formatting desired for your crate. All source-files that are beneath this crate manifest will use these options. See the [formatting](/docs/language/toolkit/formatter) section for more information.

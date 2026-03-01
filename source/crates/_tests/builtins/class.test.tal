@@ -1,0 +1,10 @@
+//!
+//! Testing: Builtin "Class" Functionality.
+//! Description: Coordinates testing the builtin "Class".
+//!
+
+// Talos Modules
+import "talos:test" as Test;
+import "talos:assert" as Assert;
+
+// - TEST CASES - //

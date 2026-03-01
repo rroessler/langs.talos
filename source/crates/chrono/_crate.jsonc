@@ -1,0 +1,6 @@
+{
+    "version": "0.1.0",
+    "name": "@talos/chrono",
+    "main": "library/_main.tal",
+    "describe": "Support for date and time manipulation"
+}

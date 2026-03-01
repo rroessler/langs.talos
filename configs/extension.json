@@ -1,0 +1,65 @@
+{
+    "$schema": "vscode://schemas/vscode-extensions",
+
+    "publisher": "talos",
+    "icon": "./icons/talos.png",
+    "displayName": "Talos Programming Language",
+
+    "engines": { "vscode": "^1.22.0" },
+    "categories": ["Programming Languages"],
+
+    "contributes": {
+        "commands": [
+            { "category": "Talos", "command": "talos.restart", "title": "Restart Language Server" },
+            { "category": "Talos", "command": "talos.settings", "title": "Open Extension Settings" }
+        ],
+
+        "configuration": {
+            "title": "Talos",
+            "properties": {
+                "talos.server.executablePath": {
+                    "default": "",
+                    "type": "string",
+                    "scope": "machine",
+                    "description": "A path to the Talos executable."
+                },
+
+                "talos.server.loggingLevel": {
+                    "default": "warn",
+                    "type": "string",
+                    "scope": "machine",
+                    "enum": ["trace", "debug", "warn", "error", "fatal"],
+                    "description": "The logging level for the underlying language server."
+                }
+            }
+        },
+
+        "configurationDefaults": { "[talos]": { "editor.formatOnSave": true } },
+
+        "languages": [
+            {
+                "id": "talos",
+                "extensions": [".tal"],
+                "aliases": ["Talos", "tal"],
+                "configuration": "./language-configuration.json",
+                "icon": { "light": "./icons/talos.svg", "dark": "./icons/talos.svg" }
+            }
+        ],
+
+        "grammars": [
+            {
+                "language": "talos",
+                "scopeName": "source.tal",
+                "path": "./syntaxes/talos.tmLanguage.json"
+            },
+            {
+                "injectTo": ["text.html.markdown"],
+                "scopeName": "markdown.talos.codeblock",
+                "path": "./syntaxes/talos.injection.json",
+                "embeddedLanguages": { "meta.embedded.block.talos": "talos" }
+            }
+        ],
+
+        "jsonValidation": [{ "fileMatch": "_crate.jsonc", "url": "./schemas/crate.schema.json" }]
+    }
+}

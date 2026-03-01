@@ -1,0 +1,6 @@
+{
+    "version": "0.1.0",
+    "name": "@talos/uuid",
+    "main": "library/_main.tal",
+    "describe": "Generators and validators for UUIDs"
+}

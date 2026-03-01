@@ -1,0 +1,16 @@
+# VSCode Development
+.cache/
+node_modules/
+
+# Build Outputs
+build/
+dist/
+
+# Environment Files
+.env
+
+# Profiling Outputs
+callgrind.out.*
+
+# Platform Files
+.DS_Store

@@ -1,0 +1,47 @@
+---
+icon: Play
+title: Runtime
+description: Executes Talos files and crates
+---
+
+## Basic Usage
+
+```shell title="Terminal"
+talos run [options...] [script] [argv...]
+```
+
+Runs a given Talos script, which can be an absolute or relative file.
+
+## Typing Options
+
+### `--lint`
+
+Enables additional linting diagnostics. If any linting errors occur during the analysis phase, these will cause an immediate failure. Alternatively, the [`talos lint`](/docs/language/toolkit/linting) subcommand can be used.
+
+### `--hints`
+
+Enables hint-based diagnostics. These includes type-checking and linting diagnostics that are declared with either a `hint` or `info` type.
+
+## Compilation Options
+
+### `--optless`
+
+Disables all available runtime optimizations, including some that are enabled by the type-system. This is currently useful for sometimes catching runtime bugs.
+
+### `--jitless` (Unimplemented)
+
+Disables runtime allocation of executable memory. This may be required for security reasons, however disabling may result in a severe performance impact.
+
+## Environment Options
+
+### `--env` (Unimplemented)
+
+Specifies a local environment file to load environment variables from. If the given file does not exist, a warning will be shown if the `--verbose` flag is also enabled.
+
+### `--verbose`
+
+Enables additional verbose output describing the analysis phase of the runtime. During startup, a module graph is constructed and analyzed in reverse from the entry-script. For larger projects, seeing the progress of analysis and compilation may help with determining the complexity of scripts.
+
+## Terminating Programs
+
+To stop a running program, the keyboard shortcut <kbd>CTRL</kbd> + <kbd>C</kbd> can be used.

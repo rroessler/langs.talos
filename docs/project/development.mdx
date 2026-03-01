@@ -1,0 +1,88 @@
+---
+icon: Code
+title: Development
+description: Setting up your development environment for building Talos
+---
+
+import { Callout } from '@/website/components';
+
+## Required Dependencies
+
+Talos requires the following dependencies to be installed.
+
+```zsh tab="Darwin"
+# Homebrew can install all required dependencies
+brew install git cmake ninja llvm
+```
+
+```bash tab="Linux"
+# These are the base dependencies required for linux
+sudo apt install wget curl unzip lsb-release software-properties-common gnupg git cmake ninja-build
+
+# LLVM is also required and can be installed using the following script (for Ubuntu)
+wget https://apt.llvm.org/llvm.sh -O - | sudo bash -s -- 20 all
+```
+
+```powershell tab="Windows"
+# Running unverified scripts may be blocked, so enable doing so by
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted
+
+# Chocolatey can install all required dependencies
+choco git cmake ninja llvm
+```
+
+<Callout>
+
+    **Note (Windows)**: [Visual Studio](https://visualstudio.microsoft.com/) with the "Desktop Development with C++" workload is required to
+    build Talos. This can be installed using the appropriate wizard or through WinGet:
+
+    ```powershell
+    winget install "Visual Studio Community 2022" --override "--add Microsoft.VisualStudio.Workload.NativeDesktop Microsoft.VisualStudio.Component.Git " -s msstore
+    ```
+
+</Callout>
+
+## Optional Dependencies
+
+The CMake build-system also allows for the use of `ccache` or `sccache` depending on your preference, which significantly speeds up builds.
+
+```bash
+# Darwin Systems
+brew install sccache
+
+# Linux Systems
+sudo apt install sccache
+
+# Windows Systems (sccache only)
+choco install sccache
+```
+
+Talos optionally requires [`bun`](https://bun.com/) for building the VSC extension, and enabling better scripting tools (until Talos can do so).
+
+```bash tab="Darwin / Linux"
+curl -fsSL https://bun.sh/install | bash
+```
+
+```powershell tab="Windows"
+powershell -c "irm https://bun.sh/install.ps1 | iex"
+```
+
+## Building Natively
+
+After cloning the [Talos repository](https://github.com/rroessler/langs.talos), the project can be built natively visually or programmatically.
+
+### Visually
+
+The project can be built visually using [Visual Studio Code](https://code.visualstudio.com/) (or [VSCodium](https://vscodium.com/)) and the [CMake Tools](https://github.com/microsoft/vscode-cmake-tools) extension. It is recommended to use the previously installed Clang compiler.
+
+### Programmatically
+
+To build the project programmatically, the following command can be invoked:
+
+```shell tab="Bun"
+bun run compile
+```
+
+```shell tab="Talos"
+talos task compile
+```
