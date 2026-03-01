@@ -48,7 +48,7 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  gh release create ${{ inputs.version }} "dist/talos-*" \
+                  gh release create ${{ inputs.version }} "./dist/*" \
                     --repo "${{ github.repository }}" \
                     --title "Talos ${{ inputs.version }}"
                     --body-file "CHANGELOG.md"

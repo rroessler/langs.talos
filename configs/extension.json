@@ -5,6 +5,7 @@
     "icon": "./icons/talos.png",
     "displayName": "Talos Programming Language",
 
+    "activationEvents": [],
     "engines": { "vscode": "^1.22.0" },
     "categories": ["Programming Languages"],
 

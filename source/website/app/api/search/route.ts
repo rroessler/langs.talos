@@ -8,4 +8,4 @@ import { Source } from '@/website/source';
 export const revalidate = false;
 
 /** The exposed "GET" method. */
-export const { staticGET: GET } = createFromSource(Source());
+export const { staticGET: GET } = createFromSource(Source.docs);
