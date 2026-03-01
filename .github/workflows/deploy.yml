@@ -44,11 +44,12 @@ jobs:
                   path: ${{ github.workspace }}/source/website/out
 
     deploy-pages:
+        runs-on: ubuntu-latest
+        needs: [deploy-build]
+        continue-on-error: true
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
-        needs: [deploy-build]
-        runs-on: ubuntu-latest
         steps:
             - name: Deploy to GitHub Pages
               id: deployment
@@ -56,6 +57,7 @@ jobs:
 
     deploy-vscode:
         runs-on: ubuntu-latest
+        needs: [deploy-build]
         continue-on-error: true
         steps:
             - uses: actions/checkout@v4

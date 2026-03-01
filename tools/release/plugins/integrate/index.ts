@@ -37,7 +37,7 @@ export class Integrate extends Task {
             // prepare the necessary inputs
             inputs: {
                 release: context.branch,
-                version: context.version.tag,
+                version: `v${context.version.semantic}`,
             },
         });
     }

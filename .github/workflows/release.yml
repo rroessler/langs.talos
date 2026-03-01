@@ -51,4 +51,4 @@ jobs:
                   gh release create ${{ inputs.version }} "./dist/*" \
                     --repo "${{ github.repository }}" \
                     --title "Talos ${{ inputs.version }}"
-                    --body-file "CHANGELOG.md"
+                    -F "CHANGELOG.md"
