@@ -2,8 +2,9 @@
     "$schema": "vscode://schemas/vscode-extensions",
 
     "publisher": "talos",
-    "icon": "./icons/talos.png",
+    "icon": "icons/talos.png",
     "displayName": "Talos Programming Language",
+    "repository": "https://github.com/rroessler/langs.talos",
 
     "activationEvents": [],
     "engines": { "vscode": "^1.22.0" },
@@ -43,7 +44,7 @@
                 "extensions": [".tal"],
                 "aliases": ["Talos", "tal"],
                 "configuration": "./language-configuration.json",
-                "icon": { "light": "./icons/talos.svg", "dark": "./icons/talos.svg" }
+                "icon": { "light": "icons/talos.svg", "dark": "icons/talos.svg" }
             }
         ],
 

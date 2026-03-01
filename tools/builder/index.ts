@@ -11,6 +11,7 @@ const g_root = path.resolve(__dirname, '..', '..');
 const g_output = path.resolve(g_root, 'dist', 'vscode');
 const g_package = path.join(g_output, 'package.json');
 const g_schemas = path.join(g_output, 'schemas');
+const g_license = path.join(g_output, 'LICENSE');
 const g_config = path.join(g_output, 'language-configuration.json');
 const g_development = process.argv.includes('--development');
 const g_options: esbuild.BuildOptions = {
@@ -45,6 +46,7 @@ const m_patch = async () => {
     await fs.promises.writeFile(g_package, JSON.stringify(pkg, undefined, 4));
 
     // also copy across the language configuration file and schemas
+    await fs.promises.copyFile(path.resolve(g_root, 'LICENSE'), g_license);
     await fs.promises.copyFile(path.resolve(g_root, 'configs', 'language.json'), g_config);
     await fs.promises.cp(path.resolve(g_root, 'schemas'), g_schemas, { recursive: true, force: true });
 };
