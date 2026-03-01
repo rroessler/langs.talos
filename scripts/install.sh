@@ -299,7 +299,7 @@ main_install() {
     rm -rf $talos_dest
 
     # attempt unpacking the incoming archive now
-    command="unzip -q '$zip_file' -d '$tmp_dir' && mv '$zip_odir' '$talos_dest'"
+    command="unzip -q '$zip_file' -d '$zip_odir' && mv '$zip_odir' '$talos_dest'"
     spinner_run "Unpacking" "'$talos_target:$version'" eval $command
 
     # restore the cursor that we hid now
@@ -318,5 +318,5 @@ main_install() {
 
 # -  RUNNER  - #
 
-# only run main script if executed directly
-if [ ${BASH_SOURCE[0]} = ${0} ]; then main_install "$@"; fi
+# attempt running the core script now
+main_install "$@"

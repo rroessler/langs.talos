@@ -70,12 +70,10 @@ jobs:
               run: bun run build
 
             - name: Package Extension
-              if: success()
               run: bunx vsce package --no-dependencies
               working-directory: dist/vscode
 
             - name: Publish Extension
-              if: success()
               run: bunx vsce publish
               working-directory: dist/vscode
               env: { VSCE_PAT: "${{ secrets.VSCOCDE_EXTENSION_TOKEN }}" }
