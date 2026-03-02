@@ -1,7 +1,4 @@
 ﻿#!/usr/bin/env pwsh
-
-# -  PARAMETERS  - #
-
 param(
     # The incoming version.
     [String]$Tag = "latest",
@@ -10,7 +7,7 @@ param(
     [Switch]$Dry = $false,
 
     # Forces writing of outputs.
-    [Switch]$Force = $false 
+    [Switch]$Force = $false
 );
 
 # -  PROPERTIES  - #
