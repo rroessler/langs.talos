@@ -3,9 +3,14 @@
 # -  PARAMETERS  - #
 
 param(
-    [String]$Tag = "latest", # The incoming version.
-    [Switch]$Dry = $false, # Whether to write outputs.
-    [Switch]$Force = $false # Forces writing of outputs.
+    # The incoming version.
+    [String]$Tag = "latest",
+
+    # Whether to write outputs.
+    [Switch]$Dry = $false,
+
+    # Forces writing of outputs.
+    [Switch]$Force = $false 
 );
 
 # -  PROPERTIES  - #
@@ -257,13 +262,13 @@ function Install-Talos-Main {
     $message = Format-Message -Lbl "Unpacking" -Msg "'${target}:$version'";
     $unpack = Invoke-Spinner -Msg $message -ScriptBlock {
         # prepare the parameters to be used now
-        param([String]$zip_file, [String]$tmpdir, [String]$source);
+        param([String]$zip_file, [String]$source);
 
         try {
             # start by unpacking the incoming details
             $original = $global:ProgressPreference;
             $global:ProgressPreference = "SilentlyContinue";
-            Expand-Archive "$zip_file" "$tmpdir" -Force | Out-Null;
+            Expand-Archive "$zip_file" "$source" -Force | Out-Null;
             $global:ProgressPreference = $original;
         }
         catch { return "Could not unzip download, $_"; };
@@ -273,7 +278,9 @@ function Install-Talos-Main {
 
         # once unpacked, we firstly test the new binary
         if (-not (Test-Path $executable)) { return "Download was corrupted, could not find 'talos.exe'"; }
-    } -ArgumentList $zip_file, $tmpdir, $zip_src;
+    } -ArgumentList $zip_file, $zip_src;
+
+    Write-Host "Source: $tmpdir";
 
     # if we received an unpacking error, then show
     if ($unpack.Count -ne 0) { Exit-Fatal -Lbl "Unpack" -Msg $unpack; }
