@@ -3,8 +3,11 @@
 # -  PARAMETERS  - #
 
 param(
-    [String]$Source, # Talos Archive Source.
-    [String]$Destination # Talos Home Folder.
+    # Talos Archive Source.
+    [String]$Source,
+
+    # Talos Home Folder.
+    [String]$Destination 
 );
 
 # -  RUNNER  - #
