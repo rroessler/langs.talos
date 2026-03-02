@@ -1,0 +1,29 @@
+name: Publish VSCE
+on: [workflow_dispatch, workflow_call]
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+jobs:
+    vscode-publish:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: oven-sh/setup-bun@v2
+
+            - name: Install Dependencies
+              run: bun install
+
+            - name: Build Extension
+              run: bun run build
+
+            - name: Package Extension
+              run: bunx vsce package --no-dependencies
+              working-directory: dist/vscode
+
+            - name: Publish Extension
+              run: bunx vsce publish
+              working-directory: dist/vscode
+              env: { VSCE_PAT: "${{ secrets.VSCODE_EXTENSION_TOKEN }}" }
