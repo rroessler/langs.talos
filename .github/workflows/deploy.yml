@@ -55,7 +55,3 @@ jobs:
               id: deployment
               uses: actions/deploy-pages@v4
 
-    deploy-vscode:
-        name: Publish VSC Extension
-        needs: [deploy-build]
-        uses: ./.github/workflows/vscode.yml

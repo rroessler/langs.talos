@@ -23,6 +23,12 @@ jobs:
         if: inputs.release == 'stable'
         uses: ./.github/workflows/deploy.yml
 
+    release-vscode:
+        name: Publish VSCE
+        needs: [release-build]
+        if: inputs.release == 'stable'
+        uses: ./.github/workflows/vscode.yml
+
     release-create:
         name: Release GitHub
         runs-on: ubuntu-latest
