@@ -102,7 +102,7 @@ bool Forge::Testing::Main::m_report(Diagnostic::Reporter* reporter, size_t sourc
 void Forge::Testing::Main::m_unhandled($::Map<$::URI::View, Value::Any>&& errors) {
     $::IO::cout() << $::Dye::red(errors.size()).bold() << ' ';  // show total errors
     $::IO::cout() << $::Dye::red("Unhandled Error{0}", errors.size() == 1 ? "" : "s").bold();
-    $::IO::cout() << $::Dye::grey(" between tests occured. See below:\n");  // and reasons
+    $::IO::cout() << $::Dye::dim(" between tests occured. See below:\n");  // and reasons
 
     // and show all the unhandled errors that occured
     for (const auto& [resource, reason] : errors) m_unhandled(resource, reason);
@@ -117,8 +117,8 @@ void Forge::Testing::Main::m_unhandled(const $::URI::View& resource, Value::Any 
     auto fence = relative.size() + 3;
 
     // show that this file had an unhandled exception
-    $::IO::cout() << $::Dye::grey("\n# {0}:", relative) << '\n';
-    $::IO::cout() << $::Dye::grey($::String::Buffer(fence, '-')) << '\n';
+    $::IO::cout() << $::Dye::dim("\n# {0}:", relative) << '\n';
+    $::IO::cout() << $::Dye::dim($::String::Buffer(fence, '-')) << '\n';
     $::IO::cout() << $::Dye::red("Unhandled ") << exception << "\n";
 
     // post-reset the underlying exception now

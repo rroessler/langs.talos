@@ -54,7 +54,7 @@ namespace Forge::Diagnostic::Traits {
     static inline constexpr $::ANSI color(Severity severity) {
 #define X(N, C, ...) \
     case Severity::N: return $::Dye::C(#N).bold();
-        switch (severity) { XX_SEVERITY_COLORS(X) default : return $::Dye::grey("UNK"); }
+        switch (severity) { XX_SEVERITY_COLORS(X) default : return $::Dye::dim("UNK"); }
 #undef X
     }
 

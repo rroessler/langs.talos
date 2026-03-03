@@ -35,7 +35,7 @@ Forge::Object::Attributes<Forge::Object::Exception>::Attributes(
 
 $::Stream::Output& Forge::Object::Exception::m_format($::Stream::Output& os) const noexcept {
     os << $::Dye::red("{0}.{1}", type_name(), name()).bold() << ": " << message();
-    for (const auto& trace : trace()) os << $::Dye::grey("\n --> {0}", trace);
+    for (const auto& trace : trace()) os << $::Dye::dim("\n --> {0}", trace);
     return os;  // and return the initial output-stream for more printing now
 }
 

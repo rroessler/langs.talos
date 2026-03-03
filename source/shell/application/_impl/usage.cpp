@@ -14,7 +14,7 @@
     X("serve", "Starts a Talos language-server instance", .cyan().bold())            \
     X("", "")                                                                        \
     X("upgrade", "Upgrades to the latest version of Talos", .blue().bold())          \
-    X("<command> --help", "Print help text for a given command", .grey())
+    X("<command> --help", "Print help text for a given command", .dim())
 
 #define XX_OPTIONS_LIST(X)                                     \
     X("-h, --help", "Display global help information")         \
@@ -62,8 +62,8 @@ void Shell::Command::Descriptor::m_help($::Stream::Output& os) const {
     if (m_title.size()) os << $::Dye::blue(" {0}", m_title).bold();  // show item
 
     // and append the usage details based on size of commands and options
-    if (m_commands.size()) os << $::Dye::grey(" <command>").bold();
-    if (m_options.size()) os << $::Dye::grey(" [options...]").bold();
+    if (m_commands.size()) os << $::Dye::bold(" <command>");
+    if (m_options.size()) os << $::Dye::bold(" [options...]");
 
     // show any potential positionals now as well
     for (const auto& entry : m_positionals) m_help(os, entry);
@@ -85,7 +85,7 @@ void Shell::Command::Descriptor::m_help($::Stream::Output& os, const Positional&
     auto close = required ? '>' : ']';  // ... and the close tags
 
     // and print the desired positional now
-    os << $::Dye::grey(" {0}{1}{2}", open, positional, close).bold();
+    os << $::Dye::dim(" {0}{1}{2}", open, positional, close).bold();
 }
 
 void Shell::Command::Descriptor::m_help($::Stream::Output& os, const $::String::View& title, const List& list) const {
