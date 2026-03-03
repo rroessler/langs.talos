@@ -50,7 +50,7 @@ endfunction()
 # --  PRIVATE METHODS  -- #
 
 # Handles fetching necessary vendors
-function(__talos_vendor_declare _target _vtag)
+function(__talos_vendors_declare _target _vtag)
     # get the underlying boost name
     get_property(_boost GLOBAL PROPERTY __MONO_BOOST_TARGET)
 
@@ -103,15 +103,15 @@ endmacro()
 # --  MODULE DEFINITION  -- #
 
 # Declare all the necessary repositories
-__talos_vendor_declare(ankerl v4.8.1 REPO "martinus/unordered_dense.git")
-__talos_vendor_declare(asmjit v1.21.0 REPO "asmjit/asmjit.git" TAG master)
-__talos_vendor_declare(aster v1.1.3 REPO "rroessler/cpp.aster.git")
-__talos_vendor_declare(CLI11 v2.6.1 REPO "CLIUtils/CLI11.git")
-__talos_vendor_declare(fmt 12.1.0 REPO "fmtlib/fmt.git")
-__talos_vendor_declare(glaze v7.0.1 REPO "stephenberry/glaze.git")
-__talos_vendor_declare(lief 0.17.2 REPO "lief-project/LIEF.git")
-__talos_vendor_declare(muuid v2.2 REPO "gershnik/modern-uuid.git")
-__talos_vendor_declare(spdlog v1.17.0 REPO "gabime/spdlog.git")
+__talos_vendors_declare(ankerl v4.8.1 REPO "martinus/unordered_dense.git")
+__talos_vendors_declare(asmjit v1.21.0 REPO "asmjit/asmjit.git" TAG master)
+__talos_vendors_declare(aster v1.1.3 REPO "rroessler/cpp.aster.git")
+__talos_vendors_declare(CLI11 v2.6.2 REPO "CLIUtils/CLI11.git")
+__talos_vendors_declare(fmt 12.1.0 REPO "fmtlib/fmt.git")
+__talos_vendors_declare(glaze v7.1.0 REPO "stephenberry/glaze.git")
+__talos_vendors_declare(lief 0.17.4 REPO "lief-project/LIEF.git")
+__talos_vendors_declare(muuid v2.2 REPO "gershnik/modern-uuid.git")
+__talos_vendors_declare(spdlog v1.17.0 REPO "gabime/spdlog.git")
 
 # Also expose "boost" as a vendor
-__talos_vendor_declare(boost 1.90.0)
+__talos_vendors_declare(boost 1.90.0 REPO "boostorg/boost.git.git")
