@@ -12,7 +12,7 @@ export const revalidate = false;
 
 /** Gets the "install.sh" script. */
 export async function GET() {
-    const body = await fs.promises.readFile(Assets.scripts('install.sh')); // prepare the incoming body
+    const body = await fs.promises.readFile(Assets.scripts('install.sh'), 'utf-8'); // prepare the incoming body
     const headers = { 'Content-Disposition': 'inline; filename="install.sh"', 'Content-Type': 'text/plain' };
     return new NextResponse(body, { headers }); // and construct the resulting response now
 }

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env pwsh
+#!/usr/bin/env pwsh
 
 # -  PARAMETERS  - #
 
@@ -14,7 +14,6 @@ $C_NONE = if ($env:NO_COLOR -or -not $IsPty) { $true } else { $false }
 
 $C_DIM = if ($C_NONE) { "" } else { [char]27 + "[2m" };
 $C_RESET = if ($C_NONE) { "" } else { [char]27 + "[0m"; };
-$C_RED = if ($C_NONE) { "" } else { [char]27 + "[1;31m"; };
 $C_GREEN = if ($C_NONE) { "" } else { [char]27 + "[32m"; };
 
 # -  RUNNER  - #

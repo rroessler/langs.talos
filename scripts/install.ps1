@@ -1,13 +1,11 @@
-﻿#!/usr/bin/env pwsh
+#!/usr/bin/env pwsh
+
+# -  PARAMETERS  - #
+
 param(
-    # The incoming version.
-    [String]$Tag = "latest",
-
-    # Whether to write outputs.
-    [Switch]$Dry = $false,
-
-    # Forces writing of outputs.
-    [Switch]$Force = $false
+    [String]$Tag = "latest", # The incoming version.
+    [Switch]$Dry = $false, # Whether to write outputs.
+    [Switch]$Force = $false # Forces writing of outputs.
 );
 
 # -  PROPERTIES  - #
@@ -15,7 +13,7 @@ param(
 # check if we can actually output colors or not
 $C_NONE = if ($env:NO_COLOR -or -not $IsPty) { $true } else { $false }
 
-$C_CLEAR = [char]27 + "[2K";
+$C_CLEAR = [char]27 + "$($ESC)[2K";
 $C_DIM = if ($C_NONE) { "" } else { [char]27 + "[2m" };
 $C_RESET = if ($C_NONE) { "" } else { [char]27 + "[0m"; };
 $C_RED = if ($C_NONE) { "" } else { [char]27 + "[1;31m"; };
@@ -69,7 +67,7 @@ function Invoke-Spinner() {
     param([ScriptBlock]$ScriptBlock, [Object[]]$ArgumentList = @(), [String]$Msg = "");
 
     # prepare the available frames to be used now
-    $frames = @("⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏");
+    $frames = @("/", "-", "\", "|");
 
     # prepare the job to be executed now
     $job = Start-Job -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList;
@@ -225,7 +223,7 @@ function Install-Talos-Main {
         Exit-Success -Msg "Talos already upgraded to '$version'";
     }
 
-    $tmpdir = "$([System.IO.Path]::GetTempPath())\talos";
+    $tmpdir = "$([System.IO.Path]::GetTempPath())talos";
     $zip_src = "$tmpdir\$target"; # prepare the source of the zip
     $zip_file = "$tmpdir\$target.zip"; # prepare zipped output location
 
@@ -277,8 +275,6 @@ function Install-Talos-Main {
         if (-not (Test-Path $executable)) { return "Download was corrupted, could not find 'talos.exe'"; }
     } -ArgumentList $zip_file, $zip_src;
 
-    Write-Host "Source: $tmpdir";
-
     # if we received an unpacking error, then show
     if ($unpack.Count -ne 0) { Exit-Fatal -Lbl "Unpack" -Msg $unpack; }
 
@@ -288,16 +284,25 @@ function Install-Talos-Main {
     # and finally show the user the resulting details
     Write-Host (Format-Message -Msg "Talos '$version' was ${TalosLabelPrefix}ed successfully!");
 
-    # prepare the scheduled job trigger to be used (this is to bypass when "talos.exe" calls this script)
-    $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(1);
-    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries;
-    $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive;
+    # check if this was called from an outside source at all
+    if (-not $PSScriptRoot) {
+        Remove-Item -Path "$TalosDest" -Recurse -Force -ErrorAction SilentlyContinue;
+        Move-Item -Path "$zip_src" -Destination "$TalosDest" -ErrorAction SilentlyContinue;
+    }
 
-    # to ensure that our action runs without show a window we must call it via the preinstalled "conhost.exe"
-    $action = New-ScheduledTaskAction -Execute 'conhost.exe' -Argument "--headless powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSScriptRoot\replace.ps1`" -Source `"$zip_src`" -Destination `"$TalosDest`"";
+    # otherwise we need to schedule the replacement instance here
+    else {
+        # prepare the scheduled job trigger to be used (this is to bypass when "talos.exe" calls this script)
+        $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(1);
+        $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries;
+        $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive;
 
-    # then we want to schedule the incoming job to replace the files
-    Register-ScheduledTask -TaskName "Replace-Talos" -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null;
+        # to ensure that our action runs without show a window we must call it via the preinstalled "conhost.exe"
+        $action = New-ScheduledTaskAction -Execute 'conhost.exe' -Argument "--headless powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSScriptRoot\replace.ps1`" -Source `"$zip_src`" -Destination `"$TalosDest`"";
+
+        # then we want to schedule the incoming job to replace the files
+        Register-ScheduledTask -TaskName "Replace-Talos" -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force | Out-Null;
+    }
 }
 
 # -  RUNNER  - #

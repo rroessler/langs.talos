@@ -5,7 +5,7 @@ To install Talos {{version}}:
 curl -fsSL https://talos.rroessler.io/install.sh | bash --tag {{version}}
 
 # Or alternatively on Windows
-powershell -c "irm https://talos.rroessler.io/install.ps1 | iex --tag {{version}}"
+powershell -c "irm https://talos.rroessler.io/install.ps1 | iex -Tag {{version}}"
 ```
 
 To upgrade to Talos {{version}}:
