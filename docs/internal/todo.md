@@ -1,8 +1,4 @@
----
-title: Todo
----
-
-## Todo Items
+# Todo Items
 
 - [x] Test Macho Loop Performance (eg: to see if internally the generated machine code is faster than bytecode)
     - Conclusion: Significant improvement in performance using (around 10x gains)

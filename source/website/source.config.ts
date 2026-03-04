@@ -12,6 +12,7 @@ export const docs = fumadocs.defineDocs({
     dir: Assets.documentation(),
     meta: { schema: fumadocs.metaSchema },
     docs: {
+        files: ['**/*.md', '**/*.mdx', '!internal'],
         schema: fumadocs.frontmatterSchema,
         postprocess: { includeProcessedMarkdown: true },
     },
