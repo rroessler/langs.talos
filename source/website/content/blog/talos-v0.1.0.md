@@ -1,5 +1,5 @@
 ---
-date: 2026-01-01
+date: 2026-03-04
 title: Talos v0.1.0
 author: Reuben Roessler
 ---
