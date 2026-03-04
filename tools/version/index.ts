@@ -75,7 +75,7 @@ async function m_replace(target: string) {
     details.version = g_version_text;
 
     // rebuild the output content now
-    await fs.promises.writeFile(target, stringify(details));
+    await fs.promises.writeFile(target, stringify(details) + '\n');
 }
 
 //  TOOL RUNNER  //
