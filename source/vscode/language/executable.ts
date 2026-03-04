@@ -1,4 +1,5 @@
 /// Node Modules
+import * as os from 'node:os';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -11,7 +12,13 @@ export namespace Executable {
     //  PROPERTIES  //
 
     /** Expected base locations available. */
-    const m_locations = [path.resolve(__dirname, '..', 'bin', Product.executable)];
+    const m_locations = [
+        // prepare a valid location for the potential executable
+        path.resolve(os.homedir(), '.talos', 'bin', Product.executable),
+
+        // as well as a development path as well (eg: located against build outputs)
+        path.resolve(__dirname, '..', 'bin', Product.executable),
+    ];
 
     //  PUBLIC METHODS  //
 
