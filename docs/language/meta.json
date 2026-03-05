@@ -9,6 +9,7 @@
         "index",
         "development/installation",
         "development/quick-start",
+        "development/environment",
         "development/configuration",
         "---Fundamentals---",
         "fundamentals/syntax",

@@ -33,4 +33,7 @@ export namespace Product {
 
     /** The current version-branch included. */
     export const branch = v.split('-').at(1) ?? '';
+
+    /** Checks if currently in development. */
+    export const development = process.env.NODE_ENV === 'development';
 }
