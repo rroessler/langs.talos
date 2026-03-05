@@ -7,13 +7,20 @@ import * as plugins from 'fumadocs-core/mdx-plugins';
 import { Assets } from '@/website/assets';
 import { Language } from '@/website/language';
 
+// Prepare a baseline draft schema property
+const g_draft = z.boolean().optional();
+
+// Extend the baseline schemas to be used.
+const g_metadata = fumadocs.metaSchema.extend({ draft: g_draft });
+const g_frontmatter = fumadocs.frontmatterSchema.extend({ draft: g_draft });
+
 // The available documentation cache.
 export const docs = fumadocs.defineDocs({
     dir: Assets.documentation(),
-    meta: { schema: fumadocs.metaSchema },
+    meta: { schema: g_metadata },
     docs: {
+        schema: g_frontmatter,
         files: ['**/*.md', '**/*.mdx', '!internal'],
-        schema: fumadocs.frontmatterSchema,
         postprocess: { includeProcessedMarkdown: true },
     },
 });
@@ -21,10 +28,10 @@ export const docs = fumadocs.defineDocs({
 // The available crates cache.
 export const crates = fumadocs.defineDocs({
     dir: Assets.crates(),
-    meta: { schema: fumadocs.metaSchema },
+    meta: { schema: g_metadata },
     docs: {
         files: ['**/*.mdx'],
-        schema: fumadocs.frontmatterSchema,
+        schema: g_frontmatter,
         postprocess: { includeProcessedMarkdown: true },
     },
 });
@@ -33,7 +40,7 @@ export const crates = fumadocs.defineDocs({
 export const blog = fumadocs.defineCollections({
     type: 'doc',
     dir: Assets.blog(),
-    schema: fumadocs.frontmatterSchema.extend({
+    schema: g_frontmatter.extend({
         author: z.string(),
         date: z.iso.date().or(z.date()),
     }),

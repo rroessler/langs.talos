@@ -1,8 +1,13 @@
 /// Vendor Modules
-import * as collections from 'fumadocs-mdx:collections/server';
 import { loader, multiple } from 'fumadocs-core/source';
 import { toFumadocsSource } from 'fumadocs-mdx/runtime/server';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
+
+/// Collections Modules
+import * as collections from 'fumadocs-mdx:collections/server';
+
+/// Website Modules
+import { Product } from '@/website/product';
 
 /** Gets the avialable source details. */
 export namespace Source {
@@ -14,7 +19,7 @@ export namespace Source {
         const keys = new Set<string>();
 
         // convert the incoming crates path to be valid
-        const crates = collections.crates.toFumadocsSource();
+        const crates = m_filter(collections.crates.toFumadocsSource());
 
         // prepare the common set of TOC items to be used
         const toc = ['Overview', 'Exports'].map((title) => ({ title, url: `#${title.toLowerCase()}`, depth: 2 }));
@@ -34,7 +39,7 @@ export namespace Source {
         }
 
         // prepare the incoming sources to be used
-        const sources = multiple({ docs: collections.docs.toFumadocsSource(), crates });
+        const sources = multiple({ docs: m_filter(collections.docs.toFumadocsSource()), crates });
 
         // construct the resulting loader to be used now
         return loader(sources, { baseUrl: '/docs', plugins: [lucideIconsPlugin()] });
@@ -42,7 +47,18 @@ export namespace Source {
 
     /** The blogs collection. */
     export const blog = (() => {
-        const sources = multiple({ blogs: toFumadocsSource(collections.blog, []) });
+        const sources = multiple({ blogs: m_filter(toFumadocsSource(collections.blog, [])) });
         return loader(sources, { baseUrl: '/blog', plugins: [lucideIconsPlugin()] });
     })();
+
+    //  PRIVATE METHODS  //
+
+    /**
+     * Handles filtering source collections.
+     * @param items                     Items to filter.
+     */
+    function m_filter<T extends import('fumadocs-core/source').Source<any>>(source: T): T {
+        if (Product.development) return source; // ignore when running in development mode at all
+        return ((source.files = source.files.filter((file) => file.data.draft !== true)), source);
+    }
 }

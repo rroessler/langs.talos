@@ -11,7 +11,7 @@ export default function Blog() {
     // get a view of all the available pages
     const pages = Source.blog
         .getPages()
-        .sort((a, b) => new Date(a.data.date).getTime() - new Date(b.data.date).getTime());
+        .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 
     // prepare all the incoming links now
     const links = pages.map((page) => (
