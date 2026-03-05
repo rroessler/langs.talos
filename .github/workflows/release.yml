@@ -39,9 +39,9 @@ jobs:
             - name: Generate Changelog
               uses: elieahd/templater@v1
               with:
-                  template: ".github/templates/release-${{ inputs.release }}.md"
                   file: "CHANGELOG.md"
                   variables: "version=${{ inputs.version }}"
+                  template: ".github/templates/release-${{ inputs.release }}.md"
 
             - name: Download Artifacts
               uses: actions/download-artifact@v6
@@ -55,6 +55,6 @@ jobs:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   gh release create ${{ inputs.version }} "./dist/*" \
+                    --notes-file "CHANGELOG.md" \
                     --repo "${{ github.repository }}" \
                     --title "Talos ${{ inputs.version }}"
-                    -F "CHANGELOG.md"

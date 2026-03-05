@@ -26,4 +26,5 @@ jobs:
             - name: Publish Extension
               run: bunx vsce publish
               working-directory: dist/vscode
-              env: { VSCE_PAT: "${{ secrets.VSCODE_EXTENSION_TOKEN }}" }
+              env:
+                  VSCE_PAT: ${{ secrets.VSCODE_EXTENSION_TOKEN }}
