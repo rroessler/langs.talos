@@ -33,8 +33,8 @@ By removing the `async` keyword from function declaration, and moving this to th
 Eventually, Talos plans to allow custom execution policies for asynchronous scheduling. This would free developers to use any form of concurrency they desire.
 
 <Callout title="Note:">
-    The current proposal is to use an additional execution policy, such as `:spawn`, the takes a scheduler context as
-    the first argument.
+    The current proposal is to use an additional execution policy, such as `::spawn`, the takes a scheduler context as
+    the first argument. This could also open up the freedom to allow for additional types (such as explicit tail-calls).
 </Callout>
 
 ## Awaiting Futures

@@ -68,7 +68,7 @@ The following is the current symbolic tokens/operators list recognized in Talos 
 
 | Operator          | Description                                           |
 | ----------------- | ----------------------------------------------------- |
-| `::`              | Typed Expressions                                     |
+| `[]`              | Typed Expressions                                     |
 | `.` `?.` `()`     | Field, Optional Chaining, Function Calls              |
 | `as`              | Type Conversion Cast                                  |
 | `-` `!` `~`       | Negate, Logical Not, Complement, Increment, Decrement |
