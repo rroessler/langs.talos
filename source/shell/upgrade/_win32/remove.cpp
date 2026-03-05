@@ -6,15 +6,15 @@
 //  PRIVATE METHODS  //
 
 void Shell::Upgrade::Action::m_remove() {
-    // we just execute the underlying "remove.ps1" script
-    auto script = Talos::Product::scripts() / "remove.ps1";
+    // prepare the deletion handler
+    auto command = "\"timeout /t 1 & rmdir /s /q " + m_installation().string() + "\"";
 
     // prepare the process builder to be used now
-    auto builder = XPC::Shell::Builder("powershell")
+    auto builder = XPC::Shell::Builder(*XPC::Shell::Path::binary())
                        .cin(XPC::Pipe::Direct::IGNORE)
                        .cout(XPC::Pipe::Direct::IGNORE)
                        .cerr(XPC::Pipe::Direct::IGNORE)
-                       .argv({ "-File", script.string(), "-Schedule", "-Location", m_installation().string() });
+                       .argv({ "/c", "start", "/b", "/min", "cmd", "/c", command });
 
     // and execute the incoming process
     XPC::Core::Child(builder).wait();

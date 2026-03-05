@@ -38,3 +38,5 @@ Talos also allows uninstalling itself through the `--remove` flag. This flag wil
 # This will uninstall the executable and all native crates.
 talos upgrade --remove
 ```
+
+Alternatively, the installation directory `$HOME/.talos` can be manually deleted.

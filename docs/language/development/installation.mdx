@@ -36,14 +36,15 @@ talos upgrade --remove      # removes Talos from your system
 ```
 
 <Callout>
+
     **Note**: To manually remove Talos:
 
     ```shell tab="Linux / Darwin"
     rm -rf ~/.talos
     ```
 
-    ```powershell tab="Windows"
-    powershell -c ~\.talos\remove.ps1
+    ```command tab="Windows"
+    rmdir /s /q $HOME\.talos
     ```
 
 </Callout>
