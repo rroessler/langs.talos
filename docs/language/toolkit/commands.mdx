@@ -29,7 +29,7 @@ talos --version
 talos --vendors
 ```
 
-## Environment Variables
+## Environment Variables (Internal)
 
 The following environment variables are available across all subcommands.
 
@@ -57,8 +57,12 @@ export TALOS_HARDWARE_VPROCS=0
     type-analysis and garbage collection.
 </Callout>
 
-## Pretty Printing
+## Environment Variables (External)
+
+### `NO_COLOR`
 
 Talos is shipped with the informal [`NO_COLOR`](https://no-color.org/) standard. This environment variable can be assigned a value other than `0` to disable all colored outputs. Furthermore, this will also forcibly toggle the enablement of the builtin ANSI crate.
 
-In future, Talos hopes to also implement an experimental [`NO_PROGRESS`](https://no-progress.org/) environment variable. Similar to the `NO_COLOR` standard, it will ensure that progress bars/spinners can be safely disabled whilst still maintaining limited outputs.
+### `NO_PROGRESS`
+
+Talos is shipped with the informal [`NO_PROGRESS`](https://no-progress.org/) standard. This environment variable can be assigned a value other than `0` to disable all spinners and progress bars. This is particularly useful for logging testing results without distortions in non-terminal contexts.
