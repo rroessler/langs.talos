@@ -11,7 +11,7 @@ param(
 # -  PROPERTIES  - #
 
 # check if we can actually output colors or not
-$C_NONE = if ($env:NO_COLOR -or -not $IsPty) { $true } else { $false }
+$C_NONE = if ($env:NO_COLOR -or [System.Console]::IsOutputRedirected) { $true } else { $false }
 
 $C_CLEAR = [char]27 + "$($ESC)[2K";
 $C_DIM = if ($C_NONE) { "" } else { [char]27 + "[2m" };
