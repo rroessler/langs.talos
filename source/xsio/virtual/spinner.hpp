@@ -46,17 +46,8 @@ namespace XSIO::Virtual {
        public:
         //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a spinner.
-         * @param text                  Initial text value.
-         */
-        explicit Spinner(const $::String::Buffer& text) : Spinner({ .suffix = text }) {}
-
-        /**
-         * @brief Constructs a spinner.
-         * @param options               Spinner options.
-         */
-        explicit Spinner(const $::Spinner::Options& options = {}) : Abstract(options) {}
+        /// @brief Inherit the baseline spinner instance.
+        using Abstract::Abstract;
 
        protected:
         //  PRIVATE METHODS  //

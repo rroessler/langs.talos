@@ -20,6 +20,7 @@ Shell::Program::Program() : m_app($::New().unique<CLI::App>()) {
 
     // process global environment variables early
     if (auto color = $::Environment::get("NO_COLOR")) m_color(*color);
+    if (auto spinners = $::Environment::get("NO_PROGRESS")) m_progress(*spinners);
     if (auto level = $::Environment::get("TALOS_LOGGING_LEVEL")) m_level(*level);
 }
 
@@ -67,8 +68,13 @@ void Shell::Program::m_level(const $::String::View &level) {
 }
 
 void Shell::Program::m_color(const $::String::View &color) {
-    auto on = color.empty() || color == "0";  // determine what sort of mode we should use here
-    $::Dye::enabled(on), $::Logger::Options::update(on ? $::Logger::Color::AUTO : $::Logger::Color::NEVER);
+    auto enabled = color.empty() || color == "0";  // determine enablement
+    auto mode = enabled ? $::Logger::Color::AUTO : $::Logger::Color::NEVER;
+    $::Dye::enabled(enabled), $::Logger::Options::update(mode);
+}
+
+void Shell::Program::m_progress(const $::String::View &progress) {
+    $::Dye::progress(progress.empty() || progress == "0");
 }
 
 void Shell::Program::m_vendors() {

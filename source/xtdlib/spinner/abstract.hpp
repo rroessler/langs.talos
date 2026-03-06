@@ -38,20 +38,22 @@ namespace $::Spinner {
        public:
         //  CONSTRUCTORS  //
 
-        /// @brief Constructs a defaulted spinner instance.
-        constexpr Abstract() = default;
-
         /**
          * @brief Constructs a spinner.
          * @param options           Options to inherit.
          */
-        constexpr Abstract(const Options& options) : m_options(options) {}
+        constexpr Abstract(const Options& options = {}) : m_options(options) {
+            if (m_options.mode != Mode::RESOLVE) return;  // check for automatic modes
+            m_options.mode = Dye::progress(m_options.os) ? Mode::ENABLED : Mode::PARTIAL;
+        }
 
         /**
          * @brief Constructs a spinner.
          * @param text              Initial text value.
+         * @param mode              Mode to inherit.
          */
-        constexpr Abstract(const String::Buffer& text) : Abstract({ .suffix = text }) {}
+        constexpr Abstract(const String::Buffer& text, Mode mode = Mode::RESOLVE) :
+            Abstract({ .mode = mode, .suffix = text }) {}
 
         /// @brief Handles dismissing the spinner.
         virtual ~Abstract() { dismiss(); }
@@ -64,6 +66,10 @@ namespace $::Spinner {
         /// @brief Allows updating the underlying tick-value.
         inline constexpr const Chrono::Duration& tick() const { return m_options.tick; }
         inline Abstract& tick(const Chrono::Duration& duration) { return m_override(m_options.tick, duration); }
+
+        /// @brief Allows updating the underlying mode.
+        inline constexpr Mode mode() const { return m_options.mode; }
+        inline constexpr Abstract& mode(Mode next) { return m_options.mode = next, *this; }
 
         /// @brief Allows updating current prefix text.
         inline constexpr String::View prefix() const { return m_options.prefix; }
@@ -84,13 +90,17 @@ namespace $::Spinner {
             if (m_complete) return;  // latch now
             m_complete = true, m_dismiss();
 
-            // ensure the cursor is available before writing the next message
-            m_cursor(true);
+            // handle the incoming modes now
+            switch (m_options.mode) {
+                // stop in disabled mode from showing
+                default: return;
 
-            // show the completion message now as necessary
-            m_clear(), m_options.os << '\r' << text << (text.empty() ? "" : "\n");
+                // we allow printing for enabled and partial modes
+                case Mode::ENABLED: m_cursor(true), m_clear(), (m_options.os << '\r'); $_FALLTHROUGH;
+                case Mode::PARTIAL: m_options.os << text << (text.empty() ? "" : "\n"); break;
+            }
 
-            // and re-show the cursor state now as necessary
+            // and flush the incoming buffer now
             m_options.os.flush();
         }
 
@@ -133,6 +143,13 @@ namespace $::Spinner {
 
         /// @brief Handles writing the current progress details.
         inline void m_writer() {
+            // handle the different modes as necessary
+            switch (m_options.mode) {
+                default: return;
+                case Mode::ENABLED: break;
+                case Mode::PARTIAL: return m_print();
+            }
+
             // ensure the cursor state is hidden
             m_cursor(false);
 
@@ -142,26 +159,47 @@ namespace $::Spinner {
 
         /// @brief Handles dumping the current details.
         inline void m_print() {
+            // ignore if currently disabled
+            if (m_options.mode == Mode::DISABLED) return;
+
             // ensure we lock whenever we write
             $_UNUSED $_AUTO = Lock::guard(m_mutex);
-
-            // when a reset is called for, clear the line
-            if (m_reset) m_clear();
 
             // determine the padding to be used
             auto padding = m_options.prefix.empty() || m_options.prefix.ends_with(' ') ? "" : " ";
 
-            // show the leading prefix text now
-            m_options.os << m_options.prefix << padding;
+            // handle the incoming modes as necessary
+            switch (m_options.mode) {
+                // ignore printing when in disabled mode
+                default: return;
 
-            // show the current frame value now
-            if (const auto& frames = m_options.frames; frames.size()) m_options.os << frames[m_frame % frames.size()];
+                // handle showing regular spinners here
+                case Mode::ENABLED: {
+                    // when a reset is called for, clear the line
+                    if (m_reset) m_clear();
 
-            // show the trailing suffix text now
-            m_options.os << (m_options.suffix.starts_with(' ') ? "" : " ") << m_options.suffix << '\r';
+                    // show the leading prefix text now
+                    m_options.os << m_options.prefix << padding;
 
-            // fix up the incoming details for frame
-            m_options.os.flush(), m_frame += 1;
+                    // show the current frame value now
+                    if (const auto& frames = m_options.frames; frames.size())
+                        m_options.os << frames[m_frame % frames.size()];
+
+                    // show the trailing suffix text now
+                    m_options.os << (m_options.suffix.starts_with(' ') ? "" : " ") << m_options.suffix << '\r';
+
+                    // fix up the incoming details for frame
+                    m_options.os.flush(), m_frame += 1;
+                } break;
+
+                // only show the immediate instance
+                case Mode::PARTIAL: {
+                    if (m_frame > 0) break;  // only show once
+                    m_options.os << m_options.prefix << padding;
+                    m_options.os << m_options.suffix << '\n';
+                    m_options.os.flush(), m_frame += 1;  // flush
+                } break;
+            }
         }
     };
 

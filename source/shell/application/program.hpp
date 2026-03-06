@@ -107,6 +107,12 @@ namespace Shell {
          * @param color                     Color to bind.
          */
         static void m_color(const $::String::View& color);
+
+        /**
+         * @brief Handles setting the necessary progress mode.
+         * @param spinners                  Spinners to bind.
+         */
+        static void m_progress(const $::String::View& spinners);
     };
 
 }  // namespace Shell
