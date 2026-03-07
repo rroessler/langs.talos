@@ -1,10 +1,10 @@
 #ifndef _CRATES_PACKAGE_ASSERT_HPP
 #define _CRATES_PACKAGE_ASSERT_HPP
 
-/// Forge Modules
-#include <forge/diagnostic/traits.hpp>
-#include <forge/dylib/registry.hpp>
-#include <forge/runtime/isolate.hpp>
+/// Talos Modules
+#include <talos/diagnostic/traits.hpp>
+#include <talos/dylib/registry.hpp>
+#include <talos/runtime/isolate.hpp>
 
 //  X-MACROS  //
 
@@ -20,7 +20,7 @@
 
 //  NAMESPACES  //
 
-namespace Forge::Package {
+namespace Talos::Package {
 
     /// @brief Assertion Package Addon.
     struct Assert : public Dylib::Proxy<"Assert"> {
@@ -71,6 +71,6 @@ namespace Forge::Package {
         }
     };
 
-}  // namespace Forge::Package
+}  // namespace Talos::Package
 
 #endif

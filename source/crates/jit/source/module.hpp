@@ -1,8 +1,8 @@
 #ifndef _CRATES_PACKAGE_JIT_HPP
 #define _CRATES_PACKAGE_JIT_HPP
 
-/// Forge Modules
-#include <forge/dylib/registry.hpp>
+/// Talos Modules
+#include <talos/dylib/registry.hpp>
 
 //  X-MACROS  //
 
@@ -10,7 +10,7 @@
 
 //  NAMESPACES  //
 
-namespace Forge::Package {
+namespace Talos::Package {
 
     /// @brief JIT Package Addon.
     struct JIT : public Dylib::Proxy<"JIT"> {
@@ -31,6 +31,6 @@ namespace Forge::Package {
 #undef X
     };
 
-}  // namespace Forge::Package
+}  // namespace Talos::Package
 
 #endif

@@ -3,4 +3,13 @@
 //! Description: Dynamic programs for sandboxed development.
 //!
 
-Debug.println("Hello, 🦄");
+class Position [T] {
+    // public let x = ax ?? 0;
+    // public let y = ay ?? 0;
+    // let _ = Debug.println(self);
+};
+
+let _ = Position();
+
+// Debug.println(Position);
+// Debug.println("Hello, 🦄");

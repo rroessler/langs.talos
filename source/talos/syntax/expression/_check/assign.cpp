@@ -1,0 +1,69 @@
+/// Talos Modules
+#include "talos/type/visitor.hpp"
+
+/// Syntax Modules
+#include "talos/syntax/_inline/expression.ipp"
+
+/// Forward Declarations
+$_FWD(Entity target(Analyzer *, const Syntax::Expression *), Talos::Type::Dispatch)
+$_FWD(Deduction immutable(Analyzer *, const Syntax::Expression *), Talos::Type::Dispatch)
+
+//  PUBLIC METHODS  //
+
+Talos::Type::Entity Talos::Type::Dispatch::target(Analyzer *analyzer, const Syntax::Expression *target) {
+    // handle identifiers by getting straight from the world
+    switch (target->traits()->tag()) {
+        case $::RTTI::Hash<Syntax::Identifier>(): {
+            auto *identifier = target->as<Syntax::Identifier>();
+            auto *entity = analyzer->world()->lookup(identifier->name()).first;
+            return entity ? *entity : Entity();  // rebuild here if valid
+        }
+
+        case $::RTTI::Hash<Syntax::Accessor>(): {
+            // cast to the base accessor node
+            auto *accessor = target->as<Syntax::Accessor>();
+
+            // get the details about the accessor now
+            auto field = accessor->field()->name();
+            auto *parent = accessor->parent();
+
+            // attempt a field lookup here now
+            return parent->traits()->type()->lookup(field);
+        }
+
+        // we have an invalid assignment target so fail immediately
+        default: return Entity();
+    }
+}
+
+Talos::Type::Deduction Talos::Type::Dispatch::immutable(Analyzer *analyzer, const Syntax::Expression *target) {
+#define MM_AS(N) target->as<Syntax::N>()
+    switch (target->traits()->tag()) {
+        case $::RTTI::Hash<Syntax::Identifier>(): return analyzer->report(3000100, MM_AS(Identifier)->name());
+        case $::RTTI::Hash<Syntax::Accessor>(): return analyzer->report(3000102, MM_AS(Accessor)->field()->name());
+        default: return analyzer->report(3000101);  // we can suitably ignore this outgoing description
+    }
+#undef MM_AS
+}
+
+TALOS_MM_CHECK_NODE(Assign, node, analyzer) {
+    // prepare the underlying dispatch details
+    $_UNUSED $_AUTO = analyzer->trace(node);
+
+    // get the underlying target node now
+    const auto *target = node->target();
+
+    // pre-check the current assignment targets
+    auto left = analyzer->check(target).type;
+    auto right = analyzer->check(node->value()).type;
+
+    // get the underlying assignment target now
+    auto entity = Type::Dispatch::target(analyzer, target);
+    if (!entity.opaque()) return analyzer->report(2000500);
+
+    // report if we cannot mutate the desired entity instance
+    if (entity.immutable()) Type::Dispatch::immutable(analyzer, target);
+
+    // and return the final result now
+    return left->unify(right) ? analyzer->passable(right) : analyzer->report(3000300, *right, *left);
+}

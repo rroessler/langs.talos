@@ -1,8 +1,8 @@
 #ifndef _CRATES_PACKAGE_MEMORY_HPP
 #define _CRATES_PACKAGE_MEMORY_HPP
 
-/// Forge Modules
-#include <forge/dylib/registry.hpp>
+/// Talos Modules
+#include <talos/dylib/registry.hpp>
 
 //  X-MACROS  //
 
@@ -13,7 +13,7 @@
 
 //  NAMESPACES  //
 
-namespace Forge::Package {
+namespace Talos::Package {
 
     /// @brief Memory Package Addon.
     struct Memory : public Dylib::Proxy<"Memory"> {
@@ -34,6 +34,6 @@ namespace Forge::Package {
 #undef X
     };
 
-}  // namespace Forge::Package
+}  // namespace Talos::Package
 
 #endif

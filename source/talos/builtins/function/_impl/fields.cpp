@@ -1,0 +1,84 @@
+/// Talos Modules
+#include "talos/member/storage.hpp"
+
+/// Builtin Modules
+#include "talos/builtins/_inline/assert.ipp"
+
+//  TYPEDEFS  //
+
+#define X(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
+struct TALOS_BUILTIN_FIELDS(Function::Dynamic) {
+    TALOS_XX_FIELDS_FUNCTION(X)
+};
+#undef X
+
+//  PROPERTIES  //
+
+#define X(N, ...) { #N, Field::N },
+TALOS_BUILTIN_STORAGE(Function::Dynamic) = Talos::Member::Storage(name(), { TALOS_XX_FIELDS_FUNCTION(X) });
+#undef X
+
+//  PUBLIC METHODS  //
+
+const Talos::Function::Info* TALOS_BUILTIN_TRAITS(Function::Dynamic)::binder() {
+    // prepare the baseline items to be prepared
+    static $::Ptr::Shared<Linker::Arena> s_arena = nullptr;
+    static $::Ptr::Shared<Function::Info> s_info = nullptr;
+
+    // the expected bytecode to be emplaced
+    static std::vector<Bytecode::Instruction> s_bytecode = {
+        TALOS_MM_BIR(CLOSURE_PASS, Engine::Accumulator()),
+        TALOS_MM_BIR(EXEC_RETURN),  // and return the value
+    };
+
+    // if the information is available, then return now
+    if (s_info != nullptr) return s_info.get();
+
+    // prepare the shared information to be used
+    auto shared = Bytecode::Shared();
+
+    // ensure we define as variadic
+    shared.locals = UINT32_MAX;
+    shared.adicity = UINT64_MAX;
+
+    // prepare the arena and information now
+    s_arena = $::New().shared<Linker::Arena>();
+    s_info = $::New().shared<Function::Info>(s_arena.get(), shared);
+
+    // bind the bytecode to call the instance now
+    for (const auto& instruction : s_bytecode) s_arena->bytecode.write(instruction.encode());
+
+    // update the buffer before continuing now
+    s_info->buffer() = s_arena->bytecode.view();
+
+    // construct the incoming information now
+    return s_info.get();
+}
+
+TALOS_MM_BUILTIN_FIELD(Function::Dynamic, bind, isolate, args) {
+    TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);  // ensure size
+    TALOS_MM_ASSERT_TYPEOF(isolate, Function::Dynamic, args.self());
+    return isolate->bind(args.self<Function::Dynamic>(), args[0]);
+}
+
+TALOS_MM_BUILTIN_FIELD(Function::Dynamic, arity, isolate, args) {
+    TALOS_MM_ASSERT_TYPEOF(isolate, Function::Dynamic, args.self());
+    return Number::Tagged(args.self<Function::Dynamic>().arity());
+}
+
+TALOS_MM_BUILTIN_FIELD(Function::Dynamic, adicity, isolate, args) {
+    TALOS_MM_ASSERT_TYPEOF(isolate, Function::Dynamic, args.self());
+    return Number::Tagged(args.self<Function::Dynamic>().adicity());
+}
+
+TALOS_MM_BUILTIN_FIELD(Function::Dynamic, receiver, isolate, args) {
+    TALOS_MM_ASSERT_TYPEOF(isolate, Function::Dynamic, args.self());
+    return args.self<Function::Dynamic>().receiver();  // get now
+}
+
+//  PRIVATE METHODS  //
+
+Talos::Member::View TALOS_BUILTIN_TRAITS(Function::Dynamic)::m_attributes(
+    const Function::Dynamic&, Value::Symbol symbol) {
+    return m_members.retrieve(symbol);
+}

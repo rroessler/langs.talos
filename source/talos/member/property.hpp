@@ -1,0 +1,53 @@
+#ifndef _TALOS_MEMBER_PROPERTY_HPP
+#define _TALOS_MEMBER_PROPERTY_HPP
+
+/// Talos Modules
+#include "talos/member/descriptor.hpp"
+#include "talos/value/void.hpp"
+
+namespace Talos::Member {
+
+    /// @brief Getter Typing.
+    using Getter = $::Functor::Unique<Value::Any(Runtime::Isolate*, Value::Any)>;
+
+    /// @brief Setting Typing.
+    using Setter = $::Functor::Unique<Value::Any(Runtime::Isolate*, Value::Any, Value::Any)>;
+
+    /// @brief Property Member Descriptor.
+    class Property : public Descriptor {
+        //  PROPERTIES  //
+
+        Getter m_getter = nullptr;  // Getter function.
+        Setter m_setter = nullptr;  // Setter function.
+
+       public:
+        //  CONSTRUCTORS  //
+
+        /// @brief Constructs a property descriptor.
+        explicit Property() : Descriptor(true) {}
+        explicit Property(Getter&& getter) : Descriptor(true), m_getter(std::move(getter)) {}
+        explicit Property(Setter&& setter) : Descriptor(false), m_setter(std::move(setter)) {}
+        explicit Property(Getter&& getter, Setter&& setter) :
+            Descriptor(false), m_getter(std::move(getter)), m_setter(std::move(setter)) {}
+
+        //  PUBLIC METHODS  //
+
+        /**
+         * @brief Handles getting the value.
+         * @param isolate           Runtime isolate.
+         * @param self              Self value.
+         */
+        Value::Any getter(Runtime::Isolate* isolate, Value::Any self) const final;
+
+        /**
+         * @brief Handles setting the value.
+         * @param isolate           Runtime isolate.
+         * @param self              Self value.
+         * @param value             Value to assign.
+         */
+        Value::Any setter(Runtime::Isolate* isolate, Value::Any self, Value::Any value) final;
+    };
+
+}  // namespace Talos::Member
+
+#endif

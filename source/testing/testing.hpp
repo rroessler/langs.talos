@@ -16,7 +16,7 @@
 
 namespace Testing::Section {
 
-    static constexpr auto FORGE = "forge";
+    static constexpr auto TALOS = "talos";
 
     static constexpr auto XPC = "xpc";
     static constexpr auto XTDLIB = "xtdlib";

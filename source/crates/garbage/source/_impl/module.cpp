@@ -1,8 +1,8 @@
-/// Forge Modules
-#include <forge/member/factory.hpp>
+/// Talos Modules
+#include <talos/member/factory.hpp>
 
 /// Assert Modules
-#include <forge/builtins/_inline/assert.ipp>
+#include <talos/builtins/_inline/assert.ipp>
 
 /// Crate Modules
 #include "crates/garbage/source/module.hpp"
@@ -10,15 +10,15 @@
 //  PROPERTIES  //
 
 /// @brief The underlying garbage addon installer.
-FORGE_MM_DYLIB_ADDON(Garbage, CRATE_XX_GARBAGE_METHODS)
+TALOS_MM_DYLIB_ADDON(Garbage, CRATE_XX_GARBAGE_METHODS)
 
 //  PRIVATE METHODS  //
 
-FORGE_MM_DYLIB_METHOD(Garbage, cycles, isolate, ) { return Number::Tagged(isolate->service<Service>()->cycles()); }
+TALOS_MM_DYLIB_METHOD(Garbage, cycles, isolate, ) { return Number::Tagged(isolate->service<Service>()->cycles()); }
 
-FORGE_MM_DYLIB_METHOD(Garbage, collect, isolate, args) {
+TALOS_MM_DYLIB_METHOD(Garbage, collect, isolate, args) {
     auto value = args.at(0, Value::Boolean(0));  // prepare
-    FORGE_MM_ASSERT_TYPEOF(isolate, Value::Boolean, value);
+    TALOS_MM_ASSERT_TYPEOF(isolate, Value::Boolean, value);
     auto major = value.as<Value::Boolean>().state();
 
     auto *garbage = isolate->service<Service>();  // prepare the collector

@@ -69,5 +69,5 @@ talos_package_declare(${TALOS_TARGET_XHASH})
 talos_package_declare(${TALOS_TARGET_XTEST})
 talos_package_declare(${TALOS_TARGET_XTDLIB})
 
+# Declare the core package for "talos"
 talos_package_declare(${TALOS_TARGET_SUPER})
-talos_package_declare(${TALOS_TARGET_FORGE})

@@ -1,3 +1,3 @@
-## Talos Public API - `<talos/talos.hpp>`
+## Talos Runtime - `talos`
 
-These is the stub-typings for Talos that are available for public use. It contains forward declarations of code from the `<forge/forge.hpp>` runtime.
+This is the core package for Talos and contains all source-code for the runtime.

@@ -1,9 +1,9 @@
 #ifndef _CRATES_PACKAGE_GARBAGE_HPP
 #define _CRATES_PACKAGE_GARBAGE_HPP
 
-/// Forge Modules
-#include <forge/dylib/registry.hpp>
-#include <forge/garbage/service.hpp>
+/// Talos Modules
+#include <talos/dylib/registry.hpp>
+#include <talos/garbage/service.hpp>
 
 //  X-MACROS  //
 
@@ -13,14 +13,14 @@
 
 //  NAMESPACES  //
 
-namespace Forge::Package {
+namespace Talos::Package {
 
     /// @brief Garbage Package Addon.
     class Garbage : public Dylib::Proxy<"Garbage"> {
         //  TYPEDEFS  //
 
         /// @brief Available service typing.
-        using Service = ::Forge::Garbage::Service;
+        using Service = ::Talos::Garbage::Service;
 
        public:
         //  CONSTRUCTORS  //
@@ -40,6 +40,6 @@ namespace Forge::Package {
 #undef X
     };
 
-}  // namespace Forge::Package
+}  // namespace Talos::Package
 
 #endif

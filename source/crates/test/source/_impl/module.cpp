@@ -1,10 +1,10 @@
-/// Forge Modules
-#include <forge/async/service.hpp>
-#include <forge/member/factory.hpp>
-#include <forge/testing/registry.hpp>
+/// Talos Modules
+#include <talos/async/service.hpp>
+#include <talos/member/factory.hpp>
+#include <talos/testing/registry.hpp>
 
 /// Assert Modules
-#include <forge/builtins/_inline/assert.ipp>
+#include <talos/builtins/_inline/assert.ipp>
 
 /// Crate Modules
 #include "crates/test/source/module.hpp"
@@ -12,49 +12,49 @@
 //  PROPERTIES  //
 
 /// @brief The underlying testing addon installer.
-FORGE_MM_DYLIB_ADDON(Test, CRATE_XX_TEST_METHODS)
+TALOS_MM_DYLIB_ADDON(Test, CRATE_XX_TEST_METHODS)
 
 //  PRIVATE METHODS  //
 
-FORGE_MM_DYLIB_METHOD(Test, case, isolate, args) {
+TALOS_MM_DYLIB_METHOD(Test, case, isolate, args) {
     // ensure testing is enabled before continuing
     if (!m_enabled(isolate)) return Value::Void();
 
-    FORGE_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
-    FORGE_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
+    TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
+    TALOS_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
 
     // register without modifiers and return now
     return m_register(isolate, args), Value::Void();
 }
 
-FORGE_MM_DYLIB_METHOD(Test, skip, isolate, args) {
+TALOS_MM_DYLIB_METHOD(Test, skip, isolate, args) {
     // ensure testing is enabled before continuing
     if (!m_enabled(isolate)) return Value::Void();
 
-    FORGE_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
-    FORGE_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
+    TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
+    TALOS_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
 
     // register with the "skip" modifier now
     return m_register(isolate, args)->skip(true), Value::Void();
 }
 
-FORGE_MM_DYLIB_METHOD(Test, todo, isolate, args) {
+TALOS_MM_DYLIB_METHOD(Test, todo, isolate, args) {
     // ensure testing is enabled before continuing
     if (!m_enabled(isolate)) return Value::Void();
 
-    FORGE_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
-    FORGE_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
+    TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
+    TALOS_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
 
     // register with the "todo" modifier now
     return m_register(isolate, args)->todo(true), Value::Void();
 }
 
-FORGE_MM_DYLIB_METHOD(Test, bench, isolate, args) {
+TALOS_MM_DYLIB_METHOD(Test, bench, isolate, args) {
     // ensure testing is enabled before continuing
     if (!m_enabled(isolate)) return Value::Void();
 
-    FORGE_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
-    FORGE_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
+    TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
+    TALOS_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
 
     // prepare the arguments to be used now
     auto name = $::String::Buffer(args.at<String::Dynamic>(0).view());
@@ -68,12 +68,12 @@ FORGE_MM_DYLIB_METHOD(Test, bench, isolate, args) {
     return Value::Void();
 }
 
-FORGE_MM_DYLIB_METHOD(Test, suite, isolate, args) {
+TALOS_MM_DYLIB_METHOD(Test, suite, isolate, args) {
     // ensure testing is enabled before continuing
     if (!m_enabled(isolate)) return Value::Void();
 
-    FORGE_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
-    FORGE_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
+    TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);  // get named
+    TALOS_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args[0]);
 
     // prepare the arguments to be used now
     auto name = $::String::Buffer(args.at<String::Dynamic>(0).view());
@@ -90,11 +90,11 @@ FORGE_MM_DYLIB_METHOD(Test, suite, isolate, args) {
     return Value::Void();
 }
 
-bool Forge::Package::Test::m_enabled(Runtime::Isolate *isolate) {
+bool Talos::Package::Test::m_enabled(Runtime::Isolate *isolate) {
     return isolate->service<XI::Container>()->exists<Testing::Registry>();
 }
 
-Forge::Testing::Case *Forge::Package::Test::m_register(Runtime::Isolate *isolate, const Function::Arguments &args) {
+Talos::Testing::Case *Talos::Package::Test::m_register(Runtime::Isolate *isolate, const Function::Arguments &args) {
     // prepare the arguments to be used now
     auto name = $::String::Buffer(args.at<String::Dynamic>(0).view());
     auto callback = args.at<Function::Dynamic>(1, Function::Dynamic());
@@ -106,12 +106,12 @@ Forge::Testing::Case *Forge::Package::Test::m_register(Runtime::Isolate *isolate
     return registry->test(name, m_callback(callback), m_location(isolate));
 }
 
-Forge::Testing::Callback Forge::Package::Test::m_callback(const Function::Dynamic &callback) {
+Talos::Testing::Callback Talos::Package::Test::m_callback(const Function::Dynamic &callback) {
     if (callback.nptr()) return [](Testing::Runner *) {};  // invalid callback
     return [callback](Testing::Runner *runner) { m_callback(runner, callback); };
 }
 
-Forge::Testing::Callback Forge::Package::Test::m_callback(const Function::Dynamic &callback, Testing::Group *group) {
+Talos::Testing::Callback Talos::Package::Test::m_callback(const Function::Dynamic &callback, Testing::Group *group) {
     if (callback.nptr()) return [](Testing::Runner *) {};
     return [callback, group](Testing::Runner *runner) {
         auto *registry = runner->service<Testing::Registry>();
@@ -131,7 +131,7 @@ Forge::Testing::Callback Forge::Package::Test::m_callback(const Function::Dynami
     };
 }
 
-void Forge::Package::Test::m_callback(Testing::Runner *runner, const Function::Dynamic &callback) {
+void Talos::Package::Test::m_callback(Testing::Runner *runner, const Function::Dynamic &callback) {
     // race the incoming result now
     auto result = m_race(runner, callback);
     if (result.has_value()) return;
@@ -142,7 +142,7 @@ void Forge::Package::Test::m_callback(Testing::Runner *runner, const Function::D
     runner->asserts()->fail(exception.message().view(), location);
 }
 
-Forge::Async::Result Forge::Package::Test::m_race(Testing::Runner *runner, const Function::Dynamic &callback) {
+Talos::Async::Result Talos::Package::Test::m_race(Testing::Runner *runner, const Function::Dynamic &callback) {
     // get the underlying async service
     auto *async = runner->service<Async::Service>();
 
@@ -166,14 +166,14 @@ Forge::Async::Result Forge::Package::Test::m_race(Testing::Runner *runner, const
     return ignore ? result : throw XT::Assert::Timeout();
 }
 
-XT::Location Forge::Package::Test::m_location(Runtime::Isolate *isolate) {
+XT::Location Talos::Package::Test::m_location(Runtime::Isolate *isolate) {
     return m_location(isolate->frame()->parent());  // always use the parent
 }
 
-XT::Location Forge::Package::Test::m_location(const Engine::Frame *frame) {
+XT::Location Talos::Package::Test::m_location(const Engine::Frame *frame) {
     return $_ASSERT(frame, "Invalid isolate frame"), m_location(frame->backtrace());
 }
 
-XT::Location Forge::Package::Test::m_location(const Resource::Trace &backtrace) {
+XT::Location Talos::Package::Test::m_location(const Resource::Trace &backtrace) {
     return Testing::Traits::location(backtrace);
 }

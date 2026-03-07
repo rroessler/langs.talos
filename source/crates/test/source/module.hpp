@@ -4,11 +4,11 @@
 /// Vendor Modules
 #include <xtest/xtest.hpp>
 
-/// Forge Modules
-#include <forge/async/thenable.hpp>
-#include <forge/dylib/registry.hpp>
-#include <forge/engine/frame.hpp>
-#include <forge/forward/testing.hpp>
+/// Talos Modules
+#include <talos/async/thenable.hpp>
+#include <talos/dylib/registry.hpp>
+#include <talos/engine/frame.hpp>
+#include <talos/forward/testing.hpp>
 
 //  X-MACROS  //
 
@@ -21,7 +21,7 @@
 
 //  NAMESPACES  //
 
-namespace Forge::Package {
+namespace Talos::Package {
 
     /// @brief Testing Package Addon.
     struct Test : public Dylib::Proxy<"Test"> {
@@ -85,6 +85,6 @@ namespace Forge::Package {
         static XT::Location m_location(const Resource::Trace& trace);
     };
 
-}  // namespace Forge::Package
+}  // namespace Talos::Package
 
 #endif

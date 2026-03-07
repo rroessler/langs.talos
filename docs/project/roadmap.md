@@ -22,7 +22,7 @@ description: A brief outline of the current bug-fixes, goals and other milestons
 |   ❌   | `#...`  | Implement compile-time attributes.  | -                        |
 |   ❌   | `use`   | Implement explicit resources.       | Requires attribute hooks |
 |   ⚪   | `enum`  | Implement enumeration declarations. | -                        |
-|   ❌   | `class` | Implement class-based inheritance.  | -                        |
+|   🚀   | `class` | Implement class-based inheritance.  | -                        |
 |   💀   | `xasm`  | Implement jitted runtime functions. | -                        |
 
 ## Libraries
