@@ -40,15 +40,15 @@ TALOS_MM_FORMAT_HINT(Placeholder, reader) {
     auto colon = reader->match(Lexer::Kind::PUNC_COLON);
     auto* extends = colon ? m_leading(reader, Callback(callback)) : nullptr;
 
-    if (extends) placeholder = storage->append(placeholder, storage->colon(), storage->space().hard(), extends);
+    if (extends) storage->append(placeholder, storage->colon(), storage->space().hard(), extends);
     else if (colon) return nullptr;  // failed to parse the incoming extension typing so we fail here now
 
     // append potential fallback types if given
     auto declare = reader->match(Lexer::Kind::ASOP_DEF);
     auto* fallback = declare ? m_leading(reader, Callback(callback)) : nullptr;
 
-    if (fallback) placeholder = storage->append(placeholder, storage->assign(), storage->space().hard(), extends);
-    else if (declare) return nullptr;  // failed to parse the incoming fallback typing so we fail here now
+    if (fallback) storage->append(placeholder, storage->assign(), storage->space().hard(), fallback);
+    else if (declare) return nullptr;  // failed to parse the incoming fallback so we exit now
 
     // and return the resulting placeholder now
     return placeholder;

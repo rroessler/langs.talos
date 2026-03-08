@@ -40,8 +40,8 @@ TALOS_MM_FORMAT_INFIX(Ternary, reader, condition) {
     Node::List* ternary = storage->group(condition);
 
     // bind the consequence and the alternative now
-    ternary = storage->append(ternary, storage->indent(separator, consequence));
-    ternary = storage->append(ternary, storage->indent(separator, alternative));
+    storage->append(ternary, storage->indent(separator, consequence));
+    storage->append(ternary, storage->indent(separator, alternative));
 
     // return the resulting ternary instance now
     return ternary;

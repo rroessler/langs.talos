@@ -30,15 +30,26 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     // set some of the constructor details to be used
     auto generic = Type::Builder::resolve<Type::Generic>(constructor);
 
+    // pre-update the constructor with the instance as a return-type
+    Type::Builder::resolve<Type::Callable>(constructor)->returns() = instance;
+
     // update the necessary components to be used now
-    auto constraints = generic ? generic->parameters() : Type::Template();
-    proto->constraints() = $::Ranges::To<Type::Erased>(constraints);
+    auto parameters = generic ? generic->parameters() : Type::Template();
+    proto->constraints() = $::Ranges::To<Type::Erased>(parameters);
 
     // update the underlying constructor function to be used
-    proto->constructor() = [constructor](const Type::Prototype* proto) -> Type::Erased {
-        auto returns = const_cast<Type::Prototype*>(proto)->instantiate();
-        auto callable = Type::Builder::resolve<Type::Callable>(constructor);
-        return Type::Builder::function(returns, callable->parameters());
+    proto->constructor() = [constructor, parameters](const Type::Prototype* proto) -> Type::Erased {
+        // bind all the prototype constraints to
+        auto generic = Type::Builder::resolve<Type::Generic>(constructor);
+        auto constraints = $::New().shared<Type::Constraints::element_type>();
+
+        // iterate over the avialable constraints to be bound
+        for (const auto& [ii, parameter] : $::Each(parameters)) {
+            constraints->emplace(parameter.get(), proto->constraints().at(ii));
+        }
+
+        // use the prototype constraints to resolve the constructor
+        return constructor->infer(constraints);
     };
 
     // resolve the entity and it's context now
@@ -46,8 +57,8 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
 
     // can safely update the underlying entity details now
     entity->context() = analyzer->captures().declare(node);
-    entity->value() = Type::Builder::generic(proto, constraints);
-    entity->type() = Type::Builder::generic(instance, constraints);
+    entity->value() = Type::Builder::generic(proto, parameters);
+    entity->type() = Type::Builder::generic(instance, parameters);
 
     // prepare the current trace location
     $_UNUSED $_AUTO = analyzer->trace(node);

@@ -20,7 +20,7 @@ TALOS_MM_FORMAT_INFIX(Spawn, reader, callee) {
     if (policy == nullptr) policy = storage->unicode("async");
 
     // append the ":" token now
-    callee = storage->append(callee, storage->policy(), policy);
+    storage->append(callee, storage->policy(), policy);
 
     // attempt resolving the resulting infix handler now
     return m_infix<Syntax::Call>(reader, callee);

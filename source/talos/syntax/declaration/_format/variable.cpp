@@ -43,7 +43,7 @@ Talos::Format::Node* Talos::Format::Dispatch::m_variable(Reader* reader, bool co
 
         // prepare the comments to be associated with the incoming hint
         hint = storage->indent(storage->line().dynamic(), hint);
-        variable = storage->append(variable, storage->colon(), storage->group(hint));
+        storage->append(variable, storage->colon(), storage->group(hint));
     }
 
     // allow assigning the variable regardless of annotation status
