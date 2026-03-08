@@ -56,3 +56,14 @@ With these combined features, Talos has removed function coloring entirely, whil
 ## Virtual Threading
 
 When the runtime executes a script, it constructs a thread isolate. Internally, these are virtual tasks that execute Talos code and can be scheduled, cancelled and awaited. For now, the only external interaction that the runtime has with these isolates is through the `Future[T]` object.
+
+## Thread Safety
+
+Internally, most mutations of Talos values are made thread-safe. Each object contains a descriptor (or header) that describes the object and has a one-byte mutex. This mutex is locked when objects are internally updated, resulting in seamless thread safety for developers. For memory safety, see the guide on [garbage collection](/docs/language/advanced/memory) within Talos.
+
+However, variable assignment is inherently not thread-safe but can be made so using the standard library [utilities for concurrency](/docs/crates/async) and [explicit resource management](/docs/language/advanced/resources).
+
+<Callout title="Note:">
+    The explicit resource management functionality and the standard library utilities for concurrency have not yet been
+    implemented. Please see the [roadmap](/docs/project/roadmap) for the current progress on this functionality.
+</Callout>

@@ -38,7 +38,9 @@ The language goals in mind to support these features include:
 
 Talos supports Windows (x64), Darwin (x64, Apple Silicon) and Linux (x64, arm64).
 
-> **Note:** Currently Talos is not available for installation. Check out [how to build](./docs/project/development.mdx)
+> **Note:**
+>
+> Currently Talos is not available for installation. Check out [how to build](./docs/project/development.mdx)
 
 ## FAQ
 

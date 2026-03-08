@@ -4,6 +4,13 @@
 /// Vendor Modules
 #include <xtdlib/xtdlib.hpp>
 
+//  MACROS  //
+
+/// @brief The underlying revision details.
+#define TALOS_MM_REVISION TALOS_MM_VERSION "+" TALOS_MM_COMMIT
+
+//  NAMESPACES  //
+
 namespace Talos::Version {
 
     /// @brief Semantic Versioning Structure.

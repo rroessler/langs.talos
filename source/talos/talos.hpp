@@ -151,6 +151,10 @@
 #include "talos/parser/snapshot.hpp"
 #include "talos/parser/stream.hpp"
 
+/// Product Modules
+#include "talos/product/details.hpp"
+#include "talos/product/version.hpp"
+
 /// Reflection Modules
 #include "talos/reflect/category.hpp"
 

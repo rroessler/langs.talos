@@ -1,6 +1,5 @@
 /// Shell Modules
 #include "shell/lint/action.hpp"
-#include "talos/diagnostic/forward.hpp"
 
 //  X-MACROS  //
 

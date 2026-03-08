@@ -31,6 +31,7 @@
         "advanced/exceptions",
         "advanced/resources",
         "advanced/type-system",
+        "advanced/memory",
         "advanced/policies"
     ]
 }
