@@ -6,17 +6,18 @@
 
 //  PRIVATE METHODS  //
 
-Talos::Syntax::Node* Talos::Parser::Dispatch::m_import(Stream* parser, bool module) {
-    auto* result = m_statement<Syntax::Import>(parser);  // parse now as needed
-    return $_LIKELY(module) ? result : parser->report(result, 8000202, "Imports");
+Talos::Syntax::Node* Talos::Parser::Dispatch::m_import(Stream* parser, Extent extent) {
+    auto* result = m_statement<Syntax::Import>(parser);
+    if ($_LIKELY(extent == Extent::MODULE)) return result;
+    return parser->report(result, 8000202, "Imports");
 }
 
-Talos::Syntax::Node* Talos::Parser::Dispatch::m_export(Stream* parser, bool module) {
-    // if we are not within a module context, allow then error-out
-    if ($_UNLIKELY(!module)) return parser->report(m_export(parser, true), 8000202, "Exports");
-
+Talos::Syntax::Node* Talos::Parser::Dispatch::m_export(Stream* parser, Extent extent) {
     // eat the current token now for use
     auto* token = m_assert(parser->current(), Lexer::Kind::MOD_EXPORT);
+
+    // if we are not within a module context, allow then error-out
+    if ($_UNLIKELY(extent != Extent::MODULE)) parser->report(token, 8000202, "Exports");
 
     // check if we have a leading string for module exports
     switch (parser->peek(1)->kind()) {
@@ -25,7 +26,7 @@ Talos::Syntax::Node* Talos::Parser::Dispatch::m_export(Stream* parser, bool modu
     }
 
     // otherwise we attempt reading an item with modifiers now
-    auto* declaration = m_modifiers(parser, module);
+    auto* declaration = m_modifiers(parser, extent);
     if (declaration == nullptr) return nullptr;
 
     // prepare the modifiers to be updated

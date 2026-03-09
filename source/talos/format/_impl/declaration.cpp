@@ -64,11 +64,11 @@ Talos::Format::Node* Talos::Format::Dispatch::m_subject(Reader* reader, Lexer::K
 Talos::Format::Node* Talos::Format::Dispatch::m_modifiers(Reader* reader, Variable::Modifiers modifiers) {
     // attempt matching modifiers whilst possible to do so
     while (reader->match(Lexer::Flag::MODIFIER)) {
-#define TALOS_XX_TOKEN_MODIFIER(K, N, ...) \
-    case Lexer::Kind::MOD_##K: modifiers.set(Variable::Flag::K); break;
         switch (reader->previous()->kind()) {
-#include "talos/lexer/_defines/tokens.def"
-            default: break;
+#define X(K, N, ...) \
+    case Lexer::Kind::MOD_##K: modifiers.set(Variable::Flag::K); break;
+            XX_VARIABLE_MODIFIERS(X) default : break;
+#undef X
         }
     }
 

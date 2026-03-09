@@ -3,21 +3,21 @@
 
 //  PRIVATE METHODS  //
 
-Talos::Syntax::Node* Talos::Parser::Dispatch::m_declaration(Stream* parser, bool module) {
+Talos::Syntax::Node* Talos::Parser::Dispatch::m_declaration(Stream* parser, Extent extent) {
     switch (parser->current()->kind()) {
         // handle decorators, attributes differently
         case Lexer::Kind::PUNC_DECOR: $_FALLTHROUGH;
-        case Lexer::Kind::PUNC_ATTRIB: return m_terminates(parser, m_preamble(parser, module), "a declaration");
+        case Lexer::Kind::PUNC_ATTRIB: return m_terminates(parser, m_preamble(parser, extent), "a declaration");
 
         // handle baseline modifiers for declarations
         case Lexer::Kind::MOD_STATIC: $_FALLTHROUGH;
         case Lexer::Kind::MOD_PUBLIC: $_FALLTHROUGH;
         case Lexer::Kind::MOD_PRIVATE: $_FALLTHROUGH;
-        case Lexer::Kind::MOD_PROTECTED: return m_terminates(parser, m_modifiers(parser, module), "a declaration");
+        case Lexer::Kind::MOD_PROTECTED: return m_terminates(parser, m_modifiers(parser, extent), "a declaration");
 
         // although export/import are statements, we can only parse them at the top-level
-        case Lexer::Kind::MOD_IMPORT: return m_terminates(parser, m_import(parser, module), "an import statement");
-        case Lexer::Kind::MOD_EXPORT: return m_terminates(parser, m_export(parser, module), "an export statement");
+        case Lexer::Kind::MOD_IMPORT: return m_terminates(parser, m_import(parser, extent), "an import statement");
+        case Lexer::Kind::MOD_EXPORT: return m_terminates(parser, m_export(parser, extent), "an export statement");
 
         // handle the various top-level declarations
         case Lexer::Kind::DECL_LET: $_FALLTHROUGH;

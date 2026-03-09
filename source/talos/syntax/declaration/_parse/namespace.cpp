@@ -15,8 +15,8 @@ TALOS_MM_PARSE_DECL(Namespace, parser) {
     if (name == nullptr) return nullptr;
 
     // parse an expected block for the namespace
-    auto* block = m_block(parser, true);
-    if (block == nullptr) return nullptr;
+    auto* block = m_block(parser, Extent::MODULE);
+    if (block == nullptr) return nullptr;  // bail
 
     // and return the resulting namespace now
     return parser->allocate<Syntax::Namespace>(name->lexeme(), block, snapshot.enclose(name));

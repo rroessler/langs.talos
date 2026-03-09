@@ -3,7 +3,7 @@
 
 //  PRIVATE METHODS  //
 
-Talos::Syntax::Block* Talos::Parser::Dispatch::m_block(Stream* parser, bool module) {
+Talos::Syntax::Block* Talos::Parser::Dispatch::m_block(Stream* parser, Extent extent) {
     // prepare the snapshot to be used now
     auto snapshot = parser->snapshot();
 
@@ -15,7 +15,7 @@ Talos::Syntax::Block* Talos::Parser::Dispatch::m_block(Stream* parser, bool modu
 
     // attempt parsing declarations whilst possible to do so
     while (!parser->check(Lexer::Kind::PUNC_RBRACE) && !parser->eos()) {
-        auto* node = m_declaration(parser, module);
+        auto* node = m_declaration(parser, extent);
         if (node == nullptr) return nullptr;
         statements.emplace_back(node);
     }
@@ -27,4 +27,4 @@ Talos::Syntax::Block* Talos::Parser::Dispatch::m_block(Stream* parser, bool modu
     return parser->allocate<Syntax::Block>(statements, snapshot);
 }
 
-TALOS_MM_PARSE_STMT(Block, parser) { return m_block(parser, false); }
+TALOS_MM_PARSE_STMT(Block, parser) { return m_block(parser, Extent::SCOPING); }

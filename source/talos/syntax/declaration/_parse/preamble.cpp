@@ -3,27 +3,39 @@
 
 //  PRIVATE METHODS  //
 
-Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_subject(Stream* parser, $::Ternary level) {
+Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_subject(Stream* parser, Extent extent) {
     // handle immediate declarations (always valid)
     if (parser->check(Lexer::Flag::VARIABLE)) return m_declaration<Syntax::Variable>(parser);
-    if (level == false) return parser->report(2000100, "a class field");  // got invalid field
 
-    // otherwise should be a valid approach for types
-    switch (parser->current()->kind()) {
-        case Lexer::Kind::DECL_ENUM: return m_declaration<Syntax::Enum>(parser);
-        case Lexer::Kind::DECL_TYPE: return m_declaration<Syntax::Alias>(parser);
-        case Lexer::Kind::DECL_CLASS: return m_declaration<Syntax::Class>(parser);
+    // prepare the current token being used
+    auto* token = parser->current();
 
-        // otherwise we break to check for valid namespacing
-        default: break;
-    }
+    // attempt resolving a suitable incoming set of details
+    auto* declaration = [&] -> Syntax::Declaration* {
+        switch (token->kind()) {
+            case Lexer::Kind::DECL_ENUM: return m_declaration<Syntax::Enum>(parser);
+            case Lexer::Kind::DECL_TYPE: return m_declaration<Syntax::Alias>(parser);
+            case Lexer::Kind::DECL_CLASS: return m_declaration<Syntax::Class>(parser);
+            case Lexer::Kind::DECL_SPACE: return m_declaration<Syntax::Namespace>(parser);
+            default: return nullptr;  // immediately invalid declaration given
+        }
+    }();
 
-    // handle namespaces if possible to do so
-    if (level == true && parser->check(Lexer::Kind::DECL_SPACE)) return m_declaration<Syntax::Namespace>(parser);
-    return parser->report(2000100, level ? "a top-level declaration" : "a class field");  // unexpected value
+    // fail-fast if necessary to do so
+    if (declaration == nullptr) return nullptr;
+
+    // check that we expected a class fields only now
+    if (extent == Extent::CLASS) return parser->report(token, 2000100, "a class field");
+
+    // check for module extents now
+    auto module = extent == Extent::MODULE;
+
+    // validate namespaces are in the correct extent as well
+    if (extent == Extent::MODULE || !declaration->is<Syntax::Namespace>()) return declaration;
+    return parser->report(token, 2000100, module ? "a top-level declaration" : "a class field");
 }
 
-Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_preamble(Stream* parser, $::Ternary level) {
+Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_preamble(Stream* parser, Extent extent) {
     // prepare the output decorator and attribute containers
     auto attributes = std::vector<Syntax::Attribute*>();
     auto decorators = std::vector<Syntax::Decorator*>();
@@ -38,7 +50,7 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_preamble(Stream* parser, 
     auto invalid = std::ranges::contains(decorators, nullptr) || std::ranges::contains(attributes, nullptr);
 
     // attempt parsing all the available modifiers now
-    auto* declaration = m_modifiers(parser, level);
+    auto* declaration = m_modifiers(parser, extent);
     if (invalid || declaration == nullptr) return nullptr;
 
     // check for valid preamble items now
@@ -46,39 +58,56 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_preamble(Stream* parser, 
     auto* preamble = valid ? static_cast<Syntax::Preamble*>(declaration) : nullptr;
 
     // should be able to update the declaration now (if a preamble)
-    if (preamble == nullptr) parser->report(declaration, 2000901);
-    else preamble->decorators() = decorators, preamble->attributes() = attributes;
+    if (preamble) preamble->decorators() = decorators, preamble->attributes() = attributes;
+    else if (decorators.size() || attributes.size()) parser->report(declaration, 2000901);
 
     // and return the result
     return declaration;
 }
 
-Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_modifiers(Stream* parser, $::Ternary level) {
+Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_modifiers(Stream* parser, Extent extent) {
     // prepare the modifiers output to be used
     auto modifiers = Variable::Modifiers();
 
     // prepare a handler for setting modifiers
-    auto emplace = [&](Variable::Flag flag, const $::String::View& name) {
-        if (level != false) parser->report(parser->previous(), level ? 2000902 : 2000903, name);
-        else if ($_LIKELY(!modifiers.test(flag))) modifiers.set(flag);  // should be the most likely
-        else parser->report(parser->previous(), 2000900, name);         // duplicated flags warning
+    auto emplace = [&](Variable::Flag flag, const Lexer::Token* token) {
+        if ($_LIKELY(!modifiers.test(flag))) modifiers.set(flag);
+        else parser->report(token, 2000900, token->lexeme());
+    };
+
+    // prepare a handler for class properties
+    auto property = [&](const Lexer::Token* token) {
+        if (extent == Extent::MODULE) parser->report(token, 2000903, token->lexeme());
+        else if (extent == Extent::SCOPING) parser->report(token, 2000904, token->lexeme());
+    };
+
+    // prepare a handler for export modifiers
+    auto exports = [&](const Lexer::Token* token) {
+        if (extent == Extent::CLASS) parser->report(token, 2000902, token->lexeme());
+        else if (extent == Extent::STATIC) parser->report(token, 2000902, token->lexeme());
+        else if (extent != Extent::MODULE) parser->report(token, 2000904, token->lexeme());
     };
 
     // attempt matching as many modifiers as possible now
-    while (parser->check(Lexer::Flag::MODIFIER)) {
+    while (parser->match(Lexer::Flag::MODIFIER)) {
+        switch (auto* token = parser->previous(); token->kind()) {
 #define TALOS_XX_TOKEN_MODIFIER(K, N, ...) \
-    case Lexer::Kind::MOD_##K: parser->advance(), emplace(Variable::Flag::K, N); break;
-        switch (parser->current()->kind()) {
+    case Lexer::Kind::MOD_##K: emplace(Variable::Flag::K, token), property(token); break;
 #include "talos/lexer/_defines/tokens.def"
-            default: break;
+
+            // "export" modifiers need to be handled different
+            case Lexer::Kind::MOD_EXPORT: emplace(Variable::Flag::EXPORT, token), exports(token); break;
+
+            // all other tokens should be unreachable
+            default: $_ABORT("Unknown modifier token '{0}'", token->lexeme()); break;
         }
     }
 
     // update our level as necessary now
-    if (modifiers.test(Variable::Flag::STATIC)) level = $::Unknown();
+    if (modifiers.test(Variable::Flag::STATIC) && extent == Extent::CLASS) extent = Extent::STATIC;
 
     // attempt parsing a suitable subject now
-    auto* declaration = m_subject(parser, level);
+    auto* declaration = m_subject(parser, extent);
     if (declaration == nullptr) return nullptr;
 
     // update the declarations modifiers

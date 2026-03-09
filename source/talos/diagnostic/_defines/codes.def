@@ -79,8 +79,9 @@ TALOS_XX_DIAGNOSTIC_SYNTAX(2000801, ERROR, "Unknown operator overload '{0}'")
 
 TALOS_XX_DIAGNOSTIC_SYNTAX(2000900, WARN, "Duplicate declaration modifier '{0}'")
 TALOS_XX_DIAGNOSTIC_SYNTAX(2000901, WARN, "Cannot apply decorators/attributes to this declaration")
-TALOS_XX_DIAGNOSTIC_SYNTAX(2000902, ERROR, "A '{0}' modifier cannot appear in a top-level declaration")
-TALOS_XX_DIAGNOSTIC_SYNTAX(2000903, ERROR, "A '{0}' modifier cannot appear in a class property")
+TALOS_XX_DIAGNOSTIC_SYNTAX(2000902, ERROR, "A '{0}' modifier cannot appear in a class property")
+TALOS_XX_DIAGNOSTIC_SYNTAX(2000903, ERROR, "A '{0}' modifier cannot appear in a top-level declaration")
+TALOS_XX_DIAGNOSTIC_SYNTAX(2000904, ERROR, "A '{0}' modifier cannot appear in a function-level declaration")
 
 /// "Analysis" Diagnostics Group 3_000_000
 TALOS_XX_DIAGNOSTIC_REFERENCE(3000000, ERROR, "{0}")

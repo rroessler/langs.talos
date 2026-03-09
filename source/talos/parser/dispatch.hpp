@@ -23,6 +23,14 @@
 
 namespace Talos::Parser {
 
+    /// @brief Parsing Extent.
+    enum class Extent : uint8_t {
+        CLASS,    // class properties
+        STATIC,   // static properties
+        MODULE,   // module scoping
+        SCOPING,  // function scoping
+    };
+
     /// @brief Syntax Dispatch Methods.
     class Dispatch : public $::Never {
         //  TYPEDEFS  //
@@ -46,7 +54,7 @@ namespace Talos::Parser {
          */
         static inline constexpr void stream(Stream* parser, std::vector<Syntax::Node*>& nodes) {
             while (!parser->eos()) {
-                auto* node = m_declaration(parser, true);
+                auto* node = m_declaration(parser, Extent::MODULE);
                 if ($_LIKELY(node)) nodes.emplace_back(node);
                 if (parser->panicking()) parser->synchronize();
             }
@@ -57,7 +65,7 @@ namespace Talos::Parser {
 
         /**
          * @brief Parses a type-annotation.
-         * @param parser                Parser stream.
+         * @param parser                    Parser stream.
          */
         template <std::derived_from<Syntax::Annotation> T>
         static T* m_annotation(Stream* parser);
@@ -65,14 +73,14 @@ namespace Talos::Parser {
 
         /**
          * @brief Handles parsing template constraints.
-         * @param parser                Parser stream.
+         * @param parser                    Parser stream.
          */
         static std::optional<Syntax::Template> m_template(Stream* parser);
 
         /**
          * @brief Handles parsing function signatures/prototypes.
-         * @param parser                Parser stream.
-         * @param annotated             Annotation flag.
+         * @param parser                    Parser stream.
+         * @param annotated                 Annotation flag.
          */
         static Syntax::Signature* m_signature(Stream* parser, bool annotated = false);
         static Syntax::Parameters* m_parameters(Stream* parser, bool annotated = false);
@@ -80,27 +88,32 @@ namespace Talos::Parser {
 
         /**
          * @brief Handles constructing anonymous qualifiers.
-         * @param parser                Parser stream.
-         * @param name                  Name of qualifier.
+         * @param parser                    Parser stream.
+         * @param name                      Name of qualifier.
          */
         static Syntax::Annotation* m_qualifier(Stream* parser, const $::String::View& name);
 
         /**
          * @brief Parses a top-level declaration node.
-         * @param parser                Parser stream.
-         * @param module                Top-level module flag.
+         * @param parser                    Parser stream.
          */
         template <std::derived_from<Syntax::Node> T>
         static T* m_declaration(Stream* parser);
-        static Syntax::Node* m_declaration(Stream* parser, bool module = false);
+
+        /**
+         * @brief Parses a top-level declaration node.
+         * @param parser                    Parser stream.
+         * @param extent                    Scoping extent.
+         */
+        static Syntax::Node* m_declaration(Stream* parser, Extent extent);
 
         /**
          * @brief Handles parsing any import/export statement.
          * @param parser                    Syntax parser.
-         * @param module                    Top-level module flag.
+         * @param extent                    Scoping extent.
          */
-        static Syntax::Node* m_import(Stream* parser, bool module = false);
-        static Syntax::Node* m_export(Stream* parser, bool module = false);
+        static Syntax::Node* m_import(Stream* parser, Extent extent);
+        static Syntax::Node* m_export(Stream* parser, Extent extent);
 
         /**
          * @brief Parses any variable declaration.
@@ -118,11 +131,11 @@ namespace Talos::Parser {
         /**
          * @brief Parses a declaration subject with details.
          * @param parser                    Syntax parser.
-         * @param level                     Module level.
+         * @param extent                    Scoping extent.
          */
-        static Syntax::Declaration* m_subject(Stream* parser, $::Ternary level = false);
-        static Syntax::Declaration* m_preamble(Stream* parser, $::Ternary level = false);
-        static Syntax::Declaration* m_modifiers(Stream* parser, $::Ternary level = false);
+        static Syntax::Declaration* m_subject(Stream* parser, Extent extent);
+        static Syntax::Declaration* m_preamble(Stream* parser, Extent extent);
+        static Syntax::Declaration* m_modifiers(Stream* parser, Extent extent);
 
         /**
          * @brief Handles parsing attributes/decorators.
@@ -145,7 +158,7 @@ namespace Talos::Parser {
          * @param parser                    Syntax parser.
          * @param module                    Top-level module flag.
          */
-        static Syntax::Block* m_block(Stream* parser, bool module);
+        static Syntax::Block* m_block(Stream* parser, Extent extent);
 
         /**
          * @brief Parses an expression with default precedence.

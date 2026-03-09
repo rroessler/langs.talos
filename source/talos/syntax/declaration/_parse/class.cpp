@@ -50,7 +50,7 @@ TALOS_MM_PARSE_DECL(Class, parser) {
     static constexpr auto s_opening = Lexer::Kind::PUNC_LBRACE;
     static constexpr auto s_closing = Lexer::Kind::PUNC_RBRACE;
     static constexpr auto s_separator = Lexer::Kind::PUNC_TERM;
-    static constexpr auto s_callback = [](auto* _) { return m_preamble(_, false); };
+    static constexpr auto s_callback = [](auto* _) { return m_preamble(_, Extent::CLASS); };
     static auto s_enclosed = Enclosed<Syntax::Declaration, s_opening, s_closing, s_separator>(s_callback);
 
     // attempt reading the available fields now

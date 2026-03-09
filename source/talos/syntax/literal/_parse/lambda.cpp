@@ -15,7 +15,7 @@ TALOS_MM_PARSE_PREFIX(Lambda, parser, ) {
 
     // attempt parsing the incoming body as well
     auto* body = [&] -> Syntax::Node* {
-        if (parser->check(Lexer::Kind::PUNC_LBRACE)) return m_block(parser, false);
+        if (parser->check(Lexer::Kind::PUNC_LBRACE)) return m_block(parser, Extent::SCOPING);
         if (!parser->expect(Lexer::Kind::ARROW_BOLD, "a function body")) return nullptr;
         return m_expression(parser);  // get the arrow expression to be used instead
     }();
