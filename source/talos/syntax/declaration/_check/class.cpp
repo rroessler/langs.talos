@@ -18,6 +18,9 @@ void Talos::Type::Dispatch::member(Analyzer* analyzer, const Syntax::Declaration
 
     // update the prototype with the values details to be bound
     proto->fields().emplace(field->name(), *entity), entity->unused(false);
+
+    // finally delete the incoming field name as well
+    analyzer->world()->entities().erase(field->name());
 }
 
 TALOS_MM_CHECK_NODE(Class, node, analyzer) {

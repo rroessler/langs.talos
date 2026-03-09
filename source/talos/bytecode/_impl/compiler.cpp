@@ -73,8 +73,21 @@ void Talos::Bytecode::Compiler::preamble(const Syntax::Preamble* preamble, Regis
 }
 
 void Talos::Bytecode::Compiler::expose(const Syntax::Declaration* preamble, Register value) {
-    if (!preamble->modifiers().test(Variable::Flag::EXPORT)) return;
-    emit<Syllable::MODULE_EXPORT>(value, string(preamble->name()));
+    // get the underlying modifiers to be handled
+    const auto& modifiers = preamble->modifiers();
+
+    // check for current immutability as well
+    auto immutable = modifiers.test(Variable::Flag::MUTABLE);
+
+    // check for exports that need to be exposed
+    auto exports = modifiers.test(Variable::Flag::EXPORT);
+
+    // check for object fields to be exposed as well
+    auto fields = modifiers.test(Variable::Flag::PUBLIC, Variable::Flag::PRIVATE, Variable::Flag::PROTECTED);
+
+    // handle exports to be shown
+    if (exports) emit<Syllable::MODULE_EXPORT>(value, string(preamble->name()));
+    if (fields) emit<Syllable::CLASS_EXPORT>(value, string(preamble->name()), immutable);
 }
 
 Talos::Bytecode::Index Talos::Bytecode::Compiler::enqueue(const Syntax::Lambda* function) const {

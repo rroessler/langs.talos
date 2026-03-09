@@ -6,5 +6,6 @@
 
 void Talos::Function::Closure::m_yield(const Closure& self, const Globals::Each& yield) {
     auto* attributes = self.m_attrs();
+    yield(attributes->receiver);
     yield(attributes->context.environment());
 }

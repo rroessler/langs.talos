@@ -50,7 +50,22 @@ TALOS_MM_PARSE_DECL(Class, parser) {
     static constexpr auto s_opening = Lexer::Kind::PUNC_LBRACE;
     static constexpr auto s_closing = Lexer::Kind::PUNC_RBRACE;
     static constexpr auto s_separator = Lexer::Kind::PUNC_TERM;
-    static constexpr auto s_callback = [](auto* _) { return m_preamble(_, Extent::CLASS); };
+    static constexpr auto s_callback = [](auto* _) -> Syntax::Declaration* {
+        // resolve the baseline field instance
+        auto* field = m_preamble(_, Extent::CLASS);
+        if (field == nullptr) return nullptr;
+
+        // get the underlying modifiers to be updated
+        auto& modifiers = field->modifiers();
+
+        // ignore modifiers that are already defined
+        if (modifiers.test(Variable::Flag::PUBLIC, Variable::Flag::PROTECTED)) return field;
+
+        // ensure we default the "private" accessibility flag
+        return modifiers.set(Variable::Flag::PRIVATE), field;
+    };
+
+    // construct the enclosed handler to bs used now
     static auto s_enclosed = Enclosed<Syntax::Declaration, s_opening, s_closing, s_separator>(s_callback);
 
     // attempt reading the available fields now

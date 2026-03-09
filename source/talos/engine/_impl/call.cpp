@@ -96,15 +96,14 @@ bool Talos::Engine::Call::m_validate(Isolate* isolate, size_t arity, const Argum
     return isolate->panic("Maximum recursion depth exceeded"), false;
 }
 
-Talos::Function::Context Talos::Engine::Call::m_initialize(
-    Isolate* isolate, size_t leaked, Function::Context parent, Value::Any self) {
+Talos::Function::Context Talos::Engine::Call::m_initialize(Isolate* isolate, size_t leaked, Function::Context parent) {
     // check if there are any leaked items
     if (!leaked) return parent;
 
     // construct a new context instance
     auto context = Function::Context(isolate, leaked);
     if (parent.valid()) context.parent(parent);
-    return context.self(self), context;
+    return context;  // should be valid to bind
 }
 
 Talos::Value::Any Talos::Engine::Call::m_closure(
@@ -138,7 +137,7 @@ Talos::Value::Any Talos::Engine::Call::m_closure(
     if (vargs != UINT64_MAX) stack[frame.argc() = vargs + 1] = isolate->create<Iterable::List>(args.slice(vargs));
 
     // update the current leaked information to be used
-    frame.context() = m_initialize(isolate, info->leaked(), context, args.self());
+    frame.context() = m_initialize(isolate, info->leaked(), context);
 
     // ensure we force a checkpoint before executing the current frame
     return isolate->thread()->checkpoint(), Dispatch::m_execute(isolate, &frame);
@@ -160,7 +159,7 @@ Talos::Value::Any Talos::Engine::Call::m_jitted(
 
     // construct the underlying stack to be used
     Value::Any stack[Machine::Offset::STK_SIZE] = {
-        m_initialize(isolate, info->leaked(), context, args.self()),
+        m_initialize(isolate, info->leaked(), context),
         std::bit_cast<Value::Any>(passthrough.data()),
         std::bit_cast<Value::Any>(&args),
     };

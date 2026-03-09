@@ -139,6 +139,7 @@ TALOS_XX_SYLLABLE_MODULE(MODULE_EXPORT, /** src */ Register, /** name */ Index)
 
 TALOS_XX_SYLLABLE_MODULE(CLASS_BIND, /** dst */ Register, /** index */ Index)
 TALOS_XX_SYLLABLE_MODULE(CLASS_MAKE, /** dst */ Register, /** name */ Index, /** shape */ Index)
+TALOS_XX_SYLLABLE_MODULE(CLASS_EXPORT, /** src */ Register, /** name */ Index, /** immutable */ Index)
 
 TALOS_XX_SYLLABLE_ENUM(ENUM_EMPTY, /** dst */ Register)
 TALOS_XX_SYLLABLE_ENUM(ENUM_MAKE, /** dst */ Register, /** values */ Register::Span)

@@ -15,8 +15,7 @@ namespace Talos::Function {
         /// @brief Available Context Offsets.
         struct Offset {
             static constexpr size_t PARENT = 0;
-            static constexpr size_t SELF = 1;
-            static constexpr size_t VALUES = 2;
+            static constexpr size_t VALUES = 1;
         };
 
         //  PROPERTIES  //
@@ -59,10 +58,6 @@ namespace Talos::Function {
         /// @brief Gets/sets the parent context value.
         inline Context parent() const noexcept { return Context(m_get(Offset::PARENT)); }
         inline constexpr void parent(const Iterable::List& next) const noexcept { m_set(Offset::PARENT, next); }
-
-        /// @brief Gets/sets the far-self value.
-        inline constexpr Value::Any self() const noexcept { return m_get(Offset::SELF); }
-        inline constexpr void self(Value::Any next) const noexcept { return m_set(Offset::SELF, next); }
 
         /**
          * @brief Loads a value from the context.

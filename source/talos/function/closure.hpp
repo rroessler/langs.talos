@@ -16,6 +16,9 @@ namespace Talos {
         /// @brief Shared function information.
         const Function::Info* info;
 
+        /// @brief Bound self value.
+        Value::Any receiver = Value::Void();
+
         /// @brief Bound function environment.
         Function::Context context = Function::Context();
 
@@ -27,10 +30,13 @@ namespace Talos {
         /**
          * @brief Constructs a closure.
          * @param info              Closure information.
+         * @param self              Bound receiver value.
          * @param context           Context to be bound.
          */
         explicit Attributes(const Function::Info* info) : Attributes(info, Value::Void()) {}
-        explicit Attributes(const Function::Info* info, Value::Any context) : info(info), context(context) {}
+        explicit Attributes(const Function::Info* info, Value::Any self) : Attributes(info, self, Value::Void()) {}
+        explicit Attributes(const Function::Info* info, Value::Any self, Value::Any context) :
+            info(info), receiver(self), context(context) {}
     };
 
     /// @brief Closure Function Interface.
@@ -47,18 +53,13 @@ namespace Talos {
 
         //  PUBLIC METHODS  //
 
-        inline constexpr const Context& context() const { return m_attrs()->context; }
         inline constexpr const Info* info() const noexcept { return m_attrs()->info; }
+        inline constexpr const Context& context() const { return m_attrs()->context; }
+        inline constexpr Value::Any receiver() const noexcept { return m_attrs()->receiver; }
 
         inline constexpr uint64_t arity() const noexcept { return info()->arity(); }
         inline constexpr uint64_t adicity() const noexcept { return info()->adicity(); }
         inline constexpr $::URI::View resource() const noexcept { return info()->resource(); }
-
-        /// @brief Gets the available self receiver.
-        inline constexpr Value::Any receiver() const noexcept {
-            auto context = m_attrs()->context;  // prepare context
-            return context.valid() ? context.self() : Value::Void();
-        }
 
        protected:
         //  PRIVATE METHODS  //

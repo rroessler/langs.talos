@@ -145,6 +145,7 @@ TALOS_XX_DIAGNOSTIC_ANALYSIS(3001001, ERROR, "Class '{0}' cannot extend non-clas
 TALOS_XX_DIAGNOSTIC_REFERENCE(4000000, ERROR, "{0}")
 
 TALOS_XX_DIAGNOSTIC_REFERENCE(4000200, ERROR, "Property '{0}' does not exist on '{1}'")
+TALOS_XX_DIAGNOSTIC_REFERENCE(4000201, ERROR, "Property '{0}' is not publicly accessible")
 
 TALOS_XX_DIAGNOSTIC_REFERENCE(4000300, ERROR, "Cannot find type '{0}'")
 TALOS_XX_DIAGNOSTIC_REFERENCE(4000301, ERROR, "Cannot find variable '{0}'")
@@ -202,6 +203,7 @@ TALOS_XX_DIAGNOSTIC_RUNTIME(6000701, ERROR, "Unwrapping 'Result' value failed")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000702, ERROR, "Unwrapping 'Result' error failed")
 
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000800, ERROR, "Could not bind constructor to '{0}'")
+TALOS_XX_DIAGNOSTIC_RUNTIME(6000801, ERROR, "Cannot re-assign to property '{0}' of type '{1}'")
 
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000900, ERROR, "'Todo' expression evaluated. {0}")
 

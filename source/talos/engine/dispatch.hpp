@@ -95,10 +95,8 @@ namespace Talos::Engine {
          * @param isolate                   Thread isolate.
          * @param leaked                    Total upvalues.
          * @param context                   Parent context.
-         * @param self                      Self value.
          */
-        static Function::Context m_initialize(
-            Isolate* isolate, size_t leaked, Function::Context context, Value::Any self);
+        static Function::Context m_initialize(Isolate* isolate, size_t leaked, Function::Context context);
 
         /**
          * @brief Explicit interpreter dispatching.

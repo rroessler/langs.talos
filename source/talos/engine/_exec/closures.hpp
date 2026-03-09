@@ -37,8 +37,8 @@ $_INLINE_FORCE Talos::Engine::Mode Talos::Engine::Dispatch::m_spawn(
 
 TALOS_MM_ENGINE_EXECUTE(CLOSURE_MAKE, isolate, frame, instruction) {
     auto* info = frame->arena()->functions.at(instruction->get<1>()).get();
-    auto closure = isolate->create<Function::Closure>(info, frame->context());
-    return frame->store(instruction->get<0>(), closure), Mode::NEXT;
+    auto closure = isolate->create<Function::Closure>(info, frame->self(), frame->context());
+    return frame->store(instruction->get<0>(), closure), Mode::NEXT;  // and store the closure
 }
 
 TALOS_MM_ENGINE_EXECUTE(CLOSURE_PASS, isolate, frame, instruction) {

@@ -16,6 +16,9 @@ namespace Talos {
         /// @brief The compiled machine code information.
         const Machine::Info* info = nullptr;
 
+        /// @brief Bound receiver value.
+        Value::Any receiver = Value::Void();
+
         /// @brief Bound function environment.
         Function::Context context = Function::Context();
 
@@ -29,7 +32,10 @@ namespace Talos {
          * @param info                  Machine callee.
          * @param context               Context to bind.
          */
-        explicit Attributes(const Machine::Info* info, Value::Any context) : info(info), context(context) {}
+        explicit Attributes(const Machine::Info* info) : Attributes(info, Value::Void()) {}
+        explicit Attributes(const Machine::Info* info, Value::Any self) : Attributes(info, self, Value::Void()) {}
+        explicit Attributes(const Machine::Info* info, Value::Any self, Value::Any context) :
+            info(info), receiver(self), context(context) {}
     };
 
     /// @brief Jitted Function Interface.
@@ -47,17 +53,12 @@ namespace Talos {
         //  PUBLIC METHODS  //
 
         inline constexpr const Context& context() const { return m_attrs()->context; }
+        inline constexpr Value::Any receiver() const noexcept { return m_attrs()->receiver; }
         inline constexpr const Machine::Info* info() const noexcept { return m_attrs()->info; }
 
         inline constexpr uint64_t arity() const noexcept { return info()->arity(); }
         inline constexpr uint64_t adicity() const noexcept { return info()->adicity(); }
         inline constexpr $::URI::View resource() const noexcept { return info()->resource(); }
-
-        /// @brief Gets the available self receiver.
-        inline constexpr Value::Any receiver() const noexcept {
-            auto context = m_attrs()->context;  // prepare context
-            return context.valid() ? context.self() : Value::Void();
-        }
 
        protected:
         //  PRIVATE METHODS  //

@@ -21,15 +21,15 @@ Talos::Machine::Reference Talos::Machine::Dispatch::passthrough(Runtime::Isolate
     auto context = frame->context();
 
     // ensure that are context and arguments are matched
-    $_ASSERT(args->self() == context.self());
+    $_ASSERT(args->self() == frame->self());
 
     // should safely be able to invoke the call
     return Engine::Call::any(isolate, context.load(0), *args).pointer();
 }
 
 Talos::Machine::Reference Talos::Machine::Dispatch::closure(Runtime::Isolate* isolate, const Function::Info* info) {
-    const auto* frame = isolate->frame()->as<Machine::Frame>();  // get frame
-    return isolate->create<Function::Closure>(info, frame->context()).pointer();
+    const auto* frame = isolate->frame()->as<Machine::Frame>();  // get frame to be used now
+    return isolate->create<Function::Closure>(info, frame->self(), frame->context()).pointer();
 }
 
 //  PRIVATE METHODS  //
