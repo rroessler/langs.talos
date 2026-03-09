@@ -5,14 +5,14 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Definitions
-$_FWD(class Event, XSIO::Timer)
-$_FWD(class Token, XSIO::Timer)
-$_FWD(class Cache, XSIO::Timer)
-$_FWD(struct Action, XSIO::Timer)
+$_FWD(XSIO::Timer, class Event)
+$_FWD(XSIO::Timer, class Token)
+$_FWD(XSIO::Timer, class Cache)
+$_FWD(XSIO::Timer, struct Action)
 
 /// Forward Definitions
-$_FWD(using Identifier = size_t, XSIO::Timer)
-$_FWD(using Point = $::Chrono::Point, XSIO::Timer)
-$_FWD(using Ticks = $::Chrono::Duration, XSIO::Timer)
+$_FWD(XSIO::Timer, using Identifier = size_t)
+$_FWD(XSIO::Timer, using Point = $::Chrono::Point)
+$_FWD(XSIO::Timer, using Ticks = $::Chrono::Duration)
 
 #endif

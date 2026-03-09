@@ -82,6 +82,7 @@ TALOS_XX_DIAGNOSTIC_SYNTAX(2000901, WARN, "Cannot apply decorators/attributes to
 TALOS_XX_DIAGNOSTIC_SYNTAX(2000902, ERROR, "A '{0}' modifier cannot appear in a class property")
 TALOS_XX_DIAGNOSTIC_SYNTAX(2000903, ERROR, "A '{0}' modifier cannot appear in a top-level declaration")
 TALOS_XX_DIAGNOSTIC_SYNTAX(2000904, ERROR, "A '{0}' modifier cannot appear in a function-level declaration")
+TALOS_XX_DIAGNOSTIC_SYNTAX(2000905, ERROR, "Cannot combine different accessibility modifiers in this context")
 
 /// "Analysis" Diagnostics Group 3_000_000
 TALOS_XX_DIAGNOSTIC_REFERENCE(3000000, ERROR, "{0}")
@@ -157,7 +158,8 @@ TALOS_XX_DIAGNOSTIC_REFERENCE(4000405, ERROR, "Cannot re-declare enum variant '{
 TALOS_XX_DIAGNOSTIC_REFERENCE(4000406, ERROR, "Class declaration overlaps with '{0}' declaration")
 
 TALOS_XX_DIAGNOSTIC_REFERENCE(4000900, HINT, "Unreachable code detected", Unnecessary)
-TALOS_XX_DIAGNOSTIC_REFERENCE(4000901, HINT, "'{0}' is declared but its value is never used", Unnecessary)
+TALOS_XX_DIAGNOSTIC_REFERENCE(4000901, HINT, "'{0}' is declared but its type is never used", Unnecessary)
+TALOS_XX_DIAGNOSTIC_REFERENCE(4000902, HINT, "'{0}' is declared but its value is never used", Unnecessary)
 
 /// "Runtime" Diagnostics Group 6_000_000
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000000, ERROR, "{0}")

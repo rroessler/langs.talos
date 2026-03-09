@@ -6,10 +6,10 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Definitions
-$_FWD(using Label = asmjit::Label, XASM::Host)
-$_FWD(using Immediate = asmjit::Imm, XASM::Host)
-$_FWD(using Memory = asmjit::ujit::Mem, XASM::Host)
-$_FWD(using Register = asmjit::ujit::Gp, XASM::Host)
-$_FWD(using Double = asmjit::ujit::Vec, XASM::Host)
+$_FWD(XASM::Host, using Label = asmjit::Label)
+$_FWD(XASM::Host, using Immediate = asmjit::Imm)
+$_FWD(XASM::Host, using Memory = asmjit::ujit::Mem)
+$_FWD(XASM::Host, using Register = asmjit::ujit::Gp)
+$_FWD(XASM::Host, using Double = asmjit::ujit::Vec)
 
 #endif

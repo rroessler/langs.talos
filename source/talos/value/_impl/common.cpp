@@ -49,8 +49,8 @@ $::String::View Talos::Value::Any::type_name() const noexcept {
 #define X(T, ...) \
     case Shape::Lookup<T>(): return Proxy<T>::name();
     switch (Object::Any(m_pointer).header()->shape()) {
-        TALOS_XX_VALUES_OBJECT(X)
-        default: X(Object::Instance)
+        TALOS_XX_VALUES_OBJECT(X)  // baseline objects here
+        default: return m_as<Object::Instance>().name().view();
     }
 #undef X
 }

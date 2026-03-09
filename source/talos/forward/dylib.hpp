@@ -5,11 +5,11 @@
 #include "talos/object/instance.hpp"
 
 /// Forward Declarations
-$_FWD(class Addon, Talos::Dylib)
-$_FWD(class Registry, Talos::Dylib)
+$_FWD(Talos::Dylib, class Addon)
+$_FWD(Talos::Dylib, class Registry)
 
 /// Forward Definitions
-$_FWD(using Exports = Object::Instance, Talos::Dylib)
-$_FWD(using Loader = $::Functor::Unique<void(Runtime::Isolate*, Exports&)>, Talos::Dylib)
+$_FWD(Talos::Dylib, using Exports = Object::Instance)
+$_FWD(Talos::Dylib, using Loader = $::Functor::Unique<void(Runtime::Isolate*, Exports&)>)
 
 #endif

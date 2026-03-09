@@ -6,8 +6,8 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Definitions
-$_FWD(using Node = asmjit::FuncNode, XASM::Function)
-$_FWD(using Callee = asmjit::InvokeNode, XASM::Function)
-$_FWD(using Signature = asmjit::FuncSignature, XASM::Function)
+$_FWD(XASM::Function, using Node = asmjit::FuncNode)
+$_FWD(XASM::Function, using Callee = asmjit::InvokeNode)
+$_FWD(XASM::Function, using Signature = asmjit::FuncSignature)
 
 #endif

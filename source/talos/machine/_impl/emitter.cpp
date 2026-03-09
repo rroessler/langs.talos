@@ -7,11 +7,11 @@
 #include "talos/value/boolean.hpp"
 
 /// Forward Declarations
-$_FWD(void expose(Reference, bool), Talos::Machine::Dispatch)
-$_FWD(uint64_t validate(Reference), Talos::Machine::Dispatch)
-$_FWD(uint64_t truthiness(Reference), Talos::Machine::Dispatch)
-$_FWD(Reference argv(const Function::Arguments*, size_t), Talos::Machine::Dispatch)
-$_FWD(Reference string(Runtime::Isolate*, const String::Intern*), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Dispatch, void expose(Reference, bool))
+$_FWD(Talos::Machine::Dispatch, uint64_t validate(Reference))
+$_FWD(Talos::Machine::Dispatch, uint64_t truthiness(Reference))
+$_FWD(Talos::Machine::Dispatch, Reference argv(const Function::Arguments*, size_t))
+$_FWD(Talos::Machine::Dispatch, Reference string(Runtime::Isolate*, const String::Intern*))
 
 //  MACROS  //
 

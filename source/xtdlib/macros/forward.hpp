@@ -4,9 +4,9 @@
 //  MACROS  //
 
 /// @brief Allows constructing a forward declaration macro.
-#define $_FWD(D, ...)       \
-    namespace __VA_ARGS__ { \
-        D;                  \
+#define $_FWD(N, ...) \
+    namespace N {     \
+        __VA_ARGS__;  \
     }
 
 #endif

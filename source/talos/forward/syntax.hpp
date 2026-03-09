@@ -5,14 +5,14 @@
 #include <xlsp/xlsp.hpp>
 
 /// Forward Declarations
-$_FWD(class Node, Talos::Syntax)
-$_FWD(class Tree, Talos::Syntax)
-$_FWD(class Preamble, Talos::Syntax)
-$_FWD(struct Generator, Talos::Syntax)
-$_FWD(class Identifier, Talos::Syntax)
-$_FWD(class Declaration, Talos::Syntax)
+$_FWD(Talos::Syntax, class Node)
+$_FWD(Talos::Syntax, class Tree)
+$_FWD(Talos::Syntax, class Preamble)
+$_FWD(Talos::Syntax, struct Generator)
+$_FWD(Talos::Syntax, class Identifier)
+$_FWD(Talos::Syntax, class Declaration)
 
 /// Forward Defintiions
-$_FWD(using Dependencies = std::vector<$::String::View>, Talos::Syntax)
+$_FWD(Talos::Syntax, using Dependencies = std::vector<$::String::View>)
 
 #endif

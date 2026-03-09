@@ -7,6 +7,6 @@
 #include "talos/function/arguments.hpp"
 
 /// Forward Definitions
-$_FWD(using Callback = Value::Any (*)(Runtime::Isolate*, const Arguments&), Talos::Function);
+$_FWD(Talos::Function, using Callback = Value::Any (*)(Runtime::Isolate*, const Arguments&));
 
 #endif

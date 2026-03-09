@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 /// Forward Declarations
-$_FWD(bool control(Pipe::Handle, int32_t, int32_t, int32_t, bool), XPC::File)
+$_FWD(XPC::File, bool control(Pipe::Handle, int32_t, int32_t, int32_t, bool))
 
 //  PUBLIC METHODS  //
 

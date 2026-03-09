@@ -5,8 +5,8 @@
 #include "talos/syntax/_inline/expression.ipp"
 
 /// Forward Declarations
-$_FWD(Entity target(Analyzer *, const Syntax::Expression *), Talos::Type::Dispatch)
-$_FWD(Deduction immutable(Analyzer *, const Syntax::Expression *), Talos::Type::Dispatch)
+$_FWD(Talos::Type::Dispatch, Entity target(Analyzer *, const Syntax::Expression *))
+$_FWD(Talos::Type::Dispatch, Deduction immutable(Analyzer *, const Syntax::Expression *))
 
 //  PUBLIC METHODS  //
 

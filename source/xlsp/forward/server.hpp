@@ -5,7 +5,7 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Implementations
-$_FWD(struct Options, XLSP::Server)
-$_FWD(class Connection, XLSP::Server)
+$_FWD(XLSP::Server, struct Options)
+$_FWD(XLSP::Server, class Connection)
 
 #endif

@@ -9,8 +9,8 @@
 #include "xsio/virtual/worker.hpp"
 
 /// Forward Declarations
-$_FWD(Transfer jump(Pointer, void *), XSIO::Context::Operation)
-$_FWD(Pointer make(void *, size_t, void (*)(Transfer)), XSIO::Context::Operation)
+$_FWD(XSIO::Context::Operation, Transfer jump(Pointer, void *))
+$_FWD(XSIO::Context::Operation, Pointer make(void *, size_t, void (*)(Transfer)))
 
 //  PROPERTIES  //
 

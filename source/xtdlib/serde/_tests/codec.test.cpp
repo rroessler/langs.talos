@@ -2,7 +2,7 @@
 #include <testing/testing.hpp>
 
 /// Forward Declarations
-$_FWD(struct Item, Mock)
+$_FWD(Mock, struct Item)
 
 //  X-MACROS  //
 

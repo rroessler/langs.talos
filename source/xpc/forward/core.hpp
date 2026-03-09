@@ -5,7 +5,7 @@
 #include <xsio/xsio.hpp>
 
 /// Forward Declarations
-$_FWD(class Child, XPC::Core)
-$_FWD(class Identifier, XPC::Core)
+$_FWD(XPC::Core, class Child)
+$_FWD(XPC::Core, class Identifier)
 
 #endif

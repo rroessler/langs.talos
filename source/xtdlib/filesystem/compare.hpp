@@ -8,7 +8,7 @@
 #include "xtdlib/macros/forward.hpp"
 
 /// Forward Declarations
-$_FWD(using Path = std::filesystem::path, $::Filesystem)
+$_FWD($::Filesystem, using Path = std::filesystem::path)
 
 namespace $::Filesystem {
 

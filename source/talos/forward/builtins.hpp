@@ -6,6 +6,6 @@
 #include "talos/forward/value.hpp"
 
 /// Forward Declarations
-$_FWD(class Service, Talos::Builtins)
+$_FWD(Talos::Builtins, class Service)
 
 #endif

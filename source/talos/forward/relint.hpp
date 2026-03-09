@@ -8,18 +8,18 @@
 #include "talos/forward/diagnostic.hpp"
 
 /// Forward Declarations
-$_FWD(struct Rule, Talos::Relint)
-$_FWD(class Hooks, Talos::Relint)
-$_FWD(class Mirror, Talos::Relint)
-$_FWD(class Context, Talos::Relint)
-$_FWD(class Service, Talos::Relint)
-$_FWD(class Metadata, Talos::Relint)
-$_FWD(struct Options, Talos::Relint)
-$_FWD(struct Analyzer, Talos::Relint)
+$_FWD(Talos::Relint, struct Rule)
+$_FWD(Talos::Relint, class Hooks)
+$_FWD(Talos::Relint, class Mirror)
+$_FWD(Talos::Relint, class Context)
+$_FWD(Talos::Relint, class Service)
+$_FWD(Talos::Relint, class Metadata)
+$_FWD(Talos::Relint, struct Options)
+$_FWD(Talos::Relint, struct Analyzer)
 
 /// Forward Definitions
-$_FWD(using Severity = Diagnostic::Severity, Talos::Relint)
-$_FWD(using Deferrer = $::Functor::Unique<void(Analyzer*)>, Talos::Relint)
-$_FWD(using Factory = $::Functor::Unique<void(Hooks*, const Rule*)>, Talos::Relint)
+$_FWD(Talos::Relint, using Severity = Diagnostic::Severity)
+$_FWD(Talos::Relint, using Deferrer = $::Functor::Unique<void(Analyzer*)>)
+$_FWD(Talos::Relint, using Factory = $::Functor::Unique<void(Hooks*, const Rule*)>)
 
 #endif

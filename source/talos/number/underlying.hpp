@@ -6,7 +6,7 @@
 #include "talos/value/common.hpp"
 
 /// Forward Definitions
-$_FWD(using Integral = Pointer::Integral, Talos::Number)
-$_FWD(using Underlying = Pointer::Numeric, Talos::Number)
+$_FWD(Talos::Number, using Integral = Pointer::Integral)
+$_FWD(Talos::Number, using Underlying = Pointer::Numeric)
 
 #endif

@@ -11,14 +11,14 @@ $_ALLOCATOR_CATEGORY(XSIO_WORKER)
 $_ALLOCATOR_CATEGORY(XSIO_PROCESSOR)
 
 /// Forward Declarations
-$_FWD(class Worker, XSIO::Virtual)
-$_FWD(class Thread, XSIO::Virtual)
-$_FWD(class Timeout, XSIO::Virtual)
-$_FWD(class Spinner, XSIO::Virtual)
-$_FWD(class Processor, XSIO::Virtual)
-$_FWD(enum class State : uint8_t, XSIO::Virtual)
+$_FWD(XSIO::Virtual, class Worker)
+$_FWD(XSIO::Virtual, class Thread)
+$_FWD(XSIO::Virtual, class Timeout)
+$_FWD(XSIO::Virtual, class Spinner)
+$_FWD(XSIO::Virtual, class Processor)
+$_FWD(XSIO::Virtual, enum class State : uint8_t)
 
 /// Forward Definitions
-$_FWD(using Native = $::Functor::Unique<void()>, XSIO::Virtual)
+$_FWD(XSIO::Virtual, using Native = $::Functor::Unique<void()>)
 
 #endif

@@ -5,8 +5,8 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct Lookup, Talos::Variable)
-$_FWD(class Context, Talos::Variable)
-$_FWD(class Captures, Talos::Variable)
+$_FWD(Talos::Variable, struct Lookup)
+$_FWD(Talos::Variable, class Context)
+$_FWD(Talos::Variable, class Captures)
 
 #endif

@@ -5,8 +5,8 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct Usage, Shell::Command)
-$_FWD(class Descriptor, Shell::Command)
-$_FWD(class Abstract, Shell::Command)
+$_FWD(Shell::Command, struct Usage)
+$_FWD(Shell::Command, class Descriptor)
+$_FWD(Shell::Command, class Abstract)
 
 #endif

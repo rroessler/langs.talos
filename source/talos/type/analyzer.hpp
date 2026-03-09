@@ -14,6 +14,7 @@
 #include "talos/syntax/declaration/variable.hpp"
 
 /// Type Modules
+#include "talos/type/compound/callable.hpp"
 #include "talos/type/utility/intrinsics.hpp"
 
 namespace Talos::Type {
@@ -90,7 +91,8 @@ namespace Talos::Type {
          * @param callee                    Callee typing.
          */
         inline constexpr $::Ptr::Unique<Scope> scope() noexcept { return $::New().unique<Scope>(this); }
-        $::Ptr::Unique<Scope> scope(const Syntax::Constructor* constructor, const Erased& callee) noexcept;
+        $::Ptr::Unique<Scope> scope(const Syntax::Constructor* constructor, const $::Ptr::Shared<Callable>& callable,
+            const $::Ptr::Shared<Generic>& generic) noexcept;
 
         /**
          * @brief Handles deferring type-checking.

@@ -12,7 +12,7 @@
 #include "talos/runtime/service.hpp"
 
 /// Forward Declarations
-$_FWD(int32_t launch(XI::Container*), Talos::Toolchain)
+$_FWD(Talos::Toolchain, int32_t launch(XI::Container*))
 
 //  PUBLIC METHODS  //
 

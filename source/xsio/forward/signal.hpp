@@ -5,7 +5,7 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Code, XSIO::Signal)
-$_FWD(class Handler, XSIO::Signal)
+$_FWD(XSIO::Signal, class Code)
+$_FWD(XSIO::Signal, class Handler)
 
 #endif

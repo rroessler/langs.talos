@@ -5,17 +5,17 @@
 #include <xtest/xtest.hpp>
 
 /// Forward Declarations
-$_FWD(class Service, Talos::Testing)
-$_FWD(struct Options, Talos::Testing)
-$_FWD(class Registry, Talos::Testing)
+$_FWD(Talos::Testing, class Service)
+$_FWD(Talos::Testing, struct Options)
+$_FWD(Talos::Testing, class Registry)
 
 /// Forward Definitions
-$_FWD(using Case = XT::Case, Talos::Testing)
-$_FWD(using Bench = XT::Bench, Talos::Testing)
-$_FWD(using Group = XT::Group, Talos::Testing)
-$_FWD(using Runner = XT::Session::Runner, Talos::Testing)
-$_FWD(using Callback = XT::Handle::Callback, Talos::Testing)
-$_FWD(using Session = XT::Session::Service, Talos::Testing)
-$_FWD(using Handle = $::Ptr::Unique<XT::Handle>, Talos::Testing)
+$_FWD(Talos::Testing, using Case = XT::Case)
+$_FWD(Talos::Testing, using Bench = XT::Bench)
+$_FWD(Talos::Testing, using Group = XT::Group)
+$_FWD(Talos::Testing, using Runner = XT::Session::Runner)
+$_FWD(Talos::Testing, using Callback = XT::Handle::Callback)
+$_FWD(Talos::Testing, using Session = XT::Session::Service)
+$_FWD(Talos::Testing, using Handle = $::Ptr::Unique<XT::Handle>)
 
 #endif

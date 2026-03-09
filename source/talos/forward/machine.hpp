@@ -9,19 +9,19 @@
 #include "talos/value/pointer.hpp"
 
 /// Forward Declarations
-$_FWD(class Info, Talos::Machine)
-$_FWD(class Frame, Talos::Machine)
-$_FWD(class Service, Talos::Machine)
-$_FWD(class Emitter, Talos::Machine)
-$_FWD(struct Builder, Talos::Machine)
+$_FWD(Talos::Machine, class Info)
+$_FWD(Talos::Machine, class Frame)
+$_FWD(Talos::Machine, class Service)
+$_FWD(Talos::Machine, class Emitter)
+$_FWD(Talos::Machine, struct Builder)
 
 /// Forward Definitions
-$_FWD(using Label = XASM::Host::Label, Talos::Machine)
-$_FWD(using Double = XASM::Host::Double, Talos::Machine)
-$_FWD(using Memory = XASM::Host::Memory, Talos::Machine)
-$_FWD(using Immediate = XASM::Host::Immediate, Talos::Machine)
-$_FWD(using Register = XASM::Host::Register, Talos::Machine)
-$_FWD(using Reference = Pointer::Underlying, Talos::Machine)
-$_FWD(using Compiler = XASM::Compiler::Universal, Talos::Machine)
+$_FWD(Talos::Machine, using Label = XASM::Host::Label)
+$_FWD(Talos::Machine, using Double = XASM::Host::Double)
+$_FWD(Talos::Machine, using Memory = XASM::Host::Memory)
+$_FWD(Talos::Machine, using Immediate = XASM::Host::Immediate)
+$_FWD(Talos::Machine, using Register = XASM::Host::Register)
+$_FWD(Talos::Machine, using Reference = Pointer::Underlying)
+$_FWD(Talos::Machine, using Compiler = XASM::Compiler::Universal)
 
 #endif

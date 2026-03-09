@@ -8,10 +8,10 @@
 #include "talos/machine/_inline/macros.ipp"
 
 /// Forward Declarations
-$_FWD(Reference open(Runtime::Isolate*), Talos::Machine::Dispatch)
-$_FWD(Reference close(Runtime::Isolate*), Talos::Machine::Dispatch)
-$_FWD(Reference import(Runtime::Isolate*, const String::Intern*), Talos::Machine::Dispatch)
-$_FWD(Reference expose(Runtime::Isolate*, Reference, const String::Intern*), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Dispatch, Reference open(Runtime::Isolate*))
+$_FWD(Talos::Machine::Dispatch, Reference close(Runtime::Isolate*))
+$_FWD(Talos::Machine::Dispatch, Reference import(Runtime::Isolate*, const String::Intern*))
+$_FWD(Talos::Machine::Dispatch, Reference expose(Runtime::Isolate*, Reference, const String::Intern*))
 
 //  PUBLIC METHODS  //
 

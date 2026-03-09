@@ -6,8 +6,8 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Definitions
-$_FWD(using Arena = asmjit::CodeHolder, XASM::Compiler)
-$_FWD(using Backend = asmjit::host::Compiler, XASM::Compiler)
-$_FWD(using Universal = asmjit::ujit::UniCompiler, XASM::Compiler)
+$_FWD(XASM::Compiler, using Arena = asmjit::CodeHolder)
+$_FWD(XASM::Compiler, using Backend = asmjit::host::Compiler)
+$_FWD(XASM::Compiler, using Universal = asmjit::ujit::UniCompiler)
 
 #endif

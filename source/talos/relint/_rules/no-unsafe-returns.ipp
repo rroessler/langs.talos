@@ -39,7 +39,7 @@ TALOS_MM_RELINT_DEFINE(MM_RULE_NAME, {
 
 #ifdef TALOS_MM_RELINT_REGISTER
 
-$_FWD(void unsafe_returns(const Mirror*, const Mirror*, const Rule*, Context*), Talos::Relint::Dispatch)
+$_FWD(Talos::Relint::Dispatch, void unsafe_returns(const Mirror*, const Mirror*, const Rule*, Context*))
 void Talos::Relint::Dispatch::unsafe_returns(
     const Mirror* value, const Mirror* parent, const Rule* rule, Context* context) {
     // ensure both the value and parent are valid

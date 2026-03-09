@@ -8,15 +8,15 @@
 #include "talos/value/_inline/value.ipp"
 
 /// Forward Declarations
-$_FWD(class Binary, Talos::Machine)
-$_FWD(class Compare, Talos::Machine)
+$_FWD(Talos::Machine, class Binary)
+$_FWD(Talos::Machine, class Compare)
 
-$_FWD(Reference lor(Reference, Reference), Talos::Machine::Dispatch)
-$_FWD(Reference land(Reference, Reference), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Dispatch, Reference lor(Reference, Reference))
+$_FWD(Talos::Machine::Dispatch, Reference land(Reference, Reference))
 
-$_FWD(Reference spawn(Runtime::Isolate *, Reference, Value::Any *), Talos::Machine::Dispatch)
-$_FWD(Reference invoke(Runtime::Isolate *, Reference, Value::Any *), Talos::Machine::Dispatch)
-$_FWD(Reference recall(Runtime::Isolate *, const Machine::Info *, Value::Any *), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Dispatch, Reference spawn(Runtime::Isolate *, Reference, Value::Any *))
+$_FWD(Talos::Machine::Dispatch, Reference invoke(Runtime::Isolate *, Reference, Value::Any *))
+$_FWD(Talos::Machine::Dispatch, Reference recall(Runtime::Isolate *, const Machine::Info *, Value::Any *))
 
 //  TYPEDEFS  //
 

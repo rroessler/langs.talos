@@ -5,9 +5,9 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct Unique, XI)
-$_FWD(struct Shared, XI)
-$_FWD(struct Service, XI)
-$_FWD(class Container, XI)
+$_FWD(XI, struct Unique)
+$_FWD(XI, struct Shared)
+$_FWD(XI, struct Service)
+$_FWD(XI, class Container)
 
 #endif

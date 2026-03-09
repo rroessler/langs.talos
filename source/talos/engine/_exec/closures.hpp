@@ -49,7 +49,7 @@ TALOS_MM_ENGINE_EXECUTE(CLOSURE_PASS, isolate, frame, instruction) {
     $_ASSERT(context.valid());
 
     // prepare the self and callee values
-    auto self = context.self(), callee = context.load(0);
+    auto self = frame->self(), callee = context.load(0);
 
     // construct the necessary arguments now
     Arguments args = { self, frame->argv() };

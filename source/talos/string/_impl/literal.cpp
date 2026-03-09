@@ -5,8 +5,8 @@
 #include "talos/runtime/isolate.hpp"
 
 /// Forward Declarations
-$_FWD(Value::Any report(Runtime::Isolate *, const std::exception &), Talos::String::Literal)
-$_FWD(Value::Any report(Runtime::Isolate *, const $::String::View &), Talos::String::Literal)
+$_FWD(Talos::String::Literal, Value::Any report(Runtime::Isolate *, const std::exception &))
+$_FWD(Talos::String::Literal, Value::Any report(Runtime::Isolate *, const $::String::View &))
 
 //  PUBLIC METHODS  //
 

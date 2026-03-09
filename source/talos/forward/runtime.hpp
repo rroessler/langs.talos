@@ -5,12 +5,12 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Stack, Talos::Runtime)
-$_FWD(struct Main, Talos::Runtime)
-$_FWD(class Isolate, Talos::Runtime)
-$_FWD(class Service, Talos::Runtime)
-$_FWD(struct Options, Talos::Runtime)
-$_FWD(class Allocator, Talos::Runtime)
-$_FWD(struct Container, Talos::Runtime)
+$_FWD(Talos::Runtime, class Stack)
+$_FWD(Talos::Runtime, struct Main)
+$_FWD(Talos::Runtime, class Isolate)
+$_FWD(Talos::Runtime, class Service)
+$_FWD(Talos::Runtime, struct Options)
+$_FWD(Talos::Runtime, class Allocator)
+$_FWD(Talos::Runtime, struct Container)
 
 #endif

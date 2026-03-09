@@ -6,7 +6,7 @@
 #include "talos/string/small.hpp"
 
 /// Forward Declarations
-$_FWD(void cancel(Runtime::Isolate*), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Dispatch, void cancel(Runtime::Isolate*))
 
 //  CONSTRUCTORS  //
 

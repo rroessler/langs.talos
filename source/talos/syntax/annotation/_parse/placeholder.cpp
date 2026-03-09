@@ -27,7 +27,7 @@ std::optional<Talos::Syntax::Template> Talos::Parser::Dispatch::m_template(Strea
     if (result->size()) return result;
 
     // otherwise declare a failure since we expected at least one type parameter
-    return parser->report(snapshot, 2000302), std::nullopt;
+    return parser->report(snapshot, 2000302), result;
 }
 
 TALOS_MM_PARSE_HINT(Placeholder, parser) {

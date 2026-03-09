@@ -5,7 +5,7 @@
 #include "talos/syntax/_inline/expression.ipp"
 
 /// Forward Declarations
-$_FWD(Value::Any fold(Operator::Kind, Value::Any, Value::Any), Talos::Bytecode::Constants)
+$_FWD(Talos::Bytecode::Constants, Value::Any fold(Operator::Kind, Value::Any, Value::Any))
 
 //  MACROS  //
 

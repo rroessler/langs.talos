@@ -5,8 +5,8 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Buffer, Talos::Document)
-$_FWD(class Service, Talos::Document)
-$_FWD(class Publisher, Talos::Document)
+$_FWD(Talos::Document, class Buffer)
+$_FWD(Talos::Document, class Service)
+$_FWD(Talos::Document, class Publisher)
 
 #endif

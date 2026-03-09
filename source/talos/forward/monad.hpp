@@ -5,6 +5,6 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct Result, Talos::Monad)
+$_FWD(Talos::Monad, struct Result)
 
 #endif

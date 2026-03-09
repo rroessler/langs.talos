@@ -20,6 +20,9 @@ TALOS_MM_CHECK_NODE(Identifier, identifier, analyzer) {
     if (entity == nullptr) return analyzer->report(4000301, name);
     if (!entity->opaque()) return analyzer->report(3000200, name);
 
+    // if we have a "self" value, then do not mark the identifier
+    if (identifier->self()) return entity->value();
+
     // update the current entity as used and return the value
     return analyzer->mark(identifier, entity, depth), entity->value();
 }

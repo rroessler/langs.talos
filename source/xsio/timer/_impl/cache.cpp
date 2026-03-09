@@ -5,8 +5,8 @@
 #include "xsio/timer/token.hpp"
 
 /// Forward Declarations
-$_FWD(class After, XSIO::Timer)
-$_FWD(class Awaken, XSIO::Timer)
+$_FWD(XSIO::Timer, class After)
+$_FWD(XSIO::Timer, class Awaken)
 
 //  TYPEDEFS  //
 

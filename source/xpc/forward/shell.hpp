@@ -5,6 +5,6 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Guard, XPC::Shell)
+$_FWD(XPC::Shell, class Guard)
 
 #endif

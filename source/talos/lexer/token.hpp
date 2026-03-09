@@ -15,6 +15,7 @@
     X(VARIABLE)   /** Denotes variable declarations. */ \
     X(ANNOTATION) /** Could be an annotation. */        \
     X(MODIFIER)   /** Potential modifier keyword. */    \
+    X(ACCESSOR)   /** Accessor modifier keyword. */     \
     X(DECORATES)  /** Adds decoration to variables. */  \
     X(LEADING)    /** Valid leading tokens. */          \
     X(TRAILING)   /** Valid panic trailing tokens. */   \

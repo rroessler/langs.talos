@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 /// Forward Declarations
-$_FWD($_NORETURN void failure(const String::View&, void*, size_t), $::Memory::Unix)
+$_FWD($::Memory::Unix, $_NORETURN void failure(const String::View&, void*, size_t))
 
 //  PROPERTIES  //
 

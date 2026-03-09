@@ -6,7 +6,6 @@
 
 #define XX_VARIABLE_MODIFIERS(X) \
     X(EXPORT, "export")          \
-    X(STATIC, "static")          \
     X(PUBLIC, "public")          \
     X(PRIVATE, "private")        \
     X(PROTECTED, "protected")
@@ -20,7 +19,6 @@ Talos::Format::Node* Talos::Format::Dispatch::m_declaration(Reader* reader) {
         case Lexer::Kind::PUNC_ATTRIB: return m_terminates(reader, m_preamble(reader));
 
         // handle baseline modifiers for declarations
-        case Lexer::Kind::MOD_STATIC: $_FALLTHROUGH;
         case Lexer::Kind::MOD_PUBLIC: $_FALLTHROUGH;
         case Lexer::Kind::MOD_PRIVATE: $_FALLTHROUGH;
         case Lexer::Kind::MOD_PROTECTED: return m_terminates(reader, m_modifiers(reader));

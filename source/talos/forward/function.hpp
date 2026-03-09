@@ -5,14 +5,14 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Frame, Talos::Function)
-$_FWD(class Context, Talos::Function)
-$_FWD(class Arguments, Talos::Function)
+$_FWD(Talos::Function, class Frame)
+$_FWD(Talos::Function, class Context)
+$_FWD(Talos::Function, class Arguments)
 
-$_FWD(class Info, Talos::Function)
-$_FWD(struct Jitted, Talos::Function)
-$_FWD(struct Native, Talos::Function)
-$_FWD(struct Closure, Talos::Function)
-$_FWD(struct Dynamic, Talos::Function)
+$_FWD(Talos::Function, class Info)
+$_FWD(Talos::Function, struct Jitted)
+$_FWD(Talos::Function, struct Native)
+$_FWD(Talos::Function, struct Closure)
+$_FWD(Talos::Function, struct Dynamic)
 
 #endif

@@ -24,7 +24,7 @@ TALOS_MM_CHECK_NODE(Placeholder, node, analyzer) {
     }
 
     // construct the type-parameter to be used
-    auto type = Type::Builder::constraint(name, extends);
+    auto type = Type::Builder::constraint(name, extends, fallback);
 
     // attempt declaring into the world now
     auto failed = analyzer->world()->types().declare(name, type, location) == nullptr;

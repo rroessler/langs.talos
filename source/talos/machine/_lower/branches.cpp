@@ -8,8 +8,8 @@
 #include "talos/machine/_inline/macros.ipp"
 
 /// Forward Declarations
-$_FWD(void interrupted(Builder*), Talos::Machine::Template)
-$_FWD(uint64_t interrupted(Runtime::Isolate*), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Template, void interrupted(Builder*))
+$_FWD(Talos::Machine::Dispatch, uint64_t interrupted(Runtime::Isolate*))
 
 //  PUBLIC METHODS  //
 

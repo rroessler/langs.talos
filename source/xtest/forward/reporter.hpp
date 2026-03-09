@@ -5,11 +5,11 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Facade, XT::Reporter)
-$_FWD(class Interface, XT::Reporter)
+$_FWD(XT::Reporter, class Facade)
+$_FWD(XT::Reporter, class Interface)
 
 /// Forward Definitions
-$_FWD(using Spinner = $::Functor::Shared<$::Spinner::Shared(XI::Container*)>, XT::Reporter)
+$_FWD(XT::Reporter, using Spinner = $::Functor::Shared<$::Spinner::Shared(XI::Container*)>)
 
 //  X-MACROS  //
 

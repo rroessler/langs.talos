@@ -2,8 +2,8 @@
 #include "shell/format/path.hpp"
 
 /// Forward Declarations
-$_FWD(std::vector<$::URI::Buffer> file(const $::Filesystem::Path&), Shell::Format::Path)
-$_FWD(std::vector<$::URI::Buffer> href(const $::Filesystem::Path&), Shell::Format::Path)
+$_FWD(Shell::Format::Path, std::vector<$::URI::Buffer> file(const $::Filesystem::Path&))
+$_FWD(Shell::Format::Path, std::vector<$::URI::Buffer> href(const $::Filesystem::Path&))
 
 //  PUBLIC METHODS  //
 

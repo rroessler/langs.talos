@@ -5,17 +5,17 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct Node, Talos::Format)
-$_FWD(class Reader, Talos::Format)
-$_FWD(class Writer, Talos::Format)
-$_FWD(class Storage, Talos::Format)
-$_FWD(class Pipeline, Talos::Format)
-$_FWD(struct Options, Talos::Format)
-$_FWD(class Dispatch, Talos::Format)
+$_FWD(Talos::Format, struct Node)
+$_FWD(Talos::Format, class Reader)
+$_FWD(Talos::Format, class Writer)
+$_FWD(Talos::Format, class Storage)
+$_FWD(Talos::Format, class Pipeline)
+$_FWD(Talos::Format, struct Options)
+$_FWD(Talos::Format, class Dispatch)
 
 /// Forward Definitions
-$_FWD(using Sigil = size_t, Talos::Format)
-$_FWD(using Buffer = std::vector<Node*>, Talos::Format)
-$_FWD(using Result = std::optional<$::String::Buffer>, Talos::Format)
+$_FWD(Talos::Format, using Sigil = size_t)
+$_FWD(Talos::Format, using Buffer = std::vector<Node*>)
+$_FWD(Talos::Format, using Result = std::optional<$::String::Buffer>)
 
 #endif

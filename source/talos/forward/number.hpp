@@ -5,7 +5,7 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct Tagged, Talos::Number)
-$_FWD(struct Bignum, Talos::Number)
+$_FWD(Talos::Number, struct Tagged)
+$_FWD(Talos::Number, struct Bignum)
 
 #endif

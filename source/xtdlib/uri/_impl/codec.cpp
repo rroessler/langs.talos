@@ -5,7 +5,7 @@
 #include "xtdlib/uri/buffer.hpp"
 
 /// Forward Declarations
-$_FWD(String::Buffer encode(const String::View &), $::URI::Codec)
+$_FWD($::URI::Codec, String::Buffer encode(const String::View &))
 
 //  PUBLIC METHODS  //
 

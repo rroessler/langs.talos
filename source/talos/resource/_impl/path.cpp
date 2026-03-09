@@ -4,7 +4,7 @@
 #include "talos/diagnostic/traits.hpp"
 
 /// Forward Declarations
-$_FWD(template <class... As> Result failure(Diagnostic::Code, As&&...), Talos::Resource::Path)
+$_FWD(Talos::Resource::Path, template <class... As> Result failure(Diagnostic::Code, As&&...))
 
 //  MACROS  //
 

@@ -6,7 +6,7 @@
 #include "talos/syntax/_inline/declaration.ipp"
 
 /// Forward Declarations
-$_FWD(Erased check(Syntax::Expression*, Analyzer*, const Erased&, Diagnostic::Code), Talos::Type::Dispatch)
+$_FWD(Talos::Type::Dispatch, Erased check(Syntax::Expression*, Analyzer*, const Erased&, Diagnostic::Code))
 
 //  PUBLIC METHODS  //
 

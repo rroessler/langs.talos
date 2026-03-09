@@ -5,9 +5,9 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Implementations
-$_FWD(class Binder, XLSP::Event)
-$_FWD(struct Storage, XLSP::Event)
-$_FWD(class Responder, XLSP::Event)
-$_FWD(class Dispatcher, XLSP::Event)
+$_FWD(XLSP::Event, class Binder)
+$_FWD(XLSP::Event, struct Storage)
+$_FWD(XLSP::Event, class Responder)
+$_FWD(XLSP::Event, class Dispatcher)
 
 #endif

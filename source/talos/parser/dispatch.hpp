@@ -26,7 +26,6 @@ namespace Talos::Parser {
     /// @brief Parsing Extent.
     enum class Extent : uint8_t {
         CLASS,    // class properties
-        STATIC,   // static properties
         MODULE,   // module scoping
         SCOPING,  // function scoping
     };

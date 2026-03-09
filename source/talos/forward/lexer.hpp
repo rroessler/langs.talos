@@ -5,10 +5,10 @@
 #include <xlsp/xlsp.hpp>
 
 /// Forward Declarations
-$_FWD(class Token, Talos::Lexer)
-$_FWD(class Buffer, Talos::Lexer)
-$_FWD(class Scanner, Talos::Lexer)
-$_FWD(struct Dispatch, Talos::Lexer)
-$_FWD(struct Generator, Talos::Lexer)
+$_FWD(Talos::Lexer, class Token)
+$_FWD(Talos::Lexer, class Buffer)
+$_FWD(Talos::Lexer, class Scanner)
+$_FWD(Talos::Lexer, struct Dispatch)
+$_FWD(Talos::Lexer, struct Generator)
 
 #endif

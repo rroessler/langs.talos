@@ -2,12 +2,12 @@
 #include "talos/machine/_inline/macros.ipp"
 
 /// Forward Declarations
-$_FWD(Reference lctx(Reference, uint16_t), Talos::Machine::Dispatch)
-$_FWD(void sctx(Reference, Reference, uint16_t), Talos::Machine::Dispatch)
-$_FWD(Reference lupv(Reference, uint16_t, uint16_t), Talos::Machine::Dispatch)
-$_FWD(void supv(Reference, Reference, uint16_t, uint16_t), Talos::Machine::Dispatch)
-$_FWD(void load(Builder*, const Engine::Register&, const Engine::Register&, uint16_t), Talos::Machine::Template)
-$_FWD(void store(Builder*, const Engine::Register&, const Engine::Register&, uint16_t), Talos::Machine::Template)
+$_FWD(Talos::Machine::Dispatch, Reference lctx(Reference, uint16_t))
+$_FWD(Talos::Machine::Dispatch, void sctx(Reference, Reference, uint16_t))
+$_FWD(Talos::Machine::Dispatch, Reference lupv(Reference, uint16_t, uint16_t))
+$_FWD(Talos::Machine::Dispatch, void supv(Reference, Reference, uint16_t, uint16_t))
+$_FWD(Talos::Machine::Template, void load(Builder*, const Engine::Register&, const Engine::Register&, uint16_t))
+$_FWD(Talos::Machine::Template, void store(Builder*, const Engine::Register&, const Engine::Register&, uint16_t))
 
 //  PUBLIC METHODS  //
 

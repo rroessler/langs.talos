@@ -5,6 +5,6 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Service, Talos::Signal)
+$_FWD(Talos::Signal, class Service)
 
 #endif

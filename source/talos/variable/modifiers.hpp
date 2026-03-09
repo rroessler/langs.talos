@@ -15,7 +15,6 @@ namespace Talos::Variable {
         VIRTUAL,   // Encapsulates virtual/abstract variables.
         OVERRIDE,  // Encapsulates field/virtual overrides.
 
-        STATIC,     // Enforces static inheritance.
         PUBLIC,     // Publically available fields.
         PRIVATE,    // Privately available fields.
         PROTECTED,  // Protected object fields.

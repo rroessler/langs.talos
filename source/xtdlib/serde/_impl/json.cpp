@@ -6,9 +6,9 @@
 #include "xtdlib/serde/json.hpp"
 
 /// Forward Declarations
-$_FWD(struct Exposed, $::Serde)
-$_FWD(template <bool = false> constexpr glz::opts options(), $::JSON)
-$_FWD(template <bool> Serde::Expected<Serde::Value> read(const String::View&), $::JSON)
+$_FWD($::Serde, struct Exposed)
+$_FWD($::JSON, template <bool = false> constexpr glz::opts options())
+$_FWD($::JSON, template <bool> Serde::Expected<Serde::Value> read(const String::View&))
 
 //  TYPEDEFS  //
 

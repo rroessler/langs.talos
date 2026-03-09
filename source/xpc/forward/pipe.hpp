@@ -5,10 +5,10 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Unique, XPC::Pipe)
-$_FWD(class Duplex, XPC::Pipe)
-$_FWD(class Simplex, XPC::Pipe)
-$_FWD(struct Reader, XPC::Pipe)
-$_FWD(struct Writer, XPC::Pipe)
+$_FWD(XPC::Pipe, class Unique)
+$_FWD(XPC::Pipe, class Duplex)
+$_FWD(XPC::Pipe, class Simplex)
+$_FWD(XPC::Pipe, struct Reader)
+$_FWD(XPC::Pipe, struct Writer)
 
 #endif

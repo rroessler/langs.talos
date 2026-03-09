@@ -5,11 +5,11 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class That, XT::Assert)
-$_FWD(struct Info, XT::Assert)
-$_FWD(struct Failure, XT::Assert)
+$_FWD(XT::Assert, class That)
+$_FWD(XT::Assert, struct Info)
+$_FWD(XT::Assert, struct Failure)
 
 /// Forward Definitions
-$_FWD(using Trace = std::vector<$::String::Buffer>, XT::Assert)
+$_FWD(XT::Assert, using Trace = std::vector<$::String::Buffer>)
 
 #endif

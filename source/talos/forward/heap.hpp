@@ -5,10 +5,10 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Buffer, Talos::Heap)
-$_FWD(class Region, Talos::Heap)
-$_FWD(class Service, Talos::Heap)
-$_FWD(struct Spaces, Talos::Heap)
-$_FWD(struct Options, Talos::Heap)
+$_FWD(Talos::Heap, class Buffer)
+$_FWD(Talos::Heap, class Region)
+$_FWD(Talos::Heap, class Service)
+$_FWD(Talos::Heap, struct Spaces)
+$_FWD(Talos::Heap, struct Options)
 
 #endif

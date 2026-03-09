@@ -10,7 +10,6 @@ Talos::Syntax::Node* Talos::Parser::Dispatch::m_declaration(Stream* parser, Exte
         case Lexer::Kind::PUNC_ATTRIB: return m_terminates(parser, m_preamble(parser, extent), "a declaration");
 
         // handle baseline modifiers for declarations
-        case Lexer::Kind::MOD_STATIC: $_FALLTHROUGH;
         case Lexer::Kind::MOD_PUBLIC: $_FALLTHROUGH;
         case Lexer::Kind::MOD_PRIVATE: $_FALLTHROUGH;
         case Lexer::Kind::MOD_PROTECTED: return m_terminates(parser, m_modifiers(parser, extent), "a declaration");

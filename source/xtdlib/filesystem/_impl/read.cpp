@@ -6,13 +6,13 @@
 #include "xtdlib/filesystem/read.hpp"
 
 /// Forward Definitions
-$_FWD(using Offset = boost::interprocess::offset_t, $::Filesystem::Buffer)
-$_FWD(using Mapping = boost::interprocess::file_mapping, $::Filesystem::Buffer)
-$_FWD(using Region = boost::interprocess::mapped_region, $::Filesystem::Buffer)
+$_FWD($::Filesystem::Buffer, using Offset = boost::interprocess::offset_t)
+$_FWD($::Filesystem::Buffer, using Mapping = boost::interprocess::file_mapping)
+$_FWD($::Filesystem::Buffer, using Region = boost::interprocess::mapped_region)
 
 /// Forward Declarations
-$_FWD(Offset Size(Mapping&, Offset = 0), $::Filesystem::Buffer)
-$_FWD(Region Resolve(const String::View&), $::Filesystem::Buffer)
+$_FWD($::Filesystem::Buffer, Offset Size(Mapping&, Offset = 0))
+$_FWD($::Filesystem::Buffer, Region Resolve(const String::View&))
 
 //  CONSTRUCTORS  //
 

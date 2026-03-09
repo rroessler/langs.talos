@@ -79,7 +79,7 @@ repository:
 
   storage-modifiers:
     name: storage.modifier.tal
-    match: (?<!\.)\b(let|mut|use|type|public|private|protected|static|abstract)\b
+    match: (?<!\.)\b(let|mut|use|type|public|private|protected|abstract)\b
 
   function-declaration:
     match: (?<!\.)\b(?:(fn))\b

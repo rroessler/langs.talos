@@ -16,7 +16,7 @@
 
 namespace Talos::Operator {
 
-#define X(K, N, ...) $_FWD(static constexpr $::String::View K = "#[Operator." N "]", Attribute)
+#define X(K, N, ...) $_FWD(Attribute, static constexpr $::String::View K = "#[Operator." N "]")
     TALOS_XX_OPERATORS_CUSTOM(X)
 #undef X
 

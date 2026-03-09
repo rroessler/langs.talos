@@ -7,11 +7,11 @@
 #include <xsio/xsio.hpp>
 
 /// Forward Declarations
-$_FWD(class Events, Talos::Server)
-$_FWD(class Worker, Talos::Server)
-$_FWD(struct Options, Talos::Server)
-$_FWD(class Transport, Talos::Server)
-$_FWD(class Utilities, Talos::Server)
-$_FWD(class Connection, Talos::Server)
+$_FWD(Talos::Server, class Events)
+$_FWD(Talos::Server, class Worker)
+$_FWD(Talos::Server, struct Options)
+$_FWD(Talos::Server, class Transport)
+$_FWD(Talos::Server, class Utilities)
+$_FWD(Talos::Server, class Connection)
 
 #endif

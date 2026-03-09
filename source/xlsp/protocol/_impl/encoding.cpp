@@ -2,7 +2,7 @@
 #include "xlsp/protocol/encoding.hpp"
 
 /// Forward Declarations
-$_FWD(template <class F> bool iterate(const $::String::View &, const F &), XLSP::Encoding);
+$_FWD(XLSP::Encoding, template <class F> bool iterate(const $::String::View &, const F &));
 
 //  PUBLIC METHODS  //
 

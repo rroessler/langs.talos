@@ -5,8 +5,8 @@
 #include "talos/syntax/_inline/expression.ipp"
 
 /// Forward Declarations
-$_FWD(Erased returns(const Syntax::Lambda*, const Erased&), Talos::Type::Dispatch)
-$_FWD(void lambda(Analyzer*, const Syntax::Lambda*, const Erased&), Talos::Type::Dispatch)
+$_FWD(Talos::Type::Dispatch, Erased returns(const Syntax::Lambda*, const Erased&))
+$_FWD(Talos::Type::Dispatch, void lambda(Analyzer*, const Syntax::Lambda*, const Erased&))
 
 //  PUBLIC METHODS  //
 
@@ -26,9 +26,13 @@ void Talos::Type::Dispatch::lambda(Analyzer* analyzer, const Syntax::Lambda* sel
     // prepare the current trace location
     $_UNUSED $_AUTO = analyzer->trace(self);
 
+    // prepare the callable instance
+    auto generic = Builder::resolve<Generic>(callee);
+    auto callable = Builder::resolve<Callable>(callee);
+
     // prepare the scoping instance
     auto* constructor = self->signature()->prototype();
-    auto world = analyzer->scope(constructor, callee);
+    auto world = analyzer->scope(constructor, callable, generic);
 
     // update the current world callee to be used now
     world->callee() = callee;
@@ -40,7 +44,7 @@ void Talos::Type::Dispatch::lambda(Analyzer* analyzer, const Syntax::Lambda* sel
     $_UNUSED $_AUTO = analyzer->trace(self->signature()->returns());
 
     // ensure we use the implicit handler when necessary
-    auto returns = Builder::resolve<Callable>(callee)->returns();
+    auto returns = callable->returns();
 
     // start determining the current return-typing
     auto arrow = !self->body()->is<Syntax::Block>();

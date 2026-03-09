@@ -10,7 +10,7 @@
 #include "xtest/reporter/_inline/xml.hpp"
 
 /// Forward Declarations
-$_FWD($::Ptr::Unique<Reporter::Interface> Factory(Tag, Session::Runner*, $::Stream::Output&), XT::Reporter)
+$_FWD(XT::Reporter, $::Ptr::Unique<Reporter::Interface> Factory(Tag, Session::Runner*, $::Stream::Output&))
 
 //  CONSTRUCTORS  //
 

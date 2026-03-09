@@ -5,7 +5,7 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Queue, XSIO::Task)
-$_FWD(class Executor, XSIO::Task)
+$_FWD(XSIO::Task, class Queue)
+$_FWD(XSIO::Task, class Executor)
 
 #endif

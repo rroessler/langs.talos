@@ -1,5 +1,6 @@
 /// Talos Modules
 #include "talos/globals/service.hpp"
+#include "talos/machine/frame.hpp"
 #include "talos/runtime/isolate.hpp"
 
 /// Inline Modules
@@ -7,7 +8,8 @@
 #include "talos/value/_inline/value.ipp"
 
 /// Forward Declarations
-$_FWD(Reference global(Runtime::Isolate*, Reference), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Dispatch, Reference self(Runtime::Isolate*))
+$_FWD(Talos::Machine::Dispatch, Reference global(Runtime::Isolate*, Reference))
 
 //  PROPERTIES  //
 
@@ -23,6 +25,10 @@ Talos::Machine::Reference Talos::Machine::Dispatch::global(Runtime::Isolate* iso
     return isolate->global(Value::Cast<Value::Symbol>(symbol)).pointer();
 }
 
+Talos::Machine::Reference Talos::Machine::Dispatch::self(Runtime::Isolate* isolate) {
+    return isolate->frame()->as<Machine::Frame>()->self().pointer();
+}
+
 //  PRIVATE METHODS  //
 
 TALOS_MM_MACHINE_EMIT(LOAD_ZERO, builder, instruction) { __ee__ load(instruction->get<0>(), g_zero); }
@@ -30,6 +36,11 @@ TALOS_MM_MACHINE_EMIT(LOAD_ONE, builder, instruction) { __ee__ load(instruction-
 TALOS_MM_MACHINE_EMIT(LOAD_VOID, builder, instruction) { __ee__ load(instruction->get<0>(), g_void); }
 TALOS_MM_MACHINE_EMIT(LOAD_TRUE, builder, instruction) { __ee__ load(instruction->get<0>(), g_true); }
 TALOS_MM_MACHINE_EMIT(LOAD_FALSE, builder, instruction) { __ee__ load(instruction->get<0>(), g_false); }
+
+TALOS_MM_MACHINE_EMIT(LOAD_SELF, builder, instruction) {
+    auto dx = __ee__ resolve(instruction->get<0>());
+    __ee__ invoke(Dispatch::self, dx, builder->isolate);
+}
 
 TALOS_MM_MACHINE_EMIT(LOAD_CONST, builder, instruction) {
     // prepare our incoming details

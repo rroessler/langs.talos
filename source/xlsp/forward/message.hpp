@@ -5,10 +5,10 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct Error, XLSP::Message)
+$_FWD(XLSP::Message, struct Error)
 
 /// Forward Definitions
-$_FWD(using Method = $::String::View, XLSP::Message)
-$_FWD(using Params = $::Serde::Value, XLSP::Message)
+$_FWD(XLSP::Message, using Method = $::String::View)
+$_FWD(XLSP::Message, using Params = $::Serde::Value)
 
 #endif

@@ -5,9 +5,9 @@
 #include "talos/forward/value.hpp"
 
 /// Forward Declarations
-$_FWD(class List, Talos::Handle)
-$_FWD(class Scope, Talos::Handle)
+$_FWD(Talos::Handle, class List)
+$_FWD(Talos::Handle, class Scope)
 
-$_FWD(template <std::derived_from<Value::Any> T> class Local, Talos::Handle)
+$_FWD(Talos::Handle, template <std::derived_from<Value::Any> T> class Local)
 
 #endif

@@ -5,9 +5,9 @@
 #include "xtest/forward/session.hpp"
 
 /// Forward Declarations
-$_FWD(class Case, XT)
-$_FWD(class Group, XT)
-$_FWD(struct Bench, XT)
-$_FWD(struct Handle, XT)
+$_FWD(XT, class Case)
+$_FWD(XT, class Group)
+$_FWD(XT, struct Bench)
+$_FWD(XT, struct Handle)
 
 #endif

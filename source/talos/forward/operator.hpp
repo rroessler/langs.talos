@@ -5,6 +5,6 @@
 #include "talos/forward/value.hpp"
 
 /// Forward Definitions
-$_FWD(template <class> class Storage, Talos::Operator)
+$_FWD(Talos::Operator, template <class> class Storage)
 
 #endif

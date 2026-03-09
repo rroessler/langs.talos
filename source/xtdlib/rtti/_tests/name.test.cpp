@@ -2,9 +2,9 @@
 #include <testing/testing.hpp>
 
 /// Forward Declarations
-$_FWD(struct A, Mock)
-$_FWD(struct C, Mock::B)
-$_FWD(template <class> struct D, Mock)
+$_FWD(Mock, struct A)
+$_FWD(Mock::B, struct C)
+$_FWD(Mock, template <class> struct D)
 
 //  X-MACROS  //
 

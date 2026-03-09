@@ -2,7 +2,7 @@
 #include "talos/server/connection.hpp"
 
 /// Forward Declarations
-$_FWD(XLSP::Encoding::Type query(const $::Serde::Value &), Talos::Server::Encoding)
+$_FWD(Talos::Server::Encoding, XLSP::Encoding::Type query(const $::Serde::Value &))
 
 //  PUBLIC METHODS  //
 

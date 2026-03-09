@@ -5,13 +5,13 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Runner, XT::Session)
-$_FWD(class Service, XT::Session)
-$_FWD(class Registry, XT::Session)
-$_FWD(struct Progress, XT::Session)
-$_FWD(class Statistics, XT::Session)
+$_FWD(XT::Session, class Runner)
+$_FWD(XT::Session, class Service)
+$_FWD(XT::Session, class Registry)
+$_FWD(XT::Session, struct Progress)
+$_FWD(XT::Session, class Statistics)
 
 /// Forward Definitions
-$_FWD(using Bind = Session::Registry, XT)
+$_FWD(XT, using Bind = Session::Registry)
 
 #endif

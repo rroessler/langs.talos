@@ -8,7 +8,7 @@
 #include <csignal>
 
 /// Forward Declarations
-$_FWD(class Native, XSIO::Signal)
+$_FWD(XSIO::Signal, class Native)
 
 //  X-MACROS  //
 

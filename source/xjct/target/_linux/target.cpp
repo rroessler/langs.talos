@@ -9,8 +9,8 @@
 #include <sys/param.h>
 
 /// Forward Declarations
-$_FWD(using Info = dl_phdr_info, XJCT::Utils::DL)
-$_FWD(int32_t callback(Info*, size_t, void*), XJCT::Utils::DL)
+$_FWD(XJCT::Utils::DL, using Info = dl_phdr_info)
+$_FWD(XJCT::Utils::DL, int32_t callback(Info*, size_t, void*))
 
 //  PUBLIC METHODS  //
 

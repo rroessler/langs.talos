@@ -5,16 +5,16 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct Any, Talos::Object)
-$_FWD(class Guard, Talos::Object)
-$_FWD(class Header, Talos::Object)
-$_FWD(struct Allocator, Talos::Object)
+$_FWD(Talos::Object, struct Any)
+$_FWD(Talos::Object, class Guard)
+$_FWD(Talos::Object, class Header)
+$_FWD(Talos::Object, struct Allocator)
 
-$_FWD(struct Enum, Talos::Object)
-$_FWD(struct Variant, Talos::Object)
+$_FWD(Talos::Object, struct Enum)
+$_FWD(Talos::Object, struct Variant)
 
-$_FWD(struct Class, Talos::Object)
-$_FWD(struct Instance, Talos::Object)
-$_FWD(struct Exception, Talos::Object)
+$_FWD(Talos::Object, struct Class)
+$_FWD(Talos::Object, struct Instance)
+$_FWD(Talos::Object, struct Exception)
 
 #endif

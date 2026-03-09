@@ -5,10 +5,10 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct Range, XLSP)
-$_FWD(struct Position, XLSP)
+$_FWD(XLSP, struct Range)
+$_FWD(XLSP, struct Position)
 
-$_FWD(enum class Value : uint8_t, XLSP::Trace)
-$_FWD(enum class Type : uint8_t, XLSP::Encoding)
+$_FWD(XLSP::Trace, enum class Value : uint8_t)
+$_FWD(XLSP::Encoding, enum class Type : uint8_t)
 
 #endif

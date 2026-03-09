@@ -6,9 +6,9 @@
 #include "talos/machine/_inline/macros.ipp"
 
 /// Forward Declarations
-$_FWD(void abort(Runtime::Isolate *, int32_t), Talos::Machine::Dispatch)
-$_FWD(void raise(Runtime::Isolate *, int32_t), Talos::Machine::Dispatch)
-$_FWD(void panic(Runtime::Isolate *, Reference), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Dispatch, void abort(Runtime::Isolate *, int32_t))
+$_FWD(Talos::Machine::Dispatch, void raise(Runtime::Isolate *, int32_t))
+$_FWD(Talos::Machine::Dispatch, void panic(Runtime::Isolate *, Reference))
 
 //  PUBLIC METHODS  //
 

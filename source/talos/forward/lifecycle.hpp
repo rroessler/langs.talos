@@ -5,7 +5,7 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Scope, Talos::Lifecycle)
-$_FWD(class Service, Talos::Lifecycle)
+$_FWD(Talos::Lifecycle, class Scope)
+$_FWD(Talos::Lifecycle, class Service)
 
 #endif

@@ -8,8 +8,8 @@
 #include "talos/value/void.hpp"
 
 /// Forward Declarations
-$_FWD(static inline constexpr bool FAST = true, Talos::Machine::Validate)
-$_FWD(static inline constexpr bool SLOW = false, Talos::Machine::Validate)
+$_FWD(Talos::Machine::Validate, static inline constexpr bool FAST = true)
+$_FWD(Talos::Machine::Validate, static inline constexpr bool SLOW = false)
 
 namespace Talos::Machine {
 

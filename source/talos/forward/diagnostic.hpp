@@ -5,17 +5,17 @@
 #include "talos/forward/resource.hpp"
 
 /// Forward Declarations
-$_FWD(class View, Talos::Diagnostic)
-$_FWD(class Scope, Talos::Diagnostic)
-$_FWD(class Reporter, Talos::Diagnostic)
-$_FWD(struct Options, Talos::Diagnostic)
+$_FWD(Talos::Diagnostic, class View)
+$_FWD(Talos::Diagnostic, class Scope)
+$_FWD(Talos::Diagnostic, class Reporter)
+$_FWD(Talos::Diagnostic, struct Options)
 
 /// Forward Definitions
-$_FWD(using Code = XLSP::Diagnostic::Code, Talos::Diagnostic)
-$_FWD(using Severity = XLSP::Diagnostic::Severity, Talos::Diagnostic)
-$_FWD(using Tags = $::Enum::Flags<XLSP::Diagnostic::Tag>, Talos::Diagnostic)
+$_FWD(Talos::Diagnostic, using Code = XLSP::Diagnostic::Code)
+$_FWD(Talos::Diagnostic, using Severity = XLSP::Diagnostic::Severity)
+$_FWD(Talos::Diagnostic, using Tags = $::Enum::Flags<XLSP::Diagnostic::Tag>)
 
-$_FWD(static constexpr auto Deprecated = XLSP::Diagnostic::Tag::DEPRECATED, Talos::Diagnostic)
-$_FWD(static constexpr auto Unnecessary = XLSP::Diagnostic::Tag::UNNECESSARY, Talos::Diagnostic)
+$_FWD(Talos::Diagnostic, static constexpr auto Deprecated = XLSP::Diagnostic::Tag::DEPRECATED)
+$_FWD(Talos::Diagnostic, static constexpr auto Unnecessary = XLSP::Diagnostic::Tag::UNNECESSARY)
 
 #endif

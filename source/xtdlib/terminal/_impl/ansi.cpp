@@ -3,10 +3,10 @@
 #include "xtdlib/macros/forward.hpp"
 #include "xtdlib/string/view.hpp"
 
-$_FWD(String::Buffer stringify(uint8_t), $::Escape)
-$_FWD(String::Buffer stringify(uint8_t, uint8_t), $::Escape)
-$_FWD(String::Buffer merge(const String::Buffer&, const String::View&), $::Escape)
-$_FWD(template <class... A> String::Buffer merge(const String::Buffer&, const String::View&, A&&...), $::Escape)
+$_FWD($::Escape, String::Buffer stringify(uint8_t))
+$_FWD($::Escape, String::Buffer stringify(uint8_t, uint8_t))
+$_FWD($::Escape, String::Buffer merge(const String::Buffer&, const String::View&))
+$_FWD($::Escape, template <class... A> String::Buffer merge(const String::Buffer&, const String::View&, A&&...))
 
 //  PUBLIC METHODS  //
 

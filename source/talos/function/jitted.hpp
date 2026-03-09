@@ -53,6 +53,7 @@ namespace Talos {
         inline constexpr uint64_t adicity() const noexcept { return info()->adicity(); }
         inline constexpr $::URI::View resource() const noexcept { return info()->resource(); }
 
+        /// @brief Gets the available self receiver.
         inline constexpr Value::Any receiver() const noexcept {
             auto context = m_attrs()->context;  // prepare context
             return context.valid() ? context.self() : Value::Void();

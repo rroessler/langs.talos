@@ -67,6 +67,7 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_preamble(Stream* parser, 
 
 Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_modifiers(Stream* parser, Extent extent) {
     // prepare the modifiers output to be used
+    auto accessibility = false;
     auto modifiers = Variable::Modifiers();
 
     // prepare a handler for setting modifiers
@@ -77,6 +78,13 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_modifiers(Stream* parser,
 
     // prepare a handler for class properties
     auto property = [&](const Lexer::Token* token) {
+        // check if the token sets an accessibility flag at all
+        if (token->flags().test(Lexer::Flag::ACCESSOR)) {
+            if (accessibility) parser->report(token, 2000905);
+            accessibility = true;  // cache the base accessor
+        }
+
+        // otherwise set the basic details now
         if (extent == Extent::MODULE) parser->report(token, 2000903, token->lexeme());
         else if (extent == Extent::SCOPING) parser->report(token, 2000904, token->lexeme());
     };
@@ -84,7 +92,6 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_modifiers(Stream* parser,
     // prepare a handler for export modifiers
     auto exports = [&](const Lexer::Token* token) {
         if (extent == Extent::CLASS) parser->report(token, 2000902, token->lexeme());
-        else if (extent == Extent::STATIC) parser->report(token, 2000902, token->lexeme());
         else if (extent != Extent::MODULE) parser->report(token, 2000904, token->lexeme());
     };
 
@@ -102,9 +109,6 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_modifiers(Stream* parser,
             default: $_ABORT("Unknown modifier token '{0}'", token->lexeme()); break;
         }
     }
-
-    // update our level as necessary now
-    if (modifiers.test(Variable::Flag::STATIC) && extent == Extent::CLASS) extent = Extent::STATIC;
 
     // attempt parsing a suitable subject now
     auto* declaration = m_subject(parser, extent);

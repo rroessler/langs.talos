@@ -93,6 +93,7 @@ TALOS_XX_SYLLABLE_LOAD(LOAD_ONE, /** dst */ Register)
 TALOS_XX_SYLLABLE_LOAD(LOAD_VOID, /** dst */ Register)
 TALOS_XX_SYLLABLE_LOAD(LOAD_TRUE, /** dst */ Register)
 TALOS_XX_SYLLABLE_LOAD(LOAD_FALSE, /** dst */ Register)
+TALOS_XX_SYLLABLE_LOAD(LOAD_SELF, /** dst */ Register)
 
 TALOS_XX_SYLLABLE_LOAD(LOAD_CONST, /** dst */ Register, /** symbol */ Index)
 TALOS_XX_SYLLABLE_LOAD(LOAD_GLOBAL, /** dst */ Register, /** symbol */ Index)

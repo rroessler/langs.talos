@@ -10,7 +10,7 @@
 #include "xtdlib/string/view.hpp"
 
 /// Forward Declarations
-$_FWD(class Buffer, $::URI)
+$_FWD($::URI, class Buffer)
 
 namespace $::URI::Codec {
 

@@ -22,6 +22,7 @@ TALOS_MM_LOWER_NODE(Class, node, compiler, ) {
     if (parent) compiler->lower(parent, treg);
     else compiler->emit<Syllable::LOAD_VOID>(treg);
 
+    // prepare the baseline class instance to be used
     auto name = compiler->string(node->name());
     auto shape = compiler->shapes()->resolve(node);
     compiler->emit<Syllable::CLASS_MAKE>(treg, name, shape);

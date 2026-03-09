@@ -8,12 +8,12 @@
 #include "talos/machine/_inline/macros.ipp"
 
 /// Forward Declarations
-$_FWD(static Reference empty(Runtime::Isolate*), Talos::Machine::Dispatch)
-$_FWD(Reference list(Runtime::Isolate*, Value::Any*), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Dispatch, static Reference empty(Runtime::Isolate*))
+$_FWD(Talos::Machine::Dispatch, Reference list(Runtime::Isolate*, Value::Any*))
 
-$_FWD(Reference value(Reference), Talos::Machine::Dispatch)
-$_FWD(Reference index(Reference), Talos::Machine::Dispatch)
-$_FWD(Reference bump(Runtime::Isolate*, Reference), Talos::Machine::Dispatch)
+$_FWD(Talos::Machine::Dispatch, Reference value(Reference))
+$_FWD(Talos::Machine::Dispatch, Reference index(Reference))
+$_FWD(Talos::Machine::Dispatch, Reference bump(Runtime::Isolate*, Reference))
 
 //  PUBLIC METHODS  //
 

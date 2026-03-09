@@ -9,11 +9,11 @@
 #include "xtdlib/portable/windows.hpp"
 
 /// Forward Declarations
-$_FWD(size_t realign(size_t), $::Memory::Windows)
-$_FWD(SYSTEM_INFO information(), $::Memory::Windows)
-$_FWD(bool access(int32_t, DWORD&), $::Memory::Windows)
-$_FWD(bool protection(int32_t, DWORD&), $::Memory::Windows)
-$_FWD($_NORETURN void* failure(const String::View&, void*, size_t), $::Memory::Windows)
+$_FWD($::Memory::Windows, size_t realign(size_t))
+$_FWD($::Memory::Windows, SYSTEM_INFO information())
+$_FWD($::Memory::Windows, bool access(int32_t, DWORD&))
+$_FWD($::Memory::Windows, bool protection(int32_t, DWORD&))
+$_FWD($::Memory::Windows, $_NORETURN void* failure(const String::View&, void*, size_t))
 
 //  MACROS  //
 

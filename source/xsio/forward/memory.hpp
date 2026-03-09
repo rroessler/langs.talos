@@ -5,7 +5,7 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Stack, XSIO::Memory)
-$_FWD(class Buffer, XSIO::Memory)
+$_FWD(XSIO::Memory, class Stack)
+$_FWD(XSIO::Memory, class Buffer)
 
 #endif

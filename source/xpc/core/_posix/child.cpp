@@ -20,8 +20,8 @@
 #include <sys/wait.h>
 
 /// Forward Definitions
-$_FWD(class Actions, XPC::Core)
-$_FWD(class Attributes, XPC::Core)
+$_FWD(XPC::Core, class Actions)
+$_FWD(XPC::Core, class Attributes)
 
 //  MACROS  //
 

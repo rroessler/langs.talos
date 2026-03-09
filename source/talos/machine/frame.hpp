@@ -59,6 +59,9 @@ namespace Talos::Machine {
         /// @brief Gets the underlying arena reference.
         inline constexpr const Linker::Arena* arena() const noexcept final { return m_info->arena(); }
 
+        /// @brief Handles getting the current self value.
+        inline constexpr Value::Any self() const noexcept { return argv()->self(); }
+
         /// @brief Casts underlying arguments pointer into an arguments structure.
         inline constexpr const Function::Arguments* argv() const noexcept {
             return reinterpret_cast<const Function::Arguments*>(m_stack + Offset::STK_DATA);

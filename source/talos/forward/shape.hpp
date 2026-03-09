@@ -5,9 +5,9 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Service, Talos::Shape)
+$_FWD(Talos::Shape, class Service)
 
 /// Forward Definitions
-$_FWD(using Underlying = uint64_t, Talos::Shape)
+$_FWD(Talos::Shape, using Underlying = uint64_t)
 
 #endif

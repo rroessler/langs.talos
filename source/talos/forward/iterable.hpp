@@ -5,7 +5,7 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(struct List, Talos::Iterable)
-$_FWD(struct Iterator, Talos::Iterable)
+$_FWD(Talos::Iterable, struct List)
+$_FWD(Talos::Iterable, struct Iterator)
 
 #endif

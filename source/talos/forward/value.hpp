@@ -5,10 +5,10 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Any, Talos::Value)
+$_FWD(Talos::Value, class Any)
 
-$_FWD(struct Void, Talos::Value)
-$_FWD(struct Symbol, Talos::Value)
-$_FWD(struct Boolean, Talos::Value)
+$_FWD(Talos::Value, struct Void)
+$_FWD(Talos::Value, struct Symbol)
+$_FWD(Talos::Value, struct Boolean)
 
 #endif

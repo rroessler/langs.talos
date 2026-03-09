@@ -6,13 +6,13 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Context, XASM::Runtime)
+$_FWD(XASM::Runtime, class Context)
 
 /// Forward Definitions
-$_FWD(using Hints = asmjit::CpuHints, XASM::Runtime)
-$_FWD(using Target = asmjit::JitRuntime, XASM::Runtime)
-$_FWD(using Logger = asmjit::StringLogger, XASM::Runtime)
-$_FWD(using Features = asmjit::CpuFeatures, XASM::Runtime)
-$_FWD(using Environment = asmjit::Environment, XASM::Runtime)
+$_FWD(XASM::Runtime, using Hints = asmjit::CpuHints)
+$_FWD(XASM::Runtime, using Target = asmjit::JitRuntime)
+$_FWD(XASM::Runtime, using Logger = asmjit::StringLogger)
+$_FWD(XASM::Runtime, using Features = asmjit::CpuFeatures)
+$_FWD(XASM::Runtime, using Environment = asmjit::Environment)
 
 #endif

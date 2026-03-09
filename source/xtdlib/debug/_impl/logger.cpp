@@ -5,7 +5,7 @@
 #include "xtdlib/utility/singleton.hpp"
 
 /// Forward Declarations
-$_FWD(class Global, $::Logger)
+$_FWD($::Logger, class Global)
 
 //  TYPEDEFS  //
 

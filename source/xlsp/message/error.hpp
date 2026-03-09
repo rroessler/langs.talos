@@ -5,7 +5,7 @@
 #include "xlsp/message/traits.hpp"
 
 /// Forward Definitions
-$_FWD(template <class T> using Result = std::variant<T $_PP_COMMA Error>, XLSP::Message)
+$_FWD(XLSP::Message, template <class T> using Result = std::variant<T, Error>)
 
 //  X-MACROS  //
 

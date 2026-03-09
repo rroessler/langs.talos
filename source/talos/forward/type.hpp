@@ -8,34 +8,34 @@
 #include "talos/forward/flow.hpp"
 
 /// Forward Declarations
-$_FWD(class Context, Talos::Type)
-$_FWD(class Lattice, Talos::Type)
-$_FWD(class Analyzer, Talos::Type)
-$_FWD(struct Options, Talos::Type)
-$_FWD(struct Deduction, Talos::Type)
-$_FWD(struct Narrowing, Talos::Type)
+$_FWD(Talos::Type, class Context)
+$_FWD(Talos::Type, class Lattice)
+$_FWD(Talos::Type, class Analyzer)
+$_FWD(Talos::Type, struct Options)
+$_FWD(Talos::Type, struct Deduction)
+$_FWD(Talos::Type, struct Narrowing)
 
-$_FWD(struct Tagged, Talos::Type)
-$_FWD(class Entity, Talos::Type)
-$_FWD(class World, Talos::Type)
+$_FWD(Talos::Type, struct Tagged)
+$_FWD(Talos::Type, class Entity)
+$_FWD(Talos::Type, class World)
 
-$_FWD(struct Any, Talos::Type)
-$_FWD(struct None, Talos::Type)
-$_FWD(struct Unset, Talos::Type)
-$_FWD(struct Failure, Talos::Type)
+$_FWD(Talos::Type, struct Any)
+$_FWD(Talos::Type, struct None)
+$_FWD(Talos::Type, struct Unset)
+$_FWD(Talos::Type, struct Failure)
 
-$_FWD(class Generic, Talos::Type)
-$_FWD(class Instance, Talos::Type)
-$_FWD(class Protocol, Talos::Type)
-$_FWD(class Parameter, Talos::Type)
-$_FWD(class Prototype, Talos::Type)
-$_FWD(class Transform, Talos::Type)
+$_FWD(Talos::Type, class Generic)
+$_FWD(Talos::Type, class Instance)
+$_FWD(Talos::Type, class Protocol)
+$_FWD(Talos::Type, class Parameter)
+$_FWD(Talos::Type, class Prototype)
+$_FWD(Talos::Type, class Transform)
 
 /// Forward Definitions
-$_FWD(using Erased = $::Ptr::Shared<Tagged>, Talos::Type)
-$_FWD(using Deferrer = $::Functor::Shared<void(Analyzer*)>, Talos::Type)
-$_FWD(using Template = std::vector<$::Ptr::Shared<Parameter>>, Talos::Type)
-$_FWD(using Branch = $::Functor::Unique<$::Ptr::Unique<Flow::Control>(Analyzer*)>, Talos::Type)
-$_FWD(using Constraints = $::Ptr::Shared<$::Map<const Parameter * $_PP_COMMA Erased>>, Talos::Type)
+$_FWD(Talos::Type, using Erased = $::Ptr::Shared<Tagged>)
+$_FWD(Talos::Type, using Deferrer = $::Functor::Shared<void(Analyzer*)>)
+$_FWD(Talos::Type, using Template = std::vector<$::Ptr::Shared<Parameter>>)
+$_FWD(Talos::Type, using Branch = $::Functor::Unique<$::Ptr::Unique<Flow::Control>(Analyzer*)>)
+$_FWD(Talos::Type, using Constraints = $::Ptr::Shared<$::Map<const Parameter*, Erased>>)
 
 #endif

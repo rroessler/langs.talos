@@ -5,7 +5,7 @@
 #include "xtdlib/macros/forward.hpp"
 
 /// Forward Declarations
-$_FWD(char* append(uint32_t, char*), $::Encoding::UTF8)
+$_FWD($::Encoding::UTF8, char* append(uint32_t, char*))
 
 //  PUBLIC METHODS  //
 

@@ -5,14 +5,14 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Graph, Talos::Import)
-$_FWD(class Drafts, Talos::Import)
-$_FWD(class Service, Talos::Import)
-$_FWD(struct Loader, Talos::Import)
+$_FWD(Talos::Import, class Graph)
+$_FWD(Talos::Import, class Drafts)
+$_FWD(Talos::Import, class Service)
+$_FWD(Talos::Import, struct Loader)
 
-$_FWD(struct Script, Talos::Module)
-$_FWD(struct Dynamic, Talos::Module)
-$_FWD(struct Archived, Talos::Module)
-$_FWD(class Interface, Talos::Module)
+$_FWD(Talos::Module, struct Script)
+$_FWD(Talos::Module, struct Dynamic)
+$_FWD(Talos::Module, struct Archived)
+$_FWD(Talos::Module, class Interface)
 
 #endif

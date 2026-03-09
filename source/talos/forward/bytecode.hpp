@@ -5,23 +5,23 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Loop, Talos::Bytecode)
-$_FWD(class Block, Talos::Bytecode)
-$_FWD(class Binder, Talos::Bytecode)
-$_FWD(struct Label, Talos::Bytecode)
-$_FWD(struct Index, Talos::Bytecode)
-$_FWD(struct Shared, Talos::Bytecode)
-$_FWD(class Invoker, Talos::Bytecode)
-$_FWD(class Request, Talos::Bytecode)
-$_FWD(struct Routine, Talos::Bytecode)
-$_FWD(class Compiler, Talos::Bytecode)
-$_FWD(class Allocator, Talos::Bytecode)
-$_FWD(class Assembler, Talos::Bytecode)
-$_FWD(class Optimizer, Talos::Bytecode)
-$_FWD(struct Instruction, Talos::Bytecode)
+$_FWD(Talos::Bytecode, class Loop)
+$_FWD(Talos::Bytecode, class Block)
+$_FWD(Talos::Bytecode, class Binder)
+$_FWD(Talos::Bytecode, struct Label)
+$_FWD(Talos::Bytecode, struct Index)
+$_FWD(Talos::Bytecode, struct Shared)
+$_FWD(Talos::Bytecode, class Invoker)
+$_FWD(Talos::Bytecode, class Request)
+$_FWD(Talos::Bytecode, struct Routine)
+$_FWD(Talos::Bytecode, class Compiler)
+$_FWD(Talos::Bytecode, class Allocator)
+$_FWD(Talos::Bytecode, class Assembler)
+$_FWD(Talos::Bytecode, class Optimizer)
+$_FWD(Talos::Bytecode, struct Instruction)
 
 /// Forward Definitions
-$_FWD(enum class Syllable : uint8_t, Talos::Bytecode)
-$_FWD(template <class...> struct Operands, Talos::Bytecode)
+$_FWD(Talos::Bytecode, enum class Syllable : uint8_t)
+$_FWD(Talos::Bytecode, template <class...> struct Operands)
 
 #endif

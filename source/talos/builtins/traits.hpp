@@ -10,7 +10,7 @@
 //  MACROS  //
 
 #define TALOS_BUILTIN_TRAITS(N) Talos::Builtins::Traits<Talos::N>
-#define TALOS_BUILTIN_CUSTOM(N) $_FWD(struct N, Talos::Builtins::Custom)
+#define TALOS_BUILTIN_CUSTOM(N) $_FWD(Talos::Builtins::Custom, struct N)
 
 #define TALOS_BUILTIN_FIELDS(N) TALOS_BUILTIN_TRAITS(N)::Field
 #define TALOS_BUILTIN_STATICS(N) TALOS_BUILTIN_TRAITS(N)::Static

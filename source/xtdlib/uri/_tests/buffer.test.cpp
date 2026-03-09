@@ -2,7 +2,7 @@
 #include <testing/testing.hpp>
 
 /// Forward Declarations
-$_FWD(void parse(XT::Session::Runner *, const std::vector<$::String::View> &), Mock)
+$_FWD(Mock, void parse(XT::Session::Runner *, const std::vector<$::String::View> &))
 
 //  X-MACROS  //
 

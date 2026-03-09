@@ -5,8 +5,8 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Definitions
-$_FWD(using Blob = $::Blob::View, XJCT::Archive)
-$_FWD(using Buffer = $::Blob::Buffer, XJCT::Archive)
-$_FWD(using Section = $::String::Buffer, XJCT::Archive)
+$_FWD(XJCT::Archive, using Blob = $::Blob::View)
+$_FWD(XJCT::Archive, using Buffer = $::Blob::Buffer)
+$_FWD(XJCT::Archive, using Section = $::String::Buffer)
 
 #endif

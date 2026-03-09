@@ -12,7 +12,7 @@
 #include "xtdlib/vendors/fmt.hpp"
 
 /// Forward Declarations
-$_FWD(template <class T $_PP_COMMA class... As> static String::Buffer stringify(const T&, As&&...), $::Convert)
+$_FWD($::Convert, template <class T, class... As> static String::Buffer stringify(const T&, As&&...))
 
 namespace $ {
 

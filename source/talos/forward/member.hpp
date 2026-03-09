@@ -5,9 +5,9 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Storage, Talos::Member)
-$_FWD(class Property, Talos::Member)
-$_FWD(class Reference, Talos::Member)
-$_FWD(class Descriptor, Talos::Member)
+$_FWD(Talos::Member, class Storage)
+$_FWD(Talos::Member, class Property)
+$_FWD(Talos::Member, class Reference)
+$_FWD(Talos::Member, class Descriptor)
 
 #endif

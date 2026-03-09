@@ -21,15 +21,11 @@ Talos::Type::Analyzer::Analyzer(XI::Container* services) : m_services(services) 
 
 //  PUBLIC METHODS  //
 
-$::Ptr::Unique<Talos::Type::Scope> Talos::Type::Analyzer::scope(
-    const Syntax::Constructor* constructor, const Erased& signature) noexcept {
+$::Ptr::Unique<Talos::Type::Scope> Talos::Type::Analyzer::scope(const Syntax::Constructor* constructor,
+    const $::Ptr::Shared<Callable>& callable, const $::Ptr::Shared<Generic>& generic) noexcept {
     // scope a new world to be used now
     auto world = scope();
     auto& captures = m_context->captures();
-
-    // get the details about the type now
-    auto generic = Builder::resolve<Generic>(signature);
-    auto callable = Builder::resolve<Callable>(signature);
 
     auto parameters = callable->parameters();  // get the base details now
     auto spread = callable->packed() ? Type::Builder::list(parameters.back().value()) : nullptr;

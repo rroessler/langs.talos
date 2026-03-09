@@ -6,8 +6,8 @@
 #include "talos/object/abstract.hpp"
 
 /// Forward Declarations
-$_FWD(Result Success(Runtime::Isolate*, Value::Any), Talos::Monad)
-$_FWD(Result Failure(Runtime::Isolate*, Value::Any), Talos::Monad)
+$_FWD(Talos::Monad, Result Success(Runtime::Isolate*, Value::Any))
+$_FWD(Talos::Monad, Result Failure(Runtime::Isolate*, Value::Any))
 
 namespace Talos {
 

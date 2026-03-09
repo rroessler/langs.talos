@@ -5,11 +5,11 @@
 #include "xsio/forward/virtual.hpp"
 
 /// Forward Declarations
-$_FWD(struct Switch, XSIO)
-$_FWD(struct Transfer, XSIO::Context)
+$_FWD(XSIO, struct Switch)
+$_FWD(XSIO::Context, struct Transfer)
 
 /// Forward Definitions
-$_FWD(using Pointer = void*, XSIO::Context)
-$_FWD(using Callback = $::Functor::Unique<void(Virtual::Thread*, Virtual::Processor*)>, XSIO::Context)
+$_FWD(XSIO::Context, using Pointer = void*)
+$_FWD(XSIO::Context, using Callback = $::Functor::Unique<void(Virtual::Thread*, Virtual::Processor*)>)
 
 #endif

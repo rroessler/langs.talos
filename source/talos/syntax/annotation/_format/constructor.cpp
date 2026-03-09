@@ -26,5 +26,5 @@ TALOS_MM_FORMAT_HINT(Constructor, reader) {
     if (generics->is<Node::Empty>() && parameters->is<Node::Empty>()) return storage->empty();
 
     // and construct the resulting constructor to be used now
-    return storage->group(storage->space().hard(), generics, parameters);
+    return storage->group(generics, parameters);
 }

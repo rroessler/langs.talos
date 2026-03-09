@@ -6,12 +6,12 @@
 #include "talos/forward/value.hpp"
 
 /// Forward Declarations
-$_FWD(class Each, Talos::Globals)
-$_FWD(class Roots, Talos::Globals)
-$_FWD(class Service, Talos::Globals)
+$_FWD(Talos::Globals, class Each)
+$_FWD(Talos::Globals, class Roots)
+$_FWD(Talos::Globals, class Service)
 
 /// Forward Definitions
-$_FWD(using Callback = $::Functor::Shared<void(Value::Any&)>, Talos::Globals)
-$_FWD(using Factory = $::Functor::Unique<Value::Any(Runtime::Isolate*)>, Talos::Globals)
+$_FWD(Talos::Globals, using Callback = $::Functor::Shared<void(Value::Any&)>)
+$_FWD(Talos::Globals, using Factory = $::Functor::Unique<Value::Any(Runtime::Isolate*)>)
 
 #endif

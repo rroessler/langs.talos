@@ -7,7 +7,7 @@
 #include "talos/string/dynamic.hpp"
 
 /// Forward Definitions
-$_FWD(using Fields = $::Map<Value::Symbol $_PP_COMMA $::Ptr::Unique<Member::Reference>>, Talos::Object)
+$_FWD(Talos::Object, using Fields = $::Map<Value::Symbol, $::Ptr::Unique<Member::Reference>>)
 
 namespace Talos {
 

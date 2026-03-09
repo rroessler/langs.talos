@@ -6,11 +6,11 @@
 #include <xlsp/xlsp.hpp>
 
 /// Forward Declarations
-$_FWD(class Frame, Talos::Resource)
-$_FWD(class Trace, Talos::Resource)
-$_FWD(class Location, Talos::Resource)
+$_FWD(Talos::Resource, class Frame)
+$_FWD(Talos::Resource, class Trace)
+$_FWD(Talos::Resource, class Location)
 
 /// Forward Definitions
-$_FWD(using Stack = std::vector<Location>, Talos::Resource)
+$_FWD(Talos::Resource, using Stack = std::vector<Location>)
 
 #endif

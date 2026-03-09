@@ -5,12 +5,12 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Loop, XSIO::Async)
-$_FWD(class Manager, XSIO::Async)
-$_FWD(struct Options, XSIO::Async)
-$_FWD(struct Storage, XSIO::Async)
-$_FWD(class Watchdog, XSIO::Async)
-$_FWD(class Shutdown, XSIO::Async)
-$_FWD(class Scheduler, XSIO::Async)
+$_FWD(XSIO::Async, class Loop)
+$_FWD(XSIO::Async, class Manager)
+$_FWD(XSIO::Async, struct Options)
+$_FWD(XSIO::Async, struct Storage)
+$_FWD(XSIO::Async, class Watchdog)
+$_FWD(XSIO::Async, class Shutdown)
+$_FWD(XSIO::Async, class Scheduler)
 
 #endif

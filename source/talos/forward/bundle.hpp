@@ -8,13 +8,13 @@
 #include "talos/forward/runtime.hpp"
 
 /// Forward Declarations
-$_FWD(class Archive, Talos::Bundle)
-$_FWD(class Service, Talos::Bundle)
-$_FWD(struct Options, Talos::Bundle)
+$_FWD(Talos::Bundle, class Archive)
+$_FWD(Talos::Bundle, class Service)
+$_FWD(Talos::Bundle, struct Options)
 
 /// Forward Definitions
-$_FWD(using Blob = XJCT::Archive::Blob, Talos::Bundle)
-$_FWD(using Buffer = XJCT::Archive::Buffer, Talos::Bundle)
-$_FWD(using Executable = XJCT::Archive::Binary, Talos::Bundle)
+$_FWD(Talos::Bundle, using Blob = XJCT::Archive::Blob)
+$_FWD(Talos::Bundle, using Buffer = XJCT::Archive::Buffer)
+$_FWD(Talos::Bundle, using Executable = XJCT::Archive::Binary)
 
 #endif

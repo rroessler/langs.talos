@@ -104,7 +104,7 @@ Talos::Function::Context Talos::Engine::Call::m_initialize(
     // construct a new context instance
     auto context = Function::Context(isolate, leaked);
     if (parent.valid()) context.parent(parent);
-    return context.self(self), context;  // and return
+    return context.self(self), context;
 }
 
 Talos::Value::Any Talos::Engine::Call::m_closure(
@@ -117,7 +117,7 @@ Talos::Value::Any Talos::Engine::Call::m_closure(
     if (locals > UINT32_MAX) locals = args.size() + 1;
 
     // build the frame to be used for calling
-    auto frame = Function::Frame(isolate, info);
+    auto frame = Function::Frame(isolate, info, args.self());
 
     // allocate the frame based on the stack now
     auto stack = isolate->allocator()->stack(locals);
@@ -130,7 +130,6 @@ Talos::Value::Any Talos::Engine::Call::m_closure(
 
     // prepare the argument count to be bound now
     auto argc = frame.argc() = std::min(args.size(), vargs);
-    if (argc == UINT64_MAX - 1) $_ABORT("UH OH!");
 
     // fill the arguments as necessary now
     if (argc) std::memcpy(stack.data() + 1, args.data(), sizeof(Value::Any) * argc);

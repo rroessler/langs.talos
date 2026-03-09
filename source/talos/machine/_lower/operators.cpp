@@ -3,7 +3,7 @@
 #include "talos/value/_inline/value.ipp"
 
 /// Forward Definitions
-$_FWD(using Kind = Operator::Kind, Talos::Machine)
+$_FWD(Talos::Machine, using Kind = Operator::Kind)
 
 //  PRIVATE METHODS  //
 

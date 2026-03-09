@@ -5,6 +5,6 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations
-$_FWD(class Stream, Talos::Parser)
+$_FWD(Talos::Parser, class Stream)
 
 #endif

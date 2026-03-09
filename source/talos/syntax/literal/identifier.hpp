@@ -34,6 +34,9 @@ namespace Talos::Syntax {
 
         /// @brief Gets the associated value.
         inline constexpr $::String::View name() const noexcept { return m_name; }
+
+        /// @brief Denotes if this is a "self" based value.
+        inline constexpr bool self() const noexcept { return m_name == "self"; }
     };
 
 }  // namespace Talos::Syntax

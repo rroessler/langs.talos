@@ -5,8 +5,8 @@
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Implementations
-$_FWD(struct Abstract, XLSP::Transport)
-$_FWD(struct Console, XLSP::Transport)
-$_FWD(class Stream, XLSP::Transport)
+$_FWD(XLSP::Transport, struct Abstract)
+$_FWD(XLSP::Transport, struct Console)
+$_FWD(XLSP::Transport, class Stream)
 
 #endif

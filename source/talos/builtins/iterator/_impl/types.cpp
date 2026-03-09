@@ -5,8 +5,8 @@
 #include "talos/builtins/_inline/builtins.ipp"
 
 /// Forward Declarations
-$_FWD(namespace TB = Type::Builder, Talos::Builtins)
-$_FWD(using Self = Type::Protocol, Talos::Builtins)
+$_FWD(Talos::Builtins, namespace TB = Type::Builder)
+$_FWD(Talos::Builtins, using Self = Type::Protocol)
 
 //  TYPEDEFS  //
 

@@ -4,7 +4,21 @@
 /// Syntax Modules
 #include "talos/syntax/_inline/declaration.ipp"
 
+/// Forward Declarations
+$_FWD(Talos::Type::Dispatch, void member(Analyzer*, const Syntax::Declaration*, Prototype*))
+
 //  PUBLIC METHODS  //
+
+void Talos::Type::Dispatch::member(Analyzer* analyzer, const Syntax::Declaration* field, Prototype* proto) {
+    // get the underlying field details to be used
+    auto type = analyzer->check(field).type;
+
+    // attempt getting the current member now
+    auto [entity, _] = analyzer->world()->lookup(field->name());
+
+    // update the prototype with the values details to be bound
+    proto->fields().emplace(field->name(), *entity), entity->unused(false);
+}
 
 TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     // get the baseline location of the node
@@ -14,9 +28,12 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     auto overlap = !analyzer->world()->declare(node->name(), location);
     if (overlap) return analyzer->report(4000406, node->name());
 
+    // prepare the current scoping to be used
+    $_UNUSED $_AUTO = analyzer->scope();
+
     // ensure that the signature is valid
     auto constructor = analyzer->check(node->constructor()).type;
-    if (constructor->is<Type::Any>()) return constructor;
+    if (constructor->is<Type::Any>()) return constructor;  // bail
 
     // attempt checking the baseline prototype details
     auto shape = analyzer->shapes()->assign(node);
@@ -40,7 +57,6 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     // update the underlying constructor function to be used
     proto->constructor() = [constructor, parameters](const Type::Prototype* proto) -> Type::Erased {
         // bind all the prototype constraints to
-        auto generic = Type::Builder::resolve<Type::Generic>(constructor);
         auto constraints = $::New().shared<Type::Constraints::element_type>();
 
         // iterate over the avialable constraints to be bound
@@ -64,7 +80,8 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     $_UNUSED $_AUTO = analyzer->trace(node);
 
     // prepare the incoming world to be used for scoping
-    auto world = analyzer->scope(node->constructor(), proto->callable());
+    auto callable = Type::Builder::resolve<Type::Callable>(proto->callable());
+    auto world = analyzer->scope(node->constructor(), callable, nullptr);
 
     // attempt resolving the incoming extension instance
     auto extends = analyzer->check(node->extends(), Type::Builder::none()).type;
@@ -76,10 +93,7 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     world->values().declare("self", instance)->unused(false);
 
     // start attempting to declare all the available fields
-    for (const auto& field : node->fields()) {
-        /// TODO: attempt checking the incoming field
-        auto member = analyzer->check(field).type;
-    }
+    for (const auto& field : node->fields()) Type::Dispatch::member(analyzer, field, proto.get());
 
     // attempt checking all the available fields now for use
     return analyzer->passable(entity->value());

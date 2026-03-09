@@ -5,8 +5,8 @@
 #include "talos/syntax/_inline/expression.ipp"
 
 /// Forward Declarations
-$_FWD(Erased infer(Generic*, const Constraints&), Talos::Type::Dispatch)
-$_FWD(Erased bind(Parameter*, const Constraints&), Talos::Type::Dispatch)
+$_FWD(Talos::Type::Dispatch, Erased infer(Generic*, const Constraints&))
+$_FWD(Talos::Type::Dispatch, Erased bind(Parameter*, const Constraints&))
 
 //  PUBLIC METHODS  //
 

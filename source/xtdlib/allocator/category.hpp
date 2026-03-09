@@ -9,7 +9,7 @@
 //  MACROS  //
 
 #if $_ENABLE_MTRACE
-#define $_ALLOCATOR_CATEGORY(C) $_FWD(struct C{}, $::Allocator::Tag)
+#define $_ALLOCATOR_CATEGORY(C) $_FWD($::Allocator::Tag, struct C{})
 #else
 #define $_ALLOCATOR_CATEGORY(C)  // declare as unset now
 #endif

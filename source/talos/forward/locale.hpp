@@ -5,8 +5,8 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Service, Talos::Locale)
-$_FWD(struct Options, Talos::Locale)
-$_FWD(using Handle = std::locale, Talos::Locale)
+$_FWD(Talos::Locale, class Service)
+$_FWD(Talos::Locale, struct Options)
+$_FWD(Talos::Locale, using Handle = std::locale)
 
 #endif

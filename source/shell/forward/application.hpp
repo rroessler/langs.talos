@@ -5,6 +5,6 @@
 #include "shell/forward/command.hpp"
 
 /// Forward Declarations
-$_FWD(class Program, Shell)
+$_FWD(Shell, class Program)
 
 #endif

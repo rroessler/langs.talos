@@ -2,7 +2,7 @@
 #include "talos/diagnostic/traits.hpp"
 
 /// Forward Declarations
-$_FWD(template <Code C $_PP_COMMA Severity S> bool overridable(), Talos::Diagnostic::Traits)
+$_FWD(Talos::Diagnostic::Traits, template <Code C, Severity S> bool overridable())
 
 //  PUBLIC METHODS  //
 

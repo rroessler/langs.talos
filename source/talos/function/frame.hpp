@@ -24,6 +24,9 @@ namespace Talos::Function {
         /// @brief Associated environment context.
         Context m_context = Context();
 
+        /// @brief Curently bound receiver.
+        Value::Any m_self = Value::Void();
+
         /// @brief Register stack (eg: 0 = accumulator, ...A = arguments, ...N = registers).
         Value::Any* m_stack = nullptr;
 
@@ -34,9 +37,10 @@ namespace Talos::Function {
          * @brief Constructs a function frame.
          * @param isolate               Runtime isolate.
          * @param info                  Function information.
+         * @param self                  Bound receiver value.
          */
-        constexpr Frame(Runtime::Isolate* isolate, const Info* info = nullptr) :
-            Abstract<Frame>(isolate), m_offset(info->buffer().address()), m_info(info) {}
+        constexpr Frame(Runtime::Isolate* isolate, const Info* info = nullptr, const Value::Any& self = Value::Void()) :
+            Abstract<Frame>(isolate), m_offset(info->buffer().address()), m_info(info), m_self(self) {}
 
         //  PUBLIC METHODS  //
 
@@ -51,6 +55,9 @@ namespace Talos::Function {
         /// @brief The incoming argument count to be used.
         inline constexpr size_t& argc() noexcept { return m_argc; }
         inline constexpr size_t argc() const noexcept { return m_argc; }
+
+        /// @brief Gets the bound receiver value.
+        inline constexpr Value::Any self() const noexcept { return m_self; }
 
         /// @brief Gets a span of the incoming arguments.
         inline constexpr std::span<Value::Any> argv() const noexcept { return span(1, m_argc); }

@@ -11,7 +11,7 @@
 #include "xtdlib/system/environment.hpp"
 
 /// Forward Declarations
-$_FWD(size_t separator(const String::View &pair), $::Environment)
+$_FWD($::Environment, size_t separator(const String::View &pair))
 
 //  MACROS  //
 

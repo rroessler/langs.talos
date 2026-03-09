@@ -5,8 +5,8 @@
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations
-$_FWD(class Marker, Talos::Garbage)
-$_FWD(class Service, Talos::Garbage)
-$_FWD(struct Options, Talos::Garbage)
+$_FWD(Talos::Garbage, class Marker)
+$_FWD(Talos::Garbage, class Service)
+$_FWD(Talos::Garbage, struct Options)
 
 #endif

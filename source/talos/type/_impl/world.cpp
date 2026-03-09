@@ -13,8 +13,14 @@ Talos::Type::Scope::~Scope() {
 
     // ensure we report any errors relating to unused variables
     for (const auto& [name, entity] : m_entities) {
-        if (!entity.unused() || name.starts_with('_')) continue;
-        m_analyzer->report(m_locations.at(name), 4000901, name);
+        // resolve the underlying location of the entity
+        auto location = m_locations.at(name);
+
+        // check whether we should actually report the instance
+        if (!entity.unused() || name.starts_with('_') || location.anonymous()) continue;
+
+        // if unused, then we declare as such to the reporter
+        m_analyzer->report(location, entity.transient() ? 4000901 : 4000902, name);
     }
 
     // resolve the current world instance to be used

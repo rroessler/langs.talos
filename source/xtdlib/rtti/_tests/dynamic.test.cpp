@@ -2,10 +2,10 @@
 #include <testing/testing.hpp>
 
 /// Forward Declarations
-$_FWD(struct A : public $::RTTI::Dynamic{}, Mock)
-$_FWD(struct B : public $::RTTI::Extends<B $_PP_COMMA A>{}, Mock)
-$_FWD(struct C : public $::RTTI::Extends<C $_PP_COMMA A>{}, Mock)
-$_FWD(struct D{}, Mock)  // should not be accessible
+$_FWD(Mock, struct A : public $::RTTI::Dynamic{})
+$_FWD(Mock, struct B : public $::RTTI::Extends<B, A>{})
+$_FWD(Mock, struct C : public $::RTTI::Extends<C, A>{})
+$_FWD(Mock, struct D{})  // should not be accessible
 
 //  TEST CASES  //
 

@@ -5,7 +5,7 @@
 #include "talos/resource/scheme.hpp"
 
 /// Forward Declarations
-$_FWD(using Result = std::expected<$::URI::Buffer $_PP_COMMA $::String::Buffer>, Talos::Resource)
+$_FWD(Talos::Resource, using Result = std::expected<$::URI::Buffer, $::String::Buffer>)
 
 namespace Talos::Resource::Path {
 

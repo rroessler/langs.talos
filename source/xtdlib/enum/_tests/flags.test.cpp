@@ -2,8 +2,8 @@
 #include <testing/testing.hpp>
 
 /// Forward Declarations
-$_FWD(enum class Enum, Mock)
-$_FWD(using Flags = $::Enum::Flags<Enum>, Mock)
+$_FWD(Mock, enum class Enum)
+$_FWD(Mock, using Flags = $::Enum::Flags<Enum>)
 
 //  TYPEDEFS  //
 

@@ -6,7 +6,7 @@
 #include "xtdlib/macros/processor.hpp"
 
 /// Forward Declarations
-$_FWD(static Filesystem::Path outer(const Filesystem::Path &), $::Path)
+$_FWD($::Path, static Filesystem::Path outer(const Filesystem::Path &))
 
 //  PUBLIC METHODS  //
 
