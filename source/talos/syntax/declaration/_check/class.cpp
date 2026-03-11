@@ -106,8 +106,12 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     // validate that the underlying "implements" values are valid
     for (const auto& implements : node->implements()) {
         auto interface = analyzer->check(implements).type;
-        if (interface->unify(instance)) continue;  // valid check
+        if (interface->unify(instance)) continue;  // valid
+
+        // declare that the incoming check failed
         analyzer->report(implements, 3001002, node->name(), *interface);
+
+        /// TODO: we should be able to get further information here
     }
 
     // attempt checking all the available fields now for use

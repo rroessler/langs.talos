@@ -19,8 +19,7 @@ bool Talos::Type::Protocol::m_unify(const Erased& candidate, const Constraints& 
     for (const auto& [name, entity] : m_fields.view(this, constraints)) {
         auto other = candidate->lookup(name);  // get the other value now
         if (!other.value()->unify(entity.value(), constraints)) return false;
-
-        /// TODO: check against the required accessibility as well now
+        if (other.modifiers().test(Variable::Flag::PRIVATE, Variable::Flag::PROTECTED)) return false;
     }
 
     // should be a success as we got through all the fields
