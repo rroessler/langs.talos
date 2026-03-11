@@ -5,7 +5,7 @@
 #include <talos/builtins/_inline/assert.ipp>
 
 /// Crate Modules
-#include "crates/garbage/source/module.hpp"
+#include "crates/gc/source/module.hpp"
 
 //  PROPERTIES  //
 

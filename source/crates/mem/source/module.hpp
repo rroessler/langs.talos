@@ -16,7 +16,7 @@
 namespace Talos::Package {
 
     /// @brief Memory Package Addon.
-    struct Memory : public Dylib::Proxy<"Memory"> {
+    struct Memory : public Dylib::Proxy<"mem"> {
         //  CONSTRUCTORS  //
 
         /**

@@ -1,9 +1,6 @@
 #ifndef _CRATES_PACKAGE_TEST_HPP
 #define _CRATES_PACKAGE_TEST_HPP
 
-/// Vendor Modules
-#include <xtest/xtest.hpp>
-
 /// Talos Modules
 #include <talos/async/thenable.hpp>
 #include <talos/dylib/registry.hpp>
@@ -24,7 +21,7 @@
 namespace Talos::Package {
 
     /// @brief Testing Package Addon.
-    struct Test : public Dylib::Proxy<"Test"> {
+    struct Test : public Dylib::Proxy<"test"> {
         //  CONSTRUCTORS  //
 
         /**

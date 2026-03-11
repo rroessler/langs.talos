@@ -46,3 +46,10 @@ target_compile_definitions(${TALOS_TARGET_SUPER} PUBLIC
     -DTALOS_MM_VERSION="${TALOS_VERSION_LONG}"
     -DTALOS_MM_COMMIT="${TALOS_VERSION_COMMIT}"
 )
+
+# Defining a custom entry-point for the entire "Talos" runtime.
+add_library(${TALOS_TARGET_CRATES} INTERFACE)
+add_library(${TALOS_TARGET_SUPER}::${TALOS_TARGET_CRATES} ALIAS ${TALOS_TARGET_CRATES})
+
+# Define the additional "talos::crates" details.
+target_link_libraries(${TALOS_TARGET_CRATES} INTERFACE $<LINK_LIBRARY:WHOLE_ARCHIVE,talos::talos>)

@@ -16,7 +16,7 @@
 namespace Talos::Package {
 
     /// @brief Garbage Package Addon.
-    class Garbage : public Dylib::Proxy<"Garbage"> {
+    class Garbage : public Dylib::Proxy<"gc"> {
         //  TYPEDEFS  //
 
         /// @brief Available service typing.

@@ -1,10 +1,10 @@
 //!
-//! Crate: "memory"
+//! Crate: "mem"
 //! Description: Utility functions for reading memory usage.
 //!
 
 // Dynamic Modules
-import "dylib:memory" as memory;
+import "dylib:mem" as mem;
 
 // Talos Modules
 import "talos:_detail" as Detail;
@@ -20,11 +20,11 @@ export namespace Heap {
     // - PUBLIC METHODS - //
 
     //! Brief: Gets the total heap memory.
-    export let total = m_cast[fn -> Number](memory.heap_total);
+    export let total = m_cast[fn -> Number](mem.heap_total);
 
     //! Brief: Gets the current heap memory usage.
-    export let usage = m_cast[fn -> Number](memory.heap_usage);
+    export let usage = m_cast[fn -> Number](mem.heap_usage);
 
     //! Brief: Gets the current heap memory available.
-    export let avail = m_cast[fn -> Number](memory.heap_avail);
+    export let avail = m_cast[fn -> Number](mem.heap_avail);
 };

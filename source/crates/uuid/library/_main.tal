@@ -3,4 +3,44 @@
 //! Description: Helpers for generating and validating UUIDs.
 //!
 
-Todo("Unimplemented Crate - 'talos:uuid'");
+// Dynamic Modules
+import "dylib:uuid" as uuid;
+
+// Talos Modules
+import "talos:_detail" as Detail;
+
+// - PROPERTIES - //
+
+//! Brief: Internal helper to reduce bytecode output.
+let m_cast = Detail.Unsafe.cast;
+
+// - PUBLIC METHODS - //
+
+//! Brief: Generates a time-based UUID (using Version 1, defined by RFC 9562).
+export let V1 = m_cast[fn -> String](uuid.V1);
+
+//! Brief: Generates an MD5 UUID (using Version 3, defined by RFC 9562).
+export let V3 = m_cast[fn -> String](uuid.V3);
+
+//! Brief: Generates a random UUID (using Version 4, defined by RFC 9562).
+export let V4 = m_cast[fn (seed?: String, name?: String) -> String](uuid.V4);
+
+//! Brief: Generates a SHA1 UUID (using Version 5, defined by RFC 9562).
+export let V5 = m_cast[fn (seed?: String, name?: String) -> String](uuid.V5);
+
+//! Brief: Generates a reordered time-based UUID (using Version 6, defined by RFC 9562).
+export let V6 = m_cast[fn -> String](uuid.V6);
+
+//! Brief: Generates a unix time-based UUID (using Version 7, defined by RFC 9562).
+export let V7 = m_cast[fn -> String](uuid.V7);
+
+// - NAMESPACES - //
+
+//! Well-known namespace seeds for V3 and V5
+export namespace Seed {
+    export let NIL = "00000000-0000-0000-0000-000000000000";
+    export let DNS = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
+    export let URL = "6ba7b811-9dad-11d1-80b4-00c04fd430c8";
+    export let OID = "6ba7b812-9dad-11d1-80b4-00c04fd430c8";
+    export let X500 = "6ba7b814-9dad-11d1-80b4-00c04fd430c8";
+};

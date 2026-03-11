@@ -18,7 +18,7 @@ add_executable(${TALOS_TARGET_TESTING} ${TALOS_SOURCES_TESTING})
 
 # Define all the libraries to be used now
 target_link_libraries(${TALOS_TARGET_TESTING} PUBLIC
-    talos::talos
     talos::xtest
+    talos::crates
     mono::warnings
 )

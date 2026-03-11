@@ -23,7 +23,7 @@
 namespace Talos::Package {
 
     /// @brief Assertion Package Addon.
-    struct Assert : public Dylib::Proxy<"Assert"> {
+    struct Assert : public Dylib::Proxy<"assert"> {
         //  CONSTRUCTORS  //
 
         /**

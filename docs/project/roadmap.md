@@ -28,23 +28,24 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 
 ## Libraries
 
-| Status | Library         | Description                     | Todo                           |
-| :----: | --------------- | ------------------------------- | ------------------------------ |
-|   ✅   | `talos:assert`  | Assertion library methods.      | Additional methods?            |
-|   ❌   | `talos:async`   | Asynchronous utilities.         | -                              |
-|   ❌   | `talos:chrono`  | Temporal utilities.             | -                              |
-|   ❌   | `talos:codec`   | Encoding/decoding function.     | -                              |
-|   ❌   | `talos:fsys`    | Filesystem utilities.           | -                              |
-|   ✅   | `talos:garbage` | Garbage collection hooks.       | Additional statistics?         |
-|   💀   | `talos:jit`     | Experimental JIT hooks.         | -                              |
-|   ❌   | `talos:json`    | JSON/JSONC parsing/serializing. | -                              |
-|   ❌   | `talos:math`    | Mathematics utilities.          | -                              |
-|   ⚪   | `talos:memory`  | Virtual memory utilities.       | Buffers, allocators, ...       |
-|   ❌   | `talos:path`    | Filesystem path utilities.      | -                              |
-|   ⚪   | `talos:test`    | Testing suite framework.        | Skipping, lifecycle hooks, ... |
-|   ❌   | `talos:toml`    | TOML parsing/serializing.       | -                              |
-|   ❌   | `talos:uuid`    | UUID generators/validators.     | -                              |
-|   ❌   | `talos:yaml`    | YAML parsing/serializing.       | -                              |
+| Status | Library        | Description                     | Todo                           |
+| :----: | -------------- | ------------------------------- | ------------------------------ |
+|   ✅   | `talos:assert` | Assertion library methods.      | Additional methods?            |
+|   ❌   | `talos:async`  | Asynchronous utilities.         | -                              |
+|   ❌   | `talos:chrono` | Temporal utilities.             | -                              |
+|   ❌   | `talos:codec`  | Encoding/decoding function.     | -                              |
+|   ❌   | `talos:fsys`   | Filesystem utilities.           | -                              |
+|   ✅   | `talos:gc`     | Garbage collection hooks.       | Additional statistics?         |
+|   💀   | `talos:jit`    | Experimental JIT hooks.         | -                              |
+|   🚀   | `talos:json`   | JSON/JSONC parsing/serializing. | -                              |
+|   ❌   | `talos:math`   | Mathematics utilities.          | -                              |
+|   ⚪   | `talos:mem`    | Virtual memory utilities.       | Buffers, allocators, ...       |
+|   ❌   | `talos:path`   | Filesystem path utilities.      | -                              |
+|   ❌   | `talos:rng`    | Random number generators.       | -                              |
+|   ⚪   | `talos:test`   | Testing suite framework.        | Skipping, lifecycle hooks, ... |
+|   🚀   | `talos:toml`   | TOML parsing/serializing.       | -                              |
+|   ✅   | `talos:uuid`   | UUID generators/validators.     | Show there be a validator?     |
+|   🚀   | `talos:yaml`   | YAML parsing/serializing.       | -                              |
 
 ## Tooling
 

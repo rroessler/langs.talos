@@ -3,4 +3,23 @@
 //! Description: Helpers for parsing and serializing YAML.
 //!
 
-Todo("Unimplemented Crate - 'talos:yaml'");
+// Dynamic Modules
+import "dylib:yaml" as yaml;
+
+// Talos Modules
+import "talos:_detail" as Detail;
+
+// - PROPERTIES - //
+
+//! Brief: Internal helper to reduce bytecode output.
+let m_cast = Detail.Unsafe.cast;
+
+// - PUBLIC METHODS - //
+
+//! Brief: Stringifies Talos values into a YAML output.
+//! Param: value                Value to stringify.
+export let encode = m_cast[fn (value: Any) -> String](yaml.encode);
+
+//! Brief: Parses YAML inputs to a Talos value.
+//! Param: input                Input to parse.
+export let decode = m_cast[fn [T = Any](input: String) -> T](yaml.decode);

@@ -22,7 +22,7 @@ add_executable(${TALOS_TARGET_SHELL} ${TALOS_SOURCES_SHELL})
 # Define all the libraries to be used now
 target_link_libraries(${TALOS_TARGET_SHELL} PUBLIC
     CLI11::CLI11
-    talos::talos
+    talos::crates
     mono::warnings
 )
 

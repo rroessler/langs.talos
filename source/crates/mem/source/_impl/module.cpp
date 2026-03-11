@@ -6,7 +6,7 @@
 #include <talos/builtins/_inline/assert.ipp>
 
 /// Crate Modules
-#include "crates/memory/source/module.hpp"
+#include "crates/mem/source/module.hpp"
 
 //  PROPERTIES  //
 

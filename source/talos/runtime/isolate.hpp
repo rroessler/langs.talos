@@ -190,6 +190,14 @@ namespace Talos::Runtime {
         Value::Any import(const $::String::View& script, const $::Filesystem::Path& hint, const Resource::Trace& trace);
 
         /**
+         * @brief Handles throw "todo" exceptions.
+         * @param reason                    Todo reasoning.
+         */
+        inline Value::Any todo(String::Dynamic reason) { return todo(reason.view()); }
+        inline Value::Any todo(const $::String::View& reason) { return panic(6000900, reason); }
+        inline Value::Any todo() { return todo("The following code has not been implemented yet"); }
+
+        /**
          * @brief Handles throwing an exception.
          * @param exception                 Exception to throw.
          */

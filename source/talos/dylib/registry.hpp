@@ -13,8 +13,8 @@
     exports.fields().emplace(#N, Member::Factory::native(isolate, m_##N, m_name(), #N));
 
 /// @brief Exposes a dynamic library addon.
-#define TALOS_MM_DYLIB_ADDON(P, L, ...)                                   \
-    static $_AUTO = Talos::Dylib::Registry::install<Talos::Package::P>(); \
+#define TALOS_MM_DYLIB_ADDON(P, L, ...)                                                             \
+    __attribute((used)) static const $_AUTO = Talos::Dylib::Registry::install<Talos::Package::P>(); \
     Talos::Package::P::P(Runtime::Isolate* isolate, Dylib::Exports& exports) { L(TALOS_MM_DYLIB_UNWRAP) }
 
 /// @brief Exposes a dynamic library method.
@@ -70,7 +70,7 @@ namespace Talos::Dylib {
         /// @brief Handles installing a dynamic package.
         template <class T>
         static inline Addon* install() {
-            return install($::Convert::lowercase(T::m_name()), [](Runtime::Isolate* isolate, Exports& exports) {
+            return install(T::m_name(), [](Runtime::Isolate* isolate, Exports& exports) {
                 auto* package = $::New().with<T>(isolate, exports);  // create
                 m_lifecycle(isolate)->subscribe([package] { delete package; });
             });

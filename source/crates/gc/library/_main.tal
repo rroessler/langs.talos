@@ -1,10 +1,10 @@
 //!
-//! Crate: "garbage"
+//! Crate: "gc"
 //! Description: Setup functions for garbage collection.
 //!
 
 // Dynamic Modules
-import "dylib:garbage" as gc;
+import "dylib:gc" as gc;
 
 // Talos Modules
 import "talos:_detail" as Detail;

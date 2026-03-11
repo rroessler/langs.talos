@@ -13,8 +13,8 @@ Talos::Value::Any TALOS_BUILTIN_TRAITS(Builtins::Custom::Todo)::m_panic(
     auto reason = args.at(0, Value::Void());
 
     // handle the incoming argument based on its typing now
-    if (reason.is<Value::Void>()) return isolate->panic(6000900, "The following code has not been implemented yet");
-    if (reason.is<String::Dynamic>()) return isolate->panic(6000900, reason);  // given a reason why so we show this
+    if (reason.is<Value::Void>()) return isolate->todo();
+    if (reason.is<String::Dynamic>()) return isolate->todo(reason.as<String::Dynamic>());
 
     // otherwise through a typing error now since invalid
     return isolate->panic(3000301, reason.type_name(), "String?");
