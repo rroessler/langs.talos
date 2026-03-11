@@ -277,11 +277,11 @@ Classes can also inherit from structural types.
 
 ```talos
 type Labeled = {
-    let label: String;
+    label: String;
 };
 
 // Enforce that these classes must have a label.
-public class Derived(a_label: String) implements Labeled {
+class Derived(a_label: String) implements Labeled {
     public let label = a_label;
 };
 

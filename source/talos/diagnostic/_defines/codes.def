@@ -140,6 +140,7 @@ TALOS_XX_DIAGNOSTIC_ANALYSIS(3000950, ERROR, "Value of type '{0}' cannot be used
 
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3001000, ERROR, "Class '{0}' is referenced in its own base expression")
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3001001, ERROR, "Class '{0}' cannot extend non-class type '{1}'")
+TALOS_XX_DIAGNOSTIC_ANALYSIS(3001002, ERROR, "Class '{0}' incorrectly implements interface type '{1}'")
 
 /// "Reference" Diagnostics Group 4_000_000
 TALOS_XX_DIAGNOSTIC_REFERENCE(4000000, ERROR, "{0}")

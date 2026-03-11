@@ -103,6 +103,13 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     // start attempting to declare all the available fields
     for (const auto& field : node->fields()) Type::Dispatch::member(analyzer, field, proto.get());
 
+    // validate that the underlying "implements" values are valid
+    for (const auto& implements : node->implements()) {
+        auto interface = analyzer->check(implements).type;
+        if (interface->unify(instance)) continue;  // valid check
+        analyzer->report(implements, 3001002, node->name(), *interface);
+    }
+
     // attempt checking all the available fields now for use
     return analyzer->passable(entity->value());
 }
