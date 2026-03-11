@@ -194,7 +194,7 @@ void Talos::Bytecode::Compiler::m_function(Request* request) {
     auto* info = m_arena->functions.emplace_back($::New().unique<Function::Info>(m_arena.get())).get();
 
     // pull out some of the request details to be used
-    const auto* function = request->m_constructor;
+    const auto* function = request->m_signature;
 
     // pull out the spread value as well to be compared
     const auto* spread = function->spread();
@@ -219,6 +219,9 @@ void Talos::Bytecode::Compiler::m_function(Request* request) {
 
     // check if the function-body is a block or not
     Destination destination = request->m_body->is<Syntax::Block>() ? Register() : Accumulator();
+
+    // if we have an inheritance expression, then run that constructor
+    m_inherits(request->m_super);
 
     // prepare the function body to be used now
     auto returns = m_labels->m_returns.emplace(m_labels->reserve());
@@ -259,4 +262,18 @@ bool Talos::Bytecode::Compiler::m_parameter(const Syntax::Variable* parameter, c
 
     // declare if the spread is same as the parameter
     return parameter == spread;
+}
+
+void Talos::Bytecode::Compiler::m_inherits(const Syntax::Call* super) {
+    // if there is no super instance, then ignore
+    if (super == nullptr) return;
+
+    // prepare all the incoming arguments to be called
+    auto list = registers()->list();
+
+    // compile down all the incoming arguments
+    for (const auto& argument : super->arguments()) lower(argument, list.grow());
+
+    // after compiling the parent, we want to call the super-constructor
+    emit<Syllable::CLASS_SUPER>(Accumulator(), list);
 }

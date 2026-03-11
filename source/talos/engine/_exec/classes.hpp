@@ -46,15 +46,40 @@ TALOS_MM_ENGINE_EXECUTE(CLASS_BIND, isolate, frame, instruction) {
 TALOS_MM_ENGINE_EXECUTE(CLASS_MAKE, isolate, frame, instruction) {
     // pull out the underlying slot and parent
     auto slot = instruction->get<0>();
-    auto extends = frame->load(slot);
+    auto super = frame->load(slot);
 
     // then also resolve the name and shape
     auto name = frame->intern(instruction->get<1>());
     Shape::Underlying shape = instruction->get<2>();
 
     // construct a current class prototype now
-    auto prototype = isolate->create<Object::Class>(name.view(), shape, extends);
+    auto prototype = isolate->create<Object::Class>(name.view(), shape, super);
 
     // and bind the prototype to the extension output
     return frame->store(slot, prototype), Mode::NEXT;
+}
+
+TALOS_MM_ENGINE_EXECUTE(CLASS_SUPER, isolate, frame, instruction) {
+    // get the incoming class instance to be constructed
+    auto span = frame->span(instruction->get<1>());
+    auto instance = frame->self().as<Object::Instance>();
+
+    // get the underlying parent constructor now
+    auto parent = instance.prototype().parent();
+
+    // fail if the parent is not a class
+    if (!parent.is<Object::Class>()) return isolate->panic(6000203, parent.type_name()), Mode::NEXT;
+
+    // get the parent constructor details now
+    auto symbol = Operator::Attribute::CALL;
+    auto prototype = parent.as<Object::Class>();
+    const auto& statics = prototype.statics();
+
+    // if the constructor is missing, then panic as well
+    if (!statics.contains(symbol)) return isolate->panic(6000202, prototype.name()), Mode::NEXT;
+
+    // can safely use the incoming self instance now
+    auto constructor = statics.at(symbol)->getter(isolate, instance);
+    auto result = Call::any(isolate, constructor, { instance, span });
+    return result.traits().okay() ? Mode::NEXT : Mode::PANIC;
 }

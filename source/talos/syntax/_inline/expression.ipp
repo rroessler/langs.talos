@@ -32,6 +32,7 @@
 //  MACROS  //
 
 #define TALOS_XX_LITERAL_NODES(X) \
+    X(Self)                       \
     X(Text)                       \
     X(Void)                       \
     X(True)                       \

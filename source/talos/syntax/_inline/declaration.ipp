@@ -20,6 +20,7 @@
 
 #define TALOS_XX_ANONYMOUS_NODES(X) \
     X(Tree)                         \
+    X(Header)                       \
     X(Variant)                      \
     X(Decorator)                    \
                                     \

@@ -24,7 +24,7 @@ TALOS_MM_CHECK_NODE(Accessor, accessor, analyzer) {
     // check if the incoming entity is private / protected at all
     if (entity.modifiers().test(Variable::Flag::PRIVATE, Variable::Flag::PROTECTED)) {
         // get the current self value to be used now
-        auto self = analyzer->world()->lookup("self").first;
+        auto self = analyzer->world()->lookup("Self").first;
 
         if (self == nullptr) return analyzer->report(4000201, field);  // not publicly accessible
         if (self->value() != parent.type) return analyzer->report(4000200, field, *parent.type);

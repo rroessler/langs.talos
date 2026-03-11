@@ -6,6 +6,8 @@
 
 //  PUBLIC METHODS  //
 
+TALOS_MM_LOWER_UNIMPLEMENTED(Header, , compiler, )
+
 TALOS_MM_LOWER_NODE(Class, node, compiler, ) {
     // prepare the trace for the node now
     $_UNUSED $_AUTO = compiler->trace(node);
@@ -15,20 +17,22 @@ TALOS_MM_LOWER_NODE(Class, node, compiler, ) {
     $_ASSERT(!dest.nowhere(), "Declaration does not exist?");
 
     // prepare some details about the class
-    auto* parent = node->extends();
     auto treg = leaked ? Accumulator() : dest;
 
-    // if we have an extension value, then resolve
-    if (parent) compiler->lower(parent, treg);
-    else compiler->emit<Syllable::LOAD_VOID>(treg);
+    // enqueue the underlying constructor
+    auto constructor = compiler->enqueue(node);
 
     // prepare the baseline class instance to be used
     auto name = compiler->string(node->name());
     auto shape = compiler->shapes()->resolve(node);
-    compiler->emit<Syllable::CLASS_MAKE>(treg, name, shape);
+
+    // prepare the baseline register now as well
+    if (auto* base = node->base()) compiler->lower(base, treg);
+    else compiler->emit<Syllable::LOAD_VOID>(treg);  // default
 
     // enqueue the class for compilation now
-    compiler->emit<Syllable::CLASS_BIND>(treg, compiler->enqueue(node));
+    compiler->emit<Syllable::CLASS_MAKE>(treg, name, shape);
+    compiler->emit<Syllable::CLASS_BIND>(treg, constructor);
 
     // we want to update the current value details
     compiler->preamble(node, treg);

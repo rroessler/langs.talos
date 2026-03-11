@@ -171,9 +171,9 @@ namespace Talos::Format {
          * @brief Handles parsing function signatures.
          * @param reader                Format reader.
          */
-        static Node* m_signature(Reader* reader);
-        static Node* m_parameters(Reader* reader);
-        static Node* m_constructor(Reader* reader);
+        static Node* m_signature(Reader* reader, bool compressed = false);
+        static Node* m_parameters(Reader* reader, bool compressed = false);
+        static Node* m_constructor(Reader* reader, bool compressed = false);
 
         /**
          * @brief Handles reading declarations.
@@ -221,6 +221,7 @@ namespace Talos::Format {
          * @brief Handles parsing class implementations.
          * @param reader                Format reader.
          */
+        static Node* m_extends(Reader* reader);
         static Node* m_implements(Reader* reader);
 
         /**

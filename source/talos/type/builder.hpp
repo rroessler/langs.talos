@@ -219,24 +219,30 @@ namespace Talos::Type::Builder {
     /**
      * @brief Handles safe resolution of types.
      * @param type                  Type to resolve.
+     * @param strict                Strictness flag.
      */
     template <std::derived_from<Tagged> T>
-    static inline constexpr $::Ptr::Shared<T> resolve(const Erased& type) {
+    static inline constexpr $::Ptr::Shared<T> resolve(const Erased& type, bool = true) {
         return type->is<T>() ? type->as<T>() : nullptr;
     }
 
     //  SPECIALIZATIONS  //
 
     template <>
-    inline constexpr $::Ptr::Shared<Prototype> resolve(const Erased& type) {
-        if (type->is<Instance>()) return type->as<Instance>()->prototype();
-        if (type->is<Generic>()) return resolve<Prototype>(type->as<Generic>()->target());
-        if (type->is<Transform>()) return resolve<Prototype>(type->as<Transform>()->reduce());
-        return type->is<Prototype>() ? type->as<Prototype>() : nullptr;  // valid lookup here
+    inline constexpr $::Ptr::Shared<Prototype> resolve(const Erased& type, bool strict) {
+        // only check for instances when not in strict checking mode
+        if (!strict && type->is<Instance>()) return type->as<Instance>()->prototype();
+
+        // should be able to resolve simply here
+        if (type->is<Generic>()) return resolve<Prototype>(type->as<Generic>()->target(), strict);
+        if (type->is<Transform>()) return resolve<Prototype>(type->as<Transform>()->reduce(), strict);
+
+        // finally attempt finding a valid prototype instance
+        return type->is<Prototype>() ? type->as<Prototype>() : nullptr;
     }
 
     template <>
-    inline constexpr $::Ptr::Shared<Callable> resolve(const Erased& type) {
+    inline constexpr $::Ptr::Shared<Callable> resolve(const Erased& type, bool) {
         // should be able to resolve simply here
         if (type->is<Generic>()) return resolve<Callable>(type->as<Generic>()->target());
         if (type->is<Transform>()) return resolve<Callable>(type->as<Transform>()->reduce());
@@ -244,7 +250,7 @@ namespace Talos::Type::Builder {
         // otherwise attempt resolving prototype constructors
         if (type->is<Prototype>()) return resolve<Callable>(type->as<Prototype>()->callable());
 
-        // finally should expect a valid constructor
+        // finally should expect a valid callable instance
         return type->is<Callable>() ? type->as<Callable>() : nullptr;
     }
 

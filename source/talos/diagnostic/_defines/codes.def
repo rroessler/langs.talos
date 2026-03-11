@@ -172,6 +172,7 @@ TALOS_XX_DIAGNOSTIC_RUNTIME(6000101, ERROR, "Future timed out whilst executing")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000200, ERROR, "Value of type '{0}' is not callable")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000201, ERROR, "Value of type '{0}' is not spawnable")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000202, ERROR, "Class '{0}' is not constructible")
+TALOS_XX_DIAGNOSTIC_RUNTIME(6000203, ERROR, "Value of type '{0}' is not constructible")
 
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000251, ERROR, "Expected at least {0} argument(s)")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000252, ERROR, "Expected at most {0} argument(s)")
@@ -204,6 +205,7 @@ TALOS_XX_DIAGNOSTIC_RUNTIME(6000702, ERROR, "Unwrapping 'Result' error failed")
 
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000800, ERROR, "Could not bind constructor to '{0}'")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000801, ERROR, "Cannot re-assign to property '{0}' of type '{1}'")
+TALOS_XX_DIAGNOSTIC_RUNTIME(6000802, ERROR, "Could not resolve super-class of value '{0}'")
 
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000900, ERROR, "'Todo' expression evaluated. {0}")
 

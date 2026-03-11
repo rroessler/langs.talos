@@ -6,11 +6,7 @@
 
 //  PRIVATE METHODS  //
 
-Talos::Format::Node* Talos::Format::Dispatch::m_parameters(Reader* reader) {
-    return m_annotation<Syntax::Parameters>(reader);
-}
-
-TALOS_MM_FORMAT_HINT(Parameters, reader) {
+Talos::Format::Node* Talos::Format::Dispatch::m_parameters(Reader* reader, bool) {
     // prepare the incoming storage to be used
     auto* storage = reader->storage();
 
@@ -38,3 +34,6 @@ TALOS_MM_FORMAT_HINT(Parameters, reader) {
     // and construct the resulting group to be returned now
     return storage->group(storage->paren().left(), parameters, trailing);
 }
+
+TALOS_MM_FORMAT_HINT(Parameters, reader) { return m_parameters(reader, true); }
+TALOS_MM_FORMAT_DECL(Parameters, reader) { return m_parameters(reader, false); }

@@ -122,6 +122,12 @@ namespace Talos::Parser {
         static Syntax::Variable* m_variable(Stream* parser, bool annotated = false);
 
         /**
+         * @brief Handles parsing super-classes.
+         * @param parser                    Syntax parser.
+         */
+        static Syntax::Expression* m_extends(Stream* parser);
+
+        /**
          * @brief Handles parsing implementation interfaces.
          * @param parser                    Syntax parser.
          */

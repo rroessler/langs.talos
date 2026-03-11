@@ -6,17 +6,13 @@
 
 //  PRIVATE METHODS  //
 
-Talos::Format::Node* Talos::Format::Dispatch::m_constructor(Reader* reader) {
-    return m_annotation<Syntax::Constructor>(reader);
-}
-
-TALOS_MM_FORMAT_HINT(Constructor, reader) {
+Talos::Format::Node* Talos::Format::Dispatch::m_constructor(Reader* reader, bool compressed) {
     // attempt parsing the generics available
     auto* generics = m_template(reader);
     if (generics == nullptr) return nullptr;
 
     // attempt parsing the incoming parameters now
-    auto* parameters = m_parameters(reader);
+    auto* parameters = m_parameters(reader, compressed);
     if (parameters == nullptr) return nullptr;
 
     // prepare the storage instance to be used
@@ -28,3 +24,6 @@ TALOS_MM_FORMAT_HINT(Constructor, reader) {
     // and construct the resulting constructor to be used now
     return storage->group(generics, parameters);
 }
+
+TALOS_MM_FORMAT_HINT(Constructor, reader) { return m_constructor(reader, true); }
+TALOS_MM_FORMAT_DECL(Constructor, reader) { return m_constructor(reader, false); }

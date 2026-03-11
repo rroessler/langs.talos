@@ -20,6 +20,7 @@ TALOS_MM_ENGINE_EXECUTE(LOAD_ONE, , frame, ii) { return frame->store(ii->get<0>(
 TALOS_MM_ENGINE_EXECUTE(LOAD_VOID, , frame, ii) { return frame->store(ii->get<0>(), g_void), Mode::NEXT; }
 TALOS_MM_ENGINE_EXECUTE(LOAD_TRUE, , frame, ii) { return frame->store(ii->get<0>(), g_true), Mode::NEXT; }
 TALOS_MM_ENGINE_EXECUTE(LOAD_FALSE, , frame, ii) { return frame->store(ii->get<0>(), g_false), Mode::NEXT; }
+
 TALOS_MM_ENGINE_EXECUTE(LOAD_SELF, , frame, ii) { return frame->store(ii->get<0>(), frame->self()), Mode::NEXT; }
 
 TALOS_MM_ENGINE_EXECUTE(LOAD_CONST, , frame, instruction) {

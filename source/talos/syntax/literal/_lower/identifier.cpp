@@ -6,14 +6,10 @@
 
 //  PUBLIC METHODS  //
 
+TALOS_MM_LOWER_NODE(Self, , compiler, destination) { compiler->plug<Syllable::LOAD_SELF>(destination); }
+
 TALOS_MM_LOWER_NODE(Identifier, identifier, compiler, destination) {
-    // declare a trace to be used
     $_UNUSED $_AUTO = compiler->trace(identifier);
-
-    // we should be able to suitable plug the current self value
-    if (identifier->self()) return compiler->plug<Syllable::LOAD_SELF>(destination);
-
-    // handle regular variables now
     auto extent = compiler->captures()->resolve(identifier);
     return compiler->load(identifier->name(), extent, destination);
 }

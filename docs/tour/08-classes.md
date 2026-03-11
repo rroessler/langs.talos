@@ -25,11 +25,11 @@ let person = Person("Talos", 25);
 All classes in Talos have a common super-class of `Object`. This is meant to describe classes as being objects that may exhibit inheritance.
 
 ```talos
-class A {};            // Implicitly inherits from `Object`.
-class B => Object {};  // Explicitly inherits from `Object`.
+class A {};     // Implicitly inherits from `Void`.
+class B: A {};  // Explicitly inherits from `A`.
 ```
 
-To declare an explicit super-class, we place the type after the colon in the signature.
+To declare an explicit super-class, we place it after the constructor declaration and then instantiate it using the super-constructor.
 
 ```talos
 class Base(ii: Number) {};

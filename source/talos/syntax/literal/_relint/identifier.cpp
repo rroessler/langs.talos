@@ -6,4 +6,5 @@
 
 //  PUBLIC METHODS  //
 
+TALOS_MM_LINT_NODE(Self, , ) {}
 TALOS_MM_LINT_NODE(Identifier, , ) {}

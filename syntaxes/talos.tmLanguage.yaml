@@ -56,6 +56,8 @@ repository:
 
   literals:
     patterns:
+      - include: "#self-literal"
+      - include: "#super-literal"
       - include: "#void-literal"
       - include: "#boolean-literal"
       - include: "#numeric-literal"
@@ -91,12 +93,11 @@ repository:
     match: (?<!\.)\b(enum)\b
 
   class-declaration:
-    match: (?<!\.)\b(?:(struct)|(class)|(self)|(implements))\b
+    match: (?<!\.)\b(?:(struct)|(class)|(implements))\b
     captures:
       1: { name: keyword.other.class.tal }
       2: { name: keyword.other.class.tal }
-      3: { name: keyword.other.self.tal }
-      4: { name: keyword.other.impl.tal }
+      3: { name: keyword.other.impl.tal }
 
   ##  Statements  ##
 
@@ -202,6 +203,14 @@ repository:
     captures: { 1: { name: keyword.control.policy.tal } }
 
   ##  Literals  ##
+
+  self-literal:
+    name: keyword.other.self.tal
+    match: (?<!\.)\bSelf\b
+
+  super-literal:
+    name: keyword.other.super.tal
+    match: (?<!\.)\bSuper\b
 
   void-literal:
     name: constant.language.void.tal

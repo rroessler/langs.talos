@@ -28,6 +28,7 @@ namespace Talos::Syntax {
 
             s_table[_(K::LTRL_STR)] = R(D::template m_prefix<Text>);
             s_table[_(K::LTRL_VOID)] = R(D::template m_prefix<Void>);
+            s_table[_(K::LTRL_SELF)] = R(D::template m_prefix<Self>);
             s_table[_(K::LTRL_IDENT)] = R(D::template m_prefix<Identifier>);
             s_table[_(K::DECL_FUNC)] = R(D::template m_prefix<Lambda>);
 

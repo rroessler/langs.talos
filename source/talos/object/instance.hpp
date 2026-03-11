@@ -43,7 +43,7 @@ namespace Talos {
         //  PUBLIC METHODS  //
 
         inline constexpr Fields& fields() const noexcept { return m_attrs()->fields; }
-        inline constexpr const Class& prototype() const noexcept { return m_attrs()->prototype; }
+        inline constexpr Class& prototype() const noexcept { return m_attrs()->prototype; }
         inline constexpr const String::Dynamic& name() const noexcept { return prototype().name(); }
 
        protected:

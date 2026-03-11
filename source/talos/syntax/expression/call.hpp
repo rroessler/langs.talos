@@ -23,6 +23,13 @@ namespace Talos::Syntax {
         /**
          * @brief Constructs a call expression.
          * @param callee                    Callee value.
+         * @param location                  Resource location.
+         */
+        explicit Call(Expression* callee, const Bounds& location) : Abstract(location), m_callee(callee) {}
+
+        /**
+         * @brief Constructs a call expression.
+         * @param callee                    Callee value.
          * @param arguments                 Bound arguments.
          * @param location                  Resource location.
          */

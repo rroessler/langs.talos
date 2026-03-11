@@ -19,6 +19,11 @@ Talos::Syntax::Identifier* Talos::Parser::Dispatch::m_identifier(Stream* parser)
     return parser->allocate<Syntax::Identifier>(token);
 }
 
+TALOS_MM_PARSE_PREFIX(Self, parser, ) {
+    auto* token = m_assert(parser->advance(), Lexer::Kind::LTRL_SELF);
+    return parser->allocate<Syntax::Self>(token);  // fully validated
+}
+
 TALOS_MM_PARSE_PREFIX(Identifier, parser, assignable) {
     // parse the underlying identifier to be used
     auto* identifier = m_identifier(parser);

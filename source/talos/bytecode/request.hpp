@@ -25,8 +25,11 @@ namespace Talos::Bytecode {
         /// @brief Bound function body.
         const Syntax::Node* m_body = nullptr;
 
-        /// @brief Bound function instance.
-        const Syntax::Constructor* m_constructor = nullptr;
+        /// @brief The super constructor details.
+        const Syntax::Call* m_super = nullptr;
+
+        /// @brief Bound function signature.
+        const Syntax::Constructor* m_signature = nullptr;
 
         /// @brief Routine to compile to.
         $::Ptr::Unique<Routine> m_routine = nullptr;

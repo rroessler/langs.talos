@@ -10,15 +10,17 @@ Talos::Bytecode::Request::Request(const Syntax::Lambda* function, const $::Ptr::
 
 Talos::Bytecode::Request::Request(const Syntax::Class* prototype) : Request(prototype, nullptr) {}
 Talos::Bytecode::Request::Request(const Syntax::Class* prototype, const $::Ptr::Shared<Variable::Context>& upvalues) :
-    Request(prototype->constructor(), prototype->block(), upvalues) {}
+    Request(prototype->constructor(), prototype->block(), upvalues) {
+    m_super = prototype->super();  // bind the super-call as well
+}
 
-Talos::Bytecode::Request::Request(const Syntax::Constructor* constructor, const Syntax::Node* body) :
-    Request(constructor, body, nullptr) {}
+Talos::Bytecode::Request::Request(const Syntax::Constructor* signature, const Syntax::Node* body) :
+    Request(signature, body, nullptr) {}
 
-Talos::Bytecode::Request::Request(const Syntax::Constructor* constructor, const Syntax::Node* body,
-    const $::Ptr::Shared<Variable::Context>& upvalues) :
+Talos::Bytecode::Request::Request(
+    const Syntax::Constructor* signature, const Syntax::Node* body, const $::Ptr::Shared<Variable::Context>& upvalues) :
     m_body(body),
-    m_constructor(constructor),
+    m_signature(signature),
     m_registers($::New().unique<Allocator>()),
     m_variables($::New().shared<Variable::Context>(upvalues)) {}
 

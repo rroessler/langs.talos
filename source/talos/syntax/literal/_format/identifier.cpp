@@ -11,4 +11,5 @@ Talos::Format::Node* Talos::Format::Dispatch::m_identifier(Reader* reader) {
     return reader->storage()->unicode(reader->previous()->lexeme());
 }
 
+TALOS_MM_FORMAT_PREFIX(Self, reader) { return m_assignment(reader, m_identifier(reader)); }
 TALOS_MM_FORMAT_PREFIX(Identifier, reader) { return m_assignment(reader, m_identifier(reader)); }

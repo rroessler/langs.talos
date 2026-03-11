@@ -248,6 +248,12 @@ namespace Talos::Bytecode {
         void m_function(Request* request);
 
         /**
+         * @brief Handles compiling a class extension.
+         * @param super                     Callable expression.
+         */
+        void m_inherits(const Syntax::Call* super);
+
+        /**
          * @brief Handles compiling a function parameter.
          * @param parameter                 Parameter to compile.
          * @param spread                    Expected spread parameter.

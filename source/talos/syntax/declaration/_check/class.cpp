@@ -23,6 +23,11 @@ void Talos::Type::Dispatch::member(Analyzer* analyzer, const Syntax::Declaration
     analyzer->world()->entities().erase(field->name());
 }
 
+TALOS_MM_CHECK_NODE(Header, node, analyzer) {
+    analyzer->check(node->super(), Type::Builder::none());
+    return analyzer->check(node->base(), Type::Builder::none());
+}
+
 TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     // get the baseline location of the node
     auto location = node->traits()->location();
@@ -86,14 +91,14 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     auto callable = Type::Builder::resolve<Type::Callable>(proto->callable());
     auto world = analyzer->scope(node->constructor(), callable, nullptr);
 
-    // attempt resolving the incoming extension instance
-    auto extends = analyzer->check(node->extends(), Type::Builder::none()).type;
-    if (extends == proto) analyzer->report(node, 3001000, node->name());  // do not allow self-references
-    else if (auto super = Type::Builder::resolve<Type::Prototype>(extends)) proto->super() = extends;
-    else if (!extends->is<Type::None>()) analyzer->report(node->extends(), 3001001, node->name(), *extends);
+    // attempt resolving the incoming super typing
+    auto base = analyzer->check(node->header(), Type::Builder::none()).type;
+    if (base == proto) analyzer->report(node, 3001000, node->name());  // no self-references
+    else if (auto _ = Type::Builder::resolve<Type::Prototype>(base)) proto->super() = base;
+    else if (!base->is<Type::None>()) analyzer->report(node->base(), 3001001, node->name(), *base);
 
-    // prepare the "self" value to be used now as well
-    world->values().declare("self", instance)->unused(false);
+    // prepare the self and super value to be used now as well
+    world->values().declare("Self", instance)->unused(false);
 
     // start attempting to declare all the available fields
     for (const auto& field : node->fields()) Type::Dispatch::member(analyzer, field, proto.get());

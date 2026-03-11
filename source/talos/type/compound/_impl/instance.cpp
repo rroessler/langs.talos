@@ -54,7 +54,7 @@ Talos::Type::Erased Talos::Type::Instance::m_infer(const Constraints& constraint
 
 bool Talos::Type::Instance::m_unify(const Erased& candidate, const Constraints& constraints) const {
     // attempt resolving a suitable prototype
-    auto other = Builder::resolve<Prototype>(candidate);
+    auto other = Builder::resolve<Prototype>(candidate, false);
 
     if (other == nullptr) return false;       // failed to find a parent class
     if (m_prototype == nullptr) return true;  // pass all generic objects now

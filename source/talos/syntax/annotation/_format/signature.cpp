@@ -6,16 +6,12 @@
 
 //  PRIVATE METHODS  //
 
-Talos::Format::Node* Talos::Format::Dispatch::m_signature(Reader* reader) {
-    return m_annotation<Syntax::Signature>(reader);
-}
-
-TALOS_MM_FORMAT_HINT(Signature, reader) {
+Talos::Format::Node* Talos::Format::Dispatch::m_signature(Reader* reader, bool compressed) {
     // ensure we have a leading "fn" keyword
     if (!reader->match(Lexer::Kind::DECL_FUNC)) return nullptr;
 
     // attempt constructing the base prototype now
-    auto* prototype = m_constructor(reader);
+    auto* prototype = m_constructor(reader, compressed);
     if (prototype == nullptr) return nullptr;
 
     // prepare the storage instance now
@@ -43,3 +39,6 @@ TALOS_MM_FORMAT_HINT(Signature, reader) {
     // update the returns instance to be it's own grouping
     return returns ? storage->append(prototype, colon, space, returns) : nullptr;
 }
+
+TALOS_MM_FORMAT_HINT(Signature, reader) { return m_signature(reader, true); }
+TALOS_MM_FORMAT_DECL(Signature, reader) { return m_signature(reader, false); }

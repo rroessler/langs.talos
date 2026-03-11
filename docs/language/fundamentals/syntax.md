@@ -97,8 +97,7 @@ Some keywords cannot be used as identifiers and as such are considered reserved.
 let mut
 in is as
 import export
-class self
-static public
+class public
 protected private
 fn return panic
 type enum namespace
@@ -242,7 +241,7 @@ class Position {
 };
 ```
 
-Where breaking apart `Position` gets use:
+Where breaking apart `Position` gets us:
 
 - A `class` introducer
 - The name of the class (optional)
@@ -251,28 +250,19 @@ Where breaking apart `Position` gets use:
 
 #### Constructors
 
-Classes can be annotated with a _limited_ function signature to denote their construction. This constructor is `protected` and should be called from _factory_ functions.
+Classes can be annotated with a _limited_ function signature to denote their construction.
 
 ```talos
-// Protected call-operator by default.
-class Position(a_x: Number, a_y: Number) {
-    //  PROPERTIES  //
-
-    public let x = a_x;
-    public let y = a_y;
-
-    //  FACTORIES  //
-
-    static public let from = fn (x: Number, y: Number) => Position(x, y);
+// Defines a class with constructor arguments.
+class Position(a_x?: Number, a_y?: Number) {
+    public let x = a_x ?? 0;
+    public let y = a_y ?? 0;
 };
-
-// Or the call-operator can be made available by using the `public` keyword.
-public class Other {};
 ```
 
 #### Inheritance
 
-For inheritance, we can denote a `class` that extends another. This gives us the following declaration:
+For inheritance, we can have a `class` that extends another. This gives us the following declaration:
 
 ```talos
 class Base(_: Any) {};
