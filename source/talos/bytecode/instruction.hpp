@@ -8,6 +8,9 @@
 #include "talos/bytecode/operands.hpp"
 #include "talos/bytecode/syllable.hpp"
 
+/// Forward Declarations
+$_FWD(Talos::Bytecode::Constants, static constexpr uint8_t OPS_MASK = ~OPS_LAST)
+
 //  MACROS  //
 
 /// @brief Helper for constructing bytecode instructions.
@@ -47,8 +50,18 @@ namespace Talos::Bytecode {
 
         //  PUBLIC METHODS  //
 
+        /// @brief Gets the underlying instruction.
         inline constexpr Encoded encode() const noexcept { return m_underlying; }
-        inline constexpr Syllable syllable() const noexcept { return static_cast<Syllable>(m_underlying & 0xFF); }
+
+        /// @brief Gets the underlying syllable value.
+        inline constexpr Syllable syllable() const noexcept {
+            return static_cast<Syllable>(m_underlying & Constants::OPS_MASK);
+        }
+
+        /// @brief Checks if the debug breakpoint is set.
+        inline constexpr bool breakpoint() const noexcept {
+            return (m_underlying & Constants::OPS_MASK) == Constants::OPS_MASK;
+        }
 
         /// @brief Converts the instruction to a valid view.
         template <Syllable S>
@@ -179,6 +192,13 @@ namespace Talos::Bytecode {
          */
         inline constexpr void m_print($::Stream::Output& os) const noexcept { m_print(os, Arguments<S>::sequence()); }
     };
+
+    // ensure all instructions are validly encoded
+    static_assert(sizeof(Instruction) == sizeof(Instruction::Encoded));
+
+    // and ensure that the underlying qualified instructions are too
+#define TALOS_XX_SYLLABLE_BASE(N, ...) static_assert(sizeof(Qualified<Syllable::N>) == sizeof(Instruction::Encoded));
+#include "talos/bytecode/_defines/syllables.def"
 
 }  // namespace Talos::Bytecode
 

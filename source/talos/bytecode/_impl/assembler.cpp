@@ -66,7 +66,7 @@ void Talos::Bytecode::Assembler::m_patch(Linker::Buffer& buffer, Linker::Arena* 
         int64_t boff = m_placed.at(index);
         int64_t loff = m_placed.at(label);
 
-        auto jump = Number::Tagged(boff - loff - static_cast<int64_t>(sizeof(Instruction::Encoded)));
+        auto jump = Number::Tagged(boff - loff - static_cast<int64_t>(sizeof(Instruction)));
         $_ASSERT(jump.value() >= INT32_MIN && jump.value() <= INT32_MAX, "Jump offset exceeds range");
 
         // emplace the patch-constant now to be used
@@ -116,5 +116,5 @@ uint64_t Talos::Bytecode::Assembler::m_encode(const Instruction* instruction, La
 
 int32_t Talos::Bytecode::Assembler::m_elide(Cache& instructions, const Instruction* current) const {
     $_PP_IGNORE(m_options);  /// TODO: elide some instructions as we write them
-    return instructions.emplace_back(current), sizeof(Instruction::Encoded);
+    return instructions.emplace_back(current), sizeof(Instruction);
 }

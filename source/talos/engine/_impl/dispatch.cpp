@@ -105,7 +105,10 @@ Talos::Value::Any Talos::Engine::Dispatch::m_execute(Isolate* isolate, Function:
 
     // prepare the available dispatch table
     static void* s_table[] = {
-#define TALOS_XX_SYLLABLE_BASE(N, ...) &&_DISPATCH_##N,
+#define TALOS_XX_SYLLABLE_BASE(N, ...) &&_HANDLE_##N,
+#include "talos/bytecode/_defines/syllables.def"
+
+#define TALOS_XX_SYLLABLE_BASE(N, ...) &&_DEBUG_##N,
 #include "talos/bytecode/_defines/syllables.def"
     };
 
@@ -119,7 +122,7 @@ Talos::Value::Any Talos::Engine::Dispatch::m_execute(Isolate* isolate, Function:
     auto advance = [&] $_INLINE_ALWAYS -> void* {
         instruction = std::bit_cast<Bytecode::Instruction*>(offset);
         auto syllable = static_cast<size_t>(instruction->syllable());
-        return offset += sizeof(Bytecode::Instruction::Encoded), s_table[syllable];
+        return offset += sizeof(Bytecode::Instruction), s_table[syllable];
     };
 
     // and force an advancement to occur initially
@@ -127,19 +130,25 @@ Talos::Value::Any Talos::Engine::Dispatch::m_execute(Isolate* isolate, Function:
 
     // prepare the all the dispatch handlers now to be completed
 #define TALOS_XX_SYLLABLE_BASE(N, ...)                                                                          \
-    _DISPATCH_##N : {                                                                                           \
+    _HANDLE_##N : {                                                                                             \
         switch (m_execute<Bytecode::Syllable::N>(isolate, frame, instruction->cast<Bytecode::Syllable::N>())) { \
             case Mode::NEXT: goto* advance();                                                                   \
-            case Mode::PANIC: goto _DISPATCH_FAILURE;                                                           \
-            case Mode::RETURN: goto _DISPATCH_SUCCESS;                                                          \
-            case Mode::INTERRUPT: goto _DISPATCH_INTERRUPT;                                                     \
+            case Mode::PANIC: goto _RESOLVE_FAILURE;                                                            \
+            case Mode::RETURN: goto _RESOLVE_SUCCESS;                                                           \
+            case Mode::INTERRUPT: goto _RESOLVE_INTERRUPT;                                                      \
         }                                                                                                       \
     }
 #include "talos/bytecode/_defines/syllables.def"
 
+// prepare all the debug handlers now to be completed
+#define TALOS_XX_SYLLABLE_BASE(N, ...) \
+    _DEBUG_##N : { $_ABORT("Unimplemented"); }
+
+#include "talos/bytecode/_defines/syllables.def"
+
     // clang-format off
-    _DISPATCH_SUCCESS: return frame->accumulator();
-    _DISPATCH_FAILURE: return Value::Failure();
-    _DISPATCH_INTERRUPT: return isolate->panic(9000200);
+    _RESOLVE_SUCCESS: return frame->accumulator();
+    _RESOLVE_FAILURE: return Value::Failure();
+    _RESOLVE_INTERRUPT: return isolate->panic(9000200);
     // clang-format on
 }

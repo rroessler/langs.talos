@@ -13,7 +13,8 @@ TALOS_BUILTIN_CUSTOM(Debug)
     X(print)                          \
     X(eprint)                         \
     X(println)                        \
-    X(eprintln)
+    X(eprintln)                       \
+    X(breakpoint)
 
 //  NAMESPACES  //
 

@@ -39,6 +39,9 @@
 #include "talos/crate/manifest.hpp"
 #include "talos/crate/service.hpp"
 
+/// Debugger Modules
+#include "talos/debugger/breakpoint.hpp"
+
 /// Diagnostic Modules
 #include "talos/diagnostic/options.hpp"
 #include "talos/diagnostic/reporter.hpp"

@@ -48,7 +48,7 @@ Talos::Function::Dynamic Talos::Machine::Service::compile(
         auto offset = bytecode.address();
 
         // prepare the width to be used now
-        auto width = sizeof(Bytecode::Instruction::Encoded);
+        auto width = sizeof(Bytecode::Instruction);
 
         // reserve the total labels now to be used
         for (size_t ii = 0; ii < (labels / width); ++ii) builder->labels.emplace_back(compiler->new_label());

@@ -15,7 +15,7 @@ void Talos::Function::Info::m_print($::Stream::Output& os, const Info& self) {
     auto address = self.m_linkage.address();
     auto base = self.m_arena->bytecode.address();
     auto sources = self.m_arena->bytecode.sources();
-    auto width = sizeof(Bytecode::Instruction::Encoded);
+    auto width = sizeof(Bytecode::Instruction);
 
     // show an empty result if necessary to do so
     if (size == 0) os << "\n(none)";

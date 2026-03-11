@@ -82,7 +82,7 @@ namespace Talos::Function {
         inline constexpr Resource::Trace backtrace() const noexcept final { return backtrace(m_group()); }
         inline constexpr Resource::Trace backtrace(Resource::Group group) const noexcept {
             auto offset = m_offset - arena()->bytecode.address();
-            offset -= sizeof(Bytecode::Instruction::Encoded);
+            offset -= sizeof(Bytecode::Instruction);  // update
             auto* entry = arena()->bytecode.sources().before(offset);
             auto* position = entry ? &entry->position : nullptr;
             return Resource::Trace(resource(), group, position);

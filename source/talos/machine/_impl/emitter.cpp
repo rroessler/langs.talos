@@ -89,7 +89,7 @@ Talos::Machine::Register Talos::Machine::Emitter::resolve(const Engine::Register
 }
 
 Talos::Machine::Label Talos::Machine::Emitter::label(size_t offset) {
-    return m_builder->labels[(m_offset = offset) / sizeof(Bytecode::Instruction::Encoded)];
+    return m_builder->labels[(m_offset = offset) / sizeof(Bytecode::Instruction)];
 }
 
 Talos::Machine::Label Talos::Machine::Emitter::label(const Bytecode::Index& index) {
@@ -99,8 +99,8 @@ Talos::Machine::Label Talos::Machine::Emitter::label(const Bytecode::Index& inde
     size_t jump = constant.as<Number::Tagged>();
 
     // get the necessary offset now and convert that to a suitable label
-    auto offset = m_offset + jump + sizeof(Bytecode::Instruction::Encoded);
-    return m_builder->labels[offset / sizeof(Bytecode::Instruction::Encoded)];
+    auto offset = m_offset + jump + sizeof(Bytecode::Instruction);
+    return m_builder->labels[offset / sizeof(Bytecode::Instruction)];
 }
 
 uint64_t Talos::Machine::Dispatch::truthiness(Reference target) { return Value::Any(target).truthiness(); }

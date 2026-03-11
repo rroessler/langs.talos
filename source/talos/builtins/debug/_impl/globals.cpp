@@ -19,8 +19,13 @@ struct TALOS_BUILTIN_FIELDS(Builtins::Custom::Debug) {
         return $::IO::N("{0}", fmt::join(arguments.span(), " ")), Value::Void(); \
     }
 
-TALOS_XX_FIELDS_DEBUG(X)
+X(print)
+X(eprint)
+X(println)
+X(eprintln)
 #undef X
+
+TALOS_MM_BUILTIN_FIELD(Builtins::Custom::Debug, breakpoint, , ) { $_ABORT("Unimplemented 'Debug.breakpoint'"); }
 
 //  PRIVATE METHODS  //
 
