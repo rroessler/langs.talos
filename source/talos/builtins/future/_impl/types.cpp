@@ -71,7 +71,7 @@ TALOS_MM_BUILTIN_STYPE(Async::Future, async) {
 }
 
 TALOS_MM_BUILTIN_STYPE(Async::Future, delay) {
-    auto duration = TB::optional(TB::number()), callback = TB::optional(TB::function(TB::none()));
+    Type::Entity duration = TB::number(), callback = TB::optional(TB::function(TB::none()));
     return { TB::function(TB::future(TB::none()), TB::arguments(duration, callback)) };
 }
 

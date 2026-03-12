@@ -137,8 +137,12 @@ Talos::Function::Dynamic Talos::Runtime::Isolate::bind(const Function::Dynamic& 
     // prepare the incoming passthrough callback information
     auto* info = Builtins::Proxy<Function::Dynamic>::binder();
 
-    auto context = Function::Context(this, 1);
-    context.store(0, callback);  // bind now
+    // construct a passthrough context
+    auto context = Function::Context(this, 2);
+
+    // bind the contextual details
+    context.store(0, receiver);
+    context.store(1, callback);
 
     // and construct the resulting passthrough handler
     return create<Function::Closure>(info, receiver, context);
