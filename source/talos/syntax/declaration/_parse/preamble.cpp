@@ -10,6 +10,9 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_subject(Stream* parser, E
     // prepare the current token being used
     auto* token = parser->current();
 
+    auto module = extent == Extent::MODULE;  // prepare the details
+    auto detail = module ? "a top-level declaration" : "a class field";
+
     // attempt resolving a suitable incoming set of details
     auto* declaration = [&] -> Syntax::Declaration* {
         switch (token->kind()) {
@@ -17,7 +20,7 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_subject(Stream* parser, E
             case Lexer::Kind::DECL_TYPE: return m_declaration<Syntax::Alias>(parser);
             case Lexer::Kind::DECL_CLASS: return m_declaration<Syntax::Class>(parser);
             case Lexer::Kind::DECL_SPACE: return m_declaration<Syntax::Namespace>(parser);
-            default: return nullptr;  // immediately invalid declaration given
+            default: return parser->report(token, 2000100, detail);  // failed to validate
         }
     }();
 
@@ -27,12 +30,8 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_subject(Stream* parser, E
     // check that we expected a class fields only now
     if (extent == Extent::CLASS) return parser->report(token, 2000100, "a class field");
 
-    // check for module extents now
-    auto module = extent == Extent::MODULE;
-
     // validate namespaces are in the correct extent as well
-    if (extent == Extent::MODULE || !declaration->is<Syntax::Namespace>()) return declaration;
-    return parser->report(token, 2000100, module ? "a top-level declaration" : "a class field");
+    return module || !declaration->is<Syntax::Namespace>() ? declaration : parser->report(token, 2000100, detail);
 }
 
 Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_preamble(Stream* parser, Extent extent) {

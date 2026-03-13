@@ -131,6 +131,7 @@ TALOS_XX_DIAGNOSTIC_ANALYSIS(3000701, ERROR, "Iterable of length '{0}' has no el
 
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3000800, ERROR, "Unary operator '{0}' cannot be applied to type '{1}'")
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3000801, ERROR, "Binary operator '{0}' cannot be applied to types '{1}' and '{2}'")
+TALOS_XX_DIAGNOSTIC_ANALYSIS(3000802, ERROR, "Expected operator attribute to be of type 'Function' not '{0}'")
 
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3000900, ERROR, "A 'return' statement can only be used within a function")
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3000901, ERROR, "A function returning 'never' cannot have a reachable exit")
@@ -248,8 +249,8 @@ TALOS_XX_DIAGNOSTIC_INTERNAL(9000000, ERROR, "{0}")
 TALOS_XX_DIAGNOSTIC_INTERNAL(9000001, ERROR, "Unreachable {0}")
 TALOS_XX_DIAGNOSTIC_INTERNAL(9000002, ERROR, "Unimplemented {0}")
 
-TALOS_XX_DIAGNOSTIC_CODE("Deprecated", 9000100, WARN, "{0}")
-TALOS_XX_DIAGNOSTIC_CODE("Deprecated", 9000101, WARN, "This declaration is marked as deprecated")
+TALOS_XX_DIAGNOSTIC_CODE("Deprecated", 9000100, HINT, "{0}", Deprecated)
+TALOS_XX_DIAGNOSTIC_CODE("Deprecated", 9000101, HINT, "This declaration is marked as deprecated", Deprecated)
 
 TALOS_XX_DIAGNOSTIC_INTERNAL(9000200, ERROR, "Isolate was forcibly interrupted")
 

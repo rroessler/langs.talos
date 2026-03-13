@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_UNIMPLEMENTED(Deprecated, , compiler, )
+TALOS_MM_LOWER_NODE(Deprecated, , , ) { /** deprecations are type-system only */ }

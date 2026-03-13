@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_UNIMPLEMENTED(Overload, , compiler, )
+TALOS_MM_LOWER_NODE(Overload, , , ) { /** overloads are type-system only */ }

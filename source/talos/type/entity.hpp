@@ -24,6 +24,9 @@ namespace Talos::Type {
         Erased m_type = $::New().shared<Unset>();   // World-of-types reference.
         Erased m_value = $::New().shared<Unset>();  // World-of-values reference.
 
+        /// @brief Bound deprecation status.
+        std::optional<$::String::View> m_deprecated = std::nullopt;
+
        public:
         //  CONSTRUCTORS  //
 
@@ -79,6 +82,9 @@ namespace Talos::Type {
 
         inline constexpr Variable::Modifiers& modifiers() noexcept { return m_modifiers; }
         inline constexpr const Variable::Modifiers& modifiers() const noexcept { return m_modifiers; }
+
+        inline constexpr auto& deprecated() noexcept { return m_deprecated; }
+        inline constexpr const auto& deprecated() const noexcept { return m_deprecated; }
 
         inline constexpr bool exported() const noexcept { return m_modifiers.test(Variable::Flag::EXPORT); }
         inline constexpr bool immutable() const noexcept { return !m_modifiers.test(Variable::Flag::MUTABLE); }

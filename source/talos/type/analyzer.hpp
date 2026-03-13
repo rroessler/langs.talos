@@ -192,6 +192,14 @@ namespace Talos::Type {
         Deduction redundant(const Syntax::Node* node);
 
         /**
+         * @brief Handles incoming deprecations.
+         * @param entity                    Entity to deprecate.
+         * @param detail                    Deprecation detail.
+         */
+        void deprecated(const Entity* entity, const Syntax::Node* node);
+        void deprecated(const Entity* entity, const $::String::View& message);
+
+        /**
          * @brief Declares a variable.
          * @param variable                      Variable to declare.
          */
@@ -203,7 +211,7 @@ namespace Talos::Type {
          * @param entity                    Associated entity.
          * @param depth                     Current depth value.
          */
-        void mark(const Syntax::Identifier* identifier, Entity* entity, Depth depth) const noexcept;
+        void mark(const Syntax::Identifier* identifier, Entity* entity, Depth depth);
 
         /**
          * @brief Reports a diagnostic.

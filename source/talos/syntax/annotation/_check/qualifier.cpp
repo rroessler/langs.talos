@@ -22,7 +22,7 @@ TALOS_MM_CHECK_NODE(Qualifier, node, analyzer) {
     if (entity == nullptr) return analyzer->report(identifier, 4000300, chain);
 
     // update the entity reference flag now and mark the first identifier
-    entity->unused(false), analyzer->mark(identifier, entity, depth);
+    analyzer->mark(identifier, entity, depth);
 
     // construct the iterator element now
     auto segment = *entity;

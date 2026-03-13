@@ -21,6 +21,9 @@ TALOS_MM_CHECK_NODE(Accessor, accessor, analyzer) {
     if (entity.unset()) return analyzer->report(4000200, field, *parent.type);
     if (!entity.opaque()) return analyzer->report(3000200, field);
 
+    // if the entity is deprecated then declare as such
+    analyzer->deprecated(&entity, accessor);
+
     // check if the incoming entity is private / protected at all
     if (entity.modifiers().test(Variable::Flag::PRIVATE, Variable::Flag::PROTECTED)) {
         // get the current self value to be used now

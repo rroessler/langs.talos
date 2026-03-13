@@ -200,8 +200,18 @@ Talos::Type::Deduction Talos::Type::Analyzer::redundant(const Syntax::Node* node
     return report(node->traits()->bounds(), 4000900);
 }
 
-void Talos::Type::Analyzer::mark(const Syntax::Identifier* identifier, Entity* entity, Depth depth) const noexcept {
-    entity->unused(false);  // mark unused
+void Talos::Type::Analyzer::deprecated(const Entity* entity, const Syntax::Node*) {
+    if (auto message = entity->deprecated()) report(9000100, *message);
+}
+
+void Talos::Type::Analyzer::mark(const Syntax::Identifier* identifier, Entity* entity, Depth depth) {
+    // mark the entity as unused
+    entity->unused(false);
+
+    // check if the entity is deprecated at all
+    deprecated(entity, identifier);
+
+    // resolve the available captures
     auto& captures = m_context->captures();
 
     if (depth < 0) captures.global(identifier);  // expecting a global value

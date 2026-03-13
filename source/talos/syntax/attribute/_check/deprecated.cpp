@@ -6,4 +6,16 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Deprecated, , analyzer) { return analyzer->passable(); }
+TALOS_MM_CHECK_NODE(Deprecated, attribute, analyzer) {
+    // get the available world instance
+    auto* world = analyzer->world();
+
+    // get the underlying entity instance
+    auto* entity = world->preamble();
+
+    // update the current deprecation details
+    entity->deprecated() = attribute->message();
+
+    // and declare as passable now
+    return analyzer->passable();
+}
