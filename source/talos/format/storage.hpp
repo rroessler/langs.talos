@@ -129,6 +129,9 @@ namespace Talos::Format {
         static inline auto s_brack_left = Node::Unicode("[");
         static inline auto s_brack_right = Node::Unicode("]");
 
+        static inline auto s_attr = Node::Unicode("#[");
+        static inline auto s_decor = Node::Unicode("@");
+
         static inline auto s_empty = Node::Empty();
         static inline auto s_query = Node::Unicode("?");
         static inline auto s_colon = Node::Unicode(":");
@@ -185,6 +188,9 @@ namespace Talos::Format {
         inline constexpr const auto& paren() const noexcept { return s_paren_getter; }
         inline constexpr const auto& brace() const noexcept { return s_brace_getter; }
         inline constexpr const auto& brack() const noexcept { return s_brack_getter; }
+
+        inline constexpr Node* attr() const noexcept { return &s_attr; }
+        inline constexpr Node* decor() const noexcept { return &s_decor; }
 
         inline constexpr Node* empty() const noexcept { return &s_empty; }
         inline constexpr Node* colon() const noexcept { return &s_colon; }

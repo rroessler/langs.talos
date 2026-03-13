@@ -9,9 +9,8 @@
 
 #define TALOS_XX_OPERATORS_CUSTOM(X) \
     X(CALL, "call", = UINT8_MAX + 1) \
-    X(ITER, "iter")                  \
     X(DISP, "dispose")               \
-    X(UNK, "unknown", = UINT16_MAX)
+    X(ITER, "iterator")
 
 //  NAMESPACES  //
 
@@ -32,6 +31,8 @@ namespace Talos::Operator {
 #define X(K, _, ...) K __VA_ARGS__,
         TALOS_XX_OPERATORS_CUSTOM(X)
 #undef X
+
+            UNK = UINT16_MAX,
     };
 
     /// @brief Unary Operator Validation.

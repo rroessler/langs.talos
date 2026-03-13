@@ -42,6 +42,7 @@ TALOS_MM_BUILTIN_STATIC(Iterable::Iterator, from, isolate, args) {
     TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);
 
     auto* descriptor = args[0].attribute(Operator::Kind::ITER);  // pull out the iterable
+    if (descriptor == nullptr) descriptor = args[0].attribute(Operator::Attribute::ITER);
     auto attribute = descriptor ? descriptor->getter(isolate, args[0]) : Value::Missing();
     return attribute.traits().okay() ? attribute : isolate->panic(6000502, attribute.type_name());
 }

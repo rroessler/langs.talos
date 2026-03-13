@@ -115,6 +115,21 @@ std::vector<$::Ptr::Shared<Talos::Type::Parameter>> Talos::Type::Analyzer::check
     return $::Ranges::To(parameters | std::views::transform(predicate));  // can safely transform here
 }
 
+Talos::Type::Deduction Talos::Type::Analyzer::preamble(const Syntax::Preamble* preamble, Entity* entity) {
+    // set the entity as the preamble target
+    m_world->m_preamble = entity;
+
+    // iterate over the available attributes and decorators
+    for (const auto* attribute : preamble->attributes()) check(attribute);
+    for (const auto* decorator : preamble->decorators()) check(decorator);
+
+    // unset the current preamble target now
+    m_world->m_preamble = nullptr;
+
+    // and return the resulting type deduction
+    return passable(entity->value());
+}
+
 Talos::Type::Erased Talos::Type::Analyzer::instantiate(const Erased& type, const Syntax::Specialization& arguments) {
     // ensure the type is actually generic before continuing with instantiating
     if (!type->is<Generic>()) return arguments.empty() ? type : report(3000350, *type).type;

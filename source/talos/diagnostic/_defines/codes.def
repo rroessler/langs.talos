@@ -181,6 +181,8 @@ TALOS_XX_DIAGNOSTIC_RUNTIME(6000253, ERROR, "Expected '{0}' to be of type '{1}'"
 
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000300, ERROR, "Value of type '{0}' has no field named '{1}'")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000301, ERROR, "Cannot assign to readonly property '{1}' of type '{0}'")
+TALOS_XX_DIAGNOSTIC_RUNTIME(6000302, ERROR, "Cannot bind operator '{0}' to value of type '{1}'")
+TALOS_XX_DIAGNOSTIC_RUNTIME(6000303, ERROR, "Cannot re-assign operator '{0}' for value of type '{1}'")
 
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000400, ERROR, "Unsupported operand '{0}' for type '{1}'")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000401, ERROR, "Unsupported operand '{0}' for types '{1}' and '{2}'")

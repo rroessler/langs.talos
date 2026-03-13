@@ -5,13 +5,13 @@
 
 Talos::Reflect::Category Talos::Parser::Dispatch::m_category(Stream* parser) {
     // prepare the initial category to be used
-    auto category = Reflect::Category::UNKNOWN;
+    auto category = Reflect::Unknown;
 
     // attempt getting the category name to validate
     if (!parser->check(Lexer::Flag::ANNOTATION)) return category;
 
 #define X(C, N, ...) \
-    case XH::FNV::U32(N): return Reflect::Category::C;
+    case XH::FNV::U32(#N): return Reflect::Category::C;
     // and attempt resolving the category name now
     switch (XH::FNV::U32(parser->current()->lexeme())) { TALOS_XX_REFLECTION_CATEGORIES(X) default : break; }
 #undef X
@@ -22,7 +22,7 @@ Talos::Reflect::Category Talos::Parser::Dispatch::m_category(Stream* parser) {
 
 Talos::Syntax::Attribute* Talos::Parser::Dispatch::m_attribute(Stream* parser) {
     // ensure there is the leading token available
-    m_assert(parser->advance(), Lexer::Kind::PUNC_ATTRIB);
+    m_assert(parser->advance(), Lexer::Kind::PUNC_ATTR);
 
     // ensure there is a leading bracket as well
     if (!parser->expect(Lexer::Kind::PUNC_LBRACK)) return nullptr;
@@ -35,7 +35,7 @@ Talos::Syntax::Attribute* Talos::Parser::Dispatch::m_attribute(Stream* parser) {
         case Reflect::Category::OPERATOR: attribute = m_declaration<Syntax::Operator>(parser); break;
         case Reflect::Category::OVERLOAD: attribute = m_declaration<Syntax::Overload>(parser); break;
         case Reflect::Category::DEPRECATED: attribute = m_declaration<Syntax::Deprecated>(parser); break;
-        default: return parser->report(2000800, parser->current()->lexeme());
+        default: return parser->report(2000800, parser->current()->lexeme());  // invalid category here
     }
 
     // attempt checking for a closing bracket now

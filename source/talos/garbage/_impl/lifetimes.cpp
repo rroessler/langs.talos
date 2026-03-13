@@ -27,18 +27,18 @@ bool Talos::Garbage::Lifetimes::close(Runtime::Isolate* isolate, size_t depth) {
     // get the incoming stack now
     auto& stack = m_stacks.at(frame);
 
-    // if the depth is zero, then remove
-    if (depth == 0) m_stacks.erase(frame);
-
     // get the initial exception value
     auto exception = isolate->exception();
 
     // attempt destructing scopes until depth
     for (; stack.size() > depth; stack.pop_back()) {
-        // attempt disposing the current stack
         if (m_dispose(isolate, stack.back())) continue;
+        if (depth == 0) m_stacks.erase(frame);  // clear
         return m_suppress(isolate, exception), false;
     }
+
+    // always run a post-condition to clear
+    if (depth == 0) m_stacks.erase(frame);
 
     // validly removed our stacks
     return true;
@@ -89,8 +89,17 @@ void Talos::Garbage::Lifetimes::m_suppress(Runtime::Isolate* isolate, Object::Ex
     // denote that the original exception is "suppressed"
     auto message = Diagnostic::Traits::message(6001001);
 
+    // get the current exception value from the isolate
+    auto current = isolate->exception().as<Object::Exception>();
+
     // update the underlying message to be used
     exception.message() = String::Dynamic(isolate, message);
+
+    // update the trace being used by the exception
+    static auto s_resource = $::URI::Evaluate("Operator.dispose()");
+    static auto s_trace = Resource::Trace(s_resource, Resource::Group::NATIVE);
+    exception.trace().insert(exception.trace().begin(), s_trace);
+    $::Ranges::Prepend(exception.trace(), current.trace());
 
     // and finally update the exception instance
     isolate->panic(exception);

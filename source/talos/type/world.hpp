@@ -182,6 +182,9 @@ namespace Talos::Type {
         /// @brief Attached world parent.
         World* m_parent = nullptr;
 
+        /// @brief Current preamble target.
+        Entity* m_preamble = nullptr;
+
         /// @brief Encapsulated entities.
         $::Record<Entity> m_entities = {};
 
@@ -207,6 +210,11 @@ namespace Talos::Type {
 
         /// @brief Gets the current world depth.
         inline constexpr Depth depth() const noexcept { return m_depth; }
+
+        /// @brief Gets the current preamble target.
+        inline constexpr Entity* preamble() const noexcept {
+            return $_ASSERT(m_preamble, "Invalid preamble context"), m_preamble;
+        }
 
         /// @brief Gets the import/export state.
         inline constexpr bool importable() const noexcept { return m_depth < 1; }

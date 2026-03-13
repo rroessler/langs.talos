@@ -6,4 +6,16 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Operator, node, analyzer) { return analyzer->report(node, 9000002, "Type::Visitor"); }
+TALOS_MM_CHECK_NODE(Operator, attribute, analyzer) {
+    // get the current preamble target to be validated
+    auto* _ = analyzer->world()->preamble();
+
+    // set the current trace handler
+    $_UNUSED $_AUTO = analyzer->trace(attribute);
+
+    // we want to validate the incoming "self" value
+    auto _ = analyzer->check(attribute->target()).type;
+
+    // declare as passable now
+    return analyzer->passable();
+}

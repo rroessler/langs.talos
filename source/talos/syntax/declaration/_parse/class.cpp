@@ -14,9 +14,10 @@ Talos::Syntax::Expression* Talos::Parser::Dispatch::m_extends(Stream* parser) {
     static constexpr auto s_opening = Lexer::Kind::PUNC_LBRACK;
     static constexpr auto s_closing = Lexer::Kind::PUNC_RBRACK;
     static constexpr auto s_separator = Lexer::Kind::PUNC_PERIOD;
-    static constexpr auto s_callback = [](auto* _) { return m_annotation(_); };
-    static auto s_delimited = Delimited<Syntax::Identifier, s_separator>(m_identifier);
-    static auto s_enclosed = Enclosed<Syntax::Annotation, s_opening, s_closing>(s_callback);
+    static constexpr auto s_annotation = [](auto* _) { return m_annotation(_); };
+    static constexpr auto s_identifier = [](auto* _) { return m_identifier(_); };
+    static auto s_delimited = Delimited<Syntax::Identifier, s_separator>(s_identifier);
+    static auto s_enclosed = Enclosed<Syntax::Annotation, s_opening, s_closing>(s_annotation);
 
     // cache the current range value to be used
     auto snapshot = parser->snapshot();

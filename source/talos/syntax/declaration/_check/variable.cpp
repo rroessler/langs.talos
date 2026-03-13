@@ -28,6 +28,6 @@ TALOS_MM_CHECK_NODE(Variable, variable, analyzer) {
     // update the entity if necessary to do so
     if (disposable) entity->unused(false);
 
-    // can now safely return the resulting
-    return analyzer->passable(expected);
+    // handle all the preamble for the node
+    return analyzer->preamble(variable, entity);
 }

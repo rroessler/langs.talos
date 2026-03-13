@@ -3,8 +3,61 @@
 
 //  PRIVATE METHODS  //
 
-Talos::Format::Node* Talos::Format::Dispatch::m_attribute(Reader*) { return nullptr; }
-Talos::Format::Node* Talos::Format::Dispatch::m_decorator(Reader*) { return nullptr; }
+Talos::Format::Node* Talos::Format::Dispatch::m_category(Reader* reader) {
+    // attempt parsing based on the incoming category now
+    if (!reader->match(Lexer::Flag::ANNOTATION)) return nullptr;
+
+    // get the current category token now
+    auto* storage = reader->storage();
+    auto* category = reader->previous();
+
+#define X(C, N, ...)                                                                                       \
+    case XH::FNV::U32(#N): {                                                                               \
+        auto* attribute = m_declaration<Syntax::N>(reader); /** attempt parsing the incoming attribute */  \
+        if (attribute != nullptr) return storage->append(storage->unicode(category->lexeme()), attribute); \
+    } break;
+
+    // attempt handling the incoming categories now
+    switch (XH::FNV::U32(category->lexeme())) { TALOS_XX_REFLECTION_CATEGORIES(X) default : break; }
+#undef X
+
+    // failures should always exit here
+    return nullptr;
+}
+
+Talos::Format::Node* Talos::Format::Dispatch::m_attribute(Reader* reader) {
+    // ensure we have a valid starting token now
+    if (!reader->match(Lexer::Kind::PUNC_ATTR)) return nullptr;
+    if (!reader->match(Lexer::Kind::PUNC_LBRACK)) return nullptr;
+
+    // attempt parsing based on the incoming category now
+    auto* category = m_category(reader);
+    if (category == nullptr) return nullptr;
+
+    // ensure there is a closing bracket as well
+    if (!reader->match(Lexer::Kind::PUNC_RBRACK)) return nullptr;
+
+    // get the storage instance now
+    auto* storage = reader->storage();
+
+    // can validly construct the result now
+    return storage->group(storage->attr(), category, storage->brack().right());
+}
+
+Talos::Format::Node* Talos::Format::Dispatch::m_decorator(Reader* reader) {
+    // ensure we have a valid starting token now
+    if (!reader->match(Lexer::Kind::PUNC_DECOR)) return nullptr;
+
+    // prepare the storage instance
+    auto* storage = reader->storage();
+
+    // parse the incoming expression to be used now
+    auto callback = [](Reader* reader) { return m_expression(reader); };
+    auto* expression = m_leading(reader, Callback(callback));
+
+    // handle the outgoing result to be emitted
+    return expression ? storage->group(storage->decor(), expression) : nullptr;
+}
 
 Talos::Format::Node* Talos::Format::Dispatch::m_preamble(Reader* reader) {
     // prepare the attribute and decorator nodes
@@ -12,7 +65,7 @@ Talos::Format::Node* Talos::Format::Dispatch::m_preamble(Reader* reader) {
 
     // whilst we can match attributes, we parse them as necessary
     while (reader->check(Lexer::Flag::DECORATES)) {
-        if (reader->check(Lexer::Kind::PUNC_ATTRIB)) attributes.emplace_back(m_attribute(reader));
+        if (reader->check(Lexer::Kind::PUNC_ATTR)) attributes.emplace_back(m_attribute(reader));
         else if (reader->check(Lexer::Kind::PUNC_DECOR)) decorators.emplace_back(m_decorator(reader));
     }
 

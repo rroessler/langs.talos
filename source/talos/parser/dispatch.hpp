@@ -195,6 +195,8 @@ namespace Talos::Parser {
          */
         static const Lexer::Token* m_label(Stream* parser);
         static Syntax::Identifier* m_identifier(Stream* parser);
+        static Syntax::Identifier* m_identifier(
+            Stream* parser, const $::String::View& name, const Syntax::Bounds& bounds = {});
 
         /**
          * @brief Handles terminating nodes with ';'.

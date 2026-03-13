@@ -66,9 +66,9 @@ TALOS_MM_PARSE_STMT(Import, parser) {
     }
 
     // prepare some details for parsring patterns
-    static constexpr auto s_callback = m_identifier;
     static constexpr auto s_opening = Lexer::Kind::PUNC_LBRACE;
     static constexpr auto s_closing = Lexer::Kind::PUNC_RBRACE;
+    static constexpr auto s_callback = [](auto* _) { return m_identifier(_); };
     static auto s_enclosed = Enclosed<Syntax::Identifier, s_opening, s_closing>(s_callback);
 
     // ensure the instance was happily parsed

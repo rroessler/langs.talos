@@ -89,7 +89,7 @@ MM_APPLY(';', [](Scanner& l) -> Token { return l.token(K::PUNC_TERM); })
 MM_APPLY(':', [](Scanner& l) -> Token { return l.token(l.match(':') ? K::PUNC_POLICY : K::PUNC_COLON); })
 
 MM_APPLY('@', [](Scanner& l) -> Token { return l.token(K::PUNC_DECOR); })
-MM_APPLY('#', [](Scanner& l) -> Token { return l.token(K::PUNC_ATTRIB); })
+MM_APPLY('#', [](Scanner& l) -> Token { return l.token(K::PUNC_ATTR); })
 
 MM_CUSTOM('.', lexer, tokens, {
     switch (lexer.match('.') + lexer.match('.')) {

@@ -14,7 +14,10 @@ TALOS_MM_ENGINE_EXECUTE(DISPOSE_OPEN, isolate, , instruction) {
 }
 
 TALOS_MM_ENGINE_EXECUTE(DISPOSE_CLOSE, isolate, , instruction) {
-    return isolate->lifetimes()->close(isolate, instruction->get<0>()), Mode::NEXT;
+    size_t depth = instruction->get<0>();
+    auto* lifetimes = isolate->lifetimes();
+    auto success = lifetimes->close(isolate, depth);
+    return success ? Mode::NEXT : Mode::PANIC;
 }
 
 TALOS_MM_ENGINE_EXECUTE(DISPOSE_DEFER, isolate, frame, instruction) {

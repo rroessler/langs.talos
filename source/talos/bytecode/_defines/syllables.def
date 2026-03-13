@@ -162,6 +162,7 @@ TALOS_XX_SYLLABLE_LIST(LIST_MAKE, /** dst */ Register, /** values */ Register::S
 
 TALOS_XX_SYLLABLE_OBJECT(OBJECT_EMPTY, /** dst */ Register)
 TALOS_XX_SYLLABLE_OBJECT(OBJECT_MAKE, /** dst */ Register, /** pairs */ Register::Span)
+TALOS_XX_SYLLABLE_OBJECT(OBJECT_ATTR, /** dst */ Register, /** self */ Register, /** attr */ Index)
 
 TALOS_XX_SYLLABLE_STRING(STRING_MAKE, /** dst */ Register, /** string */ Index)
 TALOS_XX_SYLLABLE_STRING(STRING_CONCAT, /** dst */ Register, /** ax */ Register, /** bx */ Register)

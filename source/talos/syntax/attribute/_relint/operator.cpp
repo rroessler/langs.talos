@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LINT_NODE(Operator, node, analyzer) { analyzer->report(node, 9000002, "Relint::Visitor"); }
+TALOS_MM_LINT_NODE(Operator, node, analyzer) { analyzer->verify(node->target(), node); }

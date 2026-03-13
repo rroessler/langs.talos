@@ -16,7 +16,10 @@ $_INLINE_FORCE Talos::Value::Any Talos::Engine::Dispatch::m_iterator(Isolate* is
     // check for any immediate iterators (as first-class values)
     if (iterable.is<Iterable::Iterator>()) return iterable;
 
-    auto descriptor = iterable.attribute(Operator::Kind::ITER);  // find via descriptor
+    auto descriptor = iterable.attribute(Operator::Kind::ITER);  // find the descriptor
+    if (descriptor == nullptr) descriptor = iterable.attribute(Operator::Attribute::ITER);
+
+    // attempt getting the underlying iterable value now
     auto iterator = descriptor ? descriptor->getter(isolate, iterable) : Value::Missing();
     return iterator.traits().okay() ? iterator : isolate->panic(6000502, iterable.type_name());
 }

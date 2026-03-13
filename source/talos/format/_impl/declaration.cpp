@@ -16,7 +16,7 @@ Talos::Format::Node* Talos::Format::Dispatch::m_declaration(Reader* reader) {
     switch (auto kind = reader->current()->kind()) {
         // handle decorators, attributes differently
         case Lexer::Kind::PUNC_DECOR: $_FALLTHROUGH;
-        case Lexer::Kind::PUNC_ATTRIB: return m_terminates(reader, m_preamble(reader));
+        case Lexer::Kind::PUNC_ATTR: return m_terminates(reader, m_preamble(reader));
 
         // handle baseline modifiers for declarations
         case Lexer::Kind::MOD_PUBLIC: $_FALLTHROUGH;

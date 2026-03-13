@@ -119,5 +119,5 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     }
 
     // attempt checking all the available fields now for use
-    return analyzer->passable(entity->value());
+    return analyzer->preamble(node, entity);
 }

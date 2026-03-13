@@ -141,6 +141,13 @@ namespace Talos::Type {
         Template check(const Syntax::Template& parameters);
 
         /**
+         * @brief Handles preamble checking.
+         * @param preamble                  Preamble to check.
+         * @param entity                    Bound entity reference.
+         */
+        Deduction preamble(const Syntax::Preamble* preamble, Entity* entity);
+
+        /**
          * @brief Handles instantiating
          * @param type                      Type to instantiate
          * @param arguments                 Generic arguments.

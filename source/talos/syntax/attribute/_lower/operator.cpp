@@ -6,4 +6,19 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_UNIMPLEMENTED(Operator, , compiler, )
+TALOS_MM_LOWER_NODE(Operator, attribute, compiler, destination) {
+    // ensure the incoming destination is valid
+    if (destination.nowhere()) return;
+
+    // prepare a temporary register for the incoming value
+    auto treg = compiler->registers()->temporary();
+
+    // lower the incoming target to be updated
+    compiler->lower(attribute->target(), treg);
+
+    // convert the operator kind into an operand
+    auto kind = static_cast<Bytecode::Index::Encoded>(attribute->kind());
+
+    // assign the operator as necessary now
+    compiler->emit<Syllable::OBJECT_ATTR>(destination, treg, kind);
+}

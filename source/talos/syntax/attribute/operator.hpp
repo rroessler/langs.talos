@@ -23,7 +23,7 @@ namespace Talos::Syntax {
         Kind m_kind;
 
         /// @brief Allow setting the target.
-        Annotation* m_target;
+        Expression* m_target;
 
        public:
         //  CONSTRUCTORS  //
@@ -41,13 +41,13 @@ namespace Talos::Syntax {
          * @param target            Target to overload.
          * @param location          Resource location.
          */
-        explicit Operator(Kind kind, Annotation* target, const Bounds& location = {}) :
+        explicit Operator(Kind kind, Expression* target, const Bounds& location = {}) :
             Abstract(Reflect::Category::OPERATOR, location), m_kind(kind), m_target(target) {}
 
         //  PUBLIC METHODS  //
 
         inline constexpr Kind kind() const noexcept { return m_kind; }
-        inline constexpr const Annotation* target() const noexcept { return m_target; }
+        inline constexpr const Expression* target() const noexcept { return m_target; }
     };
 
 }  // namespace Talos::Syntax

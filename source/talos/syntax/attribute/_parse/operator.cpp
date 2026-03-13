@@ -26,9 +26,9 @@ TALOS_MM_PARSE_DECL(Operator, parser) {
     auto invalid = kind == Operator::Kind::UNK;  // check validity
     invalid ? parser->report(2000801, method) : parser->advance();
 
-    auto self = !parser->check(Lexer::Kind::PUNC_LBRACK);  // attempt parsing an expression to be used
-    auto* target = self ? m_qualifier(parser, "Self") : m_annotation<Syntax::Qualifier>(parser);
-    if (target == nullptr || invalid) return nullptr;  // failed to parse a suitable target value
+    auto self = parser->check(Lexer::Kind::PUNC_RBRACK);  // ignore value if none given
+    auto* target = self ? m_identifier(parser, "Self", snapshot) : m_expression(parser);
+    if (target == nullptr || invalid) return nullptr;  // failed to parse a suitable target
 
     // fail if the kind is currently invalid
     return parser->allocate<Syntax::Operator>(kind, target, snapshot.enclose(token));

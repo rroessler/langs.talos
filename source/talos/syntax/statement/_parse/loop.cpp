@@ -40,7 +40,7 @@ TALOS_MM_PARSE_STMT(For, parser) {
     if (!parser->expect(Lexer::Kind::PUNC_LPAREN)) return nullptr;
 
     // prepare the details for parsing the parameters to be used
-    static constexpr auto s_callback = &m_identifier;
+    static constexpr auto s_callback = [](auto *_) { return m_identifier(_); };
     static auto s_delimited = Delimited<Syntax::Identifier>(s_callback);
 
     // attempt parsing the parameters

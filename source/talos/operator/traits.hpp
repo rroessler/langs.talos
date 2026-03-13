@@ -17,7 +17,7 @@ namespace Talos::Operator::Traits {
 #define X(N, S, ...) \
     case Kind::N: return S;
 #include "talos/lexer/_defines/tokens.def"
-            TALOS_XX_OPERATORS_CUSTOM(X) X(ASGN, "=")
+            TALOS_XX_OPERATORS_CUSTOM(X) X(ASGN, "=") default : return "unknown";
 #undef X
         }
     }
@@ -36,6 +36,20 @@ namespace Talos::Operator::Traits {
             TALOS_XX_OPERATORS_CUSTOM(X)
             X(ASGN, "=")  // expose assign
             default: return Kind::UNK;
+#undef X
+        }
+    }
+
+    /**
+     * @brief Handles resolving attribute symbols.
+     * @param kind                  Operator kind.
+     */
+    static inline constexpr $::String::View symbol(Kind kind) {
+        switch (kind) {
+#define X(N, ...) \
+    case Kind::N: return Attribute::N;
+            TALOS_XX_OPERATORS_CUSTOM(X)  // resolve the baseline operators for use
+            default: $_ABORT("Invalid operator/attribute lookup '{0}'", name(kind));
 #undef X
         }
     }

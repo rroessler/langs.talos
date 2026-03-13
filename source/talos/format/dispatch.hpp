@@ -214,6 +214,7 @@ namespace Talos::Format {
          * @brief Handles parsing declaration attributes/decorators.
          * @param reader                Format reader.
          */
+        static Node* m_category(Reader* reader);
         static Node* m_attribute(Reader* reader);
         static Node* m_decorator(Reader* reader);
 

@@ -37,3 +37,5 @@ TALOS_MM_MACHINE_EMIT(OBJECT_MAKE, builder, instruction) {
     // and invoke the incoming object constructor
     __ee__ invoke(Dispatch::object, dx, builder->isolate, builder->stack);
 }
+
+TALOS_MM_MACHINE_UNIMPLEMENTED(OBJECT_ATTR, , )

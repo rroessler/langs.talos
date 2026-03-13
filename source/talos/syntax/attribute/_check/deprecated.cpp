@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Deprecated, node, analyzer) { return analyzer->report(node, 9000002, "Type::Visitor"); }
+TALOS_MM_CHECK_NODE(Deprecated, , analyzer) { return analyzer->passable(); }

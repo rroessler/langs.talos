@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Overload, node, analyzer) { return analyzer->report(node, 9000002, "Type::Visitor"); }
+TALOS_MM_CHECK_NODE(Overload, , analyzer) { return analyzer->passable(); }

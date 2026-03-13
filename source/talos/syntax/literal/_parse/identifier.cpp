@@ -19,6 +19,11 @@ Talos::Syntax::Identifier* Talos::Parser::Dispatch::m_identifier(Stream* parser)
     return parser->allocate<Syntax::Identifier>(token);
 }
 
+Talos::Syntax::Identifier* Talos::Parser::Dispatch::m_identifier(
+    Stream* parser, const $::String::View& name, const Syntax::Bounds& bounds) {
+    return parser->allocate<Syntax::Identifier>(name, bounds);
+}
+
 TALOS_MM_PARSE_PREFIX(Self, parser, ) {
     auto* token = m_assert(parser->advance(), Lexer::Kind::LTRL_SELF);
     return parser->allocate<Syntax::Self>(token);  // fully validated

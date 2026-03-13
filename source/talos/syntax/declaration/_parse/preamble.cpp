@@ -42,7 +42,7 @@ Talos::Syntax::Declaration* Talos::Parser::Dispatch::m_preamble(Stream* parser, 
 
     // attempt parsing attributes and decorators whilst possible to do so
     while (parser->check(Lexer::Flag::DECORATES)) {
-        if (parser->check(Lexer::Kind::PUNC_ATTRIB)) attributes.emplace_back(m_attribute(parser));
+        if (parser->check(Lexer::Kind::PUNC_ATTR)) attributes.emplace_back(m_attribute(parser));
         else if (parser->check(Lexer::Kind::PUNC_DECOR)) decorators.emplace_back(m_decorator(parser));
     }
 
