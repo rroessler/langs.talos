@@ -13,11 +13,21 @@ TALOS_MM_CHECK_NODE(Variable, variable, analyzer) {
     // get the incoming expected typing
     auto expected = analyzer->declare(variable);
 
-    // show an error for disposable variables that are exported
-    auto exported = variable->modifiers().test(Variable::Flag::EXPORT);
-    if (exported && variable->disposable()) analyzer->report(3000150);
+    // get the incoming modifiers to be checked against
+    const auto& modifiers = variable->modifiers();
+    auto exported = modifiers.test(Variable::Flag::EXPORT);
+    auto disposable = modifiers.test(Variable::Flag::DISPOSABLE);
+
+    // ensure some conditions about the variable now
+    if (exported && disposable) analyzer->report(3000150);
 
     // attempt declaring on the world now
     auto* entity = analyzer->world()->values().declare(variable, expected, analyzer->captures());
-    return entity ? analyzer->passable(expected) : analyzer->report(4000403, variable->name());
+    if (entity == nullptr) return analyzer->report(4000403, variable->name());  // fail now
+
+    // update the entity if necessary to do so
+    if (disposable) entity->unused(false);
+
+    // can now safely return the resulting
+    return analyzer->passable(expected);
 }

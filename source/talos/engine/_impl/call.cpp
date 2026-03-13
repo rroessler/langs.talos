@@ -1,5 +1,6 @@
 /// Talos Modules
 #include "talos/engine/dispatch.hpp"
+#include "talos/garbage/service.hpp"
 #include "talos/machine/frame.hpp"
 #include "talos/machine/signature.hpp"
 #include "talos/object/class.hpp"
@@ -139,8 +140,14 @@ Talos::Value::Any Talos::Engine::Call::m_closure(
     // update the current leaked information to be used
     frame.context() = m_initialize(isolate, info->leaked(), context);
 
-    // ensure we force a checkpoint before executing the current frame
-    return isolate->thread()->checkpoint(), Dispatch::m_execute(isolate, &frame);
+    // enforce a checkpoint before running our handler
+    isolate->thread()->checkpoint();
+
+    // get the incoming result
+    auto result = Dispatch::m_execute(isolate, &frame);
+
+    // execute our necessary handler
+    return m_finalize(isolate, result);
 }
 
 Talos::Value::Any Talos::Engine::Call::m_jitted(
@@ -167,6 +174,16 @@ Talos::Value::Any Talos::Engine::Call::m_jitted(
     // finally reinterpret the stack as our outgoing arguments
     const auto& outgoing = *reinterpret_cast<const Function::Arguments*>(&(frame.stack() = stack));
 
-    // and call the underlying native now
-    return isolate->thread()->checkpoint(), info->callback(isolate, outgoing);
+    // enforce a checkpoint before running our handler
+    isolate->thread()->checkpoint();
+
+    // get the incoming result
+    auto result = info->callback(isolate, outgoing);
+
+    // execute our necessary handler
+    return m_finalize(isolate, result);
+}
+
+Talos::Value::Any Talos::Engine::Call::m_finalize(Isolate* isolate, Value::Any result) {
+    return isolate->lifetimes()->close(isolate) ? result : Value::Failure();
 }

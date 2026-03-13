@@ -84,7 +84,7 @@ namespace Talos::Engine {
 
         /**
          * @brief Handles validating any function instance.
-         * @param isolate                   Runtime isolate.
+         * @param isolate               Runtime isolate.
          */
         static bool m_validate(Isolate* isolate, size_t arity, const Arguments& arguments);
         static bool m_validate(Isolate* isolate, Function::Dynamic target, const Arguments& arguments);
@@ -92,11 +92,18 @@ namespace Talos::Engine {
 
         /**
          * @brief Handles defining a context for a closure.
-         * @param isolate                   Thread isolate.
-         * @param leaked                    Total upvalues.
-         * @param context                   Parent context.
+         * @param isolate               Runtime isolate.
+         * @param leaked                Total upvalues.
+         * @param context               Parent context.
          */
         static Function::Context m_initialize(Isolate* isolate, size_t leaked, Function::Context context);
+
+        /**
+         * @brief Handles finalizing results.
+         * @param isolate                Runtime isolate.
+         * @param result                 Outgoing result.
+         */
+        static Value::Any m_finalize(Isolate* isolate, Value::Any result);
 
         /**
          * @brief Explicit interpreter dispatching.

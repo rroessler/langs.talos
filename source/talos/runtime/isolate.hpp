@@ -111,6 +111,9 @@ namespace Talos::Runtime {
         /// @brief Gets a formatted backtrace value.
         std::vector<Resource::Trace> backtrace();
 
+        /// @brief Gets the disposable lifetimes container.
+        Garbage::Lifetimes* lifetimes() const noexcept;
+
         /**
          * @brief Handles yield isolate roots.
          * @param yield                     Yield handler.

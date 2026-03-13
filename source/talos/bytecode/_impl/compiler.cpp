@@ -9,10 +9,22 @@
 //  CONSTRUCTORS  //
 
 Talos::Bytecode::Compiler::Compiler() : Compiler($::Global::get<Runtime::Container>()) {}
-
 Talos::Bytecode::Compiler::Compiler(XI::Container* services) : m_services(services) {
     m_optimizer = services->get<Optimizer>(m_labels.get());
     m_assembler = services->get<Assembler>();  // prebuild
+}
+
+Talos::Bytecode::Disposable::Disposable(Compiler* compiler) : Disposable(compiler, nullptr) {}
+Talos::Bytecode::Disposable::Disposable(Compiler* compiler, const Disposable* ancestor) :
+    m_depth(ancestor ? ancestor->m_depth + 1 : 0), m_compiler(compiler), m_ancestor(ancestor) {
+    m_compiler->m_disposable = this;  // update ref
+    m_compiler->emit<Syllable::DISPOSE_OPEN>(m_depth);
+}
+
+Talos::Bytecode::Disposable::~Disposable() {
+    if (m_compiler == nullptr) return;
+    m_compiler->m_disposable = m_ancestor;  // unset
+    m_compiler->emit<Syllable::DISPOSE_CLOSE>(m_depth);
 }
 
 //  PUBLIC METHODS  //
@@ -62,6 +74,17 @@ void Talos::Bytecode::Compiler::import(Destination sink, const $::String::View& 
 }
 
 void Talos::Bytecode::Compiler::lower(const Syntax::Node* node, Destination sink) { Visitor::visit(node, this, sink); }
+
+Talos::Bytecode::Disposable Talos::Bytecode::Compiler::disposable(const Syntax::Block* block) {
+    // count the total resources that will be disposed on this blocks completion
+    auto resources = std::ranges::count_if(block->statements(), [](const Syntax::Node* node) -> bool {
+        if (!node->is<Syntax::Variable>()) return false;
+        return node->as<Syntax::Variable>()->disposable();
+    });
+
+    // construct the resulting stack based on the total resources
+    return resources ? Disposable(this, m_disposable) : Disposable();
+}
 
 void Talos::Bytecode::Compiler::preamble(const Syntax::Preamble* preamble, Register value) {
     // update our value with the available decorators/attributes

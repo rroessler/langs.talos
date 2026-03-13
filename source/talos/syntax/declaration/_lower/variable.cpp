@@ -22,6 +22,9 @@ TALOS_MM_LOWER_NODE(Variable, variable, compiler, ) {
     // we want to update the current value details
     compiler->preamble(variable, ireg);
 
+    // if the instance is disposable, then attach to frame
+    if (variable->disposable()) compiler->emit<Syllable::DISPOSE_DEFER>(ireg);
+
     // and handle assignment based on the leakage state
     if (leaked) compiler->emit<Syllable::STORE_CONTEXT>(dest, ireg);
 }

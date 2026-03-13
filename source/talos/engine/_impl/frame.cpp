@@ -1,6 +1,5 @@
 /// Talos Modules
 #include "talos/engine/frame.hpp"
-#include "talos/async/service.hpp"
 #include "talos/runtime/isolate.hpp"
 
 //  CONSTRUCTORS  //

@@ -85,12 +85,14 @@ Talos::Type::Deduction Talos::Type::Analyzer::check(const Syntax::Node* node, co
     // stop early if the underlying node is invalid
     if ($_UNLIKELY(node == nullptr)) return fallback;
 
-    // get the base typing we are working with
-    auto& current = node->traits()->type();
-
     // and resolve the final deduction to be used
     auto deduction = Visitor::visit(node, this);
-    return current = deduction.type, std::move(deduction);
+
+    // update the current typing now
+    node->traits()->type() = deduction.type;
+
+    // and return the resulting deduction
+    return deduction;
 }
 
 Talos::Type::Deduction Talos::Type::Analyzer::check(const std::vector<Syntax::Node*>& nodes) {
@@ -99,8 +101,8 @@ Talos::Type::Deduction Talos::Type::Analyzer::check(const std::vector<Syntax::No
 
     // attempt checking all the incoming statements now
     for (const auto& node : nodes) {
-        if (propagate(degree)) redundant(node);
-        else degree = check(node).flow->degree();
+        if (propagate(degree)) redundant(node), check(node);
+        else degree = check(node).flow->degree();  // update
     }
 
     // ensure that the instance is passable or not

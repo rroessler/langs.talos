@@ -17,6 +17,7 @@ Talos::Garbage::Service::Service(XI::Container* services) :
     m_services(services),
     m_heap(m_services->get<Heap::Service>()) {
     m_marker = m_services->get<Marker>(this);
+    m_lifetimes = m_services->get<Lifetimes>();
 }
 
 //  PUBLIC METHODS  //

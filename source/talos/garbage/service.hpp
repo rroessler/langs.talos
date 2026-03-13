@@ -2,6 +2,8 @@
 #define _TALOS_GARBAGE_SERVICE_HPP
 
 /// Talos Modules
+#include "talos/forward/engine.hpp"
+#include "talos/garbage/lifetimes.hpp"
 #include "talos/garbage/marker.hpp"
 #include "talos/garbage/options.hpp"
 #include "talos/heap/region.hpp"
@@ -35,6 +37,9 @@ namespace Talos::Garbage {
         /// @brief The underlying marking queue.
         $::Ptr::Unique<Marker> m_marker = nullptr;
 
+        /// @brief Handles disposable value lifetimes.
+        $::Ptr::Unique<Lifetimes> m_lifetimes = nullptr;
+
         /// @brief Last collection timestamp.
         $::Chrono::Point m_ts = $::Chrono::Point();
 
@@ -58,6 +63,9 @@ namespace Talos::Garbage {
 
         /// @brief Gets the total collection cycles executed.
         inline constexpr size_t cycles() const noexcept { return m_cycle; }
+
+        /// @brief Gets the disposable stack containers.
+        inline constexpr Lifetimes* lifetimes() const noexcept { return m_lifetimes.get(); }
 
         /**
          * @brief Request a GC attempt.

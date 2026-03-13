@@ -4,6 +4,7 @@
 #include "talos/builtins/proxy.hpp"
 #include "talos/engine/dispatch.hpp"
 #include "talos/engine/frame.hpp"
+#include "talos/garbage/service.hpp"
 #include "talos/globals/service.hpp"
 #include "talos/heap/service.hpp"
 #include "talos/machine/frame.hpp"
@@ -30,6 +31,10 @@ Talos::Runtime::Isolate::Isolate(XI::Container* services, const Value::Any& data
 Talos::Value::Any Talos::Runtime::Isolate::interrupt() {
     if (m_frame) m_frame->interrupted() = true;
     return Value::Failure();  // declare failed
+}
+
+Talos::Garbage::Lifetimes* Talos::Runtime::Isolate::lifetimes() const noexcept {
+    return m_services->get<Garbage::Service>()->lifetimes();
 }
 
 void Talos::Runtime::Isolate::roots(const Globals::Each& yield) {

@@ -12,6 +12,7 @@ TALOS_MM_LOWER_NODE(Block, block, compiler, ) {
 
     // trace the incoming binary node now
     $_UNUSED $_AUTO = compiler->scope();
+    $_UNUSED $_AUTO = compiler->disposable(block);
 
     // and lower each of the incoming statements as well
     for (const auto& statement : block->statements()) compiler->lower(statement);

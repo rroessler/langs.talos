@@ -10,6 +10,7 @@
 #define TALOS_XX_OPERATORS_CUSTOM(X) \
     X(CALL, "call", = UINT8_MAX + 1) \
     X(ITER, "iter")                  \
+    X(DISP, "dispose")               \
     X(UNK, "unknown", = UINT16_MAX)
 
 //  NAMESPACES  //

@@ -4,6 +4,7 @@
 
 /// Metadata Modules
 #include "talos/bytecode/metadata.hpp"
+#include "talos/type/metadata.hpp"
 
 //  PUBLIC METHODS  //
 
@@ -14,10 +15,22 @@ void Talos::Module::Interface::dump<Talos::Module::Dump::SYNTAX>() const noexcep
 
     // show the baseline dump details now
     $::IO::eprintln("\n===== Syntax Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
+
+    /// TODO: show all the syntax for this module
+    $_ABORT("Unimplemented 'Syntax Dump'");
 }
 
 template <>
-void Talos::Module::Interface::dump<Talos::Module::Dump::TYPEDEFS>() const noexcept {}
+void Talos::Module::Interface::dump<Talos::Module::Dump::TYPEDEFS>() const noexcept {
+    // ignore for non-script values now
+    if (!is<Script>()) return;
+
+    // show the baseline dump details now
+    $::IO::eprintln("\n===== Types Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
+
+    /// TODO: show all the types for this module
+    $_ABORT("Unimplemented 'Types Dump'");
+}
 
 template <>
 void Talos::Module::Interface::dump<Talos::Module::Dump::BYTECODE>() const noexcept {

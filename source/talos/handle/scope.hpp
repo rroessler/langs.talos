@@ -41,6 +41,23 @@ namespace Talos::Handle {
          */
         template <std::derived_from<Value::Any> T>
         inline constexpr Local<T> operator()(T value) {
+            return emplace<T>(value);
+        }
+
+        //  PUBLIC METHODS  //
+
+        /**
+         * @brief Handles validating the attached details.
+         * @param isolate               Runtime isolate.
+         */
+        inline constexpr bool validate(Runtime::Isolate* isolate) const noexcept { return m_isolate == isolate; }
+
+        /**
+         * @brief Handles emplacing a scope value.
+         * @param value                  Value to scope.
+         */
+        template <std::derived_from<Value::Any> T>
+        inline constexpr Local<T> emplace(T value) {
             return Local<T>(this, value);
         }
     };

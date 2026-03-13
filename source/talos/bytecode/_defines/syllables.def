@@ -35,8 +35,16 @@
 #define TALOS_XX_SYLLABLE_CALL(N, ...) TALOS_XX_SYLLABLE_BASE(N, __VA_ARGS__)
 #endif
 
+#ifndef TALOS_XX_SYLLABLE_DISPOSE
+#define TALOS_XX_SYLLABLE_DISPOSE(N, ...) TALOS_XX_SYLLABLE_BASE(N, __VA_ARGS__)
+#endif
+
 #ifndef TALOS_XX_SYLLABLE_MODULE
 #define TALOS_XX_SYLLABLE_MODULE(N, ...) TALOS_XX_SYLLABLE_BASE(N, __VA_ARGS__)
+#endif
+
+#ifndef TALOS_XX_SYLLABLE_CLASS
+#define TALOS_XX_SYLLABLE_CLASS(N, ...) TALOS_XX_SYLLABLE_BASE(N, __VA_ARGS__)
 #endif
 
 #ifndef TALOS_XX_SYLLABLE_OBJECT
@@ -132,15 +140,19 @@ TALOS_XX_SYLLABLE_CALL(SPAWN_N_VOID, /** dst */ Register, /** argv */ Register::
 TALOS_XX_SYLLABLE_CALL(SPAWN_0_FIELD, /** dst */ Register, /** symbol */ Index)
 TALOS_XX_SYLLABLE_CALL(SPAWN_N_FIELD, /** dst */ Register, /** symbol */ Index, /** argv */ Register::Span)
 
-TALOS_XX_SYLLABLE_MODULE(MODULE_OPEN, Register)
-TALOS_XX_SYLLABLE_MODULE(MODULE_CLOSE, Register)
+TALOS_XX_SYLLABLE_DISPOSE(DISPOSE_OPEN, /** depth */ Index)
+TALOS_XX_SYLLABLE_DISPOSE(DISPOSE_CLOSE, /** depth */ Index)
+TALOS_XX_SYLLABLE_DISPOSE(DISPOSE_DEFER, /** src */ Register)
+
+TALOS_XX_SYLLABLE_MODULE(MODULE_OPEN, /** src */ Register)
+TALOS_XX_SYLLABLE_MODULE(MODULE_CLOSE, /** dst */ Register)
 TALOS_XX_SYLLABLE_MODULE(MODULE_IMPORT, /** dst */ Register, /** path */ Index)
 TALOS_XX_SYLLABLE_MODULE(MODULE_EXPORT, /** src */ Register, /** name */ Index)
 
-TALOS_XX_SYLLABLE_MODULE(CLASS_BIND, /** dst */ Register, /** index */ Index)
-TALOS_XX_SYLLABLE_MODULE(CLASS_SUPER, /** src */ Register, /** argv */ Register::Span)
-TALOS_XX_SYLLABLE_MODULE(CLASS_MAKE, /** dst */ Register, /** name */ Index, /** shape */ Index)
-TALOS_XX_SYLLABLE_MODULE(CLASS_EXPORT, /** src */ Register, /** name */ Index, /** immutable */ Index)
+TALOS_XX_SYLLABLE_CLASS(CLASS_BIND, /** dst */ Register, /** index */ Index)
+TALOS_XX_SYLLABLE_CLASS(CLASS_SUPER, /** src */ Register, /** argv */ Register::Span)
+TALOS_XX_SYLLABLE_CLASS(CLASS_MAKE, /** dst */ Register, /** name */ Index, /** shape */ Index)
+TALOS_XX_SYLLABLE_CLASS(CLASS_EXPORT, /** src */ Register, /** name */ Index, /** immutable */ Index)
 
 TALOS_XX_SYLLABLE_ENUM(ENUM_EMPTY, /** dst */ Register)
 TALOS_XX_SYLLABLE_ENUM(ENUM_MAKE, /** dst */ Register, /** values */ Register::Span)
@@ -204,7 +216,9 @@ TALOS_XX_SYLLABLE_BASE(EXEC_INVALID)
 #undef TALOS_XX_SYLLABLE_JUMP
 #undef TALOS_XX_SYLLABLE_TYPE
 #undef TALOS_XX_SYLLABLE_CALL
+#undef TALOS_XX_SYLLABLE_DISPOSE
 #undef TALOS_XX_SYLLABLE_MODULE
+#undef TALOS_XX_SYLLABLE_CLASS
 #undef TALOS_XX_SYLLABLE_ENUM
 #undef TALOS_XX_SYLLABLE_LIST
 #undef TALOS_XX_SYLLABLE_OBJECT

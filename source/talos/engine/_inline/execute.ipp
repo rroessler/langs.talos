@@ -6,6 +6,7 @@
 #include "talos/engine/_exec/classes.hpp"
 #include "talos/engine/_exec/closures.hpp"
 #include "talos/engine/_exec/constants.hpp"
+#include "talos/engine/_exec/dispose.hpp"
 #include "talos/engine/_exec/enums.hpp"
 #include "talos/engine/_exec/execute.hpp"
 #include "talos/engine/_exec/fields.hpp"

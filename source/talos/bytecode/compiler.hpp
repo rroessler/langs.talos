@@ -22,8 +22,48 @@ namespace Talos::Bytecode {
     /// @brief Variable Declaration Typing.
     using Declaration = std::pair<Register, bool>;
 
+    /// @brief Current disposable stack.
+    class Disposable {
+        //  PROPERTIES  //
+
+        /// @brief The disposable depth.
+        size_t m_depth = 0;
+
+        /// @brief Bound compiler instance.
+        Compiler* m_compiler = nullptr;
+
+        /// @brief The parent disposable.
+        const Disposable* m_ancestor = nullptr;
+
+       public:
+        //  CONSTRUCTORS  //
+
+        /// @brief Constructs an empty disposable.
+        explicit Disposable() = default;
+
+        /// @brief Constructs a disposable stack.
+        explicit Disposable(Compiler* compiler);
+        explicit Disposable(Compiler* compiler, const Disposable* ancestor);
+
+        /// @brief Handles closing a disposable.
+        ~Disposable();
+
+        //  PUBLIC METHODS  //
+
+        /// @brief Gets the underlying depth of the disposable stack.
+        inline constexpr size_t depth() const noexcept { return m_depth; }
+
+        /// @brief Denotes if there is no disposable instance.
+        inline constexpr bool unset() const noexcept { return m_compiler == nullptr; }
+    };
+
     /// @brief Bytecode Compiler.
     class Compiler : public XI::Define<Compiler, XI::Unique> {
+        //  TYPEDEFS  //
+
+        /// @brief Allow disposables internal inspection.
+        friend class Disposable;
+
         //  PROPERTIES  //
 
         /// @brief Current compilation request.
@@ -37,6 +77,9 @@ namespace Talos::Bytecode {
 
         /// @brief The current bytecode arena.
         $::Ptr::Unique<Linker::Arena> m_arena = nullptr;
+
+        /// @brief Current disposable instance.
+        const Disposable* m_disposable = nullptr;
 
         /// @brief Associated variable captures.
         const Variable::Captures* m_captures = nullptr;
@@ -77,11 +120,17 @@ namespace Talos::Bytecode {
         inline constexpr Variable::Context* variables() const noexcept { return m_request->variables(); }
         inline constexpr Shape::Service* shapes() const noexcept { return m_services->get<Shape::Service>(); }
 
+        /// @brief Constructs a scoped loop.
+        inline constexpr Loop loop() { return Loop(this); }
+
         /// @brief Constructs a variable scoping.
         inline constexpr auto scope() { return m_request->scope(); }
 
-        /// @brief Constructs a scoped loop.
-        inline constexpr Loop loop() { return Loop(this); }
+        /**
+         * @brief Check if a block has disposable elements.
+         * @param block                     Block to resolve.
+         */
+        Disposable disposable(const Syntax::Block* block);
 
         /**
          * @brief Handles tracing positions.

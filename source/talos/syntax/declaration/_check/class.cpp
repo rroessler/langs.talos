@@ -80,9 +80,13 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     auto* entity = analyzer->world()->lookup(node->name()).first;
 
     // can safely update the underlying entity details now
+    entity->modifiers() = node->modifiers();
     entity->context() = analyzer->captures().declare(node);
     entity->value() = Type::Builder::generic(proto, parameters);
     entity->type() = Type::Builder::generic(instance, parameters);
+
+    // update the current exported status as well
+    if (entity->exported()) entity->unused(false);
 
     // prepare the current trace location
     $_UNUSED $_AUTO = analyzer->trace(node);

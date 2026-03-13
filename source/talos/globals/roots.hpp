@@ -38,8 +38,6 @@ namespace Talos::Globals {
         }
     };
 
-    // using Each = std::generator<Value::Any, Value::Any>;
-
     /// @brief Available Global Roots.
     class Roots {
         //  PROPERTIES  //
