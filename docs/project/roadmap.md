@@ -16,15 +16,15 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 
 ## Runtime
 
-| Status | Feature | Description                             | Todo                     |
-| :----: | ------- | --------------------------------------- | ------------------------ |
-|   ❌   | `@...`  | Implement runtime decorators.           | -                        |
-|   ❌   | `#...`  | Implement compile-time attributes.      | -                        |
-|   🚀   | `use`   | Implement explicit resources.           | Requires attribute hooks |
-|   ⚪   | `enum`  | Implement enumeration declarations.     | -                        |
-|   💀   | `class` | Implement class-based inheritance.      | -                        |
-|   💀   | `xasm`  | Implement jitted runtime functions.     | -                        |
-|   💀   | `Debug` | Implement debugger `breakpoint` method. | Implement a DAP manager  |
+| Status | Feature | Description                          | Todo                     |
+| :----: | ------- | ------------------------------------ | ------------------------ |
+|   ❌   | `@...`  | Implement runtime decorators.        | -                        |
+|   💀   | `#...`  | Implement compile-time attributes.   | Overloads not yet done   |
+|   ⚪   | `use`   | Implement explicit resources.        | Requires attribute hooks |
+|   ⚪   | `enum`  | Implement enumeration declarations.  | -                        |
+|   ⚪   | `class` | Implement class-based inheritance.   | -                        |
+|   💀   | `xasm`  | Implement jitted runtime functions.  | -                        |
+|   💀   | `Debug` | Implement debug `breakpoint` method. | Implement a DAP manager  |
 
 ## Libraries
 
@@ -63,9 +63,9 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 
 ## Documentation
 
-| Status | Section  | Description                       |
-| :----: | -------- | --------------------------------- |
-|   🚀   | Crates   | Only stub pages have been made.   |
-|   ⚪   | Language | Toolkit, advanced concepts...     |
-|   ⚪   | Project  | Contribution points, dashboard... |
-|   ⚪   | Tour     | Some steps are not yet finished.  |
+| Status | Section  | Description                         |
+| :----: | -------- | ----------------------------------- |
+|   🚀   | Crates   | Only stub pages have been made.     |
+|   ⚪   | Language | Toolkit, advanced concepts, ...     |
+|   ⚪   | Project  | Contribution points, dashboard, ... |
+|   ⚪   | Tour     | Some steps are not yet finished.    |
