@@ -16,15 +16,15 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 
 ## Runtime
 
-| Status | Feature | Description                         | Todo                     |
-| :----: | ------- | ----------------------------------- | ------------------------ |
-|   ❌   | `@...`  | Implement runtime decorators.       | -                        |
-|   ❌   | `#...`  | Implement compile-time attributes.  | -                        |
-|   ❌   | `use`   | Implement explicit resources.       | Requires attribute hooks |
-|   ⚪   | `enum`  | Implement enumeration declarations. | -                        |
-|   💀   | `class` | Implement class-based inheritance.  | -                        |
-|   💀   | `xasm`  | Implement jitted runtime functions. | -                        |
-|   💀   | `Debug` | Implement debugger based details.   | Implement a DAP manager  |
+| Status | Feature | Description                             | Todo                     |
+| :----: | ------- | --------------------------------------- | ------------------------ |
+|   ❌   | `@...`  | Implement runtime decorators.           | -                        |
+|   ❌   | `#...`  | Implement compile-time attributes.      | -                        |
+|   🚀   | `use`   | Implement explicit resources.           | Requires attribute hooks |
+|   ⚪   | `enum`  | Implement enumeration declarations.     | -                        |
+|   💀   | `class` | Implement class-based inheritance.      | -                        |
+|   💀   | `xasm`  | Implement jitted runtime functions.     | -                        |
+|   💀   | `Debug` | Implement debugger `breakpoint` method. | Implement a DAP manager  |
 
 ## Libraries
 
@@ -34,6 +34,7 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 |   ❌   | `talos:async`  | Asynchronous utilities.         | -                              |
 |   ❌   | `talos:chrono` | Temporal utilities.             | -                              |
 |   ❌   | `talos:codec`  | Encoding/decoding function.     | -                              |
+|   🚀   | `talos:ffi`    | Native library utilities.       | -                              |
 |   ❌   | `talos:fsys`   | Filesystem utilities.           | -                              |
 |   ✅   | `talos:gc`     | Garbage collection hooks.       | Additional statistics?         |
 |   💀   | `talos:jit`    | Experimental JIT hooks.         | -                              |
@@ -64,7 +65,7 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 
 | Status | Section  | Description                       |
 | :----: | -------- | --------------------------------- |
-|   🚀   | Crates   | Only stub pages have been made    |
+|   🚀   | Crates   | Only stub pages have been made.   |
 |   ⚪   | Language | Toolkit, advanced concepts...     |
 |   ⚪   | Project  | Contribution points, dashboard... |
-|   ⚪   | Tour     | Some steps are not yet finished   |
+|   ⚪   | Tour     | Some steps are not yet finished.  |

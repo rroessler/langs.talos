@@ -40,6 +40,9 @@ TALOS_MM_LOWER_NODE(Enum, enumeration, compiler, ) {
     if (arguments.empty()) compiler->emit<Syllable::ENUM_EMPTY>(treg);
     else compiler->emit<Syllable::ENUM_MAKE>(treg, arguments);
 
+    // post-emit the expose handler
+    compiler->expose(enumeration, treg);
+
     // finally emit the outgoing details now
     if (leaked) compiler->emit<Syllable::STORE_CONTEXT>(dest, treg);
 }

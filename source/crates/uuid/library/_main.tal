@@ -9,7 +9,7 @@ import "dylib:uuid" as uuid;
 // Talos Modules
 import "talos:_detail" as Detail;
 
-// - PROPERTIES - //
+// - HELPERS - //
 
 //! Brief: Internal helper to reduce bytecode output.
 let m_cast = Detail.Unsafe.cast;
