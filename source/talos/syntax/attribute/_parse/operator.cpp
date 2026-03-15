@@ -9,7 +9,7 @@ TALOS_MM_PARSE_DECL(Operator, parser) {
     auto snapshot = parser->snapshot();
 
     // get the original token location to be used
-    auto* token = m_assert(parser->advance(), "Operator");
+    m_assert(parser->advance(), "Operator");
 
     // ensure there is now a period available
     if (!parser->expect(Lexer::Kind::PUNC_PERIOD)) return nullptr;
@@ -31,5 +31,5 @@ TALOS_MM_PARSE_DECL(Operator, parser) {
     if (target == nullptr || invalid) return nullptr;  // failed to parse a suitable target
 
     // fail if the kind is currently invalid
-    return parser->allocate<Syntax::Operator>(kind, target, snapshot.enclose(token));
+    return parser->allocate<Syntax::Operator>(kind, target, snapshot);
 }

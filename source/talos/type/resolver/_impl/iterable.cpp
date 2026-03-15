@@ -12,6 +12,8 @@ Talos::Type::Erased Talos::Type::Utility::Iterable::operator()(
 
 Talos::Type::Erased Talos::Type::Utility::Iterable::m_resolve(
     const Erased& target, const Constraints& constraints) const noexcept {
-    auto value = target->infer(constraints)->apply(Operator::Kind::ITER);
-    return value->is<Unset>() ? Builder::never() : Builder::iterator(value);
+    auto inferred = target->infer(constraints);
+    auto value = inferred->apply(Operator::Kind::ITER);
+    if (value->is<Unset>()) return Builder::never();
+    return Builder::iterator(value);  // valid iterator
 }

@@ -49,6 +49,7 @@ namespace Talos::Syntax {
         inline constexpr Kind kind() const noexcept { return m_kind; }
         inline constexpr const Expression* target() const noexcept { return m_target; }
         inline constexpr $::String::View label() const noexcept { return ::Talos::Operator::Traits::name(m_kind); }
+        inline constexpr $::String::View symbol() const noexcept { return ::Talos::Operator::Traits::symbol(m_kind); }
     };
 
 }  // namespace Talos::Syntax
