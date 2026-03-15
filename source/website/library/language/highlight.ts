@@ -114,7 +114,12 @@ export namespace Highlight {
 
         // attempt resolving the desired higlighter now
         return resolve(engine, {}).then((instance) =>
-            instance.codeToHast(code, { lang, themes: m_themes, defaultColor: false, ...rest }),
+            instance.codeToHast(code, {
+                lang,
+                themes: m_themes,
+                defaultColor: false,
+                ...rest,
+            }),
         );
     };
 }

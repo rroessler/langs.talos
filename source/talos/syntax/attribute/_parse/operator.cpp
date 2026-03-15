@@ -27,7 +27,7 @@ TALOS_MM_PARSE_DECL(Operator, parser) {
     invalid ? parser->report(2000801, method) : parser->advance();
 
     auto self = parser->check(Lexer::Kind::PUNC_RBRACK);  // ignore value if none given
-    auto* target = self ? m_identifier(parser, "Self", snapshot) : m_expression(parser);
+    auto* target = self ? parser->allocate<Syntax::Self>(snapshot) : m_expression(parser);
     if (target == nullptr || invalid) return nullptr;  // failed to parse a suitable target
 
     // fail if the kind is currently invalid

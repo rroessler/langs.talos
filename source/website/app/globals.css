@@ -22,3 +22,14 @@
     --color-brand-secondary-foreground: #521700;
     --color-brand-200: hsl(27, 50%, 35%);
 }
+
+/*----------  Shiki Styles  ----------*/
+
+.shiki .highlighted-word {
+    background-color: unset !important;
+    border: unset !important;
+    padding: unset !important;
+    margin-block: unset !important;
+    border-radius: unset !important;
+    text-decoration: line-through;
+}

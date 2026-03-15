@@ -6,11 +6,11 @@ Classes are general-purpose, flexible constructs that are the building blocks of
 
 ```talos
 // We can define a class-declaration with given arguments.
-class Person(name: String, age: Number) {
+class Person(a_name: String, a_age: Number) {
     //  PROPERTIES  //
 
-    private let m_age: Number = age;
-    private let m_name: String = name;
+    private let m_age: Number = a_age;
+    private let m_name: String = a_name;
 
     //  PUBLIC METHODS  //
 
@@ -25,8 +25,8 @@ let person = Person("Talos", 25);
 All classes in Talos have a common super-class of `Object`. This is meant to describe classes as being objects that may exhibit inheritance.
 
 ```talos
-class A {};     // Implicitly inherits from `Void`.
-class B: A {};  // Explicitly inherits from `A`.
+class A {};         // Implicitly inherits from `Object`.
+class B => A {};    // Explicitly inherits from `A`.
 ```
 
 To declare an explicit super-class, we place it after the constructor declaration and then instantiate it using the super-constructor.
