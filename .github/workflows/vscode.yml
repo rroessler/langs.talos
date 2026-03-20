@@ -24,7 +24,6 @@ jobs:
               working-directory: dist/vscode
 
             - name: Publish Extension
-              run: bunx vsce publish
+              continue-on-error: true
               working-directory: dist/vscode
-              env:
-                  VSCE_PAT: ${{ secrets.VSCODE_EXTENSION_TOKEN }}
+              run: bunx vsce publish -p ${{ secrets.VSCODE_EXTENSION_TOKEN }}
