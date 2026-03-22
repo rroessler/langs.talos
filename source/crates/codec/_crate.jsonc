@@ -1,5 +1,5 @@
 {
-    "version": "0.1.1",
+    "version": "0.1.2",
     "name": "@talos/codec",
     "main": "library/_main.tal",
     "describe": "Utilities for encoding and decoding common formats"

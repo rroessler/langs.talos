@@ -1,5 +1,5 @@
 {
-    "version": "0.1.1",
+    "version": "0.1.2",
     "name": "@talos/ffi",
     "main": "library/_main.tal",
     "describe": "Bindings to call native libraries from Talos"
