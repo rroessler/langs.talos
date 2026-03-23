@@ -10,11 +10,13 @@
 #include "talos/builtins/future/traits.hpp"
 #include "talos/builtins/iterator/traits.hpp"
 #include "talos/builtins/list/traits.hpp"
+#include "talos/builtins/maybe/traits.hpp"
 #include "talos/builtins/number/traits.hpp"
 #include "talos/builtins/object/traits.hpp"
 #include "talos/builtins/result/traits.hpp"
 #include "talos/builtins/string/traits.hpp"
 #include "talos/builtins/symbol/traits.hpp"
+#include "talos/builtins/utility/traits.hpp"
 #include "talos/builtins/void/traits.hpp"
 
 /// Builtins Custom
@@ -27,6 +29,8 @@
 #define TALOS_XX_BUILTINS_CUSTOM(X) \
     X(Builtins::Custom::Todo)       \
     X(Builtins::Custom::Debug)      \
+    X(Builtins::Custom::Maybe)      \
+    X(Builtins::Custom::Utility)    \
     X(Builtins::Custom::Intrinsics)
 
 #define TALOS_XX_BUILTINS_LIST(X) \

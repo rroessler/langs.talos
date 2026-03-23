@@ -9,7 +9,7 @@ TALOS_BUILTIN_CUSTOM(Todo)
 
 namespace Talos::Builtins {
 
-    /// @brief Void Builtin Traits.
+    /// @brief Todo Custom Builtin Traits.
     template <>
     struct Traits<Custom::Todo> : public Define<Custom::Todo, "Todo">,
                                   public Features<Adapter::GLOBALS, Adapter::TYPEDEFS> {
