@@ -10,10 +10,10 @@ function(mono_vendor_declare _target _vtag)
     cmake_parse_arguments(_ARGS "NP" "TAG" "" ${ARGN})
 
     # update the tag to be used
-    if(NOT DEFINED _ARGS_TAG)
+    if (NOT DEFINED _ARGS_TAG)
         # prepare the arguments tag to be used
         set(_ARGS_TAG ${_vtag})
-    endif()
+    endif ()
 
     # attempt fetching the incoming content now
     __mono_vendor_declare(${_target} ${_repo} ${_ARGS_TAG})
@@ -21,10 +21,11 @@ endfunction()
 
 # Otherwise we actually require it from here
 function(mono_vendor_require _target)
-    if(NOT TARGET ${_target})
+    if (NOT TARGET ${_target})
         FetchContent_MakeAvailable(${_target})
         find_package(${_target} REQUIRED QUIET)
-    endif()
+        mono_message_status("Found Vendor '${_target}'")
+    endif ()
 endfunction()
 
 # --  PRIVATE METHODS  -- #
@@ -40,9 +41,9 @@ function(__mono_vendor_repo _repo)
     cmake_parse_arguments(_ARGS "" "REPO" "" ${ARGN})
 
     # ensure the version was assigned
-    if(NOT DEFINED _ARGS_REPO)
+    if (NOT DEFINED _ARGS_REPO)
         mono_message_fatal("Expected a vendor repository")
-    endif()
+    endif ()
 
     # define the necessary version now
     set(${_repo} "https://github.com/${_ARGS_REPO}" PARENT_SCOPE)
@@ -50,7 +51,7 @@ endfunction()
 
 function(__mono_vendor_declare _target _repo _tag)
     # ignore if the target already exists
-    if(NOT TARGET ${_target})
+    if (NOT TARGET ${_target})
         # include the fetch-content handler
         include(FetchContent)
 
@@ -61,7 +62,7 @@ function(__mono_vendor_declare _target _repo _tag)
             GIT_REPOSITORY ${_repo}
             GIT_SHALLOW ON
             OVERRIDE_FIND_PACKAGE)
-    endif()
+    endif ()
 endfunction()
 
 # --  MODULE DEFINITION  -- #

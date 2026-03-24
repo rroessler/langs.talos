@@ -11,20 +11,20 @@ function(talos_vendors_require)
     # get the boost vendor name as well
     get_property(_boost GLOBAL PROPERTY __MONO_BOOST_TARGET)
 
-    foreach(_target IN LISTS ARGN)
-        if(${_target} STREQUAL ${_boost})
+    foreach (_target IN LISTS ARGN)
+        if (${_target} STREQUAL ${_boost})
             __talos_vendors_boost()
-        else()
-            if(${_target} STREQUAL "LIEF")
+        else ()
+            if (${_target} STREQUAL "LIEF")
                 __talos_vendors_lief()
-            elseif(${_target} STREQUAL "asmjit")
+            elseif (${_target} STREQUAL "asmjit")
                 __talos_vendors_asmjit()
-            endif()
+            endif ()
 
             # and require the incoming item now
             mono_vendor_require(${_target})
-        endif()
-    endforeach()
+        endif ()
+    endforeach ()
 endfunction()
 
 function(talos_vendors_inject _target)
@@ -55,11 +55,11 @@ function(__talos_vendors_declare _target _vtag)
     get_property(_boost GLOBAL PROPERTY __MONO_BOOST_TARGET)
 
     # attempt resolving our vendors now
-    if(_target STREQUAL ${_boost})
+    if (_target STREQUAL ${_boost})
         mono_boost_declare(${_vtag} ${ARGN})
-    else()
+    else ()
         mono_vendor_declare(${_target} ${_vtag} ${ARGN})
-    endif()
+    endif ()
 
     # attempt parsing the base version value now
     __mono_vendor_version(${_vtag} _version)
@@ -95,6 +95,7 @@ macro(__talos_vendors_lief)
     set(LIEF_LOGGING OFF)
     set(LIEF_LOGGING_DEBUG OFF)
     set(LIEF_ENABLE_JSON OFF)
+    set(LIEF_EXTERNAL_SPDLOG ON)
 
     set(LIEF_DEX OFF)
     set(LIEF_ART OFF)
@@ -102,14 +103,19 @@ endmacro()
 
 # --  MODULE DEFINITION  -- #
 
+# We require ensuring some items are installed
+set(FMT_INSTALL ON)
+set(SPDLOG_INSTALL ON)
+set(SPDLOG_FMT_EXTERNAL ON)
+
 # Declare all the necessary repositories
 __talos_vendors_declare(ankerl v4.8.1 REPO "martinus/unordered_dense.git")
 __talos_vendors_declare(asmjit v1.21.0 REPO "asmjit/asmjit.git" TAG master)
 __talos_vendors_declare(aster v1.1.3 REPO "rroessler/cpp.aster.git")
 __talos_vendors_declare(CLI11 v2.6.2 REPO "CLIUtils/CLI11.git")
 __talos_vendors_declare(fmt 12.1.0 REPO "fmtlib/fmt.git")
-__talos_vendors_declare(glaze v7.1.0 REPO "stephenberry/glaze.git")
-__talos_vendors_declare(lief 0.17.4 REPO "lief-project/LIEF.git")
+__talos_vendors_declare(glaze v7.2.1 REPO "stephenberry/glaze.git")
+__talos_vendors_declare(lief 0.17.6 REPO "lief-project/LIEF.git")
 __talos_vendors_declare(muuid v2.2 REPO "gershnik/modern-uuid.git")
 __talos_vendors_declare(spdlog v1.17.0 REPO "gabime/spdlog.git")
 
