@@ -13,6 +13,7 @@ export function Portal({ name, href, icon, description }: Portal) {
     // prepare the header to be used now
     const header = [<React.Fragment key="icon" children={prefix} />, <React.Fragment key="name" children={name} />];
 
+    // and construct the resulting portal now
     return (
         <Anchor sleek href={href} className="bg-fd-card rounded-2xl border shadow-lg px-4 py-6">
             <h2 className="flex items-center gap-2 mt-0 mb-2 font-medium" children={header} />

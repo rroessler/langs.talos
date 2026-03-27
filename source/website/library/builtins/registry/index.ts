@@ -36,11 +36,12 @@ export namespace Registry {
 
         // attempt finding the necessary crate now
         const builtin = Assets.builtins(name);
-        console.log({ name, builtin, exists: fs.existsSync(builtin) });
         if (!fs.existsSync(builtin)) return;
 
         // ensure the given name is valid now
         if (builtin.includes('.')) return;
+
+        console.log({ name, builtin });
 
         // since value, then resolve a suitable set of details
         return { name: name[0].toUpperCase() + name.slice(1) };
