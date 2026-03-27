@@ -21,6 +21,9 @@ export namespace Assets {
     /** The crates directory. */
     const m_crates = path.resolve(m_source, 'crates');
 
+    /** The builtins directory. */
+    const m_builtins = path.resolve(m_source, 'talos', 'builtins');
+
     /** The examples directory. */
     const m_examples = path.resolve(m_root, 'examples');
 
@@ -70,6 +73,9 @@ export namespace Assets {
 
     /** The underlying crates path. */
     export const crates = m_bind(m_crates);
+
+    /** The underlying builtins path. */
+    export const builtins = m_bind(m_builtins);
 
     /** The underlying tour path. */
     export const tour = m_bind(m_tour);

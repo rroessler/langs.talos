@@ -36,6 +36,17 @@ export const crates = fumadocs.defineDocs({
     },
 });
 
+// The available builtins cache.
+export const builtins = fumadocs.defineDocs({
+    dir: Assets.builtins(),
+    meta: { schema: g_metadata },
+    docs: {
+        files: ['**/*.mdx'],
+        schema: g_frontmatter,
+        postprocess: { includeProcessedMarkdown: true },
+    },
+});
+
 // The available blogs cache.
 export const blog = fumadocs.defineCollections({
     type: 'doc',

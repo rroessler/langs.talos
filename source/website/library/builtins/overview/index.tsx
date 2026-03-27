@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import * as React from 'react';
 
 /// Website Modules
-import { Product } from '@/website/product';
 import { Portal } from '@/website/components';
 
 /// Package Modules
@@ -14,8 +13,8 @@ export interface Overview extends Omit<React.ComponentProps<'div'>, 'children'> 
 export function Overview({ className, ...props }: Overview) {
     // prepare all the available portals to be show now
     const portals = Registry.list().map(({ name, describe }) => {
-        const base = name.slice(Product.identifier.length + 2); // ensure we get the base-name now to be used
-        return <Portal key={name} name={`talos:${base}`} href={`/docs/crates/${base}`} description={describe} />;
+        const href = `/docs/builtins/${name.toLowerCase()}`; // get the location now
+        return <Portal key={name} name={name} href={href} description={describe} />;
     });
 
     // revise the incoming class-name to be used
