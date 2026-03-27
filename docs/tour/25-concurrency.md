@@ -33,7 +33,7 @@ let acceptor = fn (value: Number): Boolean => value < 0 ? panic : True;
 
 // We can then manipulate the result with futures.
 acceptor::async(-1)
-    .catch(fn: Boolean => False)
+    .fails(fn: Boolean => False)
     .then(fn (positive: Boolean): String => positive ? "Positive" : "Negative")
     .then(Debug.println);
 ```

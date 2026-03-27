@@ -1,0 +1,8 @@
+{
+    "root": true,
+    "icon": "BrickWall",
+    "title": "Builtins",
+    "defaultOpen": true,
+    "description": "The builtin langauge components for Talos",
+    "pages": ["index", "---Components---", "..."]
+}

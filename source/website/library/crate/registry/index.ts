@@ -12,6 +12,7 @@ import { Product } from '@/website/product';
 /// Package Modules
 import { Manifest } from '../manifest';
 
+/** Crates Registry Namespace. */
 export namespace Registry {
     //  PUBLIC METHODS  //
 

@@ -1,0 +1,114 @@
+---
+icon: Trash2
+title: Resources
+description: Explicit resources management for simplified cleanup
+---
+
+import { Callout } from '@/website/components';
+
+Talos supports explicitly handling disposable resources through the `use` declaration. This is a powerful feature that allows safe and readable interactions with resources that require some sort of "clean-up" handling. To understand how this works, let's start with a real-world example.
+
+## Real-World Example
+
+Suppose that we want to process some work that requires us to create a temporary file, open that file, perform various operations, then close and delete it.
+
+```talos
+// Here is a worker that performs some operations.
+export let worker = fn (args...) {
+    // We instantiate the temp-file.
+    let path = "/some/temp/file.txt";
+    let file = fs_open(path, "w+");
+
+    // Using the file ...
+
+    // And on completion, close and delete it.
+    fs_close(file);
+    fs_unlink(file);
+};
+```
+
+<Callout title="Note:">
+    The `fs_open`, `fs_close` and `fs_unlink` methods are placeholders as the file-system library has not yet been
+    implemented.
+</Callout>
+
+For now this works well, however once we start adding early exit conditions, we also start to duplicate the clean-up code.
+
+```talos
+// Here is a worker that performs some operations.
+export let worker = fn (args...) {
+    // We instantiate the temp-file.
+    let path = "/some/temp/file.txt";
+    let file = fs_open(path, "w+");
+
+    // Using the file ...
+    if (condition()) {
+        // Do some specialized work ...
+
+        // And on completion, close and delete it.
+        fs_close(file);
+        fs_unlink(file);
+        return;
+    }
+
+    // Else-wise using the file ...
+
+    // And on completion, close and delete it.
+    fs_close(file);
+    fs_unlink(file);
+};
+```
+
+Since Talos does not natively provide a `try...catch...finally`, the solution to automatic disposal of resources is the `use` declaration.
+
+## Defining Resources
+
+To simplify our example, let's start by making a temporary file resource.
+
+```talos
+// We want our class to ensure it implements the disposable attribute.
+export class TempFile(path: String) implements Disposable {
+    // - PROPERTIES - //
+
+    private let m_path = path;
+    private let m_handle = fs_open(path, "w+");
+
+    // - OPERATORS - //
+
+    #[Operator.dispose]
+    private let m_dispose = fn {
+        fs_close(Self.m_path);
+        fs_unlink(Self.m_path);
+    };
+};
+```
+
+By declaring a class that implements the `Disposable` interface, and attaching a disposal callback through the use of a [compile-time attribute](/docs/language/fundamentals/attributes), allows us to now have access to the `use` declaration.
+
+## Scoping Resources
+
+In conjunction with the `TempFile` class and the `use` declaration, we can now write our `worker` like so:
+
+```talos
+// Here is a worker that performs some operations.
+export let worker = fn (args...) {
+    // We instantiate the temp-file.
+    let path = "/some/temp/file.txt";
+    use file = TempFile(path);
+
+    // Using the file ...
+    if (condition()) {
+        // Do some specialized work ...
+        return;
+    }
+
+    // Else-wise using the file ...
+};
+```
+
+When this function is now called, it will construct a temporary file, process some required work, and then automatically release any disposables registered through `use` declarations. For those that have seen this pattern before, this is similar to [`using` declarations in C#](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/using), [`with` statements in Python](https://docs.python.org/3/reference/compound_stmts.html#with) or [`try-with-resource` statements in Java](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html).
+
+<Callout title="Note:">
+    It is important to note that disposables that are declared with the `use` declaration are cleaned-up in a
+    first-in-last-out order (FIFO), similar to a stack.
+</Callout>
