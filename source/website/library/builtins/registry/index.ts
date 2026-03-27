@@ -16,9 +16,6 @@ export namespace Registry {
         // prepare the source directory of builtins
         const source = Assets.builtins();
 
-        console.log('Builtins:', Assets.builtins());
-        console.log(fs.readdirSync(source));
-
         // filter all the available files now
         return fs
             .readdirSync(source)
@@ -31,17 +28,9 @@ export namespace Registry {
      * @param name                  Name of builtin.
      */
     export function resolve(name: string): Descriptor | undefined {
-        // immediately stop invalid items
-        if (name.startsWith('_')) return;
-
-        // attempt finding the necessary crate now
-        const builtin = Assets.builtins(name);
-        if (!fs.existsSync(builtin)) return;
-
-        // ensure the given name is valid now
-        if (builtin.includes('.')) return;
-
-        console.log({ name, builtin });
+        // attempt finding the necessary builtin now
+        const builtin = Assets.builtins(name, 'index.mdx');
+        if (name.startsWith('_') || !fs.existsSync(builtin)) return;
 
         // since value, then resolve a suitable set of details
         return { name: name[0].toUpperCase() + name.slice(1) };

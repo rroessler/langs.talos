@@ -17,8 +17,6 @@ export function Overview({ className, ...props }: Overview) {
         return <Portal key={name} name={name} href={href} description={describe} />;
     });
 
-    console.log({ portals: portals.length });
-
     // revise the incoming class-name to be used
     className = clsx(className, 'mt-8 grid grid-cols-1 gap-4 text-start md:grid-cols-2 w-full');
 
