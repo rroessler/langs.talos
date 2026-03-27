@@ -16,11 +16,14 @@ export namespace Registry {
         // prepare the source directory of builtins
         const source = Assets.builtins();
 
+        console.log('Builtins:', Assets.builtins());
+        console.log(fs.readdirSync(source));
+
         // filter all the available files now
         return fs
             .readdirSync(source)
             .map(resolve)
-            .filter((crate): crate is Descriptor => typeof crate === 'object');
+            .filter((builtin): builtin is Descriptor => typeof builtin === 'object');
     }
 
     /**
