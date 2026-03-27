@@ -1,6 +1,6 @@
 {
     "extends": "./configs/tsconfig.base.json",
-    "include": ["configs", "docs", "tools", "source/vscode"],
+    "include": ["configs", "docs", "tools", "source"],
     "exclude": ["dist", "node_modules"],
     "compilerOptions": {
         "outDir": "dist",

@@ -1,6 +1,6 @@
 //!
-//! Crate: "rnd"
+//! Crate: "rng"
 //! Description: Utilities for generating random numbers.
 //!
 
-Todo("Unimplemented Crate - 'talos:rnd'");
+Todo("Unimplemented Crate - 'talos:rng'");
