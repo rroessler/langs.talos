@@ -34,7 +34,7 @@ jobs:
         runs-on: ubuntu-latest
         needs: [release-build]
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Generate Changelog
               uses: elieahd/templater@v1
