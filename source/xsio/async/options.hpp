@@ -16,7 +16,7 @@ namespace XSIO::Async {
         /// @brief Available thread options.
         struct {
             /// @brief The maximum allowable stack-size.
-            size_t stack_size = 1 * $::Memory::Size::MB;
+            size_t stack_size = 8 * $::Memory::Size::MB;
 
             /// @brief The stack-underflow limit available.
             size_t stack_limit = 32 * $::Memory::Size::KB;
@@ -27,9 +27,6 @@ namespace XSIO::Async {
 
         /// @brief Virtual processor options.
         struct {
-            /// @brief Maximum allowable tasks on a queue.
-            size_t tasks_size = 256;
-
             /// @brief The priority chance for random acquisition.
             size_t tasks_priority = 32;
 
