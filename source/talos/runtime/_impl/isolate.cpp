@@ -72,7 +72,7 @@ std::vector<Talos::Resource::Trace> Talos::Runtime::Isolate::backtrace() {
     auto size = std::min(m_frame->depth() + 1, options()->limits.backtraces);
 
     // attempt appending each of our available frames
-    for (size_t ii = (stack.reserve(size), 0); frame != nullptr && ii < size; frame = frame->parent()) {
+    for (size_t ii = (stack.reserve(size), 0); frame != nullptr && ii < size; frame = frame->parent(), ++ii) {
         stack.emplace_back(frame->backtrace());
     }
 
