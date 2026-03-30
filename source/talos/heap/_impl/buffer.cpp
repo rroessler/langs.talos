@@ -9,7 +9,7 @@ Talos::Heap::Buffer::Buffer(Heap::Service* heap, Stage stage) : m_stage(stage), 
 
 //  PRIVATE METHODS  //
 
-void Talos::Heap::Buffer::m_release(Address address, size_t size) {
+void Talos::Heap::Buffer::m_release($_UNUSED Address address, size_t size) {
     // validate some details about the current region
     $_ASSERT(m_region, "Cannot release buffer allocation from empty region");
     $_ASSERT(size <= m_region->used(), "Release size larger than region size");

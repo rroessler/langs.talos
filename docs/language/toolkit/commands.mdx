@@ -57,6 +57,14 @@ export TALOS_HARDWARE_VPROCS=0
     type-analysis and garbage collection.
 </Callout>
 
+### `TALOS_STACK_SIZE`
+
+This variable allows setting the stack size of user-space threads. The default value is set to 8MB.
+
+### `TALOS_STACK_LIMIT`
+
+This variable allows setting the overflow limit for user-space threads. When the stack usage is below this value, the runtime will panic with a maximum recusion depth exception. The default value is set to 32KB.
+
 ## Environment Variables (External)
 
 ### `NO_COLOR`

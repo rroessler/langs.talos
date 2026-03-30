@@ -26,7 +26,7 @@ Shell::Program::Program() : m_app($::New().unique<CLI::App>()) {
 
 //  PUBLIC METHODS  //
 
-int32_t Shell::Program::launch(int32_t argc, char **argv) {
+int32_t Shell::Program::launch(int32_t argc, char** argv) {
     // fast-path our "help" screen when no arguments are given
     if (argc < 2) return m_help($::IO::cout()), $_EXIT_SUCCESS;
 
@@ -39,8 +39,14 @@ int32_t Shell::Program::launch(int32_t argc, char **argv) {
 
 //  PRIVATE METHODS  //
 
-void Shell::Command::Abstract::m_common(CLI::App *command, Talos::Runtime::Options *options, bool runtime) {
-    auto &hardware_limit = options->async.vprocs.hardware_limit;  // bind the hardware limit now
+void Shell::Command::Abstract::m_common(CLI::App* command, Talos::Runtime::Options* options, bool runtime) {
+    // prepare some common environment/internal items now
+    auto& stack_size = options->async.thread.stack_size;
+    auto& stack_limit = options->async.thread.stack_limit;
+    auto& hardware_limit = options->async.vprocs.hardware_limit;
+
+    command->add_option("--internal-stack-size", stack_size)->envname("TALOS_STACK_SIZE");
+    command->add_option("--internal-stack-limit", stack_limit)->envname("TALOS_STACK_LIMIT");
     command->add_option("--internal-hardware-vprocs", hardware_limit)->envname("TALOS_HARDWARE_VPROCS");
 
     // if not if runtime mode, then stop handling
@@ -63,23 +69,23 @@ void Shell::Command::Abstract::m_common(CLI::App *command, Talos::Runtime::Optio
     command->add_flag("--dump-assembly", options->dump.machine);
 }
 
-void Shell::Program::m_level(const $::String::View &level) {
+void Shell::Program::m_level(const $::String::View& level) {
     $::Logger::Options::update($::Logger::Options::resolve(level));
 }
 
-void Shell::Program::m_color(const $::String::View &color) {
+void Shell::Program::m_color(const $::String::View& color) {
     auto enabled = color.empty() || color == "0";  // determine enablement
     auto mode = enabled ? $::Logger::Color::AUTO : $::Logger::Color::NEVER;
     $::Dye::enabled(enabled), $::Logger::Options::update(mode);
 }
 
-void Shell::Program::m_progress(const $::String::View &progress) {
+void Shell::Program::m_progress(const $::String::View& progress) {
     $::Dye::progress(progress.empty() || progress == "0");
 }
 
 void Shell::Program::m_vendors() {
     // prints all the incoming vendor version available
-    for (const auto &[name, version] : Talos::Product::vendors()) $::IO::println("{0} - {1}", name, version);
+    for (const auto& [name, version] : Talos::Product::vendors()) $::IO::println("{0} - {1}", name, version);
 
     // and then we want to exit
     throw CLI::Success();

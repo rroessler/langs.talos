@@ -5,8 +5,6 @@
 #include "talos/heap/limits.hpp"
 #include "talos/value/pointer.hpp"
 
-namespace Talos::Heap::Limits {}
-
 namespace Talos::Heap {
 
     /// @brief Heap Address Typing.

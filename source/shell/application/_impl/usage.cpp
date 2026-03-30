@@ -25,6 +25,8 @@
 #define XX_ENVIRONMENT_LIST(X)                                                       \
     X("TALOS_LOGGING_LEVEL", "Sets the debug logging level", .cyan().italic())       \
     X("TALOS_HARDWARE_VPROCS", "Maximum virtual processors count", .cyan().italic()) \
+    X("TALOS_STACK_SIZE", "The size used by thread stacks", .cyan().italic())        \
+    X("TALOS_STACK_LIMIT", "The overflow limit for thread stacks", .cyan().italic()) \
     X("", "")                                                                        \
     X("NO_COLOR", "Disables the use of terminal colors", .cyan().italic())           \
     X("NO_PROGRESS", "Disables the use of terminal spinners and progress bars", .cyan().italic())
