@@ -26,3 +26,14 @@ TALOS_MM_DYLIB_METHOD(Memory, heap_avail, isolate, ) {
 TALOS_MM_DYLIB_METHOD(Memory, heap_usage, isolate, ) {
     return Number::Tagged(isolate->service<Heap::Service>()->usage());
 }
+
+TALOS_MM_DYLIB_METHOD(Memory, thread_total, isolate, ) { return Number::Tagged(isolate->thread()->stack()->size()); }
+
+TALOS_MM_DYLIB_METHOD(Memory, thread_avail, isolate, ) {
+    return Number::Tagged(isolate->thread()->stack()->remaining());
+}
+
+TALOS_MM_DYLIB_METHOD(Memory, thread_usage, isolate, ) {
+    const auto* stack = isolate->thread()->stack();
+    return Number::Tagged(stack->size() - stack->remaining());
+}

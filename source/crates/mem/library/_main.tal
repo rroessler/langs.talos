@@ -28,3 +28,16 @@ export namespace Heap {
     //! Brief: Gets the current heap memory available.
     export let avail = m_cast[fn -> Number](mem.heap_avail);
 };
+
+export namespace Thread {
+    // - PUBLIC METHODS - //
+
+    //! Brief: Gets the total thread-stack memory.
+    export let total = m_cast[fn -> Number](mem.thread_total);
+
+    //! Brief: Gets the current thread-stack memory usage.
+    export let usage = m_cast[fn -> Number](mem.thread_usage);
+
+    //! Brief: Gets the current thread-stack memory available.
+    export let avail = m_cast[fn -> Number](mem.thread_avail);
+};

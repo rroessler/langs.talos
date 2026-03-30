@@ -9,7 +9,11 @@
 #define CRATE_XX_MEMORY_METHODS(X) \
     X(heap_avail)                  \
     X(heap_total)                  \
-    X(heap_usage)
+    X(heap_usage)                  \
+                                   \
+    X(thread_avail)                \
+    X(thread_total)                \
+    X(thread_usage)
 
 //  NAMESPACES  //
 
