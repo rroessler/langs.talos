@@ -163,6 +163,14 @@ namespace Talos::Engine {
         static Pointer::Underlying ensure(Isolate* isolate, Pointer::Underlying value, Pointer::Underlying guard);
 
         /**
+         * @brief Handles exposing an export value.
+         * @param isolate               Runtime isolate.
+         * @param value                 Value to export.
+         * @param intern                Given export name.
+         */
+        static Pointer::Underlying expose(Isolate* isolate, Pointer::Underlying value, const String::Intern* intern);
+
+        /**
          * @brief Handles concatenating strings.
          * @param isolate               Runtime isolate.
          * @param left                  Left-hand side.
@@ -313,6 +321,16 @@ namespace Talos::Engine {
          */
         static Subtype m_extends(Value::Any value, Value::Any guard);
         static Value::Any m_ensure(Isolate* isolate, Value::Any value, Value::Any guard);
+
+        /**
+         * @brief Handles exposing an export value.
+         * @param isolate               Runtime isolate.
+         * @param exports               Exports instance.
+         * @param value                 Value to export.
+         * @param intern                Given export name.
+         */
+        static Value::Any m_expose(Isolate* isolate, Exports* exports, Value::Any value, const String::Intern* intern);
+        static Value::Any m_expose(Isolate* isolate, Object::Instance, Value::Any value, const String::Intern* intern);
 
         /**
          * @brief Handles comparing values.

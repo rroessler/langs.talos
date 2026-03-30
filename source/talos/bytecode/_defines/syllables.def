@@ -146,6 +146,7 @@ TALOS_XX_SYLLABLE_DISPOSE(DISPOSE_DEFER, /** src */ Register)
 
 TALOS_XX_SYLLABLE_MODULE(MODULE_OPEN, /** src */ Register)
 TALOS_XX_SYLLABLE_MODULE(MODULE_CLOSE, /** dst */ Register)
+TALOS_XX_SYLLABLE_MODULE(MODULE_BARREL, /** src */ Register)
 TALOS_XX_SYLLABLE_MODULE(MODULE_IMPORT, /** dst */ Register, /** path */ Index)
 TALOS_XX_SYLLABLE_MODULE(MODULE_EXPORT, /** src */ Register, /** name */ Index)
 

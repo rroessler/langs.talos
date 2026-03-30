@@ -27,6 +27,12 @@ Talos::Pointer::Underlying Talos::Engine::Dispatch::ensure(
     return m_ensure(isolate, Value::Any(value), Value::Any(guard)).pointer();
 }
 
+Talos::Pointer::Underlying Talos::Engine::Dispatch::expose(
+    Isolate* isolate, Pointer::Underlying value, const String::Intern* intern) {
+    auto* exports = isolate->exports(isolate->frame()->resource());
+    return m_expose(isolate, exports, Value::Any(value), intern).pointer();
+}
+
 Talos::Pointer::Underlying Talos::Engine::Dispatch::concat(
     Isolate* isolate, Pointer::Underlying left, Pointer::Underlying right) {
     return m_concat(isolate, Value::Any(left), Value::Any(right)).pointer();

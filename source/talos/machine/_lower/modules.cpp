@@ -1,4 +1,5 @@
 /// Talos Modules
+#include "talos/engine/dispatch.hpp"
 #include "talos/engine/exports.hpp"
 #include "talos/machine/frame.hpp"
 #include "talos/object/instance.hpp"
@@ -11,7 +12,6 @@
 $_FWD(Talos::Machine::Dispatch, Reference open(Runtime::Isolate*))
 $_FWD(Talos::Machine::Dispatch, Reference close(Runtime::Isolate*))
 $_FWD(Talos::Machine::Dispatch, Reference import(Runtime::Isolate*, const String::Intern*))
-$_FWD(Talos::Machine::Dispatch, Reference expose(Runtime::Isolate*, Reference, const String::Intern*))
 
 //  PUBLIC METHODS  //
 
@@ -31,25 +31,6 @@ Talos::Machine::Reference Talos::Machine::Dispatch::import(Runtime::Isolate* iso
     return isolate->import(intern->view(), frame->resource().body(), trace).pointer();
 }
 
-Talos::Machine::Reference Talos::Machine::Dispatch::expose(
-    Runtime::Isolate* isolate, Reference value, const String::Intern* intern) {
-    // get the current machine frame being used
-    const auto* frame = isolate->frame()->as<Machine::Frame>();
-
-    // attempt getting the underlying exports
-    auto* exports = isolate->exports(frame->resource());
-    if (exports == nullptr) return Value::Failure().pointer();
-
-    // get the underlying fields to be updated now
-    auto& fields = exports->current().as<Object::Instance>().fields();
-    auto exists = $_UNLIKELY(fields.contains(intern->symbol()));
-    if (exists) return isolate->panic(8000301, intern->view()).pointer();
-
-    // construct and emplace the field to be used now
-    auto reference = $::New().unique<Member::Reference>(Value::Any(value));
-    return fields.emplace(intern->symbol(), std::move(reference)), Value::Void().pointer();
-}
-
 //  PRIVATE METHODS  //
 
 TALOS_MM_MACHINE_EMIT(MODULE_OPEN, builder, instruction) {
@@ -61,6 +42,8 @@ TALOS_MM_MACHINE_EMIT(MODULE_CLOSE, builder, instruction) {
     auto dx = __ee__ resolve(instruction->get<0>());
     __ee__ invoke(Dispatch::close, dx, builder->isolate);
 }
+
+TALOS_MM_MACHINE_UNIMPLEMENTED(MODULE_BARREL, , )
 
 TALOS_MM_MACHINE_EMIT(MODULE_IMPORT, builder, instruction) {
     // prepare the necessary arguments
@@ -83,7 +66,7 @@ TALOS_MM_MACHINE_EMIT(MODULE_EXPORT, builder, instruction) {
     auto ix = __ee__ intern(instruction->get<1>());
 
     // attempt exporting the value now
-    __ee__ invoke(Dispatch::expose, dx, builder->isolate, sx, ix);
+    __ee__ invoke(Engine::Dispatch::expose, dx, builder->isolate, sx, ix);
 
     // validate the outgoing result
     __ee__ validate(dx, Validate::FAST);

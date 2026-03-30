@@ -11,9 +11,19 @@ TALOS_MM_LOWER_NODE(Import, import, compiler, destination) {
     $_UNUSED $_AUTO = compiler->trace(import);
 
     // get some of the baseline details
+    auto exported = import->exported();
     auto patterns = import->patterns();
     auto* captures = compiler->captures();
     auto* registers = compiler->registers();
+
+    // handle empty patterns a little differently than the rest
+    if (patterns.empty()) {
+        compiler->import(Accumulator(), import->path());
+        if (!exported) return;  // importing so we stop
+
+        // otherwise we now need to barrel the exports to parent
+        return compiler->emit<Syllable::MODULE_BARREL>(Accumulator());
+    }
 
     // prepare the wildcard details to be used
     auto wildcard = Bytecode::Declaration({}, false);
@@ -30,8 +40,8 @@ TALOS_MM_LOWER_NODE(Import, import, compiler, destination) {
     compiler->import(destination, import->path());
 
     // if exported then we need to re-export at our desired location
-    if (import->exported()) {
-        auto name = compiler->string(patterns.at(0)->name());  // prepare now
+    if (exported) {
+        auto name = compiler->string(patterns.at(0)->name());  // prepare
         return compiler->emit<Syllable::MODULE_EXPORT>(destination, name);
     }
 

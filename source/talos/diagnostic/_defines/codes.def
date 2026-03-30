@@ -240,6 +240,7 @@ TALOS_XX_DIAGNOSTIC_IMPORT(8000202, ERROR, "{0} can only be declared at the top-
 
 TALOS_XX_DIAGNOSTIC_REFERENCE(8000300, ERROR, "Module has no exported member '{0}'")
 TALOS_XX_DIAGNOSTIC_REFERENCE(8000301, ERROR, "Module already exported member '{0}")
+TALOS_XX_DIAGNOSTIC_REFERENCE(8000302, ERROR, "Barrel exports overlaps with module exports")
 
 TALOS_XX_DIAGNOSTIC_IMPORT(8000800, ERROR, "Invalid module resource '{0}'")
 TALOS_XX_DIAGNOSTIC_IMPORT(8000801, ERROR, "Invalid import scheme '{0}'")

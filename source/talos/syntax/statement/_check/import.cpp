@@ -50,6 +50,19 @@ TALOS_MM_CHECK_NODE(Import, node, analyzer) {
         else analyzer->report(4000403, name);  // failed to declare
     }
 
+    // stop early if we had some patterns
+    if (node->patterns().size() || !node->exported()) return analyzer->passable();
+
+    // otherwise we need to check against barreling exports
+    auto barrel = Type::Builder::resolve<Type::Protocol>(monotype);
+    if (barrel == nullptr) return analyzer->passable();  // ignore
+
+    // iteratively expose all the barrel exports now
+    for (const auto& [name, entity] : barrel->fields().view(barrel.get())) {
+        auto success = world->declare(name, entity, node->traits()->location());
+        if (!success) analyzer->report(4000403, name);  // failed to declare here
+    }
+
     // always declare as passable (regardless) of errors
-    return analyzer->passable(monotype);
+    return analyzer->passable();
 }

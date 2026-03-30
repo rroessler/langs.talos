@@ -53,9 +53,8 @@ TALOS_MM_PARSE_STMT(Import, parser) {
     // cache the path to be used
     auto* path = parser->previous();
 
-    // if exported and we do not see an "as" token, then we can stop safely
+    // if we do not see an "as" token, then we can stop safely
     if (!parser->match(Lexer::Kind::BINOP_AS)) {
-        if (!exported) parser->report(2000100, "import patterns");
         return parser->allocate<Syntax::Import>(path, exported, snapshot.enclose(path));
     }
 
