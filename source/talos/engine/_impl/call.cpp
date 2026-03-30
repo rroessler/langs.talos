@@ -28,10 +28,9 @@ Talos::Value::Any Talos::Engine::Call::native(Isolate* isolate, Function::Native
 
     // prepare the trace to be used
     static constexpr auto group = Resource::Group::NATIVE;
-    auto trace = Resource::Trace(native.resource(), group);
 
     // build the resource frame to be used now
-    $_UNUSED $_AUTO = Resource::Frame(isolate, trace);
+    $_UNUSED $_AUTO = Resource::Frame(isolate, Resource::Trace(native.resource(), group));
 
     // and call the underlying native now
     return isolate->thread()->checkpoint(), native.callback()(isolate, args);
@@ -114,28 +113,26 @@ Talos::Value::Any Talos::Engine::Call::m_closure(
 
     // attempt resolving our necessary sizes to be used now
     size_t locals = info->locals() + 1;
-    if (locals > UINT32_MAX) locals = args.size() + 1;
-
-    // build the frame to be used for calling
-    auto frame = Function::Frame(isolate, info, args.self());
-
-    // allocate the frame based on the stack now
-    auto stack = isolate->allocator()->stack(locals);
-
-    // bind the stack pointer to the frame
-    frame.stack() = stack.data();
-
-    // pull out the variadic arguments index
     size_t vargs = info->shared()->vargs;
 
-    // prepare the argument count to be bound now
-    auto argc = frame.argc() = std::min(args.size(), vargs);
+    // update the locals size for arguments now
+    if (locals > UINT32_MAX) locals = args.size() + 1;
+
+    // prepare a constant for frame stack offsets (eg: +2 for context / self)
+    static constexpr auto s_header = 2, s_args = s_header + 1;
+
+    // build the frame and stack to be used for calling
+    auto stack = isolate->allocator()->stack(locals + s_header);
+    auto frame = Function::Frame(isolate, info, stack.data() + s_header);
+
+    // prepare the baseline details to bind
+    frame.self() = args.self(), frame.argc() = std::min(args.size(), vargs);
 
     // fill the arguments as necessary now
-    if (argc) std::memcpy(stack.data() + 1, args.data(), sizeof(Value::Any) * argc);
+    if (frame.argc()) std::memcpy(stack.data() + s_args, args.data(), sizeof(Value::Any) * frame.argc());
 
     // we also want to emit the spread parameter as well as a list
-    if (vargs != UINT64_MAX) stack[frame.argc() = vargs + 1] = isolate->create<Iterable::List>(args.slice(vargs));
+    if (vargs != UINT64_MAX) stack[frame.argc() = vargs + s_args] = isolate->create<Iterable::List>(args.slice(vargs));
 
     // update the current leaked information to be used
     frame.context() = m_initialize(isolate, info->leaked(), context);
@@ -143,22 +140,17 @@ Talos::Value::Any Talos::Engine::Call::m_closure(
     // enforce a checkpoint before running our handler
     isolate->thread()->checkpoint();
 
-    // get the incoming result
-    auto result = Dispatch::m_execute(isolate, &frame);
-
     // execute our necessary handler
-    return m_finalize(isolate, result);
+    return m_finalize(isolate, Dispatch::m_execute(isolate, &frame));
 }
 
 Talos::Value::Any Talos::Engine::Call::m_jitted(
     Isolate* isolate, const Machine::Info* info, Function::Context context, const Arguments& args) {
-    // construct a suitable machine frame now
-    auto frame = Machine::Frame(isolate, info);
-
     // get the incoming maximum locals count to be used
     auto locals = info->locals() + Function::Offset::ARGS_DATA;
 
-    // construct the potential passthrough stack now
+    // construct a suitable machine frame and stack now
+    auto frame = Machine::Frame(isolate, info);
     auto passthrough = isolate->allocator()->stack(locals);
 
     // clean the incoming passthrough arguments now
@@ -177,11 +169,8 @@ Talos::Value::Any Talos::Engine::Call::m_jitted(
     // enforce a checkpoint before running our handler
     isolate->thread()->checkpoint();
 
-    // get the incoming result
-    auto result = info->callback(isolate, outgoing);
-
     // execute our necessary handler
-    return m_finalize(isolate, result);
+    return m_finalize(isolate, info->callback(isolate, outgoing));
 }
 
 Talos::Value::Any Talos::Engine::Call::m_finalize(Isolate* isolate, Value::Any result) {

@@ -10,6 +10,15 @@ namespace Talos::Function {
 
     /// @brief Derived Function Frame.
     class Frame : public Engine::Frame::Abstract<Frame> {
+        //  TYPEDEFS  //
+
+        /// @brief Available internal offsets.
+        struct Offset {
+            static constexpr int32_t DATA = -2;
+            static constexpr int32_t SELF = -1;
+            static constexpr int32_t ACCU = 0;
+        };
+
         //  PROPERTIES  //
 
         /// @brief Incoming argument count.
@@ -21,13 +30,7 @@ namespace Talos::Function {
         /// @brief Shared function information.
         const Info* m_info = nullptr;
 
-        /// @brief Associated environment context.
-        Context m_context = Context();
-
-        /// @brief Curently bound receiver.
-        Value::Any m_self = Value::Void();
-
-        /// @brief Register stack (eg: 0 = accumulator, ...A = arguments, ...N = registers).
+        /// @brief Register stack (eg: -2 = context, -1 = self, 0 = accumulator, ...A = arguments, ...N = registers).
         Value::Any* m_stack = nullptr;
 
        public:
@@ -37,10 +40,10 @@ namespace Talos::Function {
          * @brief Constructs a function frame.
          * @param isolate               Runtime isolate.
          * @param info                  Function information.
-         * @param self                  Bound receiver value.
+         * @param stack                 Register stack to bind.
          */
-        constexpr Frame(Runtime::Isolate* isolate, const Info* info = nullptr, const Value::Any& self = Value::Void()) :
-            Abstract<Frame>(isolate), m_offset(info->buffer().address()), m_info(info), m_self(self) {}
+        constexpr Frame(Runtime::Isolate* isolate, const Info* info = nullptr, Value::Any* stack = nullptr) :
+            Abstract<Frame>(isolate), m_offset(info->buffer().address()), m_info(info), m_stack(stack) {}
 
         //  PUBLIC METHODS  //
 
@@ -57,7 +60,8 @@ namespace Talos::Function {
         inline constexpr size_t argc() const noexcept { return m_argc; }
 
         /// @brief Gets the bound receiver value.
-        inline constexpr Value::Any self() const noexcept { return m_self; }
+        inline constexpr Value::Any& self() noexcept { return m_stack[Offset::SELF]; }
+        inline constexpr Value::Any self() const noexcept { return m_stack[Offset::SELF]; }
 
         /// @brief Gets a span of the incoming arguments.
         inline constexpr std::span<Value::Any> argv() const noexcept { return span(1, m_argc); }
@@ -67,13 +71,13 @@ namespace Talos::Function {
         inline constexpr Value::Any* stack() const noexcept { return m_stack; }
 
         /// @brief Underlying accumulator reference.
-        inline constexpr Value::Any& accumulator() noexcept { return m_stack[0]; }
-        inline constexpr Value::Any accumulator() const noexcept { return m_stack[0]; }
+        inline constexpr Value::Any& accumulator() noexcept { return m_stack[Offset::ACCU]; }
+        inline constexpr Value::Any accumulator() const noexcept { return m_stack[Offset::ACCU]; }
 
         /// @brief Current environment context.
-        inline constexpr Context& context() noexcept { return m_context; }
-        inline constexpr const Context& context() const noexcept { return m_context; }
-        inline constexpr Context context(Bytecode::Index depth) const noexcept { return m_context.resolve(depth); }
+        inline constexpr Context& context() noexcept { return m_context(); }
+        inline constexpr const Context& context() const noexcept { return m_context(); }
+        inline constexpr Context context(Bytecode::Index depth) const noexcept { return m_context().resolve(depth); }
 
         /// @brief Gets the underlying frame resource.
         inline constexpr $::URI::View resource() const noexcept final { return m_info->resource(); }
@@ -171,6 +175,12 @@ namespace Talos::Function {
 
        private:
         //  PRIVATE METHODS  //
+
+        /// @brief Gets the bound context instance.
+        inline constexpr Context& m_context() noexcept { return *reinterpret_cast<Context*>(m_stack + Offset::DATA); }
+        inline constexpr const Context& m_context() const noexcept {
+            return *reinterpret_cast<Context*>(m_stack + Offset::DATA);
+        }
 
         /**
          * @brief Ensures indices are valid.

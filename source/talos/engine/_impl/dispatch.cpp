@@ -104,12 +104,19 @@ Talos::Value::Any Talos::Engine::Dispatch::m_execute(Isolate* isolate, Function:
     $_ASSERT(isolate->frame() == frame, "Mismatched VM frames");
 
     // prepare the available dispatch table
-    static void* s_table[] = {
+    static constexpr void* s_table[] = {
 #define TALOS_XX_SYLLABLE_BASE(N, ...) &&_HANDLE_##N,
 #include "talos/bytecode/_defines/syllables.def"
 
 #define TALOS_XX_SYLLABLE_BASE(N, ...) &&_DEBUG_##N,
 #include "talos/bytecode/_defines/syllables.def"
+    };
+
+    // prepare a getter for the next instruction value
+    static constexpr auto advance = [](auto& offset, auto& instruction) $_INLINE_ALWAYS -> void* {
+        instruction = std::bit_cast<Bytecode::Instruction*>(offset);
+        auto syllable = static_cast<size_t>(instruction->syllable());
+        return offset += sizeof(Bytecode::Instruction), s_table[syllable];
     };
 
     // prepare the offset for the current instruction
@@ -118,21 +125,14 @@ Talos::Value::Any Talos::Engine::Dispatch::m_execute(Isolate* isolate, Function:
     // prepare the instruction to be handled now
     Bytecode::Instruction* instruction = nullptr;
 
-    // prepare a getter for the next instruction value
-    auto advance = [&] $_INLINE_ALWAYS -> void* {
-        instruction = std::bit_cast<Bytecode::Instruction*>(offset);
-        auto syllable = static_cast<size_t>(instruction->syllable());
-        return offset += sizeof(Bytecode::Instruction), s_table[syllable];
-    };
-
     // and force an advancement to occur initially
-    goto* advance();
+    goto* advance(offset, instruction);
 
     // prepare the all the dispatch handlers now to be completed
 #define TALOS_XX_SYLLABLE_BASE(N, ...)                                                                          \
     _HANDLE_##N : {                                                                                             \
         switch (m_execute<Bytecode::Syllable::N>(isolate, frame, instruction->cast<Bytecode::Syllable::N>())) { \
-            case Mode::NEXT: goto* advance();                                                                   \
+            case Mode::NEXT: goto* advance(offset, instruction);                                                \
             case Mode::PANIC: goto _RESOLVE_FAILURE;                                                            \
             case Mode::RETURN: goto _RESOLVE_SUCCESS;                                                           \
             case Mode::INTERRUPT: goto _RESOLVE_INTERRUPT;                                                      \
