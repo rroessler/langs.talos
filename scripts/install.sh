@@ -224,6 +224,9 @@ env_bootstrap() {
     if [ $manual = true ]; then
         # alert the user about manual installations
         echo -e "$talos_label_padding ${C_DIM}Manually add '$btldr' to \$PATH for '$shell' or similar$C_RESET"
+
+        # and exit since there is nothing else that we can do for the user
+        return
     fi
 
     # otherwise show all the necessary export commands now
