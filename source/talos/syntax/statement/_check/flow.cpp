@@ -28,9 +28,11 @@ TALOS_MM_CHECK_NODE(Return, node, analyzer) {
     // handle if we are not in a valid context
     if (callee == nullptr) return analyzer->report(3000900);
 
+    // resolve the callable instance now if we have a generic
+    auto callable = Type::Builder::resolve<Type::Callable>(callee);
+
     // ensure the expected/inferred typings are valid
-    auto expected = callee->as<Type::Callable>()->returns();
-    auto inferred = analyzer->check(node->value()).type;
+    auto expected = callable->returns(), inferred = analyzer->check(node->value()).type;
 
     // ensure the incoming return value is valid
     if (!expected->unify(inferred)) analyzer->report(3000300, *inferred, *expected);
