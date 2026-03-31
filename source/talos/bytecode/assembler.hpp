@@ -31,16 +31,12 @@ namespace Talos::Bytecode {
         /// @brief All labels that are unresolved.
         Label::Unresolved m_unresolved = {};
 
-        /// @brief Bound runtime options available.
-        const Runtime::Options* m_options = nullptr;
-
        public:
         //  CONSTRUCTORS  //
 
         /// @brief Constructs a bytecode assembler.
         explicit Assembler();
         explicit Assembler(XI::Container* services);
-        explicit Assembler(const Runtime::Options* options);
 
         //  PUBLIC METHODS  //
 

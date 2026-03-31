@@ -6,8 +6,7 @@
 //  CONSTRUCTORS  //
 
 Talos::Bytecode::Assembler::Assembler() : Assembler($::Global::get<Runtime::Container>()) {}
-Talos::Bytecode::Assembler::Assembler(XI::Container* services) : Assembler(services->get<Runtime::Options>()) {}
-Talos::Bytecode::Assembler::Assembler(const Runtime::Options* options) : m_options(options) {}
+Talos::Bytecode::Assembler::Assembler(XI::Container*) {}
 
 //  PUBLIC METHODS  //
 
@@ -115,6 +114,5 @@ uint64_t Talos::Bytecode::Assembler::m_encode(const Instruction* instruction, La
 }
 
 int32_t Talos::Bytecode::Assembler::m_elide(Cache& instructions, const Instruction* current) const {
-    $_PP_IGNORE(m_options);  /// TODO: elide some instructions as we write them
     return instructions.emplace_back(current), sizeof(Instruction);
 }

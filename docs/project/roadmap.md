@@ -18,7 +18,7 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 
 | Status | Feature | Description                          | Todo                     |
 | :----: | ------- | ------------------------------------ | ------------------------ |
-|   ❌   | `@...`  | Implement runtime decorators.        | -                        |
+|   💀   | `@...`  | Implement runtime decorators.        | -                        |
 |   💀   | `#...`  | Implement compile-time attributes.   | Overloads not yet done   |
 |   ⚪   | `use`   | Implement explicit resources.        | Requires attribute hooks |
 |   ⚪   | `enum`  | Implement enumeration declarations.  | -                        |
@@ -66,6 +66,7 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 | Status | Section  | Description                         |
 | :----: | -------- | ----------------------------------- |
 |   🚀   | Crates   | Only stub pages have been made.     |
+|   🚀   | Builtins | Only stub pages have been made.     |
 |   ⚪   | Language | Toolkit, advanced concepts, ...     |
 |   ⚪   | Project  | Contribution points, dashboard, ... |
 |   ⚪   | Tour     | Some steps are not yet finished.    |

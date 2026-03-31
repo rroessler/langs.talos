@@ -135,6 +135,8 @@ TALOS_XX_DIAGNOSTIC_ANALYSIS(3000802, ERROR, "Expected operator attribute '{0}' 
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3000803, ERROR, "Value of type '{0}' cannot bind a '{1}' attribute hook")
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3000804, ERROR, "Cannot overload the '{0}' operator with value of type '{1}'")
 
+TALOS_XX_DIAGNOSTIC_ANALYSIS(3000850, ERROR, "Expression of type '{0}' cannot be used as a decorator signature")
+
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3000900, ERROR, "A 'return' statement can only be used within a function")
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3000901, ERROR, "A function returning 'never' cannot have a reachable exit")
 TALOS_XX_DIAGNOSTIC_ANALYSIS(3000902, ERROR, "A function with a non-voidish return-type must return a value")
