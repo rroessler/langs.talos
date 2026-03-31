@@ -31,7 +31,7 @@ $TalosLabelBasic = if ($TalosUpgrade) { "Upgrading" } else { "Installing" };
 $TalosLabelPrefix = if ($TalosUpgrade) { "upgrad" } else { "install" };
 
 # resolve the version such that it has the correct tag associated
-if ($TalosVersion -match "^(?<content>.*)-main$") { $TalosVersion = $matches['content']; }
+if ($TalosVersion -match "^(?<content>.*)-stable$") { $TalosVersion = $matches['content']; }
 
 # -  METHODS  - #
 

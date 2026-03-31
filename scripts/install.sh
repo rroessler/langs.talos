@@ -17,7 +17,7 @@ talos_label_prefix=$([ $talos_upgrade = true ] && echo "upgrad" || echo "install
 talos_label_padding=$(printf "%${#talos_label_basic}s " "")
 
 # resolve the version such that the correct tag is associated
-talos_version=${talos_version/-main/}
+talos_version=${talos_version/-stable/}
 
 # check if we have been told about no color
 NO_COLOR=${NO_COLOR:-"0"}

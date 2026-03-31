@@ -22,6 +22,10 @@ Todo...
 - Fixed: Previously generic functions would crash the type-checker due to their contextual type not being resolved properly. This has now been addressed.
 - Added: Layed the foundations for runtime decorator annotations. This includes: basic type-checking, and instantiation alongside compile-time attributes.
 
+<h4>Toolkit / talos upgrade</h4>
+
+- Fixed: Previously the wrong version branch (eg: `-main` instead of `-stable`) was used for determining the current Talos installation. This resulted in upgrades not properly identifying when the latest version was the same as the current one. This has now been resolved for this release of Talos.
+
 <h4>Crate / talos:mem</h4>
 
 - Added: Exposed thread-memory namespace with stack-usage details similar to heap-memory namespace.
