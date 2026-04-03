@@ -34,5 +34,5 @@ TALOS_MM_CHECK_NODE(Accessor, accessor, analyzer) {
     }
 
     // and finally declare the entity as valid now
-    return entity.value();
+    return accessor->field()->traits()->type() = entity.value();
 }

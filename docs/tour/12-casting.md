@@ -8,7 +8,7 @@ Talos does not provide implicit conversions between primitive types. As such, ca
 // Start with an initial numeric value.
 let value = 65.4321;
 
-// We can either directly convert the number with the "to_fixed" method.
+// We can either directly convert the number with the "to_precision" method.
 let a: String = value.to_precision();
 
 // Some assignments will naturally do nothing (depends on inferred typing).
