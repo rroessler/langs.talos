@@ -2,7 +2,7 @@
 #include "talos/server/connection.hpp"
 
 /// Forward Declarations
-$_FWD(Talos::Server::Encoding, XLSP::Encoding::Type query(const $::Serde::Value &))
+$_FWD(Talos::Server::Encoding, XLSP::Encoding::Type query(const $::Serde::Value&))
 
 //  PUBLIC METHODS  //
 
@@ -10,7 +10,7 @@ $_FWD(Talos::Server::Encoding, XLSP::Encoding::Type query(const $::Serde::Value 
  * @brief Handles parsing a suitable position-encoding.
  * @param capabilities                  Capabilities to parse.
  */
-XLSP::Encoding::Type Talos::Server::Encoding::query(const $::Serde::Value &capabilities) {
+XLSP::Encoding::Type Talos::Server::Encoding::query(const $::Serde::Value& capabilities) {
     auto general = capabilities.at("general");  // get the general details
     if (!general.is<$::Serde::Object>()) return XLSP::Encoding::Type::UTF16;
 
@@ -19,7 +19,7 @@ XLSP::Encoding::Type Talos::Server::Encoding::query(const $::Serde::Value &capab
     if (!encodings.is<$::Serde::Array>()) return XLSP::Encoding::Type::UTF16;
 
     // should be able to iterate over the position encodings now
-    for (const auto &value : *encodings.as<$::Serde::Array>()) {
+    for (const auto& value : *encodings.as<$::Serde::Array>()) {
         if (!value.is<$::String::Buffer>()) continue;  // invalid value
         auto encoding = XLSP::Encoding::resolve(*value.as<$::Serde::Text>());
 
@@ -39,7 +39,7 @@ XLSP::Encoding::Type Talos::Server::Encoding::query(const $::Serde::Value &capab
 
 void Talos::Server::Events::on_initialize(XLSP_REQUEST(LIFECYCLE_INITIALIZE) request) {
     // get the base encoding details and update them as necessary for the server
-    auto *encoding = const_cast<XLSP::Encoding::Type *>(&m_connection->options()->server.encoding);
+    auto* encoding = const_cast<XLSP::Encoding::Type*>(&m_connection->options()->server.encoding);
     if (*encoding == XLSP::Encoding::Type::INVALID) *encoding = Encoding::query(request.params.capabilities);
 
     // forcibly update the underlying encoding value now to be used
@@ -62,6 +62,10 @@ void Talos::Server::Events::on_initialize(XLSP_REQUEST(LIFECYCLE_INITIALIZE) req
     bind.on_request(this, &Events::on_document_hover);
     bind.on_request(this, &Events::on_document_links);
     bind.on_request(this, &Events::on_document_format);
+    bind.on_request(this, &Events::on_document_symbols);
+    bind.on_request(this, &Events::on_document_vardef);
+    bind.on_request(this, &Events::on_document_typedef);
+    bind.on_request(this, &Events::on_document_completes);
 
     auto response = XLSP_RESPONSE(LIFECYCLE_INITIALIZE);
     response.server = XLSP::Process::Information();

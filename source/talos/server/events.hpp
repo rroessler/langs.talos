@@ -41,6 +41,10 @@ namespace Talos::Server {
         void on_document_hover(XLSP_REQUEST(DOCUMENT_HOVER) request);
         void on_document_links(XLSP_REQUEST(DOCUMENT_LINKS) request);
         void on_document_format(XLSP_REQUEST(DOCUMENT_FORMAT) request);
+        void on_document_symbols(XLSP_REQUEST(DOCUMENT_SYMBOLS) request);
+        void on_document_completes(XLSP_REQUEST(DOCUMENT_COMPLETIONS) request);
+        void on_document_typedef(XLSP_REQUEST(DOCUMENT_TYPE_DEFINITION) request);
+        void on_document_vardef(XLSP_REQUEST(DOCUMENT_VARIABLE_DEFINITION) request);
 
        private:
         //  PRIVATE METHODS  //

@@ -29,14 +29,19 @@
     X(WORKSPACE_FILE_CHANGED, "workspace/didChangeWatchedFiles") \
     X(WORKSPACE_CONFIG_CHANGED, "workspace/didChangeConfiguration")
 
-#define XX_REQUESTS_LIST(X)                        \
-    X(LIFECYCLE_INITIALIZE, "initialize")          \
-    X(LIFECYCLE_SHUTDOWN, "shutdown")              \
-                                                   \
-    X(DOCUMENT_HOVER, "textDocument/hover")        \
-    X(DOCUMENT_LINKS, "textDocument/documentLink") \
-    X(DOCUMENT_FORMAT, "textDocument/formatting")  \
-    X(DOCUMENT_SYMBOLS, "textDocument/documentSymbol")
+#define XX_REQUESTS_LIST(X)                                    \
+    X(LIFECYCLE_INITIALIZE, "initialize")                      \
+    X(LIFECYCLE_SHUTDOWN, "shutdown")                          \
+                                                               \
+    X(DOCUMENT_HOVER, "textDocument/hover")                    \
+    X(DOCUMENT_LINKS, "textDocument/documentLink")             \
+    X(DOCUMENT_FORMAT, "textDocument/formatting")              \
+    X(DOCUMENT_SYMBOLS, "textDocument/documentSymbol")         \
+    X(DOCUMENT_COMPLETIONS, "textDocument/completsion")        \
+    X(DOCUMENT_DECLARATION, "textDocument/declaration")        \
+    X(DOCUMENT_IMPLEMENTATION, "textDocument/implementation")  \
+    X(DOCUMENT_TYPE_DEFINITION, "textDocument/typeDefinition") \
+    X(DOCUMENT_VARIABLE_DEFINITION, "textDocument/definition")
 
 #define XX_MESSAGES_LIST(X)                     \
     XX_NOTIFICATIONS_LIST(X)                    \
