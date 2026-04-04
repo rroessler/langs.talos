@@ -25,6 +25,7 @@ Todo...
 <h4>Toolkit / talos serve</h4>
 
 - Fixed: When type-checking accessors, fields now have their inferred types properly cached to enable linting tools.
+- Fixed: There was an issue decoding `$/cancel` request identifiers. These are now properly decoded depending on whether they are a string or number value.
 
 <h4>Toolkit / talos upgrade</h4>
 

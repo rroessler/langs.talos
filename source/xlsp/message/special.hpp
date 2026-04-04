@@ -30,8 +30,12 @@ namespace XLSP {
             // prepare the base parameters structure
             auto params = Params();
 
+            // get the baseline identifier value
+            auto identifier = value.at("id");
+
             // attempt getting a suitable identifier now
-            params.identifier = *value.at<$::Serde::Text>("id");
+            if (auto* _ = value.as<$::Serde::Text>()) params.identifier = *_;
+            if (auto* _ = value.as<$::Serde::Number>()) params.identifier = fmt::to_string(*_);
 
             // return the resulting parameters
             return params;
