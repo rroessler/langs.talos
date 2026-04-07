@@ -37,7 +37,8 @@
     X(DOCUMENT_LINKS, "textDocument/documentLink")             \
     X(DOCUMENT_FORMAT, "textDocument/formatting")              \
     X(DOCUMENT_SYMBOLS, "textDocument/documentSymbol")         \
-    X(DOCUMENT_COMPLETIONS, "textDocument/completsion")        \
+    X(DOCUMENT_REFERENCES, "textDocument/references")          \
+    X(DOCUMENT_COMPLETIONS, "textDocument/completion")         \
     X(DOCUMENT_DECLARATION, "textDocument/declaration")        \
     X(DOCUMENT_IMPLEMENTATION, "textDocument/implementation")  \
     X(DOCUMENT_TYPE_DEFINITION, "textDocument/typeDefinition") \

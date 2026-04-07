@@ -6,7 +6,7 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Text, text, compiler, destination) {
+TALOS_MM_LOWER_NODE(Text, node, compiler, destination) {
     if (destination.nowhere()) return;  // we can suitably ignore if going nowhere
-    compiler->emit<Syllable::STRING_MAKE>(destination, compiler->string(text->buffer()));
+    compiler->emit<Syllable::STRING_MAKE>(destination, compiler->string(node->buffer()));
 }

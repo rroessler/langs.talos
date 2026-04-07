@@ -18,12 +18,14 @@ $::Ptr::Unique<Talos::Relint::Metadata> Talos::Relint::Analyzer::audit(
     // we construct a new context instance
     $_UNUSED $_AUTO = m_context(tree, reporter);
     m_mirrors = $::New().unique<Metadata>();
+    m_scope = m_mirrors->m_references.get();
 
     // then we verify and move the metadata result
-    return verify(tree), std::move(m_mirrors);
+    return verify(tree), m_scope = nullptr, std::move(m_mirrors);
 }
 
-Talos::Relint::Mirror* Talos::Relint::Analyzer::verify(const Syntax::Node* node, const Syntax::Node* parent) {
+Talos::Relint::Mirror* Talos::Relint::Analyzer::verify(
+    const Syntax::Node* node, const Syntax::Node* parent, bool visit) {
     // ignore if this node is invalid
     if ($_UNLIKELY(node == nullptr)) return nullptr;
 
@@ -31,10 +33,10 @@ Talos::Relint::Mirror* Talos::Relint::Analyzer::verify(const Syntax::Node* node,
     auto* mirror = m_mirrors->resolve(node, parent);
 
     // attempt visiting the node in question
-    Visitor::visit(node, this), traverse(node);
+    if (visit) Visitor::visit(node, this);
 
     // and resolve the resulting mirror now
-    return m_finalize(mirror), mirror;
+    return traverse(node), m_finalize(mirror), mirror;
 }
 
 void Talos::Relint::Analyzer::traverse(const Syntax::Node* node) {

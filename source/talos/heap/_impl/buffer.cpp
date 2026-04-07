@@ -4,7 +4,7 @@
 
 //  CONSTRUCTORS  //
 
-Talos::Heap::Buffer::Buffer(Stage stage) : Buffer($::Global::get<Runtime::Container>()->get<Heap::Service>(), stage) {}
+Talos::Heap::Buffer::Buffer(Stage stage) : Buffer(*$::Global::get<Runtime::Container>(), stage) {}
 Talos::Heap::Buffer::Buffer(Heap::Service* heap, Stage stage) : m_stage(stage), m_heap(heap) {}
 
 //  PRIVATE METHODS  //

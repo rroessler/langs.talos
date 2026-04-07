@@ -6,15 +6,15 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Decorator, decorator, analyzer) {
+TALOS_MM_CHECK_NODE(Decorator, node, analyzer) {
     // get the current preamble target to be validated
     auto target = analyzer->world()->preamble()->value();
 
     // set the current trace handler
-    $_UNUSED $_AUTO = analyzer->trace(decorator);
+    $_UNUSED $_AUTO = analyzer->trace(node);
 
     // we want to check the incoming "decorator" value
-    auto candidate = analyzer->check(decorator->expression()).type;
+    auto candidate = analyzer->check(node->expression()).type;
 
     // prepare a baseline decorator callback that we expect
     auto args = Type::Builder::arguments(target);

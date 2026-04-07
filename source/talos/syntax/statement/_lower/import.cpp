@@ -6,19 +6,19 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Import, import, compiler, destination) {
+TALOS_MM_LOWER_NODE(Import, node, compiler, destination) {
     // ensure we trace the import execution
-    $_UNUSED $_AUTO = compiler->trace(import);
+    $_UNUSED $_AUTO = compiler->trace(node);
 
     // get some of the baseline details
-    auto exported = import->exported();
-    auto patterns = import->patterns();
+    auto exported = node->exported();
+    auto patterns = node->patterns();
     auto* captures = compiler->captures();
     auto* registers = compiler->registers();
 
     // handle empty patterns a little differently than the rest
     if (patterns.empty()) {
-        compiler->import(Accumulator(), import->path());
+        compiler->import(Accumulator(), node->path());
         if (!exported) return;  // importing so we stop
 
         // otherwise we now need to barrel the exports to parent
@@ -29,15 +29,15 @@ TALOS_MM_LOWER_NODE(Import, import, compiler, destination) {
     auto wildcard = Bytecode::Declaration({}, false);
 
     // if we have a wildcard import, then ensure we store properly
-    if (import->wildcard()) wildcard = compiler->declare(patterns.at(0));
+    if (node->wildcard()) wildcard = compiler->declare(patterns.at(0));
 
     // prepare the sink for the import to go to
     if (wildcard.second) destination = Accumulator();
-    else if (import->wildcard()) destination = wildcard.first;
+    else if (node->wildcard()) destination = wildcard.first;
     else if (destination.nowhere()) destination = Accumulator();
 
     // attempt handling the incoming import now
-    compiler->import(destination, import->path());
+    compiler->import(destination, node->path());
 
     // if exported then we need to re-export at our desired location
     if (exported) {
@@ -49,7 +49,7 @@ TALOS_MM_LOWER_NODE(Import, import, compiler, destination) {
     if (wildcard.second) compiler->emit<Syllable::STORE_CONTEXT>(wildcard.first, destination);
 
     // stop if there are no patterns or just a wildcard handler
-    if (patterns.empty() || import->wildcard()) return;
+    if (patterns.empty() || node->wildcard()) return;
 
     // declare all the patterns to be available
     for (const auto& pattern : patterns) {

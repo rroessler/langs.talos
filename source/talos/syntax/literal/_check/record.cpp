@@ -6,15 +6,15 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Record, record, analyzer) {
+TALOS_MM_CHECK_NODE(Record, node, analyzer) {
     // get the underlying record elements
-    const auto& elements = record->elements();
+    const auto& elements = node->elements();
 
     // stop early if they are empty
     if (elements.empty()) return { Type::Builder::interface() };
 
     // begin tracing for errors here now
-    $_UNUSED $_AUTO = analyzer->trace(record);
+    $_UNUSED $_AUTO = analyzer->trace(node);
 
     // prepare the fields to be bound now
     auto fields = $::Record<Type::Entity>();

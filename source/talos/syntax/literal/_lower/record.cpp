@@ -6,18 +6,18 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Record, record, compiler, destination) {
+TALOS_MM_LOWER_NODE(Record, node, compiler, destination) {
     // trace the incoming binary node now
-    $_UNUSED $_AUTO = compiler->trace(record);
+    $_UNUSED $_AUTO = compiler->trace(node);
 
     // if empty, then construct an empty record
-    if (record->empty()) return compiler->plug<Syllable::OBJECT_EMPTY>(destination);
+    if (node->empty()) return compiler->plug<Syllable::OBJECT_EMPTY>(destination);
 
     // prepare a suitable variables list
     auto arguments = compiler->registers()->list();
 
     // attempt building our values into a list
-    for (const auto& element : record->elements()) {
+    for (const auto& element : node->elements()) {
         // ensure we trace each of the element declarations
         $_UNUSED $_AUTO = compiler->trace(element);
 

@@ -3,7 +3,7 @@
 
 //  CONSTRUCTORS  //
 
-Talos::Signal::Service::Service(XI::Container* services) : m_async(services->get<Async::Service>()) {
+Talos::Signal::Service::Service(XI::Container* services) : m_async(*services) {
     m_async->signals()->bind([&](const XSIO::Signal::Code& code) { return m_dispatch(code); });
 }
 
@@ -21,5 +21,5 @@ void Talos::Signal::Service::m_dispatch(const XSIO::Signal::Code& code) {
 
     // and now we can safely exit the routine as necessary
     m_async->exit($_EXIT_CUSTOM(code.underlying()));
-    if (!$_PLATFORM_WINDOWS) $::IO::eprintln();
+    if (!$_PLATFORM_WINDOWS) $::IO::println();
 }

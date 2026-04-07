@@ -164,7 +164,7 @@ Talos::Type::Deduction Talos::Type::Analyzer::branch(Deduction&& deduction, Bran
 
 const Talos::Type::Context* Talos::Type::Analyzer::import(
     const $::String::View& path, const Resource::Location& location) {
-    auto* modules = m_services->get<Import::Service>();
+    Import::Service* modules = *m_services;  // resolve now
     auto result = modules->resolve(path, resource().body());
     if (result.has_value()) return import(*result, location);
     return report(location, 8000000, result.error()), &g_failure;
@@ -172,17 +172,17 @@ const Talos::Type::Context* Talos::Type::Analyzer::import(
 
 const Talos::Type::Context* Talos::Type::Analyzer::import(const $::URI::View& resource, const Resource::Location&) {
     // prepare the importer service to be used
-    auto* importer = m_services->get<Import::Service>();
+    Import::Service* modules = *m_services;
 
     // ignore if we could not validly fetch our module
-    auto* module = importer->fetch(resource);
-    if (module == nullptr) return &g_failure;
+    auto* found = modules->fetch(resource);
+    if (found == nullptr) return &g_failure;
 
     // should be able to analyze the module now
-    module->analyze(m_services);
+    found->analyze(m_services);
 
     // and return the underlying type-context
-    return module->metadata<Module::Phase::TYPED>()->context().get();
+    return found->metadata<Module::Phase::TYPED>()->context().get();
 }
 
 Talos::Type::Deduction Talos::Type::Analyzer::passable() const { return { Builder::none() }; }

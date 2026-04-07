@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LINT_NODE(Record, record, analyzer) { analyzer->verify(record->elements(), record); }
+TALOS_MM_LINT_NODE(Record, node, analyzer) { analyzer->verify(node->elements(), node, false); }

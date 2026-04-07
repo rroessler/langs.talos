@@ -49,9 +49,9 @@ int32_t Talos::Toolchain::launch(int32_t argc, char** argv) {
 
     // bootstrap the runtime options now
     auto* services = bootstrap(options);
+    Import::Service* modules = *services;
 
     // ensure we preload the archived modules
-    auto* modules = services->get<Import::Service>();
     modules->preload(std::move(filesystem.scripts));
 
     // and attempt launching the runtime now

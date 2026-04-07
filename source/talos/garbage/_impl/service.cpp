@@ -13,9 +13,7 @@
 
 Talos::Garbage::Service::Service() : Service($::Global::get<Runtime::Container>()) {}
 Talos::Garbage::Service::Service(XI::Container* services) :
-    m_options(&services->get<Runtime::Options>()->garbage),
-    m_services(services),
-    m_heap(m_services->get<Heap::Service>()) {
+    m_options(&services->get<Runtime::Options>()->garbage), m_services(services), m_heap(*m_services) {
     m_marker = m_services->get<Marker>(this);
     m_lifetimes = m_services->get<Lifetimes>();
 }
@@ -40,7 +38,7 @@ void Talos::Garbage::Service::m_request(bool major) {
     if (!m_collectable) return;
 
     // get the underlying heap-service now
-    auto* async = m_services->get<Async::Service>();
+    Async::Service* async = *m_services;
 
     // ensure we can actually run our instance now
     if (!async->running()) return;

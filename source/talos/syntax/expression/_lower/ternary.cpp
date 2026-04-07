@@ -6,14 +6,14 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Ternary, ternary, compiler, destination) {
+TALOS_MM_LOWER_NODE(Ternary, node, compiler, destination) {
     // get the base condition to be handled
-    auto* condition = ternary->condition();
+    auto* condition = node->condition();
     auto type = condition->traits()->lattice();
 
     // bypass everything if the condition is truthy/falsey
-    if (type.truthy()) return compiler->lower(condition), compiler->lower(ternary->consequence(), destination);
-    if (type.falsey()) return compiler->lower(condition), compiler->lower(ternary->alternative(), destination);
+    if (type.truthy()) return compiler->lower(condition), compiler->lower(node->consequence(), destination);
+    if (type.falsey()) return compiler->lower(condition), compiler->lower(node->alternative(), destination);
 
     auto* labels = compiler->labels();  // prepare labels
     auto skip = labels->reserve(), exit = labels->reserve();
@@ -22,11 +22,11 @@ TALOS_MM_LOWER_NODE(Ternary, ternary, compiler, destination) {
     compiler->emit<Syllable::JUMP_FALSEY>(skip, Accumulator());
 
     // prepare the consequence handler now
-    compiler->lower(ternary->consequence(), destination);
+    compiler->lower(node->consequence(), destination);
     compiler->emit<Syllable::JUMP_TO>(exit);  // bailout
 
     // prepare the alternative pathway handler
-    labels->patch(skip), compiler->lower(ternary->alternative(), destination);
+    labels->patch(skip), compiler->lower(node->alternative(), destination);
 
     // and finally patch the exit handler
     labels->patch(exit);

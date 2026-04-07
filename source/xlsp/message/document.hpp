@@ -6,6 +6,7 @@
 #include "xlsp/message/request.hpp"
 #include "xlsp/protocol/document.hpp"
 #include "xlsp/protocol/format.hpp"
+#include "xlsp/protocol/location.hpp"
 #include "xlsp/protocol/markup.hpp"
 
 //  MACROS  //
@@ -214,7 +215,7 @@ namespace XLSP {
         //  PROPERTIES  //
 
         /// @brief The available document links.
-        std::vector<Document::Link> links = {};
+        std::vector<Anchor> links = {};
 
         //  CONSTRUCTORS  //
 
@@ -239,6 +240,9 @@ namespace XLSP {
     struct Response::Value<Message::Type::DOCUMENT_SYMBOLS> {
         //  PROPERTIES  //
 
+        /// @brief Total symbols to be output.
+        std::vector<Symbol> symbols = {};
+
         //  CONSTRUCTORS  //
 
         /// @brief Constructs a defaulted result.
@@ -251,7 +255,7 @@ namespace XLSP {
          * @brief Constructs the outgoing links result.
          * @param response                      Response to encode.
          */
-        static $::Serde::Value m_encode(const Value&) { return {}; }
+        static $::Serde::Value m_encode(const Value& response) { return $::Reflect::encode(response.symbols); }
     };
 
     /// @brief Document Format Parameters.
@@ -309,13 +313,73 @@ namespace XLSP {
         static $::Serde::Value m_encode(const Value& response) { return $::Reflect::encode(response.edits); }
     };
 
+    /// @brief Document References Parameters.
+    XLSP_MESSAGE_EXTENDS(Request::Params, DOCUMENT_REFERENCES, DOCUMENT_POSITION) {
+        //  PROPERTIES  //
+
+        /// @brief Include declaration reference.
+        bool declaration = false;
+
+        //  CONSTRUCTORS  //
+
+        /// @brief Inherit the base constructor.
+        using Layout<XLSP_MESSAGE_TYPE(DOCUMENT_POSITION)>::Layout;
+
+        /**
+         * @brief Constructs hover parameters from the base layout.
+         * @param layout                        Layout to inherit.
+         * @param declaration                   Include declaration.
+         */
+        explicit Params(const Layout& layout, bool declaration = false) : Layout(layout), declaration(declaration) {}
+        explicit Params(const Layout& layout, const bool* declaration = nullptr) :
+            Params(layout, declaration ? *declaration : false) {}
+
+       protected:
+        //  PRIVATE METHODS  //
+
+        /**
+         * @brief Constructs the document parameters.
+         * @param value                         Value to decode.
+         */
+        static Params m_decode(const $::Serde::Value& value) {
+            auto declaration = value.at("context").at<$::Serde::Boolean>("includeDeclaration");
+            return Params($::Reflect::decode<Layout>(value), declaration);  // construct
+        }
+    };
+
+    /// @brief Constructs a references response.
+    template <>
+    struct Response::Value<Message::Type::DOCUMENT_REFERENCES> {
+        //  PROPERTIES  //
+
+        /// @brief All reference locations found.
+        std::vector<Location> locations = {};
+
+        //  CONSTRUCTORS  //
+
+        /// @brief Constructs a defaulted result.
+        explicit Value() = default;
+
+       protected:
+        //  PRIVATE METHODS  //
+
+        /**
+         * @brief Constructs the outgoing format result.
+         * @param response                      Response to encode.
+         */
+        static $::Serde::Value m_encode(const Value& response) { return $::Reflect::encode(response.locations); }
+    };
+
     /// @brief Document Completion Parameters.
-    XLSP_MESSAGE_DOCUMENT(DOCUMENT_COMPLETIONS, DOCUMENT_IDENTIFIER);
+    XLSP_MESSAGE_DOCUMENT(DOCUMENT_COMPLETIONS, DOCUMENT_POSITION);
 
     /// @brief Constructs a completions response.
     template <>
     struct Response::Value<Message::Type::DOCUMENT_COMPLETIONS> {
         //  PROPERTIES  //
+
+        /// @brief Completions to be returned.
+        std::vector<Completion> completions = {};
 
         //  CONSTRUCTORS  //
 
@@ -329,7 +393,7 @@ namespace XLSP {
          * @brief Constructs the outgoing completions result.
          * @param response                      Response to encode.
          */
-        static $::Serde::Value m_encode(const Value&) { return {}; }
+        static $::Serde::Value m_encode(const Value& response) { return $::Reflect::encode(response.completions); }
     };
 
     /// @brief Document Type-Definition Parameters.
@@ -339,6 +403,9 @@ namespace XLSP {
     template <>
     struct Response::Value<Message::Type::DOCUMENT_TYPE_DEFINITION> {
         //  PROPERTIES  //
+
+        /// @brief All reference locations found.
+        std::vector<Location> locations = {};
 
         //  CONSTRUCTORS  //
 
@@ -352,7 +419,7 @@ namespace XLSP {
          * @brief Constructs the outgoing type-definition result.
          * @param response                      Response to encode.
          */
-        static $::Serde::Value m_encode(const Value&) { return {}; }
+        static $::Serde::Value m_encode(const Value& response) { return $::Reflect::encode(response.locations); }
     };
 
     /// @brief Document Variable-Definition Parameters.
@@ -362,6 +429,9 @@ namespace XLSP {
     template <>
     struct Response::Value<Message::Type::DOCUMENT_VARIABLE_DEFINITION> {
         //  PROPERTIES  //
+
+        /// @brief All reference locations found.
+        std::vector<Location> locations = {};
 
         //  CONSTRUCTORS  //
 
@@ -375,7 +445,7 @@ namespace XLSP {
          * @brief Constructs the outgoing variable-definition result.
          * @param response                      Response to encode.
          */
-        static $::Serde::Value m_encode(const Value&) { return {}; }
+        static $::Serde::Value m_encode(const Value& response) { return $::Reflect::encode(response.locations); }
     };
 
 }  // namespace XLSP

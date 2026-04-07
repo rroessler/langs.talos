@@ -20,6 +20,9 @@ namespace Talos::Relint {
 
         //  PROPERTIES  //
 
+        /// @brief Gets the current references scope.
+        Scope* m_scope = nullptr;
+
         /// @brief Services container.
         XI::Container* m_services = nullptr;
 
@@ -31,9 +34,6 @@ namespace Talos::Relint {
 
         /// @brief Current metadata value.
         $::Ptr::Unique<Metadata> m_mirrors = nullptr;
-
-        /// @brief Currently deferred values.
-        std::vector<Deferrer> m_deferred = {};
 
        public:
         //  CONSTRUCTORS  //
@@ -48,6 +48,9 @@ namespace Talos::Relint {
         inline constexpr $::URI::View resource() const noexcept {
             return m_reporter ? m_reporter->resource() : $::URI::Anonymous();
         }
+
+        /// @brief Gets the references scoping.
+        inline constexpr const Scope* references() const noexcept { return m_scope; }
 
         /// @brief Available metadata mirrors.
         inline constexpr const Metadata* mirrors() const noexcept { return m_mirrors.get(); }

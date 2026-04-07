@@ -6,12 +6,12 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Enum, enumeration, compiler, ) {
+TALOS_MM_LOWER_NODE(Enum, node, compiler, ) {
     // trace the incoming enumeration node now
-    $_UNUSED $_AUTO = compiler->trace(enumeration);
+    $_UNUSED $_AUTO = compiler->trace(node);
 
     // prepare the destination of the enumeration
-    auto [dest, leaked] = compiler->declare(enumeration);
+    auto [dest, leaked] = compiler->declare(node);
     $_ASSERT(!dest.nowhere(), "Declaration does not exist?");
     auto treg = leaked ? compiler->registers()->temporary() : dest;
 
@@ -19,7 +19,7 @@ TALOS_MM_LOWER_NODE(Enum, enumeration, compiler, ) {
     auto arguments = compiler->registers()->list();
 
     // attempt building our values into a list
-    for (const auto& variant : enumeration->variants()) {
+    for (const auto& variant : node->variants()) {
         // ensure we trace on each of the variants
         $_UNUSED $_AUTO = compiler->trace(variant);
 
@@ -41,7 +41,7 @@ TALOS_MM_LOWER_NODE(Enum, enumeration, compiler, ) {
     else compiler->emit<Syllable::ENUM_MAKE>(treg, arguments);
 
     // post-emit the expose handler
-    compiler->expose(enumeration, treg);
+    compiler->expose(node, treg);
 
     // finally emit the outgoing details now
     if (leaked) compiler->emit<Syllable::STORE_CONTEXT>(dest, treg);

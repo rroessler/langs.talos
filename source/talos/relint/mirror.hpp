@@ -7,6 +7,22 @@
 
 namespace Talos::Relint {
 
+    /// @brief Mirror Reference Definition.
+    struct Definition {
+        //  PROPERTIES  //
+
+        Mirror* variable = nullptr;
+        Mirror* annotation = nullptr;
+
+        //  CONSTRUCTORS  //
+
+        /// @brief Constructs a baseline definition.
+        constexpr Definition() = default;
+    };
+
+    /// @brief Empty Relint Definition.
+    static inline auto Empty = $::New().shared<Definition>();
+
     /// @brief Helper for relinting overloads.
     template <class... Fs>
     struct Overloads : Fs... {
@@ -40,14 +56,14 @@ namespace Talos::Relint {
         /// @brief The associated origin node.
         const Syntax::Node* m_origin = nullptr;
 
-        /// @brief The associated type definition.
-        const Mirror* m_annotation = nullptr;
-
-        /// @brief The associated declaration definition.
-        const Mirror* m_declaration = nullptr;
+        /// @brief The associated definition (type or value).
+        $::Ptr::Shared<Definition> m_definition = $::New().shared<Definition>();
 
         /// @brief Currently available references to the origin node.
         std::vector<const Mirror*> m_references = {};
+
+        /// @brief Currently available fields for the mirror.
+        $::Record<$::Ptr::Shared<Definition>> m_fields = {};
 
        public:
         //  CONSTRUCTORS  //
@@ -82,17 +98,22 @@ namespace Talos::Relint {
         inline constexpr $::String::Buffer& comments() { return m_comments; }
         inline constexpr $::String::View comments() const noexcept { return m_comments; }
 
-        /// @brief Type declaration of the mirror.
-        inline constexpr const Mirror*& annotation() noexcept { return m_annotation; }
-        inline constexpr const Mirror* annotation() const noexcept { return m_annotation; }
-
-        /// @brief Variable declaration of the node.
-        inline constexpr const Mirror*& declaration() noexcept { return m_declaration; }
-        inline constexpr const Mirror* declaration() const noexcept { return m_declaration; }
+        /// @brief Variable definition of the node.
+        inline constexpr Definition* definition() noexcept { return m_definition.get(); }
+        inline constexpr const Definition* definition() const noexcept { return m_definition.get(); }
 
         /// @brief All available references for the node.
         inline constexpr std::vector<const Mirror*>& references() noexcept { return m_references; }
         inline constexpr const std::vector<const Mirror*>& references() const noexcept { return m_references; }
+
+        /// @brief All available fields for the node.
+        inline constexpr $::Record<$::Ptr::Shared<Definition>>& fields() noexcept { return m_fields; }
+        inline constexpr const $::Record<$::Ptr::Shared<Definition>>& fields() const noexcept { return m_fields; }
+
+        /// @brief Checks if a node is type-qualified or not (eg: type-world identifier or value identifier).
+        inline constexpr bool qualified() const noexcept {
+            return filter<Syntax::Qualifier>() || filter<Syntax::Alias>();
+        }
 
         /// @brief Gets the canonical representation of the node.
         inline constexpr $::String::View canonical() const noexcept {
@@ -114,6 +135,22 @@ namespace Talos::Relint {
             if (m_parent == nullptr) return nullptr;
             if (auto node = m_parent->when<T>()) return node;
             return m_parent->parent<T>();  // scan further
+        }
+
+        /// @brief Attempts scanning upwards from this node.
+        template <std::derived_from<Syntax::Node> T>
+        inline constexpr const T* filter() const noexcept {
+            if (auto node = when<T>()) return node;
+            else return parent<T>();  // scan upwards
+        }
+
+        /**
+         * @brief Handles looking up field definitions.
+         * @param name                  Name of member field.
+         */
+        inline constexpr $::Ptr::Shared<Definition> lookup(const $::String::View& name) {
+            auto iter = m_fields.find(name);  // resolve the field
+            return iter == m_fields.cend() ? Empty : iter->second;
         }
 
         /// @brief Allows visiting different nodes.

@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Group, group, compiler, destination) { compiler->lower(group->value(), destination); }
+TALOS_MM_LOWER_NODE(Group, node, compiler, destination) { compiler->lower(node->value(), destination); }

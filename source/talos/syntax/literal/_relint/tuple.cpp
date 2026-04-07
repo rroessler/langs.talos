@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LINT_NODE(Tuple, tuple, analyzer) { analyzer->verify(tuple->elements(), tuple); }
+TALOS_MM_LINT_NODE(Tuple, node, analyzer) { analyzer->verify(node->elements(), node); }

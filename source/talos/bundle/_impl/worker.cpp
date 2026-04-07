@@ -44,7 +44,7 @@ $_NORETURN void Talos::Bundle::Worker::m_execute() {
 
     // stop if in linting only mode
     if (!m_options.compile) m_thread->shutdown($_EXIT_SUCCESS);
-    else if (stats.hints) $::IO::eprintln();  // display padding
+    else if (stats.hints) $::IO::println();  // display padding
 
     // construct the necessary spinner now
     if (runtime->flags.verbose) m_spinner = async->spinner(suffix("Compiling Modules..."));

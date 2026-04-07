@@ -6,12 +6,12 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Numeric, numeric, compiler, destination) {
+TALOS_MM_LOWER_NODE(Numeric, node, compiler, destination) {
     // ignore if there is no sink to output to
     if (destination.nowhere()) return;
 
     // prepare the value to be used now
-    auto value = numeric->value();
+    auto value = node->value();
 
     // handle consistent values now
     if (value == 0) return compiler->emit<Syllable::LOAD_ZERO>(destination);

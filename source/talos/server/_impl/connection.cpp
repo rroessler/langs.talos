@@ -5,7 +5,7 @@
 //  CONSTRUCTORS  //
 
 Talos::Server::Connection::Connection(XI::Container* services, const Options* options) :
-    Define(options), m_services(services), m_async(m_services->get<Async::Service>()) {
+    Define(options), m_services(services), m_async(*m_services) {
     // prepare the utilities and events to be used
     m_utilities = m_services->get<Utilities>();
     m_events = m_services->get<Events>(this, m_utilities.get());

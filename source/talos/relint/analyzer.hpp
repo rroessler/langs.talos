@@ -21,15 +21,22 @@ namespace Talos::Relint {
 
         //  PUBLIC METHODS  //
 
+        /// @brief Gets the current scoped references.
+        inline constexpr Scope* references() noexcept { return m_scope; }
+
         /// @brief Current analyzer metadata.
-        inline constexpr Metadata* metadata() noexcept { return m_mirrors.get(); }
+        inline constexpr Metadata* mirrors() noexcept { return m_mirrors.get(); }
 
         /// @brief Handles scoping deferred callbacks.
         inline constexpr auto scope() {
-            return $::Functor::Defer([&] {
-                auto deferred = std::move(m_deferred);  // remove
-                for (auto&& deferrer : deferred) deferrer(this);
-            });
+            // construct the current scoping now
+            auto scope = $::New().unique<Scope>(m_scope);
+
+            // update the current reference
+            m_scope = scope.get();
+
+            // and defer destruction handling now
+            return $::Functor::Defer([&, scope = std::move(scope)] { m_scope = scope->m_ancestor; });
         }
 
         /**
@@ -49,12 +56,6 @@ namespace Talos::Relint {
         }
 
         /**
-         * @brief Handles deferring linting.
-         * @param deferrer                  Deferred handler.
-         */
-        inline constexpr void defer(Deferrer&& deferrer) { m_deferred.emplace_back(std::move(deferrer)); }
-
-        /**
          * @brief Handles running a complete linter-audit.
          * @param tree                      Syntax tree node.
          * @param reporter                  Diagnostic reporter.
@@ -65,19 +66,21 @@ namespace Talos::Relint {
          * @brief Handles linting a singular node.
          * @param node                      Node to lint.
          * @param parent                    Parent to bind.
+         * @param visit                     Visit children.
          */
-        Mirror* verify(const Syntax::Node* node, const Syntax::Node* parent = nullptr);
+        Mirror* verify(const Syntax::Node* node, const Syntax::Node* parent = nullptr, bool visit = true);
 
         /**
          * @brief Handles linting a multiple nodes.
          * @param nodes                     Nodes to lint.
          * @param parent                    Parent to bind.
+         * @param visit                     Visit children.
          */
         template <std::derived_from<Syntax::Node> T>
         inline constexpr std::vector<Mirror*> verify(
-            const std::vector<T*>& nodes, const Syntax::Node* parent = nullptr) {
-            auto predicate = [&](const T* node) { return verify(node, parent); };
-            return $::Ranges::To(nodes | std::views::transform(predicate));
+            const std::vector<T*>& nodes, const Syntax::Node* parent = nullptr, bool visit = true) {
+            auto predicate = [&](const T* node) { return verify(node, parent, visit); };
+            return $::Ranges::To(nodes | std::views::transform(predicate));  // resolve
         }
 
         /**

@@ -7,7 +7,7 @@
 
 int32_t XT::Session::Service::launch(const $::Dict<Group*>& sections) {
     // prepare a current test-runner to be used
-    auto runner = m_services->get<Runner>();
+    $::Ptr::Unique<Runner> runner = *m_services;
 
     // prepare caching the runner instance for external use potentially
     $_UNUSED $_AUTO = (m_runner = runner.get(), $::Functor::Defer([&] { m_runner = nullptr; }));

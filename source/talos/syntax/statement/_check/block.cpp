@@ -6,11 +6,11 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Block, block, analyzer) {
+TALOS_MM_CHECK_NODE(Block, node, analyzer) {
     // ignore if there are no statements available
-    if (block->empty()) return analyzer->passable();
+    if (node->empty()) return analyzer->passable();
 
     // otherwise attempt scoping the result now
     $_UNUSED $_AUTO = analyzer->scope();
-    return analyzer->check(block->statements());
+    return analyzer->check(node->statements());
 }

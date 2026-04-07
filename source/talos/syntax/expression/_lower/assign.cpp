@@ -6,16 +6,16 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Assign, assign, compiler, destination) {
+TALOS_MM_LOWER_NODE(Assign, node, compiler, destination) {
     // handle based on the target details to be used
-    switch (auto* target = assign->target(); target->traits()->tag()) {
+    switch (auto* target = node->target(); target->traits()->tag()) {
         case $::RTTI::Hash<Syntax::Accessor>(): {
             auto* accessor = target->as<Syntax::Accessor>();
             auto treg = compiler->registers()->temporary();
             auto index = compiler->symbol(accessor->field()->name());
 
             compiler->lower(accessor->parent(), treg);
-            compiler->lower(assign->value(), Accumulator());
+            compiler->lower(node->value(), Accumulator());
 
             $_UNUSED $_AUTO = compiler->trace(accessor->parent());  // and store
             compiler->emit<Syllable::STORE_FIELD>(treg, Accumulator(), index);
@@ -25,7 +25,7 @@ TALOS_MM_LOWER_NODE(Assign, assign, compiler, destination) {
         case $::RTTI::Hash<Syntax::Identifier>(): {
             auto* identifier = target->as<Syntax::Identifier>();
             auto extent = compiler->captures()->resolve(identifier);
-            compiler->lower(assign->value(), Accumulator());
+            compiler->lower(node->value(), Accumulator());
             $_UNUSED $_AUTO = compiler->trace(identifier);  // trace
             compiler->store(identifier->name(), extent, Accumulator());
             compiler->plug<Syllable::REG_MOVE>(destination, Accumulator());

@@ -50,8 +50,8 @@ void Talos::Lifecycle::Service::m_globals(Runtime::Isolate* isolate) {
     isolate->global(Value::Symbol(Builtins::Proxy<Object::Instance>::name()));
 
     // and we need to register certain items for their GC roots
-    auto* async = m_services->get<Async::Service>();
-    auto* modules = m_services->get<Import::Service>();
+    Async::Service* async = *m_services;
+    Import::Service* modules = *m_services;
 
     // register all the "dylib" modules as well
     globals->roots()->bind([](const Globals::Each& yield) { Dylib::Registry::each(yield); });

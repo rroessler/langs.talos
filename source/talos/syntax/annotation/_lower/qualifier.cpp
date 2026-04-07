@@ -6,9 +6,9 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Qualifier, qualifier, compiler, destination) {
+TALOS_MM_LOWER_NODE(Qualifier, node, compiler, destination) {
     // get the incoming segments to be handled
-    const auto& segments = qualifier->segments();
+    const auto& segments = node->segments();
 
     // if the destination is nowhere, then we ignore
     if (segments.empty() || destination.nowhere()) return;

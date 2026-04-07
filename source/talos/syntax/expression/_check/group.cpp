@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Group, group, analyzer) { return analyzer->check(group->value()); }
+TALOS_MM_CHECK_NODE(Group, node, analyzer) { return analyzer->check(node->value()); }

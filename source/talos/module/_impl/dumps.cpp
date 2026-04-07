@@ -14,7 +14,7 @@ void Talos::Module::Interface::dump<Talos::Module::Dump::SYNTAX>() const noexcep
     if (!is<Script>()) return;
 
     // show the baseline dump details now
-    $::IO::eprintln("\n===== Syntax Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
+    $::IO::println("\n===== Syntax Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
 
     /// TODO: show all the syntax for this module
     $_ABORT("Unimplemented 'Syntax Dump'");
@@ -26,7 +26,7 @@ void Talos::Module::Interface::dump<Talos::Module::Dump::TYPEDEFS>() const noexc
     if (!is<Script>()) return;
 
     // show the baseline dump details now
-    $::IO::eprintln("\n===== Types Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
+    $::IO::println("\n===== Types Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
 
     /// TODO: show all the types for this module
     $_ABORT("Unimplemented 'Types Dump'");
@@ -38,9 +38,9 @@ void Talos::Module::Interface::dump<Talos::Module::Dump::BYTECODE>() const noexc
     if (!(is<Script>() || is<Archived>())) return;
 
     // show the baseline dump details now
-    $::IO::eprintln("\n===== Bytecode Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
+    $::IO::println("\n===== Bytecode Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
 
     // print the arena if it has some functions
     auto* arena = metadata<Phase::COMPILED>()->arena();
-    if (arena->functions.size()) $::IO::eprintln("{0}\n", *arena);
+    if (arena->functions.size()) $::IO::println("{0}\n", *arena);
 }

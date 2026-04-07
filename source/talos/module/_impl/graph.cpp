@@ -9,7 +9,7 @@
 
 Talos::Import::Graph::Graph() : Graph($::Global::get<Runtime::Container>()) {}
 Talos::Import::Graph::Graph(XI::Container* services, const Dependencies& dependencies) :
-    Graph(services->get<Import::Service>(), dependencies) {}
+    Graph(*services, dependencies) {}
 
 //  PUBLIC METHODS  //
 

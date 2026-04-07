@@ -8,8 +8,8 @@
 
 TALOS_MM_LOWER_NODE(Self, , compiler, destination) { compiler->plug<Syllable::LOAD_SELF>(destination); }
 
-TALOS_MM_LOWER_NODE(Identifier, identifier, compiler, destination) {
-    $_UNUSED $_AUTO = compiler->trace(identifier);
-    auto extent = compiler->captures()->resolve(identifier);
-    return compiler->load(identifier->name(), extent, destination);
+TALOS_MM_LOWER_NODE(Identifier, node, compiler, destination) {
+    $_UNUSED $_AUTO = compiler->trace(node);
+    auto extent = compiler->captures()->resolve(node);
+    return compiler->load(node->name(), extent, destination);
 }

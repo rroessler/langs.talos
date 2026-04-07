@@ -6,7 +6,7 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Panic, panic, compiler, ) {
-    $_UNUSED $_AUTO = compiler->trace(panic);
-    compiler->panic(panic->value());
+TALOS_MM_LOWER_NODE(Panic, node, compiler, ) {
+    $_UNUSED $_AUTO = compiler->trace(node);
+    compiler->panic(node->value());  // bind
 }

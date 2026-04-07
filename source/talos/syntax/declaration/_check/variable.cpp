@@ -6,15 +6,15 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Variable, variable, analyzer) {
+TALOS_MM_CHECK_NODE(Variable, node, analyzer) {
     // prepare the base variable report to be used
-    $_UNUSED $_AUTO = analyzer->trace(variable);
+    $_UNUSED $_AUTO = analyzer->trace(node);
 
     // get the incoming expected typing
-    auto expected = analyzer->declare(variable);
+    auto expected = analyzer->declare(node);
 
     // get the incoming modifiers to be checked against
-    const auto& modifiers = variable->modifiers();
+    const auto& modifiers = node->modifiers();
     auto exported = modifiers.test(Variable::Flag::EXPORT);
     auto disposable = modifiers.test(Variable::Flag::DISPOSABLE);
 
@@ -22,12 +22,12 @@ TALOS_MM_CHECK_NODE(Variable, variable, analyzer) {
     if (exported && disposable) analyzer->report(3000150);
 
     // attempt declaring on the world now
-    auto* entity = analyzer->world()->values().declare(variable, expected, analyzer->captures());
-    if (entity == nullptr) return analyzer->report(4000403, variable->name());  // fail now
+    auto* entity = analyzer->world()->values().declare(node, expected, analyzer->captures());
+    if (entity == nullptr) return analyzer->report(4000403, node->name());  // fail now here
 
     // update the entity if necessary to do so
     if (disposable) entity->unused(false);
 
     // handle all the preamble for the node
-    return analyzer->preamble(variable, entity);
+    return analyzer->preamble(node, entity);
 }

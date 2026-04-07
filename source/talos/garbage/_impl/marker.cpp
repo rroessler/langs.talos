@@ -12,7 +12,7 @@
 
 Talos::Garbage::Marker::Marker(Garbage::Service* garbage) : Marker($::Global::get<Runtime::Container>(), garbage) {}
 Talos::Garbage::Marker::Marker(XI::Container* services, Garbage::Service* garbage) :
-    m_heap(services->get<Heap::Service>()), m_garbage(garbage) {}
+    m_heap(*services), m_garbage(garbage) {}
 
 //  PUBLIC METHODS  //
 

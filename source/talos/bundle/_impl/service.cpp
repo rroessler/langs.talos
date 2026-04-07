@@ -5,8 +5,7 @@
 //  CONSTRUCTORS  //
 
 Talos::Bundle::Service::Service() : Service($::Global::get<Runtime::Container>()) {}
-Talos::Bundle::Service::Service(XI::Container* services) :
-    m_services(services), m_async(m_services->get<Async::Service>()) {}
+Talos::Bundle::Service::Service(XI::Container* services) : m_services(services), m_async(*m_services) {}
 
 //  PUBLIC METHODS  //
 

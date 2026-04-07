@@ -31,8 +31,10 @@ Talos::Function::Dynamic Talos::Machine::Service::compile(
     // for now we can only compile one item at a time
     $_UNUSED $_AUTO = $::Lock::guard(m_mutex);
 
+    // get all the necessary services required
+    Runtime::Options* options = *m_services;
+
     // prepare a compilation scope to be used
-    auto* options = m_services->get<Runtime::Options>();
     auto compiler = m_context.scope<Callback>(options->dump.machine);
 
     // construct a new callee information to be used now
@@ -76,8 +78,8 @@ Talos::Function::Dynamic Talos::Machine::Service::compile(
 
 void Talos::Machine::Service::m_dump(const Function::Info* info) const noexcept {
     // show the baseline dump details now
-    $::IO::eprintln("\n===== Assembly Dump '{0}' =====\n", $::Path::relative(info->resource().body()).string());
+    $::IO::println("\n===== Assembly Dump '{0}' =====\n", $::Path::relative(info->resource().body()).string());
 
     // and attempt showing the necessary output now
-    if (auto content = m_context.content(); content.size()) $::IO::eprintln(content);
+    if (auto content = m_context.content(); content.size()) $::IO::println(content);
 }

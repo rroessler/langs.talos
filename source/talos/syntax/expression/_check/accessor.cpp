@@ -6,15 +6,15 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Accessor, accessor, analyzer) {
-    $_UNUSED $_AUTO = analyzer->trace(accessor);
-    auto parent = analyzer->check(accessor->parent());
+TALOS_MM_CHECK_NODE(Accessor, node, analyzer) {
+    $_UNUSED $_AUTO = analyzer->trace(node);
+    auto parent = analyzer->check(node->parent());
 
     // if any, the return the any result immediately
     if (parent.type->is<Type::Any>()) return parent;
 
     // attempt looking up the desired field
-    auto field = accessor->field()->name();
+    auto field = node->field()->name();
     auto entity = parent.type->lookup(field);
 
     // ensure the entity is actually a valid value
@@ -22,7 +22,7 @@ TALOS_MM_CHECK_NODE(Accessor, accessor, analyzer) {
     if (!entity.opaque()) return analyzer->report(3000200, field);
 
     // if the entity is deprecated then declare as such
-    analyzer->deprecated(&entity, accessor);
+    analyzer->deprecated(&entity, node);
 
     // check if the incoming entity is private / protected at all
     if (entity.modifiers().test(Variable::Flag::PRIVATE, Variable::Flag::PROTECTED)) {
@@ -34,5 +34,5 @@ TALOS_MM_CHECK_NODE(Accessor, accessor, analyzer) {
     }
 
     // and finally declare the entity as valid now
-    return accessor->field()->traits()->type() = entity.value();
+    return node->field()->traits()->type() = entity.value();
 }

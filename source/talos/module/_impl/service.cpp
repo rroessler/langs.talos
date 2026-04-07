@@ -64,8 +64,11 @@ Talos::Import::Statistics Talos::Import::Service::analyze(
     // prepare the spinner to be used
     $::Spinner::Shared spinner = nullptr;
 
+    // get the required services to be used
+    Async::Service* async = *m_services;
+    Runtime::Options* options = *m_services;
+
     // check if using verbose output at all
-    auto* options = m_services->get<Runtime::Options>();
     auto verbose = collector && options->flags.verbose && display;
 
     // prepare the suffix constructor to be used now
@@ -75,7 +78,6 @@ Talos::Import::Statistics Talos::Import::Service::analyze(
     };
 
     // prepare a spinner instance if necessary
-    auto* async = m_services->get<Async::Service>();
     if (verbose) spinner = async->spinner(suffix("Loading Modules..."));
 
     // get an initial starting time-point
@@ -114,7 +116,7 @@ Talos::Import::Statistics Talos::Import::Service::analyze(
 
     // show the verbose details when necessary too
     if (display && collector) {
-        if (hints) $::IO::eprintln("- Found {0} linting diagnostic(s)", hints);
+        if (hints) $::IO::println("- Found {0} linting diagnostic(s)", hints);
         if (errors) $::IO::eprintln("- Found {0} error(s) across {1} file(s)", errors, sources);
     }
 

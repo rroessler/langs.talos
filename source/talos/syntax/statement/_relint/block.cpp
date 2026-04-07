@@ -6,7 +6,7 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LINT_NODE(Block, block, analyzer) {
+TALOS_MM_LINT_NODE(Block, node, analyzer) {
     $_UNUSED $_AUTO = analyzer->scope();
-    analyzer->verify(block->statements(), block);
+    analyzer->verify(node->statements(), node);
 }

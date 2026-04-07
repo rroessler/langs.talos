@@ -113,12 +113,12 @@ namespace Talos::Bytecode {
         inline constexpr bool bundled() const noexcept { return m_bundled(); }
         inline constexpr Binder* labels() const noexcept { return m_labels.get(); }
         inline constexpr const Queue* queue() const noexcept { return m_queue.get(); }
+        inline constexpr Shape::Service* shapes() const noexcept { return *m_services; }
         inline constexpr $::URI::View resource() const noexcept { return m_arena->resource; }
         inline constexpr Routine* routine() const noexcept { return m_request->routine(); }
         inline constexpr const Variable::Captures* captures() const noexcept { return m_captures; }
         inline constexpr Allocator* registers() const noexcept { return m_request->registers(); }
         inline constexpr Variable::Context* variables() const noexcept { return m_request->variables(); }
-        inline constexpr Shape::Service* shapes() const noexcept { return m_services->get<Shape::Service>(); }
 
         /// @brief Constructs a scoped loop.
         inline constexpr Loop loop() { return Loop(this); }

@@ -6,11 +6,13 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LINT_NODE(Lambda, lambda, analyzer) {
+TALOS_MM_LINT_NODE(Lambda, node, analyzer) {
+    // prepare the scoping to be used for this lambda
+    $_UNUSED $_AUTO = analyzer->scope();
+
     // always pre-verify the signature for the lambda
-    analyzer->verify(lambda->signature(), lambda);
+    analyzer->verify(node->signature(), node);
 
     // and then verify the resulting body
-    $_UNUSED $_AUTO = analyzer->scope();
-    analyzer->verify(lambda->body(), lambda);
+    analyzer->verify(node->body(), node);
 }

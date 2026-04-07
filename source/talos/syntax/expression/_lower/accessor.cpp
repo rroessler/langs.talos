@@ -6,17 +6,17 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Accessor, accessor, compiler, destination) {
+TALOS_MM_LOWER_NODE(Accessor, node, compiler, destination) {
     // ensure we load the parent into the accumulator
-    compiler->lower(accessor->parent(), destination);
+    compiler->lower(node->parent(), destination);
 
     // ignore loading the field if the destination is nowhere
     if (destination.nowhere()) return;
 
     // prepare the trace for the node now
-    $_UNUSED $_AUTO = compiler->trace(accessor);
+    $_UNUSED $_AUTO = compiler->trace(node);
 
     // attempt loading the field as necessary now
-    auto symbol = compiler->symbol(accessor->field()->name());
+    auto symbol = compiler->symbol(node->field()->name());
     compiler->emit<Syllable::LOAD_FIELD>(destination, destination, symbol);
 }

@@ -6,7 +6,7 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LINT_NODE(Placeholder, placeholder, analyzer) {
-    analyzer->verify(placeholder->extends(), placeholder);
-    analyzer->verify(placeholder->fallback(), placeholder);
+TALOS_MM_LINT_NODE(Placeholder, node, analyzer) {
+    analyzer->verify(node->extends(), node);
+    analyzer->verify(node->fallback(), node);
 }

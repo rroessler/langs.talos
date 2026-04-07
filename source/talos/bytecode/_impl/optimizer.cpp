@@ -7,17 +7,14 @@
 
 //  CONSTRUCTORS  //
 
-Talos::Bytecode::Optimizer::Optimizer(Binder *labels) : Optimizer($::Global::get<Runtime::Container>(), labels) {}
-
-Talos::Bytecode::Optimizer::Optimizer(XI::Container *services, Binder *labels) :
-    Optimizer(labels, services->get<Runtime::Options>()) {}
-
-Talos::Bytecode::Optimizer::Optimizer(Binder *labels, const Runtime::Options *options) :
+Talos::Bytecode::Optimizer::Optimizer(Binder* labels) : Optimizer($::Global::get<Runtime::Container>(), labels) {}
+Talos::Bytecode::Optimizer::Optimizer(XI::Container* services, Binder* labels) : Optimizer(labels, *services) {}
+Talos::Bytecode::Optimizer::Optimizer(Binder* labels, const Runtime::Options* options) :
     m_labels(labels), m_options(options) {}
 
 //  PUBLIC METHODS  //
 
-void Talos::Bytecode::Optimizer::process(Routine *routine) const {
+void Talos::Bytecode::Optimizer::process(Routine* routine) const {
     // prepare the current callable for optimization
     if (!m_options->flags.optless) {
         m_remove_dead_ir(routine);       // start by removing dead ir
@@ -40,7 +37,7 @@ void Talos::Bytecode::Optimizer::process(Routine *routine) const {
 
 //  PRIVATE METHODS  //
 
-void Talos::Bytecode::Optimizer::m_build_graph(Routine *routine) const {
+void Talos::Bytecode::Optimizer::m_build_graph(Routine* routine) const {
     // pre-ensure we are not at the end before continuing
     if (routine->blocks.empty()) return;
 
@@ -49,12 +46,12 @@ void Talos::Bytecode::Optimizer::m_build_graph(Routine *routine) const {
     auto end = routine->blocks.end();
 
     // available labelled blocks
-    const auto &labelled = m_labels->blocks();
+    const auto& labelled = m_labels->blocks();
 
     // attempt updating whilst possible to do so
     while (iter != end) {
         // get the current block value now
-        auto *block = iter->get();
+        auto* block = iter->get();
         auto next = std::next(iter);
 
         // empty blocks fall through to next block
@@ -64,7 +61,7 @@ void Talos::Bytecode::Optimizer::m_build_graph(Routine *routine) const {
         }
 
         // get the last-most instruction now
-        auto *last = block->instructions().back().get();
+        auto* last = block->instructions().back().get();
 
         // handle based on the last operation code now
         switch (last->syllable()) {
@@ -105,34 +102,34 @@ void Talos::Bytecode::Optimizer::m_build_graph(Routine *routine) const {
     }
 }
 
-void Talos::Bytecode::Optimizer::m_dump_graph(Routine *routine) const {
-    $::IO::eprintln("\n===== CFG / {0} =====", fmt::ptr(routine->shared));
-    if (!routine->blocks.empty()) $::IO::eprintln();  // stop if needed
+void Talos::Bytecode::Optimizer::m_dump_graph(Routine* routine) const {
+    $::IO::println("\n===== CFG / {0} =====", fmt::ptr(routine->shared));
+    if (!routine->blocks.empty()) $::IO::println();  // stop if needed
 
     // attempt dumping each basic-block of the function now
-    for (const auto &block : routine->blocks) $::IO::eprintln(*block);
+    for (const auto& block : routine->blocks) $::IO::println(*block);
 }
 
-void Talos::Bytecode::Optimizer::m_remove_dead_ir(Routine *routine) const {
+void Talos::Bytecode::Optimizer::m_remove_dead_ir(Routine* routine) const {
     // prepare the predicate to be used here
-    static auto predicate = [](const auto &instruction) { return instruction->terminates(); };
+    static auto predicate = [](const auto& instruction) { return instruction->terminates(); };
 
     // and iteratively remove dead instructions now
-    for (auto &block : routine->blocks) {
-        auto &instructions = block->instructions();
+    for (auto& block : routine->blocks) {
+        auto& instructions = block->instructions();
         auto begin = instructions.begin(), end = instructions.end();
         auto iter = std::ranges::find_if(begin, end, predicate);
         if (iter != end) instructions.erase(std::next(iter), end);
     }
 }
 
-void Talos::Bytecode::Optimizer::m_remove_empty_blocks(Routine *routine) const {
+void Talos::Bytecode::Optimizer::m_remove_empty_blocks(Routine* routine) const {
     // prepare the blocks to be resolved now
-    auto &blocks = routine->blocks;
+    auto& blocks = routine->blocks;
     auto iter = blocks.begin(), end = blocks.end();
 
     // prepare the details now for labelled blocks
-    auto &labelled = m_labels->blocks();
+    auto& labelled = m_labels->blocks();
 
     // prepare the removal process now
     while (std::next(iter) != end && std::next(iter)->get() != nullptr) {
@@ -144,7 +141,7 @@ void Talos::Bytecode::Optimizer::m_remove_empty_blocks(Routine *routine) const {
 
         // handle update labels now if necessary
         if (auto labels = block->labels(); removable && labels.size()) {
-            for (const auto &label : labels) labelled.insert_or_assign(label, next);
+            for (const auto& label : labels) labelled.insert_or_assign(label, next);
             next->labels().insert(labels.begin(), labels.end());  // move across
         }
 
@@ -153,17 +150,17 @@ void Talos::Bytecode::Optimizer::m_remove_empty_blocks(Routine *routine) const {
     }
 }
 
-void Talos::Bytecode::Optimizer::m_rewrite_chained_branches(Routine *routine) const {
+void Talos::Bytecode::Optimizer::m_rewrite_chained_branches(Routine* routine) const {
     // iterate over all the available blocks
-    for (auto &block : routine->blocks) {
+    for (auto& block : routine->blocks) {
         // get the underlying instructions
-        auto &instructions = block->instructions();
+        auto& instructions = block->instructions();
 
         // skip all empty blocks
         if (instructions.empty()) continue;
 
         // jump instructions can sometimes be rewritten
-        auto &last = instructions.back();
+        auto& last = instructions.back();
         if (last->syllable() != Syllable::JUMP_TO) continue;
 
         // get the target block and catch infinite loops
@@ -174,7 +171,7 @@ void Talos::Bytecode::Optimizer::m_rewrite_chained_branches(Routine *routine) co
         if (target->instructions().size() != 1) continue;
 
         // get the target blocks only item now
-        auto *compare = target->instructions().front().get();
+        auto* compare = target->instructions().front().get();
 
         // only handle some comparable opcodes
         switch (compare->syllable()) {
@@ -190,10 +187,10 @@ void Talos::Bytecode::Optimizer::m_rewrite_chained_branches(Routine *routine) co
     }
 }
 
-void Talos::Bytecode::Optimizer::m_remove_dead_blocks(Routine *routine) const {
+void Talos::Bytecode::Optimizer::m_remove_dead_blocks(Routine* routine) const {
     // get the list of available blocks now
-    auto &blocks = routine->blocks;
-    std::list<Block *> reachable = {};
+    auto& blocks = routine->blocks;
+    std::list<Block*> reachable = {};
 
     // push the initial block when we have one
     if (blocks.size()) reachable.push_back(blocks.front().get());
@@ -210,33 +207,33 @@ void Talos::Bytecode::Optimizer::m_remove_dead_blocks(Routine *routine) const {
         block->reachable() = true;
 
         // update the reachable blocks to be checked now
-        for (const auto &outgoing : block->outgoing()) reachable.push_back(outgoing);
+        for (const auto& outgoing : block->outgoing()) reachable.push_back(outgoing);
     }
 
     // delete all non-reachable blocks
     for (auto iter = blocks.cbegin(); iter != blocks.cend();) {
         // get the block instance now
-        auto &block = *iter;
+        auto& block = *iter;
 
         if (block->reachable()) ++iter;  // skip if reachable
         else block->unlink(), iter = blocks.erase(iter);
     }
 }
 
-void Talos::Bytecode::Optimizer::m_remove_useless_jumps(Routine *routine) const {
+void Talos::Bytecode::Optimizer::m_remove_useless_jumps(Routine* routine) const {
     for (auto iter = routine->blocks.begin(); std::next(iter) != routine->blocks.end(); ++iter) {
         // prepare some details to be handled
         auto &block = *iter, &next = *std::next(iter);
-        auto &instructions = block->instructions();
+        auto& instructions = block->instructions();
 
         // ignore if the block is currently empty
         if (instructions.empty()) continue;
 
         // and handle the incoming jumps as necessary
-        switch (auto *last = instructions.back().get(); last->syllable()) {
+        switch (auto* last = instructions.back().get(); last->syllable()) {
 #define TALOS_XX_SYLLABLE_JUMP(N, ...)                                        \
     case Syllable::N: {                                                       \
-        auto *jump = last->cast<Syllable::N>();                               \
+        auto* jump = last->cast<Syllable::N>();                               \
         if (next->labels().contains(jump->get<0>())) instructions.pop_back(); \
     } break;
 #include "talos/bytecode/_defines/syllables.def"

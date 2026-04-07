@@ -5,5 +5,4 @@
 //  CONSTRUCTORS  //
 
 Talos::Runtime::Service::Service() : Service($::Global::get<Runtime::Container>()) {}
-Talos::Runtime::Service::Service(XI::Container* services) :
-    m_services(services), m_async(m_services->get<Async::Service>()) {}
+Talos::Runtime::Service::Service(XI::Container* services) : m_services(services), m_async(*m_services) {}

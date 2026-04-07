@@ -31,7 +31,7 @@ namespace Talos::Document {
          * @brief Constructs a document service.
          * @param services                  Services container.
          */
-        explicit Service(XI::Container* services) : m_publisher(services->get<Publisher>()) {}
+        explicit Service(XI::Container* services) : m_publisher(*services) {}
 
         //  PUBLIC METHODS  //
 

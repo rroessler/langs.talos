@@ -30,24 +30,24 @@ Talos::Type::Deduction Talos::Type::Dispatch::attribute(
     }
 }
 
-TALOS_MM_CHECK_NODE(Operator, attribute, analyzer) {
+TALOS_MM_CHECK_NODE(Operator, node, analyzer) {
     // get the current preamble target to be validated
     auto* entity = analyzer->world()->preamble();
 
     // set the current trace handler
-    $_UNUSED $_AUTO = analyzer->trace(attribute);
+    $_UNUSED $_AUTO = analyzer->trace(node);
 
     // we want to check the incoming "self" value
-    auto self = analyzer->check(attribute->target());
+    auto self = analyzer->check(node->target());
     auto* fields = Type::Dispatch::fields(self.type);
 
     // check if we have a valid instance (eg: must have fields)
-    if (fields == nullptr) return analyzer->report(3000803, *self.type, attribute->label());
+    if (fields == nullptr) return analyzer->report(3000803, *self.type, node->label());
 
     // to which we can then update the necessary lookup now
-    auto valid = fields->emplace(attribute->symbol(), entity->value());
-    if (!valid) return analyzer->report(6000303, attribute->label(), *self.type);
+    auto valid = fields->emplace(node->symbol(), entity->value());
+    if (!valid) return analyzer->report(6000303, node->label(), *self.type);
 
     // attempt validing the incoming operator now
-    return Type::Dispatch::attribute(analyzer, entity->value(), attribute);
+    return Type::Dispatch::attribute(analyzer, entity->value(), node);
 }

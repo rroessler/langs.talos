@@ -8,5 +8,5 @@
 
 TALOS_MM_LINT_NODE(Accessor, node, analyzer) {
     analyzer->verify(node->parent(), node);
-    analyzer->verify(node->field(), node);
+    analyzer->verify(node->field(), node, false);
 }

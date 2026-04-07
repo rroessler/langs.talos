@@ -66,6 +66,7 @@ void Talos::Server::Events::on_initialize(XLSP_REQUEST(LIFECYCLE_INITIALIZE) req
     bind.on_request(this, &Events::on_document_vardef);
     bind.on_request(this, &Events::on_document_typedef);
     bind.on_request(this, &Events::on_document_completes);
+    bind.on_request(this, &Events::on_document_references);
 
     auto response = XLSP_RESPONSE(LIFECYCLE_INITIALIZE);
     response.server = XLSP::Process::Information();
@@ -76,9 +77,22 @@ void Talos::Server::Events::on_initialize(XLSP_REQUEST(LIFECYCLE_INITIALIZE) req
 
     // update the current capabilities now
     response.capabilities["hoverProvider"] = true;
+    response.capabilities["referencesProvider"] = true;
+    response.capabilities["definitionProvider"] = true;
+    response.capabilities["typeDefinitionProvider"] = true;
+    response.capabilities["documentSymbolProvider"] = true;
     response.capabilities["documentFormattingProvider"] = true;
-    response.capabilities["documentLinkProvider"] = { { "resolveProvider", false } };
     response.capabilities["positionEncoding"] = XLSP::Encoding::format(*encoding);
+    response.capabilities["documentLinkProvider"] = { { "resolveProvider", false } };
+
+    // completion providers require a variety of details to construct
+    response.capabilities["completionProvider"] = {
+        { "resolveProvider", false },
+        { "triggerCharacters", $::Serde::Array({ "." }) },
+
+    };
+
+    // we want document synchronization with the entire document
     response.capabilities["textDocumentSync"] = {
         { "save", false },
         { "openClose", true },

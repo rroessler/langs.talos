@@ -29,7 +29,8 @@ namespace Talos::Async {
          * @brief Constructs an asynchronous manager.
          * @param services          Services container.
          */
-        explicit Service(XI::Container* services) : Define(&services->get<Runtime::Options>()->async) {}
+        explicit Service(XI::Container* services) : Service(*services) {}
+        explicit Service(const Runtime::Options* options) : Define(&options->async) {}
 
         //  PUBLIC METHODS  //
 

@@ -6,6 +6,6 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Overload, attribute, analyzer) {
-    return analyzer->report(attribute, 9000002, "Unimplemented Analyzer.check(Syntax::Overload)");
+TALOS_MM_CHECK_NODE(Overload, node, analyzer) {
+    return analyzer->report(node, 9000002, "Unimplemented Analyzer.check(Syntax::Overload)");
 }

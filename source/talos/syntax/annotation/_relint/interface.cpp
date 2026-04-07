@@ -6,4 +6,4 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LINT_NODE(Interface, interface, analyzer) { analyzer->verify(interface->properties(), interface); }
+TALOS_MM_LINT_NODE(Interface, node, analyzer) { analyzer->verify(node->properties(), node); }

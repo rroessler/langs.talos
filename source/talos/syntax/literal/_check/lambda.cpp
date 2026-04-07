@@ -60,19 +60,19 @@ void Talos::Type::Dispatch::lambda(Analyzer* analyzer, const Syntax::Lambda* sel
     }
 }
 
-TALOS_MM_CHECK_NODE(Lambda, lambda, analyzer) {
+TALOS_MM_CHECK_NODE(Lambda, node, analyzer) {
     // immediately ensure that the signature is valid
-    auto result = analyzer->check(lambda->signature());
+    auto result = analyzer->check(node->signature());
 
     // return early when necessary to do so here
     if (result.type->is<Type::Any>()) return result;
 
     // get the return-typing of the result
     auto callable = Type::Builder::resolve<Type::Callable>(result.type);
-    callable->returns() = Type::Dispatch::returns(lambda, callable->returns());
+    callable->returns() = Type::Dispatch::returns(node, callable->returns());
 
     // prepare the deferred check handler
-    Type::Deferrer check = [lambda, type = result.type](auto* _) mutable { Type::Dispatch::lambda(_, lambda, type); };
+    Type::Deferrer check = [node, type = result.type](auto* _) mutable { Type::Dispatch::lambda(_, node, type); };
 
     // push the incoming instance onto main checker now
     return analyzer->defer(std::move(result), std::move(check));

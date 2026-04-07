@@ -56,9 +56,9 @@ namespace Talos::Type {
         //  PUBLIC METHODS  //
 
         inline constexpr Context* context() const noexcept { return m_context.get(); }
+        inline constexpr Shape::Service* shapes() const noexcept { return *m_services; }
         inline constexpr Exports& exports() const noexcept { return m_context->exports(); }
         inline constexpr Variable::Captures& captures() const noexcept { return m_context->captures(); }
-        inline constexpr Shape::Service* shapes() const noexcept { return m_services->get<Shape::Service>(); }
 
         inline constexpr Depth depth() const noexcept { return m_world->depth(); }
         inline constexpr $::URI::View resource() const noexcept {

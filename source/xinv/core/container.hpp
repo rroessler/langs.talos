@@ -29,6 +29,20 @@ namespace XI {
         /// @brief Constructs a defaulted container.
         explicit Container() = default;
 
+        //  OPERATOR METHODS  //
+
+        /// @brief Allows getting services through dereferencing.
+        template <std::derived_from<Shared> T>
+        inline constexpr operator T*() {
+            return get<T>();  // attempt getting the value
+        }
+
+        /// @brief Allows creating services through dereferencing.
+        template <std::derived_from<Unique> T>
+        inline constexpr operator $::Ptr::Unique<T>() {
+            return m_reify<T>();  // create eht value now
+        }
+
         //  PUBLIC METHODS  //
 
         /// @brief Checks if a service exists.

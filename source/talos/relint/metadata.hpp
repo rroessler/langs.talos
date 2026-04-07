@@ -2,7 +2,7 @@
 #define _TALOS_RELINT_METADATA_HPP
 
 /// Talos Modules
-#include "talos/relint/mirror.hpp"
+#include "talos/relint/scope.hpp"
 #include "talos/syntax/comparator.hpp"
 
 namespace Talos::Relint {
@@ -19,6 +19,9 @@ namespace Talos::Relint {
         /// @brief The sorted list of mirrors.
         std::vector<const Syntax::Node*> m_sorted = {};
 
+        /// @brief Prepare the base references scope.
+        $::Ptr::Unique<Scope> m_references = $::New().unique<Scope>();
+
         /// @brief Mirrors that contain node reflection data.
         $::Map<const Syntax::Node*, $::Ptr::Unique<Mirror>> m_mirrors = {};
 
@@ -29,6 +32,9 @@ namespace Talos::Relint {
         explicit Metadata() = default;
 
         //  PUBLIC METHODS  //
+
+        /// @brief Gets the core references scoping.
+        inline constexpr const Scope* references() const noexcept { return m_references.get(); }
 
         /**
          * @brief Denotes if a mirror is bound.

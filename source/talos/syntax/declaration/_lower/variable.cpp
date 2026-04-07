@@ -6,24 +6,24 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_LOWER_NODE(Variable, variable, compiler, ) {
+TALOS_MM_LOWER_NODE(Variable, node, compiler, ) {
     // prepare the trace for the node now
-    $_UNUSED $_AUTO = compiler->trace(variable);
+    $_UNUSED $_AUTO = compiler->trace(node);
 
     // get the location of the variable now
-    auto [dest, leaked] = compiler->declare(variable);
+    auto [dest, leaked] = compiler->declare(node);
     $_ASSERT(!dest.nowhere(), "Declaration does not exist?");
 
     // prepare our initializer for the variable now
     auto ireg = leaked ? Accumulator() : dest;
-    auto* initializer = variable->initializer();
+    auto* initializer = node->initializer();
     if (initializer) compiler->lower(initializer, ireg);
 
     // we want to update the current value details
-    compiler->preamble(variable, ireg);
+    compiler->preamble(node, ireg);
 
     // if the instance is disposable, then attach to frame
-    if (variable->disposable()) compiler->emit<Syllable::DISPOSE_DEFER>(ireg);
+    if (node->disposable()) compiler->emit<Syllable::DISPOSE_DEFER>(ireg);
 
     // and handle assignment based on the leakage state
     if (leaked) compiler->emit<Syllable::STORE_CONTEXT>(dest, ireg);

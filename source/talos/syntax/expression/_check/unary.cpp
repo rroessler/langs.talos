@@ -6,12 +6,12 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Unary, unary, analyzer) {
-    // trace from the unary node
-    $_UNUSED $_AUTO = analyzer->trace(unary);
+TALOS_MM_CHECK_NODE(Unary, node, analyzer) {
+    // trace from the binary node
+    $_UNUSED $_AUTO = analyzer->trace(node);
 
     // prepare the sides that are available
-    auto operand = analyzer->check(unary->operand()).type;
+    auto operand = analyzer->check(node->operand()).type;
 
     // prepare the base deduction to be used
     auto deduction = analyzer->passable(Type::Builder::fail());
@@ -20,8 +20,8 @@ TALOS_MM_CHECK_NODE(Unary, unary, analyzer) {
     if (operand->is<Type::Failure>()) return deduction;
 
     // otherwise attempt running the transformation now
-    deduction.type = operand->apply(unary->opcode());
+    deduction.type = operand->apply(node->opcode());
 
     if (!deduction.type->is<Type::Unset>()) return deduction;
-    return analyzer->report(3000800, unary->symbol(), *operand);
+    return analyzer->report(3000800, node->symbol(), *operand);
 }

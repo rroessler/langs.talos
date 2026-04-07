@@ -31,11 +31,10 @@ XLSP::Position Talos::Server::Utilities::position_to_server(const XLSP::Position
 }
 
 const Talos::Relint::Metadata* Talos::Server::Utilities::syntax_view_at(const $::URI::View& resource) const {
-    auto* imports = m_services->get<Import::Service>();
-    auto* module = imports->drafts()->lookup(resource);
-    if (module == nullptr) return nullptr;  // failed
-
-    auto* metadata = module->metadata<Module::Phase::TYPED>();
+    Import::Service* modules = *m_services;  // resolve
+    auto* found = modules->drafts()->lookup(resource);
+    if (found == nullptr) return nullptr;  // failed
+    auto* metadata = found->metadata<Module::Phase::TYPED>();
     return metadata->context()->mirrors().get();  // resolved
 }
 

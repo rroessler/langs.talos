@@ -10,6 +10,7 @@
 /// Forward Declarations
 $_FWD(Talos::Relint, struct Rule)
 $_FWD(Talos::Relint, class Hooks)
+$_FWD(Talos::Relint, class Scope)
 $_FWD(Talos::Relint, class Mirror)
 $_FWD(Talos::Relint, class Context)
 $_FWD(Talos::Relint, class Service)

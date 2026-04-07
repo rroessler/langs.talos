@@ -179,7 +179,7 @@ namespace XLSP::Server {
          */
         $::String::Buffer m_bind(Event::Answer&& reply) {
             // prepare the necessary identifier to be used
-            auto identifier = std::to_string(++m_events->identifier);
+            auto identifier = fmt::to_string(++m_events->identifier);
 
             // get the maximum queue threshold
             const auto threshold = m_options->events.threshold;

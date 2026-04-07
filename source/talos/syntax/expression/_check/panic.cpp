@@ -6,18 +6,12 @@
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Panic, panic, analyzer) {
+TALOS_MM_CHECK_NODE(Panic, node, analyzer) {
     // push the necessary traces for analyzing
-    $_UNUSED $_AUTO = analyzer->trace(panic);
+    $_UNUSED $_AUTO = analyzer->trace(node);
 
     // forcibly check the incoming value to be used now
-    analyzer->check(panic->value());
-
-    // // check for validness against potential types
-    // auto valid = result.type->is<Type::Any, Type::None>();
-
-    // // ensure the result is valid for exceptions
-    // if (!valid) analyzer->report(3000950, *result.type);
+    analyzer->check(node->value());
 
     // and declare as currently reachable now
     return analyzer->unreachable();

@@ -77,7 +77,7 @@ Talos::Heap::Region* Talos::Heap::Service::acquire(Stage stage, Region* parent) 
     // handle garbage collection when necessary
     if (stage == Stage::EDEN && region == nullptr) {
         for (size_t attempt = 0; attempt < m_options->garbage_attempts; ++attempt) {
-            auto* garbage = m_services->get<Garbage::Service>();
+            Garbage::Service* garbage = *m_services;
             lock.unlock(), garbage->collect(), lock.lock();
             if ((region = m_pop())) break;  // got next now
         }

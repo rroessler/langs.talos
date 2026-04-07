@@ -16,59 +16,212 @@
 
 namespace XLSP {
 
+    /// @brief Text Document Symbol.
+    struct Symbol {
+        //  TYPEDEFS  //
+
+        /// @brief Available Symbol Kinds.
+        enum class Kind : uint8_t {
+            UNKNOWN = 0,
+            FILE = 1,
+            MODULE = 2,
+            NAMESPACE = 3,
+            PACKAGE = 4,
+            CLASS = 5,
+            METHOD = 6,
+            PROPERTY = 7,
+            FIELD = 8,
+            CONSTRUCTOR = 9,
+            ENUM = 10,
+            INTERFACE = 11,
+            FUNCTION = 12,
+            VARIABLE = 13,
+            CONSTANT = 14,
+            STRING = 15,
+            NUMBER = 16,
+            BOOLEAN = 17,
+            ARRAY = 18,
+            OBJECT = 19,
+            KEY = 20,
+            VOID = 21,
+            VARIANT = 22,
+            STRUCT = 23,
+            EVENT = 24,
+            OPERATOR = 25,
+            TPARAM = 26,
+        };
+
+        //  PROPERTIES  //
+
+        /// @brief Name of the symbol.
+        $::String::Buffer name;
+
+        /// @brief Kind of symbol.
+        Kind kind = Kind::UNKNOWN;
+
+        /// @brief Deprecation state.
+        bool deprecated = false;
+
+        /// @brief Base range of symbol.
+        Range range = {};
+
+        /// @brief Selection range of symbol.
+        Range selection = {};
+
+        //  CONSTRUCTORS  //
+
+        /// @brief Ensure we bind a symbol name.
+        explicit Symbol() = delete;
+
+        /**
+         * @brief Constructs a document symbol.
+         * @param name                      Name of symbol.
+         * @param kind                      Kind of symbol.
+         */
+        explicit Symbol(const $::String::Buffer& name, Kind kind = Kind::UNKNOWN) : name(name), kind(kind) {}
+
+       protected:
+        //  PRIVATE METHODS  //
+
+        /**
+         * @brief Handles encoding a document symbol.
+         * @param self                      Symbol to encode.
+         */
+        static $::Serde::Value m_encode(const Symbol& self) {
+            // construct the basis of our symbol
+            $::Serde::Object symbol = {
+                { "name", self.name },
+                { "kind", self.kind },
+                { "range", $::Reflect::encode(self.range) },
+                { "selectionRange", $::Reflect::encode(self.selection) },
+            };
+
+            // bind the deprecation status as well
+            if (self.deprecated) symbol["tags"] = { 1 };
+
+            // and resolve our symbol
+            return symbol;
+        }
+    };
+
+    /// @brief Document Link (eg: Internal/External Website).
+    struct Anchor {
+        //  PROPERTIES  //
+
+        /// @brief Document Link Range.
+        Range range = {};
+
+        /// @brief The resource target to link.
+        $::URI::Buffer target;
+
+        /// @brief Link text to show on hover.
+        $::String::Buffer tooltip = "";
+
+        //  CONSTRUCTORS  //
+
+        /// @brief Do not allow default construction.
+        constexpr Anchor() = delete;
+
+        /**
+         * @brief Constructs an empty document.
+         * @param resource                  Document resource.
+         * @param range                     Range to bind.
+         */
+        constexpr Anchor(const $::URI::Buffer& resource, const Range& range = {}) : range(range), target(resource) {}
+
+       protected:
+        //  PRIVATE METHODS  //
+
+        /**
+         * @brief Handles encoding a document link.
+         * @param self                      Link to encode.
+         */
+        static $::Serde::Value m_encode(const Anchor& self) {
+            // construct the basis of our link
+            $::Serde::Object link = {
+                { "range", $::Reflect::encode(self.range) },
+                { "target", $::Reflect::encode(self.target) },
+            };
+
+            // bind the resulting tooltip if it has a size
+            if (self.tooltip.size()) link["tooltip"] = self.tooltip;
+
+            // return the reslting link
+            return link;
+        }
+    };
+
+    /// @brief Text Document Completion.
+    struct Completion {
+        //  TYPEDEFS  //
+
+        /// @brief Available completion kinds.
+        enum class Kind : uint8_t {
+            TEXT = 1,
+            METHOD = 2,
+            FUNCTION = 3,
+            CONSTRUCTOR = 4,
+            FIELD = 5,
+            VARIABLE = 6,
+            CLASS = 7,
+            INTERFACE = 8,
+            MODULE = 9,
+            PROPERTY = 10,
+            UNIT = 11,
+            VALUE = 12,
+            ENUM = 13,
+            KEYWORD = 14,
+            SNIPPET = 15,
+            COLOR = 16,
+            FILE = 17,
+            REFERENCE = 18,
+            FOLDER = 19,
+            VARIANT = 20,
+            CONSTANT = 21,
+            STRUCT = 22,
+            EVENT = 23,
+            OPERATOR = 24,
+            TPARAM = 25
+        };
+
+        //  PROPERTIES  //
+
+        /// @brief The kind of completion.
+        Kind kind = Kind::TEXT;
+
+        /// @brief Label of the completion item.
+        $::String::Buffer label;
+
+        //  CONSTRUCTORS  //
+
+        /// @brief Do not allow empty completion items.
+        constexpr Completion() = delete;
+
+        /**
+         * @brief Constructs an empty completion.
+         * @param label             Completion label.
+         * @param kind              Kind of completion.
+         */
+        constexpr Completion(const $::String::Buffer& label, Kind kind = Kind::TEXT) : kind(kind), label(label) {}
+
+       protected:
+        //  PRIVATE METHODS  //
+
+        /**
+         * @brief Handles encoding a completion.
+         * @param self                      Completion to encode.
+         */
+        static $::Serde::Value m_encode(const Completion& self) {
+            return { { "kind", self.kind }, { "label", self.label } };
+        }
+    };
+
     /// @brief Text Document Item.
     struct Document {
         //  TYPEDEFS  //
 
         /// @brief Document Synchronization Kinds.
         $_XX_ENUM_CLASS(Sync, uint8_t, XX_DOCUMENT_SYNC);
-
-        /// @brief Document Link Structure.
-        struct Link {
-            //  PROPERTIES  //
-
-            /// @brief Document Link Range.
-            Range range = {};
-
-            /// @brief The resource target to link.
-            $::URI::Buffer target;
-
-            /// @brief Link text to show on hover.
-            $::String::Buffer tooltip = "";
-
-            //  CONSTRUCTORS  //
-
-            /// @brief Do not allow default construction.
-            constexpr Link() = delete;
-
-            /**
-             * @brief Constructs an empty document.
-             * @param resource                  Document resource.
-             * @param range                     Range to bind.
-             */
-            constexpr Link(const $::URI::Buffer& resource, const Range& range = {}) : range(range), target(resource) {}
-
-           protected:
-            //  PRIVATE METHODS  //
-
-            /**
-             * @brief Handles encoding a document link.
-             * @param self                      Link to encode.
-             */
-            static $::Serde::Value m_encode(const Link& self) {
-                // construct the basis of our link
-                $::Serde::Object link = {
-                    { "range", $::Reflect::encode(self.range) },
-                    { "target", $::Reflect::encode(self.target) },
-                };
-
-                // bind the resulting tooltip if it has a size
-                if (self.tooltip.size()) link["tooltip"] = self.tooltip;
-
-                // return the reslting link
-                return link;
-            }
-        };
 
         /// @brief Document Edit Structure.
         struct Edit {

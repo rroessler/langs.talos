@@ -91,4 +91,4 @@ void Shell::Program::m_vendors() {
     throw CLI::Success();
 }
 
-void Shell::Program::m_revision() { $::IO::eprintln("v" TALOS_MM_REVISION), throw CLI::Success(); }
+void Shell::Program::m_revision() { $::IO::println("v" TALOS_MM_REVISION), throw CLI::Success(); }
