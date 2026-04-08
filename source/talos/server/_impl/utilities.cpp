@@ -39,9 +39,28 @@ const Talos::Relint::Metadata* Talos::Server::Utilities::syntax_view_at(const $:
 }
 
 const Talos::Relint::Mirror* Talos::Server::Utilities::syntax_node_at(
-    const $::URI::View& resource, const XLSP::Position& position) const {
+    const $::URI::View& resource, const XLSP::Position& position, Relint::Filter&& filter) const {
     auto* mirrors = syntax_view_at(resource);
     if (mirrors == nullptr) return nullptr;
     auto normalized = position_to_server(position);
-    return mirrors->search(normalized);  // search
+    return mirrors->search(normalized, std::move(filter));
+}
+
+const Talos::Relint::Mirror* Talos::Server::Utilities::vardef_node_at(
+    const $::URI::View& resource, const XLSP::Position& position) const {
+    auto* mirror = syntax_node_at<Syntax::Identifier, Syntax::Declaration>(resource, position);
+    return mirror && !mirror->qualified() ? mirror->definition()->variable : nullptr;
+}
+
+const Talos::Relint::Mirror* Talos::Server::Utilities::typedef_node_at(
+    const $::URI::View& resource, const XLSP::Position& position) const {
+    auto* mirror = syntax_node_at<Syntax::Identifier, Syntax::Alias>(resource, position);
+    return mirror && mirror->qualified() ? mirror->definition()->annotation : nullptr;
+}
+
+const Talos::Relint::Mirror* Talos::Server::Utilities::anydef_node_at(
+    const $::URI::View& resource, const XLSP::Position& position) const {
+    auto* mirror = syntax_node_at<Syntax::Identifier, Syntax::Declaration>(resource, position);
+    if (mirror == nullptr) return nullptr;  // stop early when the incoming mirror is invalid at all
+    return mirror->qualified() ? mirror->definition()->annotation : mirror->definition()->variable;
 }

@@ -7,6 +7,9 @@
 
 namespace Talos::Relint {
 
+    /// @brief Document Symbols Alias.
+    using Symbols = std::vector<XLSP::Symbol>;
+
     /// @brief Relint Environment Metadata.
     class Metadata {
         //  TYPEDEFS  //
@@ -15,6 +18,9 @@ namespace Talos::Relint {
         friend struct Analyzer;
 
         //  PROPERTIES  //
+
+        /// @brief The available document symbols.
+        Symbols m_symbols = {};
 
         /// @brief The sorted list of mirrors.
         std::vector<const Syntax::Node*> m_sorted = {};
@@ -32,6 +38,9 @@ namespace Talos::Relint {
         explicit Metadata() = default;
 
         //  PUBLIC METHODS  //
+
+        /// @brief Gets the available document symbols.
+        inline constexpr const Symbols& symbols() const noexcept { return m_symbols; }
 
         /// @brief Gets the core references scoping.
         inline constexpr const Scope* references() const noexcept { return m_references.get(); }
@@ -58,8 +67,10 @@ namespace Talos::Relint {
         /**
          * @brief Handles searching for a node mirror.
          * @param position              Search position.
+         * @param filter                Optional filter.
          */
         const Mirror* search(const XLSP::Position& position) const noexcept;
+        const Mirror* search(const XLSP::Position& position, Filter&& filter) const noexcept;
 
         /// @brief Handles filtering metadata.
         template <std::derived_from<Syntax::Node> T>

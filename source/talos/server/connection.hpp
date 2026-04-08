@@ -14,6 +14,9 @@ namespace Talos::Server {
     class Connection : public XI::Define<Connection, XI::Shared, XLSP::Server::Connection> {
         //  PROPERTIES  //
 
+        /// @brief The mutex for analysis.
+        mutable $::Mutex::Auto m_mutex;
+
         /// @brief Available services container.
         XI::Container* m_services;
 
@@ -53,6 +56,9 @@ namespace Talos::Server {
         inline constexpr void schedule(As&&... args) {
             m_async->spawn<Delegate>(this, std::forward<As>(args)...);
         }
+
+        /// @brief Prepares a suitable scoped connection guard.
+        $_NODISCARD inline constexpr auto guard() noexcept { return $::Lock::guard(m_mutex); }
 
        private:
         //  PRIVATE METHODS  //

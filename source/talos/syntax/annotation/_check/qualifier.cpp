@@ -43,7 +43,7 @@ TALOS_MM_CHECK_NODE(Qualifier, node, analyzer) {
     }
 
     // ensure the final segment we have is transient before inferring the type
-    if (!entity->transient()) return analyzer->report(identifier, 3000201, chain);
+    if (!segment.transient()) return analyzer->report(identifier, 3000201, chain);
 
     $_UNUSED $_AUTO = analyzer->trace(node);  // ensure we trace errors here as well
     return analyzer->passable(analyzer->instantiate(segment.type(), node->types()));

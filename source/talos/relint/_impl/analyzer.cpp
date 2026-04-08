@@ -57,9 +57,49 @@ void Talos::Relint::Analyzer::m_finalize(Mirror* mirror) {
     auto* origin = mirror->origin();
     auto* traits = origin->traits();
 
+    // if the symbol is suitably valid, then we append to the lsit
+    if (auto symbol = m_classify(mirror)) m_mirrors->m_symbols.emplace_back(symbol);
+
     // ignore if we do not have a declaration node
     if (!origin->is<Syntax::Declaration>()) return;
 
-    // use the traits to get all documentation comments
+    /// TODO: use the traits to get all documentation comments
     $_PP_IGNORE(traits);
+}
+
+XLSP::Symbol Talos::Relint::Analyzer::m_classify(const Mirror* mirror) const {
+    switch (auto* origin = mirror->origin(); origin->traits()->tag()) {
+        // aliases can simply be resolved as needed
+        case $::RTTI::Hash<Syntax::Alias>(): {
+            auto name = origin->as<Syntax::Alias>()->name();
+            return { name, XLSP::Symbol::Kind::INTERFACE };
+        }
+
+        // enums can simply be resolved as needed
+        case $::RTTI::Hash<Syntax::Enum>(): {
+            auto name = origin->as<Syntax::Enum>()->name();
+            return { name, XLSP::Symbol::Kind::ENUM };
+        }
+
+        // classes can simply be resolved as needed
+        case $::RTTI::Hash<Syntax::Class>(): {
+            auto name = origin->as<Syntax::Class>()->name();
+            return { name, XLSP::Symbol::Kind::CLASS };
+        }
+
+        // variables can simply be resolved as needed
+        case $::RTTI::Hash<Syntax::Variable>(): {
+            auto name = origin->as<Syntax::Variable>()->name();
+            return { name, XLSP::Symbol::Kind::VARIABLE };
+        }
+
+        // namespaces can simply be resolved as needed
+        case $::RTTI::Hash<Syntax::Namespace>(): {
+            auto name = origin->as<Syntax::Declaration>()->name();
+            return { name, XLSP::Symbol::Kind::NAMESPACE };
+        }
+
+        // in the default case, return an unknown symbol
+        default: return XLSP::Symbol();
+    }
 }

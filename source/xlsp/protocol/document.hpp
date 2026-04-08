@@ -53,9 +53,6 @@ namespace XLSP {
 
         //  PROPERTIES  //
 
-        /// @brief Name of the symbol.
-        $::String::Buffer name;
-
         /// @brief Kind of symbol.
         Kind kind = Kind::UNKNOWN;
 
@@ -68,17 +65,24 @@ namespace XLSP {
         /// @brief Selection range of symbol.
         Range selection = {};
 
+        /// @brief Name of the symbol.
+        $::String::Buffer name = {};
+
         //  CONSTRUCTORS  //
 
-        /// @brief Ensure we bind a symbol name.
-        explicit Symbol() = delete;
+        /// @brief Constructs invalid symbols.
+        constexpr Symbol() = default;
 
         /**
          * @brief Constructs a document symbol.
          * @param name                      Name of symbol.
          * @param kind                      Kind of symbol.
          */
-        explicit Symbol(const $::String::Buffer& name, Kind kind = Kind::UNKNOWN) : name(name), kind(kind) {}
+        constexpr Symbol(const $::String::View& name, Kind kind = Kind::UNKNOWN) : kind(kind), name(name) {}
+
+        //  OPERATOR METHODS  //
+
+        inline constexpr operator bool() const noexcept { return kind != Kind::UNKNOWN; }
 
        protected:
         //  PRIVATE METHODS  //

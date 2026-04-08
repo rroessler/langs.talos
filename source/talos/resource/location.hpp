@@ -56,7 +56,8 @@ namespace Talos::Resource {
          * @param self                  Location instance.
          */
         static inline void m_print($::Stream::Output& os, const Location& self) {
-            os << self.m_resource.relative() << ':' << self.m_range.start;
+            XLSP::Position start = self.m_range.start;
+            os << self.m_resource.relative() << ':' << start;
         }
     };
 

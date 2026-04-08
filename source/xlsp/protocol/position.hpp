@@ -6,8 +6,8 @@
 
 namespace XLSP {
 
-    /// @brief Position Structure.
-    struct Position : public $::Printable {
+    /// @brief Baseline Cursor Position (to reduce `Position` and `Range` sizes).
+    struct Cursor {
         //  PROPERTIES  //
 
         uint32_t line = 0;    // Line-number (zero-offset).
@@ -15,25 +15,25 @@ namespace XLSP {
 
         //  CONSTRUCTORS  //
 
-        /// @brief Constructs an empty position (0, 0).
-        constexpr Position() = default;
+        /// @brief Constructs an empty cursor (0, 0).
+        constexpr Cursor() = default;
 
         /**
-         * @brief Constructs a position.
-         * @param ln                        Line of position.
-         * @param col                       Column of position.
+         * @brief Constructs a cursor.
+         * @param ln                        Line of cursor.
+         * @param col                       Column of cursor.
          */
-        constexpr Position(uint32_t ln, uint32_t col) : line(ln), column(col) {}
+        constexpr Cursor(uint32_t ln, uint32_t col) : line(ln), column(col) {}
 
         //  OPERATOR METHODS  //
 
         /// @brief Equality operator for positions.
-        inline constexpr auto operator==(const Position& other) const -> bool {
+        inline constexpr auto operator==(const Cursor& other) const -> bool {
             return line == other.line && column == other.column;
         }
 
         /// @brief Comparison operator for positions.
-        inline constexpr auto operator<=>(const Position& other) const {
+        inline constexpr auto operator<=>(const Cursor& other) const {
             return std::tie(line, column) <=> std::tie(other.line, other.column);
         }
 
@@ -65,6 +65,17 @@ namespace XLSP {
             // return the final result now
             return total > view.size() ? -1 : total;
         }
+    };
+
+    /// @brief Position Structure.
+    struct Position : public Cursor, public $::Printable {
+        //  CONSTRUCTORS  //
+
+        /// @brief Inherit the base constructors.
+        using Cursor::Cursor;
+
+        /// @brief We allow direct conversions from cursor values.
+        constexpr Position(const Cursor& cursor) : Cursor(cursor) {}
 
        protected:
         //  PRIVATE METHODS  //

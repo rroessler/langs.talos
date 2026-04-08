@@ -15,7 +15,7 @@ void Talos::Server::Events::on_document_format(XLSP_REQUEST(DOCUMENT_FORMAT) req
 std::vector<XLSP::Document::Edit> Talos::Server::Worker::format() const noexcept { return format(m_crate->format()); }
 std::vector<XLSP::Document::Edit> Talos::Server::Worker::format(const Format::Options& options) const noexcept {
     // show that a format was requested
-    $_TRACE("--| format: requested '{0}'", m_resource);
+    $_TRACE("--| format: requested '{0}'", m_resource.relative());
 
     // get some necessary services to be used
     auto* documents = m_connection->service<Document::Service>();

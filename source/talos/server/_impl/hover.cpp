@@ -10,7 +10,7 @@ void Talos::Server::Events::on_document_hover(XLSP_REQUEST(DOCUMENT_HOVER) reque
     auto resource = request.params.identifier.resource;
 
     // show that a message was requested
-    $_TRACE("--| hover: requested '{0}:{1}'", resource, position);
+    $_TRACE("--| hover: requested '{0}:{1}'", resource.relative(), position);
 
     // prepare an empty response to be returned
     auto response = XLSP_RESPONSE(DOCUMENT_HOVER);

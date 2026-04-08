@@ -84,8 +84,9 @@ namespace Talos::Lexer {
          * @param self                  Token to print.
          */
         static inline void m_print($::Stream::Output& os, const Token& self) {
-            auto name = Traits::name(self.m_kind);
-            auto position = self.m_location.range().start;
+            // resolve the incoming details to be shown
+            $::String::View name = Traits::name(self.m_kind);
+            XLSP::Position position = self.m_location.range().start;
 
             // print the resulting token now for debug viewing
             os << fmt::format("[{0} / {1}] = '{2}'", name, position, self.m_lexeme);

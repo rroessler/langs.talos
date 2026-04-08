@@ -47,8 +47,42 @@ namespace Talos::Server {
          * @brief Gets a syntax-node at a location.
          * @param resource                  Resource value.
          * @param position                  Position value.
+         * @param filter                    Optional filter.
          */
-        const Relint::Mirror* syntax_node_at(const $::URI::View& resource, const XLSP::Position& position) const;
+        const Relint::Mirror* syntax_node_at(
+            const $::URI::View& resource, const XLSP::Position& position, Relint::Filter&& filter = nullptr) const;
+
+        /**
+         * @brief Gets a syntax-node at a location.
+         * @param resource                  Resource value.
+         * @param position                  Position value.
+         */
+        template <std::derived_from<Syntax::Node>... Ts>
+        inline constexpr const Relint::Mirror* syntax_node_at(
+            const $::URI::View& resource, const XLSP::Position& position) const {
+            return syntax_node_at(resource, position, [](const Syntax::Node* node) { return node->is<Ts...>(); });
+        }
+
+        /**
+         * @brief Gets a variable definition node at a location.
+         * @param resource                  Resource value.
+         * @param position                  Position value.
+         */
+        const Relint::Mirror* vardef_node_at(const $::URI::View& resource, const XLSP::Position& position) const;
+
+        /**
+         * @brief Gets a type-definition node at a location.
+         * @param resource                  Resource value.
+         * @param position                  Position value.
+         */
+        const Relint::Mirror* typedef_node_at(const $::URI::View& resource, const XLSP::Position& position) const;
+
+        /**
+         * @brief Gets a definition node at a location.
+         * @param resource                  Resource value.
+         * @param position                  Position value.
+         */
+        const Relint::Mirror* anydef_node_at(const $::URI::View& resource, const XLSP::Position& position) const;
     };
 
 }  // namespace Talos::Server

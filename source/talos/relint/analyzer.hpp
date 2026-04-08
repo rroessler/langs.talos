@@ -106,6 +106,12 @@ namespace Talos::Relint {
          * @param mirror                    Mirror to finalize.
          */
         void m_finalize(Mirror* mirror);
+
+        /**
+         * @brief Handles classifying node symbols.
+         * @param mirror                    Mirror to classify.
+         */
+        XLSP::Symbol m_classify(const Mirror* mirror) const;
     };
 
 }  // namespace Talos::Relint

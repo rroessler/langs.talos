@@ -32,6 +32,9 @@ namespace Talos::Relint {
 
         //  PUBLIC METHODS  //
 
+        /// @brief Gets a view of the available definitions.
+        inline constexpr auto view() const noexcept { return m_definitions; }
+
         /**
          * @brief Declares a variable reference.
          * @param name              Name of variable.

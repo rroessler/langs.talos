@@ -10,8 +10,8 @@ namespace XLSP {
     struct Range : public $::Printable {
         //  PROPERTIES  //
 
-        Position start = {};  // Starting position.
-        Position end = {};    // Ending position.
+        Cursor start = {};  // Starting position.
+        Cursor end = {};    // Ending position.
 
         //  CONSTRUCTORS  //
 
@@ -34,7 +34,7 @@ namespace XLSP {
          * @param start                     Starting position.
          * @param end                       Ending position.
          */
-        constexpr Range(const Position& start, const Position& end) :
+        constexpr Range(const Cursor& start, const Cursor& end) :
             Range(start.line, start.column, end.line, end.column) {}
 
         //  OPERATOR METHODS  //
@@ -65,7 +65,8 @@ namespace XLSP {
          * @param self                      Range instance.
          */
         static $::Serde::Object m_encode(const Range& self) {
-            return { { "start", $::Reflect::encode(self.start) }, { "end", $::Reflect::encode(self.end) } };
+            Position start = self.start, end = self.end;  // rebind as positions to decode here
+            return { { "start", $::Reflect::encode(start) }, { "end", $::Reflect::encode(end) } };
         }
 
         /**
@@ -81,7 +82,10 @@ namespace XLSP {
          * @param os                        Output stream.
          * @param self                      Range to print.
          */
-        static void m_print($::Stream::Output& os, const Range& self) { os << self.start << '-' << self.end; }
+        static void m_print($::Stream::Output& os, const Range& self) {
+            os << self.start.line << ':' << self.start.column;
+            os << '-' << self.end.line << ':' << self.end.column;
+        }
     };
 
 }  // namespace XLSP

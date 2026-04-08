@@ -11,7 +11,7 @@ void Talos::Server::Events::on_document_links(XLSP_REQUEST(DOCUMENT_LINKS) reque
     auto resource = request.params.identifier.resource;
 
     // show that a format was requested
-    $_TRACE("--| links: requested '{0}'", resource);
+    $_TRACE("--| links: requested '{0}'", resource.relative());
 
     // get the incoming modules service to use
     auto* modules = m_connection->service<Import::Service>();

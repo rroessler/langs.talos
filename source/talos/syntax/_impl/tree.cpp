@@ -24,16 +24,16 @@ Talos::Syntax::Tree::Tree(const $::URI::View& resource) : m_resource(resource) {
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Tree, tree, analyzer) {
+TALOS_MM_CHECK_NODE(Tree, node, analyzer) {
     $_ASSERT(analyzer->depth() == -1);  // ensure at global-depth
     auto world = analyzer->scope();     // scope the incoming world
     $_ASSERT(analyzer->depth() == 0);   // and ensure now exporting
 
     auto& exports = analyzer->exports();  // prepare exports
-    auto result = analyzer->check(tree->statements());
+    auto result = analyzer->check(node->statements());
 
     auto retval = Type::Builder::none();  // prepare return value
-    tree->main()->traits()->type() = Type::Builder::function(retval);
+    node->main()->traits()->type() = Type::Builder::function(retval);
 
     // bind all the available exports now
     for (const auto& [name, entity] : world->entities()) {
@@ -44,9 +44,5 @@ TALOS_MM_CHECK_NODE(Tree, tree, analyzer) {
     return result.flow->passable() ? analyzer->passable(retval) : analyzer->unreachable();
 }
 
-TALOS_MM_LINT_NODE(Tree, tree, analyzer) {
-    $_UNUSED $_AUTO = analyzer->scope();
-    analyzer->verify(tree->statements(), tree);
-}
-
-TALOS_MM_LOWER_NODE(Tree, tree, compiler, ) { compiler->enqueue(tree->main()); }
+TALOS_MM_LOWER_NODE(Tree, node, compiler, ) { compiler->enqueue(node->main()); }
+TALOS_MM_LINT_NODE(Tree, node, analyzer) { analyzer->verify(node->statements(), node); }

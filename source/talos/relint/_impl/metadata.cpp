@@ -20,21 +20,28 @@ Talos::Relint::Mirror* Talos::Relint::Metadata::resolve(const Syntax::Node* orig
 }
 
 const Talos::Relint::Mirror* Talos::Relint::Metadata::search(const XLSP::Position& position) const noexcept {
-    // prepare a predicate that uses the incoming position
-    auto predicate = [position](const Syntax::Node* node) {
+    return search(position, [](const Syntax::Node* node) -> bool {
         // ensure we ignore some nodes (since we want internal values)
         switch (node->traits()->tag()) {
             case $::RTTI::Hash<Syntax::Block>(): return false;
             case $::RTTI::Hash<Syntax::Ternary>(): return false;
-            default: return node->traits()->range().contains(position);
+            default: return true;  // valid target for searching
         }
-    };
+    });
+}
 
-    // attempt searching for a suitable range now
-    auto iter = std::ranges::find_if(m_sorted, predicate);
+const Talos::Relint::Mirror* Talos::Relint::Metadata::search(
+    const XLSP::Position& position, Filter&& filter) const noexcept {
+    // if the filter is invalid, then request the baseline details
+    if (filter == nullptr) return search(position);
 
-    // and return the resulting mirror as necessary
-    return iter == m_sorted.end() ? nullptr : resolve(*iter);
+    // attempt finding a suitable candidate to be used
+    for (const auto* node : m_sorted) {
+        if (filter(node) && node->traits()->range().contains(position)) return resolve(node);
+    }
+
+    // otherwise we failed to find a candidate
+    return nullptr;
 }
 
 //  PRIVATE METHODS  //

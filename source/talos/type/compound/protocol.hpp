@@ -59,6 +59,8 @@ namespace Talos::Type {
          * @param fields                    Interface fields.
          */
         explicit Protocol(const $::String::View& name, const Algorithm& fields) : m_fields(fields), m_name(name) {}
+        explicit Protocol(const $::String::View& name, const $::Record<Entity>& fields) :
+            m_fields(fields), m_name(name) {}
 
         //  PUBLIC METHODS  //
 

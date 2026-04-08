@@ -7,6 +7,9 @@
 
 namespace Talos::Relint {
 
+    /// @brief Function type for search filtering.
+    using Filter = $::Functor::Unique<bool(const Syntax::Node*)>;
+
     /// @brief Mirror Reference Definition.
     struct Definition {
         //  PROPERTIES  //

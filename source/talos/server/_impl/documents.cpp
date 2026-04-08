@@ -11,11 +11,14 @@ void Talos::Server::Events::on_document_opened(const XLSP_NOTIFICATION(DOCUMENT_
 }
 
 void Talos::Server::Events::on_document_closed(const XLSP_NOTIFICATION(DOCUMENT_CLOSED) & params) {
-    auto* documents = m_connection->service<Document::Service>();
-    documents->remove(params.identifier.resource);  // remove now
+    $_UNUSED $_AUTO = m_connection->guard();  // since updating we wait for readiness
+    m_connection->service<Document::Service>()->remove(params.identifier.resource);
 }
 
 void Talos::Server::Events::on_document_changed(const XLSP_NOTIFICATION(DOCUMENT_CHANGED) & params) {
+    // since updating documents we wait for readiness
+    $_UNUSED $_AUTO = m_connection->guard();
+
     // prepare the underlying documents container here
     auto* documents = m_connection->service<Document::Service>();
 

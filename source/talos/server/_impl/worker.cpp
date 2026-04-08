@@ -7,8 +7,11 @@
 //  PUBLIC METHODS  //
 
 void Talos::Server::Worker::analyze(bool fresh) const noexcept {
+    // we always lock the service when it is being analyzed
+    $_UNUSED $_AUTO = m_connection->guard();
+
     // declare that we are analyzing the incoming item
-    $_TRACE("--| analyze: requested '{0}'", m_resource);
+    $_TRACE("--| analyze: requested '{0}'", m_resource.relative());
 
     // attempt getting the document service
     auto* modules = m_connection->service<Import::Service>();

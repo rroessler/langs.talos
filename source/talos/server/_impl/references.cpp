@@ -9,7 +9,7 @@ void Talos::Server::Events::on_document_references(XLSP_REQUEST(DOCUMENT_REFEREN
     auto resource = request.params.identifier.resource;
 
     // show that a message was requested
-    $_TRACE("--| references: requested '{0}:{1}'", resource, position);
+    $_TRACE("--| references: requested '{0}:{1}'", resource.relative(), position);
 
     // prepare the response to be used
     auto response = XLSP_RESPONSE(DOCUMENT_REFERENCES);
@@ -21,25 +21,15 @@ void Talos::Server::Events::on_document_references(XLSP_REQUEST(DOCUMENT_REFEREN
         response.locations.emplace_back(std::move(location));
     };
 
-    // attempt resolving the baseline syntax node
-    auto* node = m_utilities->syntax_node_at(resource, position);
-    if (node == nullptr) return request.reply(std::move(response));
-
-    // attempt getting the associated definition details now
-    auto definition = node ? node->definition() : Relint::Empty.get();
-
     // start by resolving the node at the resource/position now
-    if (auto* source = node->qualified() ? definition->annotation : definition->variable) {
+    if (auto* node = m_utilities->anydef_node_at(resource, position)) {
         // trace what we actually found for debug viewing
         $_TRACE("--| references: found node '{0}' at {1}", node->canonical(), node->range());
 
-        // always prepend the base definition to be used
-        append(source);
-
         // get the available references that we have found
-        auto references = source->references();
+        auto references = (append(node), node->references());
 
-        // if we have lots of references then we want to pre-build the size
+        // if we have lots of references then we want to update the size
         response.locations.reserve(references.size() + 1);
 
         // get all the available node references and fill the result

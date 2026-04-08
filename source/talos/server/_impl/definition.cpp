@@ -12,21 +12,18 @@ void Talos::Server::Events::on_document_vardef(XLSP_REQUEST(DOCUMENT_VARIABLE_DE
     auto resource = request.params.identifier.resource;
 
     // show that a message was requested
-    $_TRACE("--| vardef: requested '{0}:{1}'", resource, position);
+    $_TRACE("--| vardef: requested '{0}:{1}'", resource.relative(), position);
 
     // prepare the response to be used
     auto response = XLSP_RESPONSE(DOCUMENT_VARIABLE_DEFINITION);
 
-    // attempt resolving the source and definition as well
-    auto* node = m_utilities->syntax_node_at(resource, position);
-
-    // only allow emitting variable-definitions if we have a valid target
-    if (auto* source = node && !node->qualified() ? node->definition()->variable : nullptr) {
+    // attempt resolving a suitable node to be used now
+    if (auto* node = m_utilities->vardef_node_at(resource, position)) {
         // show to developers what we have actually found so far now
         $_TRACE("--| vardef: found node '{0}' at {1}", node->canonical(), node->range());
 
         // convert our details as necessary now for the incoming source
-        auto range = m_utilities->range_to_client(source->range());
+        auto range = m_utilities->range_to_client(node->range());
         response.locations.emplace_back(XLSP::Location(resource, range));
     }
 
@@ -40,21 +37,18 @@ void Talos::Server::Events::on_document_typedef(XLSP_REQUEST(DOCUMENT_TYPE_DEFIN
     auto resource = request.params.identifier.resource;
 
     // show that a message was requested
-    $_TRACE("--| typedef: requested '{0}:{1}'", resource, position);
+    $_TRACE("--| typedef: requested '{0}:{1}'", resource.relative(), position);
 
     // prepare the response to be used
     auto response = XLSP_RESPONSE(DOCUMENT_TYPE_DEFINITION);
 
-    // attempt resolving the source and definition as well
-    auto* node = m_utilities->syntax_node_at(resource, position);
-
-    // only allow emitting type-definitions if we have a valid target
-    if (auto* source = node && node->qualified() ? node->definition()->annotation : nullptr) {
+    // attempt resolving a suitable node to be used now
+    if (auto* node = m_utilities->typedef_node_at(resource, position)) {
         // show to developers what we have actually found so far now
         $_TRACE("--| typedef: found node '{0}' at {1}", node->canonical(), node->range());
 
         // convert our details as necessary now for the incoming source
-        auto range = m_utilities->range_to_client(source->range());
+        auto range = m_utilities->range_to_client(node->range());
         response.locations.emplace_back(XLSP::Location(resource, range));
     }
 
