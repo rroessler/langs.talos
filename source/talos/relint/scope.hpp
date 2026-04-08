@@ -19,7 +19,7 @@ namespace Talos::Relint {
         Scope* m_ancestor = nullptr;
 
         /// @brief All bound variable definitions.
-        $::Record<$::Ptr::Shared<Definition>> m_definitions = {};
+        $::Dict<$::Ptr::Shared<Definition>> m_definitions = {};
 
        public:
         //  CONSTRUCTORS  //
@@ -34,6 +34,16 @@ namespace Talos::Relint {
 
         /// @brief Gets a view of the available definitions.
         inline constexpr auto view() const noexcept { return m_definitions; }
+
+        /**
+         * @brief Allows emplacing an immediate definition.
+         * @param name              Name of variable.
+         * @param definition        Definition to bind.
+         */
+        inline void emplace(const $::String::View& name,
+            const $::Ptr::Shared<Definition>& definition = $::New().shared<Definition>()) noexcept {
+            m_define(name, definition);
+        }
 
         /**
          * @brief Declares a variable reference.
@@ -64,7 +74,7 @@ namespace Talos::Relint {
          * @param name              Name of variable.
          */
         inline constexpr $::Ptr::Shared<Definition> resolve(const $::String::View& name) const noexcept {
-            auto iter = m_definitions.find(name);
+            auto iter = m_definitions.find($::String::Buffer(name));
             if (iter != m_definitions.cend()) return iter->second;
             return m_ancestor ? m_ancestor->resolve(name) : Empty;
         }
@@ -74,8 +84,8 @@ namespace Talos::Relint {
          * @param name              Name of definition.
          * @param child             Child mirror to bind.
          */
-        inline void relate(const $::String::View& name, Mirror* child) { return relate(child, resolve(name)); }
-        inline void relate(Mirror* child, const $::Ptr::Shared<Definition>& parent) {
+        inline void relate(const $::String::View& name, Mirror* child) const { return relate(child, resolve(name)); }
+        inline void relate(Mirror* child, const $::Ptr::Shared<Definition>& parent) const {
             capture(child, parent), subtype(child, parent);
         }
 
@@ -84,8 +94,8 @@ namespace Talos::Relint {
          * @param name              Name of definition.
          * @param child             Child mirror to bind.
          */
-        inline void capture(const $::String::View& name, Mirror* child) { return capture(child, resolve(name)); }
-        inline void capture(Mirror* child, const $::Ptr::Shared<Definition>& parent) {
+        inline void capture(const $::String::View& name, Mirror* child) const { return capture(child, resolve(name)); }
+        inline void capture(Mirror* child, const $::Ptr::Shared<Definition>& parent) const {
             if (!parent || !parent->variable) return;
             parent->variable->references().emplace_back(child);
             child->definition()->variable = parent->variable;
@@ -96,8 +106,8 @@ namespace Talos::Relint {
          * @param name              Name of definition.
          * @param child             Child mirror to bind.
          */
-        inline void subtype(const $::String::View& name, Mirror* child) { return subtype(child, resolve(name)); }
-        inline void subtype(Mirror* child, const $::Ptr::Shared<Definition>& parent) {
+        inline void subtype(const $::String::View& name, Mirror* child) const { return subtype(child, resolve(name)); }
+        inline void subtype(Mirror* child, const $::Ptr::Shared<Definition>& parent) const {
             if (!parent || !parent->annotation) return;
             parent->annotation->references().emplace_back(child);
             child->definition()->annotation = parent->annotation;
@@ -111,7 +121,17 @@ namespace Talos::Relint {
          * @param name              Name of variable.
          */
         inline constexpr $::Ptr::Shared<Definition> m_define(const $::String::View& name) noexcept {
-            return m_definitions.try_emplace(name, $::New().shared<Definition>()).first->second;
+            return m_define(name, $::New().shared<Definition>());
+        }
+
+        /**
+         * @brief Declares a reference instance.
+         * @param name              Name of variable.
+         * @param definition        Definition to bind.
+         */
+        inline constexpr $::Ptr::Shared<Definition> m_define(
+            const $::String::View& name, const $::Ptr::Shared<Definition>& definition) noexcept {
+            return m_definitions.try_emplace($::String::Buffer(name), definition).first->second;
         }
     };
 

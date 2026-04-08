@@ -11,7 +11,7 @@ void Talos::Document::Publisher::clear(const $::URI::View& resource) {
     if (auto* drafts = m_drafts()) drafts->remove(resource);
 }
 
-void Talos::Document::Publisher::update(const $::URI::View& resource) {
+void Talos::Document::Publisher::refresh(const $::URI::View& resource) {
     if (auto* drafts = m_drafts()) drafts->remove(resource);
 }
 

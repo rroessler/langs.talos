@@ -66,7 +66,7 @@ namespace Talos::Relint {
         std::vector<const Mirror*> m_references = {};
 
         /// @brief Currently available fields for the mirror.
-        $::Record<$::Ptr::Shared<Definition>> m_fields = {};
+        $::Dict<$::Ptr::Shared<Definition>> m_fields = {};
 
        public:
         //  CONSTRUCTORS  //
@@ -97,6 +97,9 @@ namespace Talos::Relint {
         inline constexpr const XLSP::Range& range() const noexcept { return m_origin->traits()->range(); }
         inline constexpr const XLSP::Range& bounds() const noexcept { return m_origin->traits()->bounds(); }
 
+        /// @brief Gets the associated node resource.
+        inline constexpr $::URI::View resource() const noexcept { return m_origin->traits()->resource(); }
+
         /// @brief The bound documentation comments.
         inline constexpr $::String::Buffer& comments() { return m_comments; }
         inline constexpr $::String::View comments() const noexcept { return m_comments; }
@@ -110,8 +113,8 @@ namespace Talos::Relint {
         inline constexpr const std::vector<const Mirror*>& references() const noexcept { return m_references; }
 
         /// @brief All available fields for the node.
-        inline constexpr $::Record<$::Ptr::Shared<Definition>>& fields() noexcept { return m_fields; }
-        inline constexpr const $::Record<$::Ptr::Shared<Definition>>& fields() const noexcept { return m_fields; }
+        inline constexpr $::Dict<$::Ptr::Shared<Definition>>& fields() noexcept { return m_fields; }
+        inline constexpr const $::Dict<$::Ptr::Shared<Definition>>& fields() const noexcept { return m_fields; }
 
         /// @brief Checks if a node is type-qualified or not (eg: type-world identifier or value identifier).
         inline constexpr bool qualified() const noexcept {
@@ -152,7 +155,7 @@ namespace Talos::Relint {
          * @param name                  Name of member field.
          */
         inline constexpr $::Ptr::Shared<Definition> lookup(const $::String::View& name) {
-            auto iter = m_fields.find(name);  // resolve the field
+            auto iter = m_fields.find($::String::Buffer(name));
             return iter == m_fields.cend() ? Empty : iter->second;
         }
 

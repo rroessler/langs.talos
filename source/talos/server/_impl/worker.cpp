@@ -6,7 +6,9 @@
 
 //  PUBLIC METHODS  //
 
-void Talos::Server::Worker::analyze(bool fresh) const noexcept {
+const Talos::Server::Utilities* Talos::Server::Worker::utilities() const noexcept { return m_connection->utilities(); }
+
+void Talos::Server::Worker::analyze(Refresh mode) const noexcept {
     // we always lock the service when it is being analyzed
     $_UNUSED $_AUTO = m_connection->guard();
 
@@ -23,9 +25,15 @@ void Talos::Server::Worker::analyze(bool fresh) const noexcept {
     // prepare the publisher to be used now
     auto* publisher = documents->publisher();
 
-    // if we required refreshing then do so
-    for (const auto& resource : resources) {
-        if (fresh) publisher->update(resource);
+    // handle refreshes based on the incoming mode
+    switch (mode) {
+        default: break;  // ignore coordinting refreshing when stale
+        case Refresh::PARTIAL: publisher->refresh(m_resource); break;
+
+        // only in the entire case do we worry about refreshing all items
+        case Refresh::FULL: {
+            for (const auto& resource : resources) publisher->refresh(resource);
+        } break;
     }
 
     // attempt analyzing each resource as needed

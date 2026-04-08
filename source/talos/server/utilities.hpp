@@ -38,6 +38,13 @@ namespace Talos::Server {
         XLSP::Position position_to_server(const XLSP::Position& position) const;
 
         /**
+         * @brief Converts syntax to a location.
+         * @param node                      Node to be converted.
+         */
+        XLSP::Location syntax_to_client(const Syntax::Node* node) const;
+        XLSP::Location syntax_to_client(const Relint::Mirror* mirror) const;
+
+        /**
          * @brief Gets the syntax-metadata at a resource.
          * @param resource                  Resource value.
          */

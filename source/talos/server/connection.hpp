@@ -42,6 +42,12 @@ namespace Talos::Server {
 
         //  PUBLIC METHODS  //
 
+        /// @brief Gets the underlying utilities.
+        inline constexpr const Utilities* utilities() const noexcept { return m_utilities.get(); }
+
+        /// @brief Prepares a suitable scoped connection guard.
+        $_NODISCARD inline constexpr auto guard() noexcept { return $::Lock::guard(m_mutex); }
+
         /// @brief Allows getting underlying services.
         template <std::derived_from<XI::Service> T>
         inline constexpr T* service() const noexcept {
@@ -56,9 +62,6 @@ namespace Talos::Server {
         inline constexpr void schedule(As&&... args) {
             m_async->spawn<Delegate>(this, std::forward<As>(args)...);
         }
-
-        /// @brief Prepares a suitable scoped connection guard.
-        $_NODISCARD inline constexpr auto guard() noexcept { return $::Lock::guard(m_mutex); }
 
        private:
         //  PRIVATE METHODS  //

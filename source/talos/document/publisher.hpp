@@ -33,7 +33,7 @@ namespace Talos::Document {
          * @brief Forces an update event to occur.
          * @param resource                  Document resource.
          */
-        void update(const $::URI::View& resource);
+        void refresh(const $::URI::View& resource);
 
         /**
          * @brief Handles clearing document diagnostics.

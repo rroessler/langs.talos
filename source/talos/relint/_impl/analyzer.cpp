@@ -1,7 +1,9 @@
 /// Talos Modules
 #include "talos/relint/analyzer.hpp"
+#include "talos/module/service.hpp"
 #include "talos/relint/visitor.hpp"
 #include "talos/runtime/container.hpp"
+#include "talos/type/metadata.hpp"
 
 //  CONSTRUCTORS  //
 
@@ -48,6 +50,25 @@ void Talos::Relint::Analyzer::traverse(const Syntax::Node* node) {
 
     // apply all available rules to the current node in question
     for (const auto& rule : rules) rule(node, this);
+}
+
+const Talos::Relint::Scope* Talos::Relint::Analyzer::import(const $::String::View& path) {
+    Import::Service* modules = *m_services;  // resolve now
+    auto result = modules->resolve(path, resource().body());
+    return result.has_value() ? import(*result) : nullptr;
+}
+
+const Talos::Relint::Scope* Talos::Relint::Analyzer::import(const $::URI::View& resource) {
+    Import::Service* modules = *m_services;
+    auto* found = modules->fetch(resource);
+    if (found == nullptr) return nullptr;
+
+    // always forcibly analyze the module
+    found->analyze(m_services);
+
+    // then we can safely resolve the metadata now
+    auto* metadata = found->metadata<Module::Phase::TYPED>();
+    return metadata->context()->mirrors()->references();
 }
 
 //  PRIVATE METHODS  //

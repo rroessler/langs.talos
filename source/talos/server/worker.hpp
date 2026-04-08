@@ -11,6 +11,13 @@ namespace Talos::Server {
     /// @brief Server Worker Callback.
     using Callback = $::Functor::Unique<void(Worker*)>;
 
+    /// @brief The analysis refresh mode available.
+    enum class Refresh : uint8_t {
+        STALE,    // ignore refreshing
+        PARTIAL,  // only current resource
+        FULL,     // fully refresh all files
+    };
+
     /// @brief Isolate Executor Abstraction.
     class Worker {
         //  TYPEDEFS  //
@@ -60,11 +67,14 @@ namespace Talos::Server {
         /// @brief Gets the underlying resource value.
         inline constexpr $::URI::View resource() const noexcept { return m_resource; }
 
+        /// @brief Gets the available utilities service.
+        const Utilities* utilities() const noexcept;
+
         /**
          * @brief Forces the worker to analyze all the cached documents.
-         * @param fresh                     Forcibly clear all drafts.
+         * @param mode                      Refresh mode to use.
          */
-        void analyze(bool fresh = false) const noexcept;
+        void analyze(Refresh mode) const noexcept;
 
         /**
          * @brief Handles formatting a file.

@@ -80,7 +80,7 @@ namespace Talos::Document {
         inline constexpr void update(const $::URI::View& resource, const $::String::Buffer& content) {
             $_UNUSED $_AUTO = $::Lock::guard(m_mutex);  // lock mutex here
             m_buffers[resource] = $::New().shared<Buffer>(content, resource);
-            m_publisher->update(resource);  // and force a publisher update
+            m_publisher->refresh(resource);  // and force a publisher update
         }
 
         /**

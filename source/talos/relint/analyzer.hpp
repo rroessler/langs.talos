@@ -98,6 +98,13 @@ namespace Talos::Relint {
             for (const auto* node : nodes) traverse(node);
         }
 
+        /**
+         * @brief Handles importing module references.
+         * @param path                      Resource to import.
+         */
+        const Scope* import(const $::String::View& path);
+        const Scope* import(const $::URI::View& resource);
+
        private:
         //  PRIVATE METHODS  //
 

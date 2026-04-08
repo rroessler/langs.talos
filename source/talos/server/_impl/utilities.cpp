@@ -30,6 +30,14 @@ XLSP::Position Talos::Server::Utilities::position_to_server(const XLSP::Position
     return { position.line + 1, position.column + 1 };
 }
 
+XLSP::Location Talos::Server::Utilities::syntax_to_client(const Relint::Mirror* mirror) const {
+    return syntax_to_client(mirror->origin());
+}
+
+XLSP::Location Talos::Server::Utilities::syntax_to_client(const Syntax::Node* node) const {
+    return { node->traits()->resource().buffer(), range_to_client(node->traits()->range()) };
+}
+
 const Talos::Relint::Metadata* Talos::Server::Utilities::syntax_view_at(const $::URI::View& resource) const {
     Import::Service* modules = *m_services;  // resolve
     auto* found = modules->drafts()->lookup(resource);
