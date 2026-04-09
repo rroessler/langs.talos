@@ -3,6 +3,7 @@
 
 /// Builtin Modules
 #include "talos/builtins/_inline/assert.ipp"
+#include "talos/builtins/_inline/defines.ipp"
 
 //  PRIVATE METHODS  //
 

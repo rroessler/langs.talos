@@ -5,16 +5,6 @@
 #include "talos/builtins/traits.hpp"
 #include "talos/value/boolean.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_BOOLEAN(X) \
-    X(parse)                        \
-    X(from)
-
-#define TALOS_XX_FIELDS_BOOLEAN(X)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Tagged Boolean Builtin Traits.

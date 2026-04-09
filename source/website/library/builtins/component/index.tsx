@@ -2,9 +2,16 @@
 import * as React from 'react';
 import { Heading } from '@fumadocs/base-ui/components/heading';
 
+/// Package Modules
+import { Registry } from '../registry';
+
 /** Builtins Documentation Component. */
 export interface Component extends Component.Props {}
-export function Component({ children }: Component) {
+export function Component({ children, name }: Component) {
+    // attempt resolving the required component
+    const builtin = Registry.resolve(name);
+    if (typeof builtin === 'undefined') return;
+
     // and return the resulting documentation
     return (
         <React.Fragment>

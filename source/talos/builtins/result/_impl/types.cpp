@@ -1,23 +1,26 @@
 /// Talos Modules
 #include "talos/type/builder.hpp"
 
+/// Builtin Inlines
+#include "talos/builtins/_inline/defines.ipp"
+
 /// Forward Declarations
 $_FWD(Talos::Builtins, namespace TB = Type::Builder)
 $_FWD(Talos::Builtins, using Self = Type::Protocol)
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Type::Entity N(const Self*);
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N(const Self*);
 struct TALOS_BUILTIN_FIELDS(Monad::Result) {
-    TALOS_XX_FIELDS_RESULT(X)
+#include "talos/builtins/result/_defines/fields.def"
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_STATICS(Monad::Result) {
-    TALOS_XX_STATICS_RESULT(X)
+#include "talos/builtins/result/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 //  PROPERTIES  //
 
@@ -89,17 +92,18 @@ void TALOS_BUILTIN_TRAITS(Monad::Result)::m_typedefs(Type::World* globals) {
     // prepare the prototype to be constructed
     auto proto = prototype();
     auto& fields = proto->fields();
+    auto& statics = proto->statics();
 
     // set the underlying constraints
     proto->constraints() = { g_T, g_E };
 
-#define X(N, ...) fields.emplace(#N, Field::N);
-    TALOS_XX_FIELDS_RESULT(X)
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N);
+#include "talos/builtins/result/_defines/fields.def"
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) { #N, Static::N() },
-    proto->statics() = $::Record<Type::Entity>({ TALOS_XX_STATICS_RESULT(X) });
-#undef X
+#define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
+#include "talos/builtins/result/_defines/statics.def"
+#undef TALOS_XX_STATICS_DEFINE
 
     // and assign the resulting entity to be used
     globals->types().declare(name(), typing());

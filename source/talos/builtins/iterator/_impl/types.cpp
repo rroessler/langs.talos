@@ -3,6 +3,7 @@
 
 /// Builtin Modules
 #include "talos/builtins/_inline/builtins.ipp"
+#include "talos/builtins/_inline/defines.ipp"
 
 /// Forward Declarations
 $_FWD(Talos::Builtins, namespace TB = Type::Builder)
@@ -10,17 +11,17 @@ $_FWD(Talos::Builtins, using Self = Type::Protocol)
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Type::Entity N(const Self*);
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N(const Self*);
 struct TALOS_BUILTIN_FIELDS(Iterable::Iterator) {
-    TALOS_XX_FIELDS_ITERATOR(X)
+#include "talos/builtins/iterator/_defines/fields.def"
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_STATICS(Iterable::Iterator) {
-    TALOS_XX_STATICS_ITERATOR(X)
+#include "talos/builtins/iterator/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 struct TALOS_MM_BUILTIN_ODECL(Iterable::Iterator, unary, binary);
 
@@ -109,6 +110,7 @@ void TALOS_BUILTIN_TRAITS(Iterable::Iterator)::m_typedefs(Type::World* globals) 
     // prepare the underlying prototype to be used
     auto proto = prototype();
     auto& fields = proto->fields();
+    auto& statics = proto->statics();
 
     // prepare the parameter typings now
     proto->constraints() = { g_T };
@@ -116,13 +118,13 @@ void TALOS_BUILTIN_TRAITS(Iterable::Iterator)::m_typedefs(Type::World* globals) 
     // bind the decision handler for operators
     proto->operators() = Apply::decide;
 
-#define X(N, ...) fields.emplace(#N, Field::N);
-    TALOS_XX_FIELDS_ITERATOR(X)
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N);
+#include "talos/builtins/iterator/_defines/fields.def"
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) { #N, Static::N() },
-    proto->statics() = { TALOS_XX_STATICS_ITERATOR(X) };
-#undef X
+#define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
+#include "talos/builtins/iterator/_defines/statics.def"
+#undef TALOS_XX_STATICS_DEFINE
 
     // bind the necessary properties now for use
     globals->types().declare(name(), typing());

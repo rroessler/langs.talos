@@ -6,21 +6,6 @@
 #include "talos/function/closure.hpp"
 #include "talos/function/native.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_FUNCTION(X) \
-    X(call)                          \
-    X(apply)                         \
-    X(limit)
-
-#define TALOS_XX_FIELDS_FUNCTION(X) \
-    X(bind)                         \
-    X(arity)                        \
-    X(adicity)                      \
-    X(receiver)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Any Function Builtin Traits.

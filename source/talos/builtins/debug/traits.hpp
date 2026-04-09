@@ -7,17 +7,6 @@
 /// Forward Declarations
 TALOS_BUILTIN_CUSTOM(Debug)
 
-//  X-MACROS  //
-
-#define TALOS_XX_FIELDS_DEBUG(X, ...) \
-    X(print)                          \
-    X(eprint)                         \
-    X(println)                        \
-    X(eprintln)                       \
-    X(breakpoint)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Void Builtin Traits.

@@ -1,22 +1,25 @@
 /// Talos Modules
 #include "talos/type/builder.hpp"
 
+/// Builtin Inlines
+#include "talos/builtins/_inline/defines.ipp"
+
 /// Forward Declarations
 $_FWD(Talos::Builtins, namespace TB = Type::Builder)
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_FIELDS(Function::Dynamic) {
-    TALOS_XX_FIELDS_FUNCTION(X)
+#include "talos/builtins/function/_defines/fields.def"
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_STATICS(Function::Dynamic) {
-    TALOS_XX_STATICS_FUNCTION(X)
+#include "talos/builtins/function/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
@@ -47,14 +50,16 @@ TALOS_MM_BUILTIN_STYPE(Function::Dynamic, apply) {
 void TALOS_BUILTIN_TRAITS(Function::Dynamic)::m_typedefs(Type::World* globals) {
     // prepare the prototype to be constructed
     auto proto = prototype();
+    auto& fields = proto->fields();
+    auto& statics = proto->statics();
 
-#define X(N, ...) { #N, Field::N() },
-    proto->fields() = $::Record<Type::Entity>({ TALOS_XX_FIELDS_FUNCTION(X) });
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N());
+#include "talos/builtins/function/_defines/fields.def"
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) { #N, Static::N() },
-    proto->statics() = { TALOS_XX_STATICS_FUNCTION(X) };
-#undef X
+#define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
+#include "talos/builtins/function/_defines/statics.def"
+#undef TALOS_XX_STATICS_DEFINE
 
     // and assign the resulting entity to be used
     globals->types().declare(name(), typing());

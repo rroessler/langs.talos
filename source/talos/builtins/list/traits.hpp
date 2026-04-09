@@ -5,41 +5,6 @@
 #include "talos/builtins/traits.hpp"
 #include "talos/iterable/list.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_LIST(X) \
-    X(from)                      \
-    X(empty)                     \
-    X(range)                     \
-    X(filled)
-
-#define TALOS_XX_FIELDS_LIST(X, ...) \
-    X(size)                          \
-    X(empty)                         \
-                                     \
-    X(front)                         \
-    X(back)                          \
-                                     \
-    X(get)                           \
-    X(set)                           \
-                                     \
-    X(map)                           \
-    X(fold)                          \
-    X(erase)                         \
-    X(slice)                         \
-    X(filter)                        \
-    X(reverse)                       \
-                                     \
-    X(push_front)                    \
-    X(push_back)                     \
-    X(pop_front)                     \
-    X(pop_back)                      \
-                                     \
-    X(first_index_of)                \
-    X(last_index_of)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Tagged List Builtin Traits.

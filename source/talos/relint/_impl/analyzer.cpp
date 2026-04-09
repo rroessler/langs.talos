@@ -66,9 +66,10 @@ const Talos::Relint::Scope* Talos::Relint::Analyzer::import(const $::URI::View& 
     // always forcibly analyze the module
     found->analyze(m_services);
 
-    // then we can safely resolve the metadata now
+    // then we can safely resolve the references now
     auto* metadata = found->metadata<Module::Phase::TYPED>();
-    return metadata->context()->mirrors()->references();
+    auto* mirrors = metadata->context()->mirrors().get();
+    return mirrors ? mirrors->references() : nullptr;
 }
 
 //  PRIVATE METHODS  //

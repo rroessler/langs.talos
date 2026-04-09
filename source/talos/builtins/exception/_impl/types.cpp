@@ -1,22 +1,25 @@
 /// Talos Modules
 #include "talos/type/builder.hpp"
 
+/// Builtin Inlines
+#include "talos/builtins/_inline/defines.ipp"
+
 /// Forward Declarations
 $_FWD(Talos::Builtins, namespace TB = Type::Builder)
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_FIELDS(Object::Exception) {
-    TALOS_XX_FIELDS_EXCEPTION(X)
+#include "talos/builtins/exception/_defines/fields.def"
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_STATICS(Object::Exception) {
-    TALOS_XX_STATICS_EXCEPTION(X)
+#include "talos/builtins/exception/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
@@ -42,14 +45,16 @@ TALOS_MM_BUILTIN_STYPE(Object::Exception, named) {
 void TALOS_BUILTIN_TRAITS(Object::Exception)::m_typedefs(Type::World* globals) {
     // prepare the prototype to be constructed
     auto proto = prototype();
+    auto& fields = proto->fields();
+    auto& statics = proto->statics();
 
-#define X(N, ...) { #N, Field::N() },
-    proto->fields() = $::Record<Type::Entity>({ TALOS_XX_FIELDS_EXCEPTION(X) });
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N());
+#include "talos/builtins/exception/_defines/fields.def"
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) { #N, Static::N() },
-    proto->statics() = $::Record<Type::Entity>({ TALOS_XX_STATICS_EXCEPTION(X) });
-#undef X
+#define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
+#include "talos/builtins/exception/_defines/statics.def"
+#undef TALOS_XX_STATICS_DEFINE
 
     // and assign the resulting entity to be used
     globals->types().declare(name(), typing());

@@ -1,23 +1,26 @@
 /// Talos Modules
 #include "talos/type/builder.hpp"
 
+/// Builtin Inlines
+#include "talos/builtins/_inline/defines.ipp"
+
 /// Forward Declarations
 $_FWD(Talos::Builtins, namespace TB = Type::Builder)
 $_FWD(Talos::Builtins, using Self = Type::Protocol)
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Type::Entity N(const Self*);
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N(const Self*);
 struct TALOS_BUILTIN_FIELDS(Async::Future) {
-    TALOS_XX_FIELDS_FUTURE(X)
+#include "talos/builtins/future/_defines/fields.def"
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_STATICS(Async::Future) {
-    TALOS_XX_STATICS_FUTURE(X)
+#include "talos/builtins/future/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 //  PROPERTIES  //
 
@@ -71,7 +74,7 @@ TALOS_MM_BUILTIN_STYPE(Async::Future, async) {
 }
 
 TALOS_MM_BUILTIN_STYPE(Async::Future, delay) {
-    Type::Entity duration = TB::number(), callback = TB::optional(TB::function(TB::none()));
+    auto duration = TB::optional(TB::number()), callback = TB::optional(TB::function(TB::none()));
     return { TB::function(TB::future(TB::none()), TB::arguments(duration, callback)) };
 }
 
@@ -93,17 +96,18 @@ void TALOS_BUILTIN_TRAITS(Async::Future)::m_typedefs(Type::World* globals) {
     // prepare the prototype to be constructed
     auto proto = prototype();
     auto& fields = proto->fields();
+    auto& statics = proto->statics();
 
     // prepare the parameter typings now
     proto->constraints() = { g_T };
 
-#define X(N, ...) fields.emplace(#N, Field::N);
-    TALOS_XX_FIELDS_FUTURE(X)
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N);
+#include "talos/builtins/future/_defines/fields.def"
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) { #N, Static::N() },
-    proto->statics() = { TALOS_XX_STATICS_FUTURE(X) };
-#undef X
+#define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
+#include "talos/builtins/future/_defines/statics.def"
+#undef TALOS_XX_STATICS_DEFINE
 
     // and assign the resulting entity to be used
     globals->types().declare(name(), typing());

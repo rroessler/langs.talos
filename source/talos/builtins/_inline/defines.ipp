@@ -1,0 +1,22 @@
+#ifndef _TALOS_BUILTINS_DEFINES_IPP
+#define _TALOS_BUILTINS_DEFINES_IPP
+
+//  MACROS  //
+
+#ifndef TALOS_XX_FIELDS_HEADER
+#define TALOS_XX_FIELDS_HEADER(...)
+#endif
+
+#ifndef TALOS_XX_FIELDS_FOOTER
+#define TALOS_XX_FIELDS_FOOTER(...)
+#endif
+
+#ifndef TALOS_XX_STATICS_HEADER
+#define TALOS_XX_STATICS_HEADER(...)
+#endif
+
+#ifndef TALOS_XX_STATICS_FOOTER
+#define TALOS_XX_STATICS_FOOTER(...)
+#endif
+
+#endif

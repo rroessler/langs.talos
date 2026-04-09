@@ -6,41 +6,6 @@
 #include "talos/string/large.hpp"
 #include "talos/string/small.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_STRING(X) \
-    X(from)                        \
-    X(codepoint)
-
-#define TALOS_XX_FIELDS_STRING(X) \
-    X(hash)                       \
-    X(size)                       \
-    X(bytes)                      \
-    X(empty)                      \
-                                  \
-    X(at)                         \
-    X(slice)                      \
-                                  \
-    X(compare)                    \
-    X(contains)                   \
-                                  \
-    X(starts_with)                \
-    X(ends_with)                  \
-                                  \
-    X(to_lower)                   \
-    X(to_upper)                   \
-                                  \
-    X(trim_both)                  \
-    X(trim_leading)               \
-    X(trim_trailing)              \
-                                  \
-    X(pad_leading)                \
-    X(pad_trailing)               \
-                                  \
-    X(fmt)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Any String Builtin Traits.

@@ -5,28 +5,6 @@
 #include "talos/builtins/traits.hpp"
 #include "talos/number/tagged.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_NUMBER(X) X(parse)
-#define TALOS_XX_FIELDS_NUMBER(X) \
-    X(sign)                       \
-                                  \
-    X(abs)                        \
-    X(ceil)                       \
-    X(floor)                      \
-    X(round)                      \
-    X(trunc)                      \
-    X(clamp)                      \
-                                  \
-    X(is_nan)                     \
-    X(is_fin)                     \
-    X(is_inf)                     \
-                                  \
-    X(to_precision)               \
-    X(to_scientific)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Tagged Number Builtin Traits.

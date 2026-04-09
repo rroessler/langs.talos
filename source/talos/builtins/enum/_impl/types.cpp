@@ -1,22 +1,19 @@
 /// Talos Modules
 #include "talos/type/builder.hpp"
 
+/// Builtin Inlines
+#include "talos/builtins/_inline/defines.ipp"
+
 /// Forward Declarations
 $_FWD(Talos::Builtins, namespace TB = Type::Builder)
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Type::Entity N();
-struct TALOS_BUILTIN_FIELDS(Object::Enum) {
-    TALOS_XX_FIELDS_ENUM(X)
-};
-#undef X
-
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_STATICS(Object::Enum) {
-    TALOS_XX_STATICS_ENUM(X)
+#include "talos/builtins/enum/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
@@ -46,14 +43,15 @@ TALOS_MM_BUILTIN_STYPE(Object::Enum, value) {
 void TALOS_BUILTIN_TRAITS(Object::Enum)::m_typedefs(Type::World* globals) {
     // prepare the prototype to be constructed
     auto proto = prototype();
+    auto& statics = proto->statics();
     auto instance = proto->instantiate();
 
     // update the underlying prototype now to be numeric
     proto->super() = Traits<Number::Tagged>::prototype();
 
-#define X(N, ...) { #N, Static::N() },
-    proto->statics() = { TALOS_XX_STATICS_ENUM(X) };
-#undef X
+#define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
+#include "talos/builtins/enum/_defines/statics.def"
+#undef TALOS_XX_STATICS_DEFINE
 
     // and assign the resulting entity to be used
     globals->types().declare(name(), instance);

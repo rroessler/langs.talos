@@ -1,16 +1,19 @@
 /// Talos Modules
 #include "talos/type/builder.hpp"
 
+/// Builtin Inlines
+#include "talos/builtins/_inline/defines.ipp"
+
 /// Forward Declarations
 $_FWD(Talos::Builtins, namespace TB = Type::Builder)
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_STATICS(Value::Boolean) {
-    TALOS_XX_STATICS_BOOLEAN(X)
+#include "talos/builtins/boolean/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
@@ -27,10 +30,12 @@ TALOS_MM_BUILTIN_STYPE(Value::Boolean, parse) {
 void TALOS_BUILTIN_TRAITS(Value::Boolean)::m_typedefs(Type::World* globals) {
     // get the underlying prototype instance
     auto proto = prototype();
+    auto& statics = proto->statics();
 
-#define X(N, ...) { #N, Static::N() },
-    proto->statics() = { TALOS_XX_STATICS_BOOLEAN(X) };
-#undef X
+    // define the underlying statics for booleans
+#define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
+#include "talos/builtins/boolean/_defines/statics.def"
+#undef TALOS_XX_STATICS_DEFINE
 
     // prepare the baseline typing to be used
     globals->types().declare(name(), typing());

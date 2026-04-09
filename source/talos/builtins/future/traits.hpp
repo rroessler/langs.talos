@@ -5,22 +5,6 @@
 #include "talos/async/future.hpp"
 #include "talos/builtins/traits.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_FUTURE(X) \
-    X(async)                       \
-    X(delay)                       \
-    X(resolve)                     \
-    X(reject)
-
-#define TALOS_XX_FIELDS_FUTURE(X) \
-    X(then)                       \
-    X(fails)                      \
-    X(await)                      \
-    X(state)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Tagged Future Builtin Traits.

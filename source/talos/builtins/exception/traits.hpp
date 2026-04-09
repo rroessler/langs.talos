@@ -5,18 +5,6 @@
 #include "talos/builtins/traits.hpp"
 #include "talos/object/exception.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_EXCEPTION(X) \
-    X(from)                           \
-    X(named)
-
-#define TALOS_XX_FIELDS_EXCEPTION(X) \
-    X(name)                          \
-    X(message)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Tagged Exception Builtin Traits.

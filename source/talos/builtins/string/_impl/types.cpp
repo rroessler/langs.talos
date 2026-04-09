@@ -1,23 +1,26 @@
 /// Talos Modules
 #include "talos/type/builder.hpp"
 
+/// Builtin Inlines
+#include "talos/builtins/_inline/defines.ipp"
+
 /// Forward Declarations
 $_FWD(Talos::Builtins, namespace TB = Type::Builder)
 $_FWD(Talos::Builtins, using Self = Type::Protocol)
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_FIELDS(String::Dynamic) {
-    TALOS_XX_FIELDS_STRING(X)
+#include "talos/builtins/string/_defines/fields.def"
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_STATICS(String::Dynamic) {
-    TALOS_XX_STATICS_STRING(X)
+#include "talos/builtins/string/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 struct TALOS_MM_BUILTIN_ODECL(String::Dynamic, unary, binary);
 
@@ -105,17 +108,19 @@ TALOS_MM_BUILTIN_OTYPE(String::Dynamic, binary, const Self*, Operator::Kind kind
 void TALOS_BUILTIN_TRAITS(String::Dynamic)::m_typedefs(Type::World* globals) {
     // prepare the prototype to be constructed
     auto proto = prototype();
+    auto& fields = proto->fields();
+    auto& statics = proto->statics();
 
     // bind the decision handler for operators
     proto->operators() = Apply::decide;
 
-#define X(N, ...) { #N, Field::N() },
-    proto->fields() = $::Record<Type::Entity>({ TALOS_XX_FIELDS_STRING(X) });
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N());
+#include "talos/builtins/string/_defines/fields.def"
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) { #N, Static::N() },
-    proto->statics() = { TALOS_XX_STATICS_STRING(X) };
-#undef X
+#define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
+#include "talos/builtins/string/_defines/statics.def"
+#undef TALOS_XX_STATICS_DEFINE
 
     // and assign the resulting entity to be used
     globals->types().declare(name(), typing());

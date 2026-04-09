@@ -1,0 +1,10 @@
+//!
+//! Example: "modules/_main.tal"
+//! Description: Barrel exports a variety of values.
+//!
+
+// Firstly export the raw values.
+export "values.tal";
+
+// Then export as a named value.
+export "values.tal" as other;

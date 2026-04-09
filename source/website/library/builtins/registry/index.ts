@@ -32,6 +32,8 @@ export namespace Registry {
         const builtin = Assets.builtins(name, 'index.mdx');
         if (name.startsWith('_') || !fs.existsSync(builtin)) return;
 
+        // we attempt parsing the available "defines" files for content
+
         // since value, then resolve a suitable set of details
         return { name: name[0].toUpperCase() + name.slice(1) };
     }

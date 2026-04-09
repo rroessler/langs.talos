@@ -4,14 +4,15 @@
 
 /// Builtin Modules
 #include "talos/builtins/_inline/assert.ipp"
+#include "talos/builtins/_inline/defines.ipp"
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
 struct TALOS_BUILTIN_STATICS(Monad::Result) {
-    TALOS_XX_STATICS_RESULT(X)
+#include "talos/builtins/result/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
@@ -51,9 +52,10 @@ Talos::Value::Any TALOS_BUILTIN_TRAITS(Monad::Result)::m_globals(Runtime::Isolat
     auto self = isolate->create<Object::Class>(name(), shape());
 
 // assign the necessary fields now
-#define X(N, ...) self.statics().emplace(#N, Member::Factory::native(isolate, Static::N, name(), #N));
-    TALOS_XX_STATICS_RESULT(X)
-#undef X
+#define TALOS_XX_STATICS_DEFINE(N, ...) \
+    self.statics().emplace(#N, Member::Factory::native(isolate, Static::N, name(), #N));
+#include "talos/builtins/result/_defines/statics.def"
+#undef TALOS_XX_STATICS_DEFINE
 
     // and return the resulting instance
     return self;

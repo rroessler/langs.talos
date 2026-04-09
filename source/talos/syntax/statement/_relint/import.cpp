@@ -45,5 +45,6 @@ TALOS_MM_LINT_NODE(Import, node, analyzer) {
      * when a refresh occurs, then we need to cancel our request somehow ???
      */
 
-    // for (const auto& [name, definition] : module->view()) references->overwrite(name, definition);
+    // this appears to work well enough for now, but again we should properly work out the de-sync problems
+    for (const auto& [name, definition] : module->view()) references->overwrite(name, definition);
 }

@@ -3,14 +3,15 @@
 
 /// Builtin Modules
 #include "talos/builtins/_inline/builtins.ipp"
+#include "talos/builtins/_inline/defines.ipp"
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
 struct TALOS_BUILTIN_FIELDS(Builtins::Custom::Debug) {
-    TALOS_XX_FIELDS_DEBUG(X)
+#include "talos/builtins/debug/_defines/fields.def"
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
 //  PUBLIC METHODS  //
 
@@ -34,9 +35,10 @@ Talos::Value::Any TALOS_BUILTIN_TRAITS(Builtins::Custom::Debug)::m_globals(Runti
     auto self = isolate->create<Object::Instance>();
 
 // assign the necessary fields now
-#define X(N, ...) self.fields().emplace(#N, Member::Factory::native(isolate, Field::N, name(), #N));
-    TALOS_XX_FIELDS_DEBUG(X)
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) \
+    self.fields().emplace(#N, Member::Factory::native(isolate, Field::N, name(), #N));
+#include "talos/builtins/debug/_defines/fields.def"
+#undef TALOS_XX_FIELDS_DEFINE
 
     // and return the resulting instance
     return self;

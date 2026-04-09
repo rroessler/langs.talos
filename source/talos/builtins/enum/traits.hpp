@@ -4,17 +4,6 @@
 /// Talos Modules
 #include "talos/builtins/traits.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_ENUM(X) \
-    X(name)                      \
-    X(label)                     \
-    X(value)
-
-#define TALOS_XX_FIELDS_ENUM(X)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Tagged Enumeration Builtin Traits.

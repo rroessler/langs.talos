@@ -5,13 +5,6 @@
 #include "talos/builtins/traits.hpp"
 #include "talos/value/void.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_VOID(X)
-#define TALOS_XX_FIELDS_VOID(X)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Void Builtin Traits.

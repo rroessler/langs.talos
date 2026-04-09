@@ -74,7 +74,7 @@ namespace Talos::Server {
          * @brief Forces the worker to analyze all the cached documents.
          * @param mode                      Refresh mode to use.
          */
-        void analyze(Refresh mode) const noexcept;
+        void analyze(Refresh mode = Refresh::FULL) const noexcept;
 
         /**
          * @brief Handles formatting a file.

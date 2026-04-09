@@ -5,13 +5,6 @@
 #include "talos/builtins/traits.hpp"
 #include "talos/value/symbol.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_SYMBOL(X) X(from)
-#define TALOS_XX_FIELDS_SYMBOL(X) X(hash)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Tagged Symbol Builtin Traits.

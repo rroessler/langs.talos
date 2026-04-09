@@ -1,22 +1,25 @@
 /// Talos Modules
 #include "talos/type/builder.hpp"
 
+/// Builtin Inlines
+#include "talos/builtins/_inline/defines.ipp"
+
 /// Forward Declarations
 $_FWD(Talos::Builtins, namespace TB = Type::Builder)
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_FIELDS(Value::Symbol) {
-    TALOS_XX_FIELDS_SYMBOL(X)
+#include "talos/builtins/symbol/_defines/fields.def"
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) static Type::Entity N();
+#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
 struct TALOS_BUILTIN_STATICS(Value::Symbol) {
-    TALOS_XX_STATICS_SYMBOL(X)
+#include "talos/builtins/symbol/_defines/statics.def"
 };
-#undef X
+#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
@@ -31,13 +34,17 @@ void TALOS_BUILTIN_TRAITS(Value::Symbol)::m_typedefs(Type::World* globals) {
     // prepare the prototype to be used
     auto proto = prototype();
 
-#define X(N, ...) { #N, Field::N() },
-    proto->fields() = $::Record<Type::Entity>({ TALOS_XX_FIELDS_SYMBOL(X) });
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) { #N, Field::N() },
+    proto->fields() = $::Record<Type::Entity>({
+#include "talos/builtins/symbol/_defines/fields.def"
+    });
+#undef TALOS_XX_FIELDS_DEFINE
 
-#define X(N, ...) { #N, Static::N() },
-    proto->statics() = { TALOS_XX_STATICS_SYMBOL(X) };
-#undef X
+#define TALOS_XX_STATICS_DEFINE(N, ...) { #N, Static::N() },
+    proto->statics() = {
+#include "talos/builtins/symbol/_defines/statics.def"
+    };
+#undef TALOS_XX_STATICS_DEFINE
 
     // and declare the types to be used now
     globals->types().declare(name(), typing());

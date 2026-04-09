@@ -5,20 +5,6 @@
 #include "talos/builtins/traits.hpp"
 #include "talos/iterable/iterator.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_ITERATOR(X) \
-    X(from)                          \
-    X(empty)                         \
-    X(dynamic)
-
-#define TALOS_XX_FIELDS_ITERATOR(X) \
-    X(done)                         \
-    X(next)                         \
-    X(index)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Iterator Builtin Traits.

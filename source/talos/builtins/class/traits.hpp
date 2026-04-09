@@ -5,13 +5,6 @@
 #include "talos/builtins/traits.hpp"
 #include "talos/object/class.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_CLASS(X)
-#define TALOS_XX_FIELDS_CLASS(X)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Tagged Class Builtin Traits.

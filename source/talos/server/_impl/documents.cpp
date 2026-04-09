@@ -34,5 +34,5 @@ void Talos::Server::Events::on_document_changed(const XLSP_NOTIFICATION(DOCUMENT
     documents->update(params.identifier.resource, content);
 
     // and request a rebuild of the underlying module graph
-    m_connection->schedule(params.identifier.resource, [](Worker* worker) { worker->analyze(Refresh::FULL); });
+    m_connection->schedule(params.identifier.resource, [](Worker* worker) { worker->analyze(); });
 }

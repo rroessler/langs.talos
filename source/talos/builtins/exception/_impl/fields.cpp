@@ -3,31 +3,35 @@
 
 /// Builtin Modules
 #include "talos/builtins/_inline/assert.ipp"
+#include "talos/builtins/_inline/defines.ipp"
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
 struct TALOS_BUILTIN_FIELDS(Object::Exception) {
-    TALOS_XX_FIELDS_EXCEPTION(X)
+#include "talos/builtins/exception/_defines/fields.def"
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
 //  PROPERTIES  //
 
-#define X(N, ...) { #N, Field::N },
-TALOS_BUILTIN_STORAGE(Object::Exception) = Talos::Member::Storage(name(), { TALOS_XX_FIELDS_EXCEPTION(X) });
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) { #N, Field::N },
+TALOS_BUILTIN_STORAGE(Object::Exception) = Talos::Member::Storage(name(), {
+#include "talos/builtins/exception/_defines/fields.def"
+                                                                          });
+#undef TALOS_XX_FIELDS_DEFINE
 
 //  PUBLIC METHODS  //
 
-#define X(N, ...)                                                        \
-    TALOS_MM_BUILTIN_FIELD(Object::Exception, N, isolate, args) {        \
-        TALOS_MM_ASSERT_TYPEOF(isolate, Object::Exception, args.self()); \
-        return args.self<Object::Exception>().N();                       \
-    }
+TALOS_MM_BUILTIN_FIELD(Object::Exception, name, isolate, args) {
+    TALOS_MM_ASSERT_TYPEOF(isolate, Object::Exception, args.self());
+    return args.self<Object::Exception>().name();  // get the name
+}
 
-TALOS_XX_FIELDS_EXCEPTION(X)
-#undef X
+TALOS_MM_BUILTIN_FIELD(Object::Exception, message, isolate, args) {
+    TALOS_MM_ASSERT_TYPEOF(isolate, Object::Exception, args.self());
+    return args.self<Object::Exception>().message();  // get the name
+}
 
 //  PRIVATE METHODS  //
 

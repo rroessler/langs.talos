@@ -3,12 +3,13 @@
 
 /// Builtin Modules
 #include "talos/builtins/_inline/assert.ipp"
+#include "talos/builtins/_inline/defines.ipp"
 
 //  TYPEDEFS  //
 
-#define X(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
+#define TALOS_XX_FIELDS_DEFINE(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
 struct TALOS_BUILTIN_FIELDS(Number::Tagged) {
-    TALOS_XX_FIELDS_NUMBER(X)
+#include "talos/builtins/number/_defines/fields.def"
 
    private:
     //  PRIVATE METHODS  //
@@ -16,13 +17,15 @@ struct TALOS_BUILTIN_FIELDS(Number::Tagged) {
     /// @brief Handles converting numerics to outputs.
     static Value::Any m_stringify(Runtime::Isolate*, const Function::Arguments&, const $::String::View&);
 };
-#undef X
+#undef TALOS_XX_FIELDS_DEFINE
 
 //  PROPERTIES  //
 
-#define X(N, ...) { #N, Field::N },
-TALOS_BUILTIN_STORAGE(Number::Tagged) = Talos::Member::Storage(name(), { TALOS_XX_FIELDS_NUMBER(X) });
-#undef X
+#define TALOS_XX_FIELDS_DEFINE(N, ...) { #N, Field::N },
+TALOS_BUILTIN_STORAGE(Number::Tagged) = Talos::Member::Storage(name(), {
+#include "talos/builtins/number/_defines/fields.def"
+                                                                       });
+#undef TALOS_XX_FIELDS_DEFINE
 
 //  PUBLIC METHODS  //
 

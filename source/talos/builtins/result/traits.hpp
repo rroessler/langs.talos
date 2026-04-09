@@ -5,22 +5,6 @@
 #include "talos/builtins/traits.hpp"
 #include "talos/monad/result.hpp"
 
-//  X-MACROS  //
-
-#define TALOS_XX_STATICS_RESULT(X) \
-    X(wrap)                        \
-    X(okay)                        \
-    X(error)
-
-#define TALOS_XX_FIELDS_RESULT(X) \
-    X(is_okay)                    \
-    X(is_error)                   \
-                                  \
-    X(unwrap_okay)                \
-    X(unwrap_error)
-
-//  NAMESPACES  //
-
 namespace Talos::Builtins {
 
     /// @brief Tagged Result Builtin Traits.
