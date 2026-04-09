@@ -8,7 +8,7 @@
 
 TALOS_MM_LINT_NODE(Import, node, analyzer) {
     auto* module = analyzer->import(node->path());
-    if (module == nullptr) return;  // failure here
+    if (module == nullptr) return;  // failed here
 
     // prepare the available references now
     auto* references = analyzer->references();
@@ -31,7 +31,19 @@ TALOS_MM_LINT_NODE(Import, node, analyzer) {
         else {
             auto definition = module->resolve(pattern->name());
             references->relate(mirror, definition);  // relate
-            references->emplace(pattern->name(), definition);
+            references->overwrite(pattern->name(), definition);
         }
     }
+
+    // check if we have any barrel exports that need to be handled
+    if (!node->exported() || node->patterns().size()) return;
+
+    /**
+     * TODO: We should be appending barrel imports/exports (eg: export "..."), however due to VSC opening/closing
+     * files anytime references/definitions are requested (for the mini preview), it causes syncing issues. This
+     * is currently untenable with the linting setup we have now. If we are midway through resolving definitions
+     * when a refresh occurs, then we need to cancel our request somehow ???
+     */
+
+    // for (const auto& [name, definition] : module->view()) references->overwrite(name, definition);
 }

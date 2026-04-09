@@ -17,7 +17,7 @@ void Talos::Server::Events::on_document_vardef(XLSP_REQUEST(DOCUMENT_VARIABLE_DE
     // we need to prepare a suitable context to resolve details from
     m_connection->schedule(resource, [position, request = std::move(request)](Worker* worker) {
         // forcibly re-analyze the incoming module
-        worker->analyze(Refresh::PARTIAL);
+        worker->analyze(Refresh::FULL);
 
         // prepare the available utilities service
         auto* utilities = worker->utilities();
@@ -47,7 +47,7 @@ void Talos::Server::Events::on_document_typedef(XLSP_REQUEST(DOCUMENT_TYPE_DEFIN
     // we need to prepare a suitable context to resolve details from
     m_connection->schedule(resource, [position, request = std::move(request)](Worker* worker) {
         // forcibly re-analyze the incoming module
-        worker->analyze(Refresh::PARTIAL);
+        worker->analyze(Refresh::FULL);
 
         // prepare the available utilities service
         auto* utilities = worker->utilities();

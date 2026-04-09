@@ -36,13 +36,12 @@ namespace Talos::Relint {
         inline constexpr auto view() const noexcept { return m_definitions; }
 
         /**
-         * @brief Allows emplacing an immediate definition.
+         * @brief Allows overwriting an immediate definition.
          * @param name              Name of variable.
          * @param definition        Definition to bind.
          */
-        inline void emplace(const $::String::View& name,
-            const $::Ptr::Shared<Definition>& definition = $::New().shared<Definition>()) noexcept {
-            m_define(name, definition);
+        inline void overwrite(const $::String::View& name, const $::Ptr::Shared<Definition>& definition) noexcept {
+            m_definitions.try_emplace($::String::Buffer(name), definition);  // we immediately update here
         }
 
         /**
@@ -51,10 +50,7 @@ namespace Talos::Relint {
          * @param mirror            Mirror to bind.
          */
         inline constexpr bool declare(const $::String::View& name, Mirror* mirror) noexcept {
-            auto definition = m_define(name);
-            if (definition->variable) return false;
-            mirror->definition()->variable = mirror;
-            return definition->variable = mirror, true;
+            return m_define(name, mirror, [](auto* definition) -> Mirror*& { return definition->variable; });
         }
 
         /**
@@ -63,10 +59,7 @@ namespace Talos::Relint {
          * @param mirror            Mirror to bind.
          */
         inline constexpr bool annotate(const $::String::View& name, Mirror* mirror) noexcept {
-            auto definition = m_define(name);
-            if (definition->annotation) return false;
-            mirror->definition()->annotation = mirror;
-            return definition->annotation = mirror, true;
+            return m_define(name, mirror, [](auto* definition) -> Mirror*& { return definition->annotation; });
         }
 
         /**
@@ -119,19 +112,37 @@ namespace Talos::Relint {
         /**
          * @brief Declares a reference instance.
          * @param name              Name of variable.
+         * @param mirror            Mirror to define.
+         * @param resolver          Resolver function.
          */
-        inline constexpr $::Ptr::Shared<Definition> m_define(const $::String::View& name) noexcept {
-            return m_define(name, $::New().shared<Definition>());
+        template <class R>
+        inline constexpr bool m_define(const $::String::View& name, Mirror* mirror, R&& resolver) noexcept {
+            return m_define($::String::Buffer(name), mirror, std::move(resolver));
         }
 
         /**
          * @brief Declares a reference instance.
          * @param name              Name of variable.
-         * @param definition        Definition to bind.
+         * @param mirror            Mirror to define.
+         * @param resolver          Resolver function.
          */
-        inline constexpr $::Ptr::Shared<Definition> m_define(
-            const $::String::View& name, const $::Ptr::Shared<Definition>& definition) noexcept {
-            return m_definitions.try_emplace($::String::Buffer(name), definition).first->second;
+        template <class R>
+        inline constexpr bool m_define(const $::String::Buffer& name, Mirror* mirror, R&& resolver) noexcept {
+            // check if the definition actually exists at all
+            if (!m_definitions.contains(name)) m_definitions.try_emplace(name, $::New().shared<Definition>());
+
+            // get the current definition instance
+            auto& definition = m_definitions.at(name);
+            auto& reference = resolver(definition.get());
+
+            // check if we had a valid definition
+            auto updated = reference == nullptr;
+
+            // if the reference is defined, then ignore
+            if (updated) resolver(mirror->definition()) = reference = mirror;
+
+            // declare as a success now
+            return updated;
         }
     };
 
