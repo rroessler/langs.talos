@@ -4,12 +4,12 @@
 //  EVENT METHODS  //
 
 void Talos::Server::Events::on_document_completes(XLSP_REQUEST(DOCUMENT_COMPLETIONS) request) {
+    // since this relies on an updated set of modules, we guard the connection
+    $_UNUSED $_AUTO = m_connection->guard();
+
     // destructure the incoming items to be used
     auto position = request.params.position;
     auto resource = request.params.identifier.resource;
-
-    // since this relies on an updated set of modules, we guard the connection
-    $_UNUSED $_AUTO = m_connection->guard();
 
     // show that a message was requested
     $_TRACE("--| completions: requested '{0}:{1}'", resource.relative(), position);

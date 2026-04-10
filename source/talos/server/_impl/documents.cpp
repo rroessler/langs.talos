@@ -11,8 +11,8 @@ void Talos::Server::Events::on_document_opened(const XLSP_NOTIFICATION(DOCUMENT_
 }
 
 void Talos::Server::Events::on_document_closed(const XLSP_NOTIFICATION(DOCUMENT_CLOSED) & params) {
-    $_UNUSED $_AUTO = m_connection->guard();  // since updating we wait for readiness
-    m_connection->service<Document::Service>()->remove(params.identifier.resource);
+    $_UNUSED $_AUTO = m_connection->guard();  // we should wait
+    m_connection->documents()->remove(params.identifier.resource);
 }
 
 void Talos::Server::Events::on_document_changed(const XLSP_NOTIFICATION(DOCUMENT_CHANGED) & params) {
@@ -20,7 +20,7 @@ void Talos::Server::Events::on_document_changed(const XLSP_NOTIFICATION(DOCUMENT
     $_UNUSED $_AUTO = m_connection->guard();
 
     // prepare the underlying documents container here
-    auto* documents = m_connection->service<Document::Service>();
+    auto* documents = m_connection->documents();
 
     // attempt re-constructing the buffer we require now
     auto buffer = documents->resolve(params.identifier.resource);
@@ -33,6 +33,6 @@ void Talos::Server::Events::on_document_changed(const XLSP_NOTIFICATION(DOCUMENT
     // update the document (this will also reset the drafts module)
     documents->update(params.identifier.resource, content);
 
-    // and request a rebuild of the underlying module graph
-    m_connection->schedule(params.identifier.resource, [](Worker* worker) { worker->analyze(); });
+    // and request a rebuild of the underlying modules in their entirety
+    m_connection->analyze(Refresh::ENTIRE, params.identifier.resource);
 }

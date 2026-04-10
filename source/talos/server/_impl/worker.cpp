@@ -27,18 +27,24 @@ void Talos::Server::Worker::analyze(Refresh mode) const noexcept {
 
     // handle refreshes based on the incoming mode
     switch (mode) {
-        default: break;  // ignore coordinting refreshing when stale
-        case Refresh::PARTIAL: publisher->refresh(m_resource); break;
+        // for stale mode refreshes we want to ignore handling
+        case Refresh::STALE: break;
 
-        // only in the entire case do we worry about refreshing all items
-        case Refresh::FULL: {
-            for (const auto& resource : resources) publisher->refresh(resource);
-        } break;
+        // for singular refreshes we reset this resource
+        case Refresh::SINGLE: publisher->refresh(m_resource); break;
+
+        // for partial refreshes, we want to only update some items
+        case Refresh::PARTIAL: publisher->refresh(resources); break;
+
+        // for entire refreshes, we clear the underlying drafts
+        case Refresh::ENTIRE: modules->drafts()->clear(); break;
     }
 
     // attempt analyzing each resource as needed
     auto elapsed = $::Clock::Measure([&] { modules->analyze(resources, false); });
-    $_TRACE("--| analyze: elapsed time {0}", elapsed);  // show measured time
+
+    // show the measured time that we found for analysis
+    $_TRACE("--| analyze: elapsed time {0}", elapsed);
 
     // finally refresh the necessary diagnostics
     for (const auto& resource : resources) {

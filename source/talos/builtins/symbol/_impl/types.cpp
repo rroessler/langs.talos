@@ -33,17 +33,15 @@ TALOS_MM_BUILTIN_STYPE(Value::Symbol, from) { return { TB::function(TB::symbol()
 void TALOS_BUILTIN_TRAITS(Value::Symbol)::m_typedefs(Type::World* globals) {
     // prepare the prototype to be used
     auto proto = prototype();
+    auto& fields = proto->fields();
+    auto& statics = proto->statics();
 
-#define TALOS_XX_FIELDS_DEFINE(N, ...) { #N, Field::N() },
-    proto->fields() = $::Record<Type::Entity>({
+#define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N());
 #include "talos/builtins/symbol/_defines/fields.def"
-    });
 #undef TALOS_XX_FIELDS_DEFINE
 
-#define TALOS_XX_STATICS_DEFINE(N, ...) { #N, Static::N() },
-    proto->statics() = {
+#define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
 #include "talos/builtins/symbol/_defines/statics.def"
-    };
 #undef TALOS_XX_STATICS_DEFINE
 
     // and declare the types to be used now

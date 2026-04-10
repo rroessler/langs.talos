@@ -3,6 +3,7 @@
 
 /// Talos Includes
 #include "talos/async/service.hpp"
+#include "talos/document/service.hpp"
 #include "talos/server/events.hpp"
 #include "talos/server/options.hpp"
 #include "talos/server/transport.hpp"
@@ -23,6 +24,9 @@ namespace Talos::Server {
         /// @brief Asynchrononous runtime service.
         Async::Service* m_async;
 
+        /// @brief Module documents service.
+        Document::Service* m_documents;
+
         /// @brief Events dispatcher instance.
         $::Ptr::Unique<Events> m_events;
 
@@ -41,6 +45,10 @@ namespace Talos::Server {
         explicit Connection(XI::Container* services, const Options* options = $::Global::get<Options>());
 
         //  PUBLIC METHODS  //
+
+        /// @brief Gets the underlying documents.
+        inline constexpr Document::Service* documents() noexcept { return m_documents; }
+        inline constexpr const Document::Service* documents() const noexcept { return m_documents; }
 
         /// @brief Gets the underlying utilities.
         inline constexpr const Utilities* utilities() const noexcept { return m_utilities.get(); }
@@ -61,6 +69,25 @@ namespace Talos::Server {
         template <class... As>
         inline constexpr void schedule(As&&... args) {
             m_async->spawn<Delegate>(this, std::forward<As>(args)...);
+        }
+
+        /**
+         * @brief Handles coordinating analysis.
+         * @param args                  Worker arguments.
+         */
+        template <class... As>
+        inline constexpr void analyze(As&&... args) {
+            analyze(Refresh::ENTIRE, std::forward<As>(args)...);
+        }
+
+        /**
+         * @brief Handles coordinating analysis.
+         * @param mode                  Refresh mode.
+         * @param args                  Worker arguments.
+         */
+        template <class... As>
+        inline constexpr void analyze(Refresh mode, As&&... args) {
+            schedule(std::forward<As>(args)..., [mode](Worker* worker) { worker->analyze(mode); });
         }
 
        private:

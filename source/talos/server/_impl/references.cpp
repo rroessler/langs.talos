@@ -4,7 +4,7 @@
 //  EVENT METHODS  //
 
 void Talos::Server::Events::on_document_references(XLSP_REQUEST(DOCUMENT_REFERENCES) request) {
-    // lock the current process instance now
+    // since this relies on an updated set of modules, we guard the connection
     $_UNUSED $_AUTO = m_connection->guard();
 
     // destructure the incoming items to be used

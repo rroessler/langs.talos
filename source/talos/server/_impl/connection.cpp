@@ -5,16 +5,12 @@
 //  CONSTRUCTORS  //
 
 Talos::Server::Connection::Connection(XI::Container* services, const Options* options) :
-    Define(options), m_services(services), m_async(*m_services) {
-    // prepare the utilities and events to be used
-    m_utilities = m_services->get<Utilities>();
-    m_events = m_services->get<Events>(this, m_utilities.get());
+    Define(options), m_services(services), m_async(*m_services), m_documents(*m_services), m_utilities(*m_services) {
+    // prepare the events seperately since it requires different items
+    auto events = (m_events = m_services->get<Events>(this, m_utilities.get())).get();
 
     // prepare an initial binder to be used
     auto bind = binder();
-
-    // get the underlying events cache now
-    auto events = m_events.get();
 
     // and prepare the base lifecycle events to be handled
     bind.on_request(events, &Events::on_initialize);

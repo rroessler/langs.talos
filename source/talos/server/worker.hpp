@@ -14,8 +14,9 @@ namespace Talos::Server {
     /// @brief The analysis refresh mode available.
     enum class Refresh : uint8_t {
         STALE,    // ignore refreshing
-        PARTIAL,  // only current resource
-        FULL,     // fully refresh all files
+        SINGLE,   // singule resource update
+        PARTIAL,  // partially update items
+        ENTIRE,   // fully refresh all files
     };
 
     /// @brief Isolate Executor Abstraction.
@@ -74,7 +75,7 @@ namespace Talos::Server {
          * @brief Forces the worker to analyze all the cached documents.
          * @param mode                      Refresh mode to use.
          */
-        void analyze(Refresh mode = Refresh::FULL) const noexcept;
+        void analyze(Refresh mode = Refresh::ENTIRE) const noexcept;
 
         /**
          * @brief Handles formatting a file.

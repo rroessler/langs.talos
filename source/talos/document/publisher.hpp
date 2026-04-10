@@ -30,16 +30,18 @@ namespace Talos::Document {
         //  PUBLIC METHODS  //
 
         /**
-         * @brief Forces an update event to occur.
-         * @param resource                  Document resource.
-         */
-        void refresh(const $::URI::View& resource);
-
-        /**
          * @brief Handles clearing document diagnostics.
          * @param resource                  Document resource.
          */
         void clear(const $::URI::View& resource);
+
+        /**
+         * @brief Forces an update event to occur.
+         * @param resource                  Document resource.
+         */
+        void refresh(const $::URI::View& resource);
+        void refresh(const std::vector<$::URI::View>& resources);
+        void refresh(const std::vector<$::URI::Buffer>& resources);
 
         /**
          * @brief Handles publishing document diagnostics.

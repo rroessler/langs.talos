@@ -46,6 +46,12 @@ namespace $::Serde {
     class Value : public Printable {
         //  TYPEDEFS  //
 
+        /// @brief Encpasulates visitor overloads.
+        template <class... Ts>
+        struct Overloads : Ts... {
+            using Ts::operator()...;
+        };
+
         /// @brief Initializer List Typing.
         template <class T>
         using Initializer = std::initializer_list<typename T::value_type>;
@@ -128,6 +134,19 @@ namespace $::Serde {
 
         inline constexpr bool operator==(const Value& other) const noexcept { return m_storage == other.m_storage; }
         inline constexpr bool operator!=(const Value& other) const noexcept { return m_storage != other.m_storage; }
+
+        /// @brief Handles converting the instance to a boolean.
+        inline constexpr operator bool() const noexcept {
+            static constexpr auto s_overloads = Overloads{
+                [](Null) -> bool { return false; },
+                [](Boolean value) -> bool { return value; },
+                [](Number value) -> bool { return value != 0; },
+                [](const auto& value) -> bool { return value.size(); },
+            };
+
+            // determine if suitably truthy
+            return m_storage.visit(s_overloads);
+        }
 
         //  PUBLIC METHODS  //
 

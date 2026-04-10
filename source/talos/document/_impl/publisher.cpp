@@ -7,12 +7,19 @@
 //  PUBLIC METHODS  //
 
 void Talos::Document::Publisher::clear(const $::URI::View& resource) {
-    publish(resource, {});  // remove resource here now
-    if (auto* drafts = m_drafts()) drafts->remove(resource);
+    publish(resource, {});  // remove resource here now as needed
 }
 
 void Talos::Document::Publisher::refresh(const $::URI::View& resource) {
     if (auto* drafts = m_drafts()) drafts->remove(resource);
+}
+
+void Talos::Document::Publisher::refresh(const std::vector<$::URI::View>& resources) {
+    for (const auto& resource : resources) refresh(resource);
+}
+
+void Talos::Document::Publisher::refresh(const std::vector<$::URI::Buffer>& resources) {
+    for (const auto& resource : resources) refresh(resource);
 }
 
 void Talos::Document::Publisher::publish(

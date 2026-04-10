@@ -331,8 +331,6 @@ namespace XLSP {
          * @param declaration                   Include declaration.
          */
         explicit Params(const Layout& layout, bool declaration = false) : Layout(layout), declaration(declaration) {}
-        explicit Params(const Layout& layout, const bool* declaration = nullptr) :
-            Params(layout, declaration ? *declaration : false) {}
 
        protected:
         //  PRIVATE METHODS  //
@@ -342,8 +340,8 @@ namespace XLSP {
          * @param value                         Value to decode.
          */
         static Params m_decode(const $::Serde::Value& value) {
-            auto declaration = value.at("context").at<$::Serde::Boolean>("includeDeclaration");
-            return Params($::Reflect::decode<Layout>(value), declaration);  // construct
+            auto declaration = value.at("context").at("includeDeclaration");
+            return Params($::Reflect::decode<Layout>(value), !!declaration);
         }
     };
 

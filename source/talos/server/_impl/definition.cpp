@@ -7,7 +7,7 @@
 //  EVENT METHODS  //
 
 void Talos::Server::Events::on_document_vardef(XLSP_REQUEST(DOCUMENT_VARIABLE_DEFINITION) request) {
-    // lock the current process instance now
+    // since this relies on an updated set of modules, we guard the connection
     $_UNUSED $_AUTO = m_connection->guard();
 
     // destructure the incoming items to be used
@@ -31,7 +31,7 @@ void Talos::Server::Events::on_document_vardef(XLSP_REQUEST(DOCUMENT_VARIABLE_DE
 }
 
 void Talos::Server::Events::on_document_typedef(XLSP_REQUEST(DOCUMENT_TYPE_DEFINITION) request) {
-    // lock the current process instance now
+    // since this relies on an updated set of modules, we guard the connection
     $_UNUSED $_AUTO = m_connection->guard();
 
     // destructure the incoming items to be used
