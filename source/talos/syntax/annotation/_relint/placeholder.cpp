@@ -7,6 +7,9 @@
 //  PUBLIC METHODS  //
 
 TALOS_MM_LINT_NODE(Placeholder, node, analyzer) {
+    // bind this declaration now as a suitable symbol
+    analyzer->symbol(node->name(), node, XLSP::Symbol::Kind::TPARAM);
+
     // get some base analyzer details
     auto* mirrors = analyzer->mirrors();
     auto* references = analyzer->references();

@@ -7,6 +7,9 @@
 //  PUBLIC METHODS  //
 
 TALOS_MM_LINT_NODE(Namespace, node, analyzer) {
+    // bind this declaration now as a suitable symbol
+    $_UNUSED $_AUTO = analyzer->symbol(node, XLSP::Symbol::Kind::NAMESPACE);
+
     // get some base analyzer details
     auto* mirrors = analyzer->mirrors();
     auto* references = analyzer->references();

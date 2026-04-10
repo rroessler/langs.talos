@@ -31,7 +31,8 @@ void Talos::Server::Events::on_document_links(XLSP_REQUEST(DOCUMENT_LINKS) reque
         for (const auto* import : imports) {
             auto result = modules->resolve(import->path(), resource.body());
             if (!result.has_value() || result->scheme() != $::URI::Scheme::FILE) continue;
-            auto range = m_utilities->range_to_client(import->traits()->range());
+
+            auto range = import->traits()->range().client();  // resolve
             response.links.emplace_back(XLSP::Anchor(*result, range));
         }
     }

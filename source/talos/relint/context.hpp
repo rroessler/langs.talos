@@ -23,6 +23,9 @@ namespace Talos::Relint {
         /// @brief Gets the current references scope.
         Scope* m_scope = nullptr;
 
+        /// @brief The current target symbol.
+        XLSP::Symbol* m_symbol = nullptr;
+
         /// @brief Services container.
         XI::Container* m_services = nullptr;
 

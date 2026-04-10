@@ -27,7 +27,7 @@ void Talos::Server::Events::on_document_hover(XLSP_REQUEST(DOCUMENT_HOVER) reque
         auto sections = std::vector<$::String::Buffer>();
 
         // prepare hover response details now
-        response.range = m_utilities->range_to_client(source->range());
+        response.range = source->range().client();
         response.contents = $::New().unique<XLSP::Markup::Formatted>();
 
         // attempt binding the current typing to the top of the value

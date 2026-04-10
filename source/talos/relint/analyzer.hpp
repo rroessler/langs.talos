@@ -39,6 +39,25 @@ namespace Talos::Relint {
             return $::Functor::Defer([&, scope = std::move(scope)] { m_scope = scope->m_ancestor; });
         }
 
+        /// @brief Handles scoping symbols.
+        inline constexpr auto symbol(const Syntax::Declaration* node, XLSP::Symbol::Kind kind) {
+            m_symbol = m_symbolize(node->name(), node, kind);
+            return $::Functor::Defer([&] { m_symbol = nullptr; });
+        }
+
+        /// @brief Handles scoping symbols.
+        template <std::derived_from<Syntax::Node> T>
+        inline constexpr auto symbol(const $::String::View& name, const T* node, XLSP::Symbol::Kind kind) {
+            // handle the result to be returned now
+            auto* symbol = m_symbolize(name, node, kind);
+
+            // determine whether or not we have a scopable item
+            static constexpr auto s_scoped = std::same_as<T, Syntax::Lambda>;
+
+            if constexpr (!s_scoped) return;  // ignore anything that is not scopedhere
+            else return m_symbol = symbol, $::Functor::Defer([&] { m_symbol = nullptr; });
+        }
+
         /**
          * @brief Handles tracing reporter resources.
          * @param node                      Node to trace.
@@ -115,10 +134,26 @@ namespace Talos::Relint {
         void m_finalize(Mirror* mirror);
 
         /**
-         * @brief Handles classifying node symbols.
-         * @param mirror                    Mirror to classify.
+         * @brief Handles constructing symbols.
+         * @param name                      Name of symbol.
+         * @param node                      Node of symbol.
+         * @param kind                      Kind of symbol.
          */
-        XLSP::Symbol m_classify(const Mirror* mirror) const;
+        inline constexpr XLSP::Symbol* m_symbolize(
+            const $::String::View& name, const Syntax::Node* node, XLSP::Symbol::Kind kind) {
+            // get the current context for which we should bind the symbol
+            auto& siblings = m_symbol ? m_symbol->children : m_mirrors->m_symbols;
+
+            // construct this symbol instance now
+            auto symbol = XLSP::Symbol(name, kind);
+
+            // update the symbol location as well for use
+            symbol.range = node->traits()->bounds().client();
+            symbol.selection = node->traits()->range().client();
+
+            // resolve this symbol reference
+            return &siblings.emplace_back(symbol);
+        }
     };
 
 }  // namespace Talos::Relint

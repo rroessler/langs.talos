@@ -68,6 +68,9 @@ namespace XLSP {
         /// @brief Name of the symbol.
         $::String::Buffer name = {};
 
+        /// @brief Bound symbols to this one.
+        std::vector<Symbol> children = {};
+
         //  CONSTRUCTORS  //
 
         /// @brief Constructs invalid symbols.
@@ -79,10 +82,6 @@ namespace XLSP {
          * @param kind                      Kind of symbol.
          */
         constexpr Symbol(const $::String::View& name, Kind kind = Kind::UNKNOWN) : kind(kind), name(name) {}
-
-        //  OPERATOR METHODS  //
-
-        inline constexpr operator bool() const noexcept { return kind != Kind::UNKNOWN; }
 
        protected:
         //  PRIVATE METHODS  //
@@ -100,8 +99,9 @@ namespace XLSP {
                 { "selectionRange", $::Reflect::encode(self.selection) },
             };
 
-            // bind the deprecation status as well
+            // bind the optional details as well
             if (self.deprecated) symbol["tags"] = { 1 };
+            if (self.children.size()) symbol["children"] = $::Reflect::encode(self.children);
 
             // and resolve our symbol
             return symbol;

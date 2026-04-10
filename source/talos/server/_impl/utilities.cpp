@@ -12,30 +12,12 @@ Talos::Server::Utilities::Utilities(XI::Container* services) : m_services(servic
 
 //  PUBLIC METHODS  //
 
-XLSP::Range Talos::Server::Utilities::range_to_client(const XLSP::Range& range) const {
-    if (range == XLSP::Range()) return range;  // ignore if we have base range
-    return { position_to_client(range.start), position_to_client(range.end) };
-}
-
-XLSP::Range Talos::Server::Utilities::range_to_server(const XLSP::Range& range) const {
-    return { position_to_server(range.start), position_to_server(range.end) };
-}
-
-XLSP::Position Talos::Server::Utilities::position_to_client(const XLSP::Position& position) const {
-    if (position == XLSP::Position()) return position;
-    return { position.line - 1, position.column - 1 };
-}
-
-XLSP::Position Talos::Server::Utilities::position_to_server(const XLSP::Position& position) const {
-    return { position.line + 1, position.column + 1 };
-}
-
 XLSP::Location Talos::Server::Utilities::syntax_to_client(const Relint::Mirror* mirror) const {
     return syntax_to_client(mirror->origin());
 }
 
 XLSP::Location Talos::Server::Utilities::syntax_to_client(const Syntax::Node* node) const {
-    return { node->traits()->resource().buffer(), range_to_client(node->traits()->range()) };
+    return { node->traits()->resource().buffer(), node->traits()->range().client() };
 }
 
 const Talos::Relint::Metadata* Talos::Server::Utilities::syntax_view_at(const $::URI::View& resource) const {
@@ -50,8 +32,7 @@ const Talos::Relint::Mirror* Talos::Server::Utilities::syntax_node_at(
     const $::URI::View& resource, const XLSP::Position& position, Relint::Filter&& filter) const {
     auto* mirrors = syntax_view_at(resource);
     if (mirrors == nullptr) return nullptr;
-    auto normalized = position_to_server(position);
-    return mirrors->search(normalized, std::move(filter));
+    return mirrors->search(position.server(), std::move(filter));
 }
 
 const Talos::Relint::Mirror* Talos::Server::Utilities::vardef_node_at(

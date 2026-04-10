@@ -24,20 +24,6 @@ namespace Talos::Server {
         //  PUBLIC METHODS  //
 
         /**
-         * @brief Normalizes a range from the client.
-         * @param range                     Range to normalize.
-         */
-        XLSP::Range range_to_client(const XLSP::Range& range) const;
-        XLSP::Range range_to_server(const XLSP::Range& range) const;
-
-        /**
-         * @brief Normalizes a position from the client.
-         * @param position                  Position to normalize.
-         */
-        XLSP::Position position_to_client(const XLSP::Position& position) const;
-        XLSP::Position position_to_server(const XLSP::Position& position) const;
-
-        /**
          * @brief Converts syntax to a location.
          * @param node                      Node to be converted.
          */

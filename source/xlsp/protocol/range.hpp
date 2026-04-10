@@ -49,6 +49,12 @@ namespace XLSP {
 
         //  PUBLIC METHODS  //
 
+        /// @brief Gets a client version of a range.
+        inline constexpr Range client() const noexcept { return Range(start.client(), end.client()); }
+
+        /// @brief Gets a server version of a range.
+        inline constexpr Range server() const noexcept { return Range(start.server(), end.server()); }
+
         /**
          * @brief Checks if a range contains a position.
          * @param position                  Value to check.

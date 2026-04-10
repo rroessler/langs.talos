@@ -39,6 +39,16 @@ namespace XLSP {
 
         //  PUBLIC METHODS  //
 
+        /// @brief Gets a client version of a cursor.
+        inline constexpr Cursor client() const noexcept {
+            return *this == Cursor() ? *this : Cursor(line - 1, column - 1);
+        }
+
+        /// @brief Gets a server version of a cursor.
+        inline constexpr Cursor server() const noexcept {
+            return *this == Cursor() ? *this : Cursor(line + 1, column + 1);
+        }
+
         /**
          * @brief Gets a suitable offset of a view.
          * @param view                      Variable to get offset of.
@@ -76,6 +86,18 @@ namespace XLSP {
 
         /// @brief We allow direct conversions from cursor values.
         constexpr Position(const Cursor& cursor) : Cursor(cursor) {}
+
+        //  PUBLIC METHODS  //
+
+        /// @brief Gets a client version of a cursor.
+        inline constexpr Position client() const noexcept {
+            return *this == Position() ? *this : Position(line - 1, column - 1);
+        }
+
+        /// @brief Gets a server version of a cursor.
+        inline constexpr Position server() const noexcept {
+            return *this == Position() ? *this : Position(line + 1, column + 1);
+        }
 
        protected:
         //  PRIVATE METHODS  //

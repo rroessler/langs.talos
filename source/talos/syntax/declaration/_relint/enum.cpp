@@ -7,6 +7,9 @@
 //  PUBLIC METHODS  //
 
 TALOS_MM_LINT_NODE(Enum, node, analyzer) {
+    // bind this declaration now as a suitable symbol
+    $_UNUSED $_AUTO = analyzer->symbol(node, XLSP::Symbol::Kind::ENUM);
+
     // get some base analyzer details
     auto* mirrors = analyzer->mirrors();
     auto* references = analyzer->references();
@@ -31,6 +34,10 @@ TALOS_MM_LINT_NODE(Enum, node, analyzer) {
 }
 
 TALOS_MM_LINT_NODE(Variant, node, analyzer) {
+    // bind this declaration now as a suitable symbol
+    analyzer->symbol(node->key(), node, XLSP::Symbol::Kind::VARIANT);
+
+    // bind the available variant details now
     analyzer->verify(node->label(), node);
     analyzer->verify(node->value(), node);
 }
