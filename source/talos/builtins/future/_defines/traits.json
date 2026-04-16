@@ -1,0 +1,4 @@
+{
+    "name": "Future",
+    "describe": "An asynchronous computation that acts as a proxy for an eventual deferred value."
+}

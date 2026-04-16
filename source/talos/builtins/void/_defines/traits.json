@@ -1,0 +1,4 @@
+{
+    "name": "Void",
+    "describe": "A nullable data-type that denotes the abscence of a value."
+}

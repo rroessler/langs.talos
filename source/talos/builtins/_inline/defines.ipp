@@ -7,12 +7,28 @@
 #define TALOS_XX_FIELDS_HEADER(...)
 #endif
 
+#ifndef TALOS_XX_FIELDS_DESCRIBE
+#define TALOS_XX_FIELDS_DESCRIBE(...)
+#endif
+
+#ifndef TALOS_XX_FIELDS_TYPEDEF
+#define TALOS_XX_FIELDS_TYPEDEF(...)
+#endif
+
 #ifndef TALOS_XX_FIELDS_FOOTER
 #define TALOS_XX_FIELDS_FOOTER(...)
 #endif
 
 #ifndef TALOS_XX_STATICS_HEADER
 #define TALOS_XX_STATICS_HEADER(...)
+#endif
+
+#ifndef TALOS_XX_STATICS_DESCRIBE
+#define TALOS_XX_STATICS_DESCRIBE(...)
+#endif
+
+#ifndef TALOS_XX_STATICS_TYPEDEF
+#define TALOS_XX_STATICS_TYPEDEF(...)
 #endif
 
 #ifndef TALOS_XX_STATICS_FOOTER

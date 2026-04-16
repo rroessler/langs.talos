@@ -1,0 +1,4 @@
+{
+    "name": "Enum",
+    "describe": "Reflection namespace for any `enum` based values."
+}

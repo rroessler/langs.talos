@@ -1,0 +1,4 @@
+{
+    "name": "Boolean",
+    "describe": "A data-type that can only be one of the two possible values that represents boolean logic."
+}

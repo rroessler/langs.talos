@@ -45,7 +45,7 @@ TALOS_MM_BUILTIN_FTYPE(Monad::Result, unwrap_okay, const Self* self) {
 }
 
 TALOS_MM_BUILTIN_FTYPE(Monad::Result, unwrap_error, const Self* self) {
-    auto error = self->constraints(0);
+    auto error = self->constraints(1);
     auto message = TB::optional(TB::string());
     auto args = TB::arguments(message);
     return { TB::function(error, args) };

@@ -1,5 +1,8 @@
+/// Package Modules
+import { Property } from '../property';
+
 /** Builtins Descriptor Interface. */
-export interface Descriptor {
-    readonly name: string;
-    readonly describe?: string;
+export interface Descriptor extends Property {
+    readonly fields?: Property[];
+    readonly statics?: Property[];
 }

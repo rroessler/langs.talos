@@ -1,0 +1,4 @@
+{
+    "name": "String",
+    "describe": "A sequence of UTF-8 code units."
+}

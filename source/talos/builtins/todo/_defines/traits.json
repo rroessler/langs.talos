@@ -1,0 +1,4 @@
+{
+    "name": "Todo",
+    "describe": "A utility type/value that allows the safe declaration of unimplemented code."
+}

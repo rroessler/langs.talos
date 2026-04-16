@@ -28,7 +28,7 @@ export const docs = fumadocs.defineDocs({
 // The available crates cache.
 export const crates = fumadocs.defineDocs({
     dir: Assets.crates(),
-    meta: { schema: g_metadata },
+    meta: { files: ['**/meta.json'], schema: g_metadata },
     docs: {
         files: ['**/*.mdx'],
         schema: g_frontmatter,
@@ -39,7 +39,7 @@ export const crates = fumadocs.defineDocs({
 // The available builtins cache.
 export const builtins = fumadocs.defineDocs({
     dir: Assets.builtins(),
-    meta: { schema: g_metadata },
+    meta: { files: ['**/meta.json'], schema: g_metadata },
     docs: {
         files: ['**/*.mdx'],
         schema: g_frontmatter,

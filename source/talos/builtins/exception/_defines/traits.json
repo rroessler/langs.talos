@@ -1,0 +1,4 @@
+{
+    "name": "Exception",
+    "describe": "Objects that encapsulate program errors, typically resulting from `panic` statements."
+}

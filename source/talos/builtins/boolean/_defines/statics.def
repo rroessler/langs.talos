@@ -1,9 +1,13 @@
 //  MACROS  //
 
 TALOS_XX_STATICS_HEADER()
-TALOS_XX_STATICS_DEFINE(parse)
+TALOS_XX_STATICS_DEFINE(from)
+TALOS_XX_STATICS_TYPEDEF("fn (value: Any) -> Boolean")
+TALOS_XX_STATICS_DESCRIBE("Creates a `Boolean` from a given value.")
 TALOS_XX_STATICS_FOOTER()
 
 TALOS_XX_STATICS_HEADER()
-TALOS_XX_STATICS_DEFINE(from)
+TALOS_XX_STATICS_DEFINE(parse)
+TALOS_XX_STATICS_TYPEDEF("fn (input: String, case?: Boolean) -> Boolean")
+TALOS_XX_STATICS_DESCRIBE("Parses a source as an, optionally case-insensitive, `Boolean` literal.")
 TALOS_XX_STATICS_FOOTER()

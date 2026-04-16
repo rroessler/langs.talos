@@ -89,7 +89,7 @@ Test.suite("Methods", fn {
         Assert.equals(Mock.encapsulate.adicity(), 1);
 
         Assert.equals(Mock.optional.adicity(), 1);
-        Assert.equals(Mock.variadic.adicity(), Function.limit());
+        Assert.equals(Mock.variadic.adicity(), Function.vlimit());
     });
 });
 

@@ -1,0 +1,4 @@
+{
+    "name": "Result",
+    "describe": "A monadic type holding a returned value or an error."
+}

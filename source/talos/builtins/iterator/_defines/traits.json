@@ -1,0 +1,4 @@
+{
+    "name": "Iterator",
+    "describe": "A object that allows abitrarily traversing over an encapsulated sequence."
+}

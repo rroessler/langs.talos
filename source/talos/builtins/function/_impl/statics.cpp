@@ -15,7 +15,7 @@ struct TALOS_BUILTIN_STATICS(Function::Dynamic) {
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_BUILTIN_STATIC(Function::Dynamic, limit, , ) { return Number::Tagged(UINT64_MAX); }
+TALOS_MM_BUILTIN_STATIC(Function::Dynamic, vlimit, , ) { return Number::Tagged(UINT64_MAX); }
 
 TALOS_MM_BUILTIN_STATIC(Function::Dynamic, call, isolate, args) {
     // ensure we have some valid values as necessary now

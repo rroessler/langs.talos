@@ -31,7 +31,7 @@ TALOS_MM_BUILTIN_FTYPE(Function::Dynamic, adicity) { return { TB::function(TB::n
 TALOS_MM_BUILTIN_FTYPE(Function::Dynamic, receiver) { return { TB::function(TB::any()) }; }
 TALOS_MM_BUILTIN_FTYPE(Function::Dynamic, bind) { return { TB::function(TB::variadic(), TB::arguments(TB::any())) }; }
 
-TALOS_MM_BUILTIN_STYPE(Function::Dynamic, limit) { return { TB::function(TB::number()) }; }
+TALOS_MM_BUILTIN_STYPE(Function::Dynamic, vlimit) { return { TB::function(TB::number()) }; }
 
 TALOS_MM_BUILTIN_STYPE(Function::Dynamic, call) {
     auto F = TB::constraint("F", TB::variadic());
