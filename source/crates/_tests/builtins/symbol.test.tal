@@ -21,7 +21,9 @@ Test.suite("Statics", fn {
     });
 
     Test.case("Symbol.of 'String'", fn {
+        Assert.equals("".symbol(), Symbol.from(""));
         Assert.equals(Symbol.from(""), Symbol.from(""));
+        Assert.equals("abc".symbol(), Symbol.from("abc"));
         Assert.equals(Symbol.from("abc"), Symbol.from("abc"));
     });
 

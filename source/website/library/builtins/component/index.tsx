@@ -5,21 +5,20 @@ import { Heading } from '@fumadocs/base-ui/components/heading';
 /// Package Modules
 import { Property } from '../property';
 import { Registry } from '../registry';
+import { Ancillary } from '../descriptor';
 
 /** Builtins Documentation Component. */
 export interface Component extends Component.Props {}
-export function Component({ children, name }: Component) {
+export function Component({ name, ancillary, children }: Component) {
     // attempt resolving the required component
-    const builtin = Registry.resolve(name);
+    const builtin = Registry.resolve(name, ancillary);
     if (typeof builtin === 'undefined') return;
 
     // and return the resulting documentation
     return (
         <React.Fragment>
             <Heading as="h2" id="overview" children="Overview" />
-
-            {/* all the children come from website side */}
-            {children}
+            {children /* all the children come from website side */}
 
             <Component.Section id="fields" heading="Fields" items={builtin.fields} />
             <Component.Section id="statics" heading="Statics" items={builtin.statics} />
@@ -31,7 +30,10 @@ export namespace Component {
     //  TYPEDEFS  //
 
     /** Documentation Component Properties. */
-    export type Props = React.PropsWithChildren<{ readonly name: string }>;
+    export type Props = React.PropsWithChildren<{
+        readonly name: string;
+        readonly ancillary?: Ancillary;
+    }>;
 
     /** Documentation Component Section. */
     export type Section = { id: string; heading: string; items?: Property[] };

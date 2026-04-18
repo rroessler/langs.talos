@@ -4,4 +4,34 @@ title: Intrinsics
 
 import { Builtins } from '@/website/builtins';
 
-<Builtins.Component name="Intrinsics" />
+<Builtins.Component name="Intrinsics">
+    There are a variety of intrinsic types that Talos provides to aid in type-checking. These include the top and bottom
+    types, `Any` and `Never`, respectively.
+
+    ### `Any`
+
+    The top type `Any` can be used to represent any possible type. It can be used powerfully to disable type-checking, but comes at the cost of losing type-safety, and as such should be used wisely and sparingly.
+
+    ```talos
+    // A function that can receive a value of any type.
+    let show = fn (value: Any) => Debug.eprintln("Value:", value);
+
+    show(123456);       // Outputs: 'Value: 123456'
+    show("String");     // Outputs: 'Value: String'
+    ```
+
+    ### `Never`
+
+    The bottom type `Never` is assignable to any other type, but no type is assignable to `Never` (except itself). The primary use-case for `Never` is to express impossible conditions, such as an infinite loop or function that panics.
+
+    ```talos
+    // A function that will never return.
+    let fatal = fn: Never => panic "Fatal Error!";
+
+    // A function the will loop infinitely.
+    let infinite = fn: Never {
+        loop {}; // never concludes
+    };
+    ```
+
+</Builtins.Component>

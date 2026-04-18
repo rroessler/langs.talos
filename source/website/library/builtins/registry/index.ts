@@ -6,10 +6,10 @@ import * as JSONC from 'jsonc-parser';
 
 /// Website Modules
 import { Assets } from '@/website/assets';
-import { Product } from '@/website/product';
 
 /// Package Modules
-import { Descriptor } from '../descriptor';
+import { Property } from '../property';
+import { Ancillary, Descriptor } from '../descriptor';
 
 /** Builtins Registry Namespace. */
 export namespace Registry {
@@ -22,9 +22,6 @@ export namespace Registry {
     }
 
     //  PROPERTIES  //
-
-    /** The currently cached values. */
-    const m_cached = new Map<string, Descriptor | undefined>();
 
     /** Replacements factory to be used. */
     const m_replacements = (type: string): Replacer[] => [
@@ -42,37 +39,40 @@ export namespace Registry {
         // prepare the source directory of builtins
         const source = Assets.builtins();
 
+        // prepare the resolved items
+        const resolved = fs.readdirSync(source).map((name) => resolve(name));
+
         // filter all the available files now
-        return fs
-            .readdirSync(source)
-            .map(resolve)
-            .filter((builtin): builtin is Descriptor => typeof builtin === 'object');
+        return resolved.filter(m_filter);
     }
 
     /**
      * Handles resolving builtin documentation.
      * @param name                  Name of builtin.
+     * @param extra                 Extra details.
      */
-    export function resolve(name: string): Descriptor | undefined {
-        // stop early if we have a suitable cache value
-        if (m_cached.has(name) && !Product.development) return m_cached.get(name);
-
+    export function resolve(name: string, extra?: Ancillary): Descriptor | undefined {
         // attempt finding the necessary builtin now
         const builtin = Assets.builtins(name, 'index.mdx');
         if (name.startsWith('_') || !fs.existsSync(builtin)) return;
 
         // get the underlying definition files now
-        const fields = m_process(name, 'fields');
-        const statics = m_process(name, 'statics');
+        const fields = m_process(name, 'fields', extra);
+        const statics = m_process(name, 'statics', extra);
 
         // resolve the descriptor now
-        const descriptor: Descriptor = { ...m_details(name), fields, statics };
-
-        // assign and return the resulting value now
-        return (m_cached.set(name, descriptor), descriptor);
+        return { ...m_details(name), fields, statics };
     }
 
     //  PRIVATE METHODS  //
+
+    /**
+     * Handles filtering builtins.
+     * @param builtin               Builtin to filter.
+     */
+    function m_filter(builtin?: Descriptor): builtin is Descriptor {
+        return typeof builtin === 'object';
+    }
 
     /**
      * Handles resolving descriptors traits.
@@ -88,8 +88,9 @@ export namespace Registry {
      * Handles processing helper files.
      * @param name                  Name of builtin.
      * @param type                  Type of details.
+     * @param extras                Extras to bind.
      */
-    function m_process(name: string, type: 'fields' | 'statics') {
+    function m_process(name: string, type: 'fields' | 'statics', extras?: Ancillary) {
         // prepare the baseline definition string to be transformed
         const defines = Assets.builtins(name, '_defines', `${type}.def`);
 
@@ -106,6 +107,11 @@ export namespace Registry {
         for (const { re, pp } of replacements) content = content.replaceAll(new RegExp(re, 'g'), pp);
 
         // and parse the incoming results now
-        return JSONC.parse(`[${content}]`);
+        return JSONC.parse(`[${content}]`).map(
+            (property: Property): Property => ({
+                ...property, // merge the extra details now
+                ancillary: extras?.[`${type}.${property.name}`],
+            }),
+        );
     }
 }

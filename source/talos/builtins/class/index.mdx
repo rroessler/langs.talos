@@ -3,5 +3,11 @@ title: Class
 ---
 
 import { Builtins } from '@/website/builtins';
+import { Callout } from '@/website/components';
 
-<Builtins.Component name="class" />
+<Builtins.Component name="class">
+    Classes constructed with the `class` statement, can be targeted by the `Class` namespace reflection methods. These
+    methods allow introspection of class metadata, specifically noted by their respective declaration.
+</Builtins.Component>
+
+<Callout title="Note:">The static methods for the `Class` namespace have not yet been decided.</Callout>

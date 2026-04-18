@@ -1,4 +1,4 @@
 {
     "name": "Number",
-    "describe": "A specialized 63-bit floating point value."
+    "describe": "A specialized 63-bit floating-point value."
 }

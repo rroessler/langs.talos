@@ -4,4 +4,17 @@ title: Maybe
 
 import { Builtins } from '@/website/builtins';
 
-<Builtins.Component name="maybe" />
+<Builtins.Component name="maybe">
+
+    The `Maybe` type is a utility type that conveniently allows annotating optional types. It is equivalent to the union
+    between a type `T` and `Void`. The typical usage is with the voidish coalescing operator:
+
+    ```talos
+    // A type/function pair that creates a closure that defaults optional values.
+    type Resolver = fn [T](value?: T) -> T;
+    let Resolver = fn [T](default: T): Resolver[T] {
+        return fn (value?) => value ?? default;
+    };
+    ```
+
+</Builtins.Component>

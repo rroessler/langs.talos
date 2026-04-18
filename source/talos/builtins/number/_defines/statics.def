@@ -2,6 +2,6 @@
 
 TALOS_XX_STATICS_HEADER()
 TALOS_XX_STATICS_DEFINE(parse)
-TALOS_XX_STATICS_TYPEDEF("fn (input: Any, radix?: Number) -> Number")
-TALOS_XX_STATICS_DESCRIBE("...")
+TALOS_XX_STATICS_TYPEDEF("fn (input: String, radix?: Number) -> Number")
+TALOS_XX_STATICS_DESCRIBE("Parses an input `String`, as a possible `Number` value. A radix value can be given to ensure parsing integer only values.")
 TALOS_XX_STATICS_FOOTER()

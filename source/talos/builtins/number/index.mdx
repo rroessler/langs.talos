@@ -4,4 +4,9 @@ title: Number
 
 import { Builtins } from '@/website/builtins';
 
-<Builtins.Component name="number" />
+<Builtins.Component name="number">
+    A `Number` represents any 63-bit floating-point number. Internally, all values are encoded as tagged pointers where
+    pointers with an initial bit of zero denote a floating-point value. As such, it should be noted there will be a
+    minor loss of precision, approximately 15 decimal digits instead of ~15.95 for a full 64-bit double, with a mantissa
+    of 51-bits.
+</Builtins.Component>

@@ -27,7 +27,7 @@ TALOS_BUILTIN_STORAGE(String::Dynamic) = Talos::Member::Storage(name(), {
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_BUILTIN_FIELD(String::Dynamic, hash, isolate, args) {
+TALOS_MM_BUILTIN_FIELD(String::Dynamic, symbol, isolate, args) {
     TALOS_MM_ASSERT_TYPEOF(isolate, String::Dynamic, args.self());
     return args.self<String::Dynamic>().symbol();  // get symbol
 }

@@ -28,10 +28,10 @@ struct TALOS_MM_BUILTIN_ODECL(String::Dynamic, unary, binary);
 
 Talos::Type::Erased TALOS_BUILTIN_TRAITS(String::Dynamic)::typing() { return prototype()->instantiate(); }
 
-TALOS_MM_BUILTIN_FTYPE(String::Dynamic, hash) { return { TB::function(TB::symbol()) }; }
 TALOS_MM_BUILTIN_FTYPE(String::Dynamic, size) { return { TB::function(TB::number()) }; }
 TALOS_MM_BUILTIN_FTYPE(String::Dynamic, bytes) { return { TB::function(TB::number()) }; }
 TALOS_MM_BUILTIN_FTYPE(String::Dynamic, empty) { return { TB::function(TB::boolean()) }; }
+TALOS_MM_BUILTIN_FTYPE(String::Dynamic, symbol) { return { TB::function(TB::symbol()) }; }
 TALOS_MM_BUILTIN_FTYPE(String::Dynamic, fmt) { return { TB::variadic(TB::string()) }; }
 
 TALOS_MM_BUILTIN_FTYPE(String::Dynamic, at) {

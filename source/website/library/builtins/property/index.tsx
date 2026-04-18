@@ -16,7 +16,7 @@ export function Snippet({ code }: Snippet) {
 
 /** Builtins Property Component. */
 export interface Property extends Property.Props {}
-export function Property({ name, parent, describe, typedef }: Property) {
+export function Property({ name, parent, typedef, describe, ancillary }: Property) {
     // prepare the href to be used now
     const href = `#${parent ? `${parent}-` : ''}${name}`;
 
@@ -29,6 +29,7 @@ export function Property({ name, parent, describe, typedef }: Property) {
             <Heading as="h3" children={title} />
             {typedef && <Snippet code={typedef} />}
             <Markdown.Embed markdown={describe} />
+            {ancillary /** additional details */}
         </div>
     );
 }
@@ -40,7 +41,8 @@ export namespace Property {
     export interface Props {
         readonly name: string;
         readonly parent?: string;
-        readonly describe?: string;
         readonly typedef?: string;
+        readonly describe?: string;
+        readonly ancillary?: React.ReactNode;
     }
 }
