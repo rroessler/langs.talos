@@ -131,11 +131,14 @@ Talos::Type::Deduction Talos::Type::Analyzer::preamble(const Syntax::Preamble* p
 }
 
 Talos::Type::Erased Talos::Type::Analyzer::instantiate(const Erased& type, const Syntax::Specialization& arguments) {
+    // we need to resolve a suitable generic target
+    auto target = type->is<Transform>() ? type->as<Transform>()->reduce() : type;
+
     // ensure the type is actually generic before continuing with instantiating
-    if (!type->is<Generic>()) return arguments.empty() ? type : report(3000350, *type).type;
+    if (!target->is<Generic>()) return arguments.empty() ? target : report(3000350, *target).type;
 
     // cast to the generic we want to instantiate
-    auto generic = type->as<Generic>();
+    auto generic = target->as<Generic>();
 
     // pre-check the arity and adicity of the generic
     auto total = arguments.size();
