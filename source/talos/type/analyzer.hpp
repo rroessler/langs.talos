@@ -206,6 +206,12 @@ namespace Talos::Type {
         Erased declare(const Syntax::Variable* variable);
 
         /**
+         * @brief Handles sanity checks on declarations.
+         * @param node                          Declaration node.
+         */
+        const Syntax::Declaration* sanity(const Syntax::Declaration* node);
+
+        /**
          * @brief Handles marking an identifier.
          * @param identifier                Identifier to mark.
          * @param entity                    Associated entity.

@@ -14,9 +14,12 @@ TALOS_MM_CHECK_NODE(Alias, node, analyzer) {
     auto name = node->name();
     auto location = node->traits()->location();
 
+    // sanity check the incoming node now
+    analyzer->sanity(node);
+
     // pre-declare the entity as necessary
     auto* entity = analyzer->world()->types().declare(name, transform, location);
-    if (entity == nullptr) return analyzer->report(node, 4000402, name);  // failure
+    if (entity == nullptr) return analyzer->report(node, 4000402, name);
 
     // prepare a current scoping to be used now
     $_UNUSED $_AUTO = analyzer->scope();

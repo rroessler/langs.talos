@@ -22,8 +22,8 @@ TALOS_MM_CHECK_NODE(Variable, node, analyzer) {
     if (exported && disposable) analyzer->report(3000150);
 
     // attempt declaring on the world now
-    auto* entity = analyzer->world()->values().declare(node, expected, analyzer->captures());
-    if (entity == nullptr) return analyzer->report(4000403, node->name());  // fail now here
+    auto* entity = analyzer->world()->values().declare(analyzer->sanity(node), expected);
+    if (entity == nullptr) return analyzer->report(4000403, node->name());
 
     // update the entity if necessary to do so
     if (disposable) entity->unused(false);

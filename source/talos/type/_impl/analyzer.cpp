@@ -25,7 +25,6 @@ $::Ptr::Unique<Talos::Type::Scope> Talos::Type::Analyzer::scope(const Syntax::Co
     const $::Ptr::Shared<Callable>& callable, const $::Ptr::Shared<Generic>& generic) noexcept {
     // scope a new world to be used now
     auto world = scope();
-    auto& captures = m_context->captures();
 
     auto parameters = callable->parameters();  // get the base details now
     auto spread = callable->packed() ? Type::Builder::list(parameters.back().value()) : nullptr;
@@ -52,7 +51,7 @@ $::Ptr::Unique<Talos::Type::Scope> Talos::Type::Analyzer::scope(const Syntax::Co
         if (optional) type = Builder::maybe(type);
 
         // and attempt declaring the incoming entity now
-        auto* entity = world->values().declare(parameter, type, captures);
+        auto* entity = world->values().declare(sanity(parameter), type);
         if (entity == nullptr) report(parameter, 4000401, parameter->name());
     }
 
@@ -244,6 +243,30 @@ Talos::Type::Erased Talos::Type::Analyzer::declare(const Syntax::Variable* varia
 
     // return the resulting type reference now
     return expected;
+}
+
+const Talos::Syntax::Declaration* Talos::Type::Analyzer::sanity(const Syntax::Declaration* node) {
+    // get the incoming node name
+    auto name = node->name();
+
+    // get the entity instance to be checked against
+    auto* entity = m_world->lookup(name).first;
+
+    // ignore if there is no valid entity (eg: new entity)
+    if (entity == nullptr) return node;
+
+    // ignore if our current export flags do not have a mismatch.
+    if (entity->exported() == node->modifiers().test(Variable::Flag::EXPORT)) return node;
+
+    // since there is a mismatch we can report this merge error now
+    report(8000203, name);
+
+    // also resolve the current entity details
+    auto iter = m_world->m_locations.find(name);
+    if (iter == m_world->m_locations.end()) return node;
+
+    // can safely report the mismatch at the origin as well
+    return report(iter->second, 8000203, name), node;
 }
 
 //  PRIVATE METHODS  //

@@ -239,6 +239,7 @@ TALOS_XX_DIAGNOSTIC_IMPORT(8000102, ERROR, "No loader available for module '{0}'
 TALOS_XX_DIAGNOSTIC_IMPORT(8000200, WARN, "Empty import does not declare any exports for use")
 TALOS_XX_DIAGNOSTIC_IMPORT(8000201, WARN, "Empty export does nothing and can be removed", Unnecessary)
 TALOS_XX_DIAGNOSTIC_IMPORT(8000202, ERROR, "{0} can only be declared at the top-level of a module/namespace")
+TALOS_XX_DIAGNOSTIC_IMPORT(8000203, ERROR, "Individual merged declarations '{0}' must be all exported or all local")
 
 TALOS_XX_DIAGNOSTIC_REFERENCE(8000300, ERROR, "Module has no exported member '{0}'")
 TALOS_XX_DIAGNOSTIC_REFERENCE(8000301, ERROR, "Module already exported member '{0}")

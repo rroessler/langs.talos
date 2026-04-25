@@ -26,3 +26,7 @@ Talos::Type::Scope::~Scope() {
     // resolve the current world instance to be used
     m_analyzer->m_world = m_parent;
 }
+
+//  PRIVATE METHODS  //
+
+Talos::Variable::Captures* Talos::Type::Scope::m_captures() const noexcept { return &m_analyzer->captures(); }

@@ -47,11 +47,12 @@ TALOS_MM_CHECK_NODE(Enum, node, analyzer) {
         emplaced ? analyzer->check(variant) : analyzer->report(variant, 4000405, variant->key());
     }
 
-    auto accessor = Type::Builder::interface(name, variants);  // prepare custom accessor
-    auto* entity = analyzer->world()->values().declare(node, accessor, analyzer->captures());
+    // prepare a custom accessor to be used now
+    auto accessor = Type::Builder::interface(name, variants);
+    auto* entity = analyzer->world()->values().declare(analyzer->sanity(node), accessor);
 
     if (entity == nullptr) return analyzer->report(4000403, name);    // already exists so fail
-    if (entity->transient()) return analyzer->report(4000402, name);  // exists in type-land
+    if (entity->transient()) return analyzer->report(4000402, name);  // only exists in type-land
 
     // update the underlying type to be used now
     return analyzer->passable(entity->type() = enumeration);

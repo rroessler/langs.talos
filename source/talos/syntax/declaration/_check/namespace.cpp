@@ -30,6 +30,7 @@ TALOS_MM_CHECK_NODE(Namespace, node, analyzer) {
         result.type = Type::Builder::interface(node->name(), fields);
     }
 
-    auto* entity = analyzer->world()->values().declare(node, result.type, analyzer->captures());
-    return entity ? std::move(result) : analyzer->report(4000403, node->name());  // failed to declare
+    // attempt declaring our entity to be used now
+    auto* entity = analyzer->world()->values().declare(analyzer->sanity(node), result.type);
+    return entity == nullptr ? analyzer->report(4000403, node->name()) : std::move(result);
 }

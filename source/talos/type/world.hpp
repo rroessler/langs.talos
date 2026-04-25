@@ -93,16 +93,15 @@ namespace Talos::Type {
              * @brief Handles declaring entity instances.
              * @param declaration           Variable declaration.
              * @param type                  Associated type to bind.
-             * @param captures              Context captures.
              */
             template <std::derived_from<Syntax::Declaration> T>
-            inline Entity* declare(const T* declaration, const Erased& type, Variable::Captures& captures) {
+            inline Entity* declare(const T* declaration, const Erased& type) {
                 auto* entity = declare(declaration->name(), type, declaration->traits()->location());
                 if ($_UNLIKELY(entity == nullptr)) return nullptr;  // failed to declare an entity
 
                 // update the entity details now
-                entity->modifiers() = declaration->modifiers();
-                entity->context() = captures.declare(declaration);
+                entity->context() = m_world->m_captures()->declare(declaration);
+                entity->modifiers() = entity->modifiers() | declaration->modifiers();
 
                 // update the used state if necessary to do so
                 if (entity->exported()) entity->unused(false);
@@ -206,6 +205,9 @@ namespace Talos::Type {
          */
         explicit World(World* parent) : m_depth(($_ASSERT(parent), parent->m_depth + 1)), m_parent(parent) {}
 
+        /// @brief Virtual abstract destructor.
+        virtual ~World() = default;
+
         //  PUBLIC METHODS  //
 
         /// @brief Gets the current world depth.
@@ -289,6 +291,12 @@ namespace Talos::Type {
             if (iter != m_entities.cend()) return { const_cast<Entity*>(&iter->second), m_depth };
             return m_parent ? m_parent->lookup(name) : Entry(nullptr, -1);  // failed to find value
         }
+
+       protected:
+        //  PRIVATE METHODS  //
+
+        /// @brief Gets encapsulated variable captures.
+        virtual Variable::Captures* m_captures() const noexcept { return nullptr; }
     };
 
     /// @brief Scoped World Container.
@@ -307,6 +315,12 @@ namespace Talos::Type {
 
         /// @brief Handles removing the scoping.
         ~Scope();
+
+       protected:
+        //  PRIVATE METHODS  //
+
+        /// @brief Gets variable captures from the analyzer.
+        Variable::Captures* m_captures() const noexcept final;
     };
 
 }  // namespace Talos::Type
