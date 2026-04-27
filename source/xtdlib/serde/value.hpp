@@ -145,7 +145,7 @@ namespace $::Serde {
             };
 
             // determine if suitably truthy
-            return m_storage.visit(s_overloads);
+            return std::visit(s_overloads, m_storage);
         }
 
         //  PUBLIC METHODS  //
