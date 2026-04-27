@@ -26,6 +26,10 @@ Todo...
 - Fixed: Previously generic functions would crash the type-checker due to their contextual type not being resolved properly. This has now been addressed.
 - Added: Laid the foundations for runtime decorator annotations. This includes: basic type-checking, and instantiation alongside compile-time attributes.
 
+<h4>Toolkit / talos bundle<h4>
+
+- Fixed: Bundling on Linux would previously result in a segfault due to invalid ELF note construction. The required flags and constructors to do so have been added.
+
 <h4>Toolkit / talos serve</h4>
 
 - Fixed: When type-checking accessors, fields now have their inferred types properly cached to enable linting tools.

@@ -12,12 +12,22 @@ bool XJCT::Target::Linux::m_imbue(Archive::Binary& binary, const Imbue::Options&
     auto predicate = [options](const auto& note) { return note.name() == options.name; };
     if (std::any_of(parser->notes().begin(), parser->notes().end(), predicate)) return false;
 
-    auto type = LIEF::ELF::Note::TYPE::UNKNOWN;  // prepare note options
+    // prepare some constants to be used
+    static constexpr auto s_section = ".note.custom";
+    static constexpr auto s_type = LIEF::ELF::Note::TYPE::UNKNOWN;
+
+    // prepare the archive content to be used
     Archive::Buffer content = { options.blob.begin(), options.blob.end() };
 
     // prepare the note (need to have a temporary value since its a unique_ptr)
-    auto note = LIEF::ELF::Note::create(options.name, type, content, ".note.custom");
+    auto note = $::New().unique<LIEF::ELF::Note>(options.name, s_type, 0, content, s_section);
+
+    // bind the note we require to our parser
+    parser->add(*note);
+
+    // manually build our instance (as we require note building)
+    LIEF::ELF::Builder builder = { *parser, { .notes = true } };
 
     // finally rebuild the output as necessary now (this currently fails due to LIEF being bad)
-    return parser->add(*note), binary.buffer() = parser->raw(), true;
+    return builder.build(), binary.buffer() = builder.get_build(), true;
 }
