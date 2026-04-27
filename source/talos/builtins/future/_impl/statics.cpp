@@ -31,9 +31,6 @@ TALOS_MM_BUILTIN_STATIC(Async::Future, async, isolate, args) {
 }
 
 TALOS_MM_BUILTIN_STATIC(Async::Future, delay, isolate, args) {
-    // validate the incoming passthrough arguments now
-    TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, args[0]);
-
     // validate the callback argument if given
     switch (args.size()) {
         default: TALOS_MM_ASSERT_TYPEOF(isolate, Function::Dynamic, args[1]); $_FALLTHROUGH;
