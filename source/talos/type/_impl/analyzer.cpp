@@ -250,10 +250,10 @@ const Talos::Syntax::Declaration* Talos::Type::Analyzer::sanity(const Syntax::De
     auto name = node->name();
 
     // get the entity instance to be checked against
-    auto* entity = m_world->lookup(name).first;
+    auto [entity, depth] = m_world->lookup(name);
 
-    // ignore if there is no valid entity (eg: new entity)
-    if (entity == nullptr) return node;
+    // ignore if there is no valid entity (eg: new entity, or not same depth)
+    if (entity == nullptr || depth < m_world->m_depth) return node;
 
     // ignore if our current export flags do not have a mismatch.
     if (entity->exported() == node->modifiers().test(Variable::Flag::EXPORT)) return node;

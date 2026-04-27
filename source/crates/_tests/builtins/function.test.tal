@@ -23,7 +23,7 @@ namespace Mock {
     export let encapsulate = fn (value: Any): fn -> Any { return fn => value; };
 
     //! Tests for optional parameters.
-    export let optional = fn (optional: Number = 42): Number => optional;
+    export let optional = fn (value: Number = 42): Number => value;
 
     //! Tests for variadic parameters.
     export let variadic: Function = fn (...vargs): Any => vargs;
