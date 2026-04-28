@@ -23,7 +23,7 @@ export namespace Settings {
         //  INJECTABLES  //
 
         /** Commands Registry. */
-        @Inversify.inject(Command.Registry) protected readonly m_commands: Command.Registry;
+        @Inversify.inject(Command.Registry) protected readonly m_commands!: Command.Registry;
 
         //  LIFECYCLE METHODS  //
 
@@ -56,7 +56,7 @@ export namespace Settings {
     /** Gets the entire configuration. */
     export const all = (): Readonly<Settings> => {
         return Object.keys(m_defaults).reduce(
-            (settings, key: keyof Settings) => ({ ...settings, [key]: get(key) }),
+            (settings, key) => ({ ...settings, [key]: get(key as keyof Settings) }),
             {} as Settings, // prepare the default set of settings to inherit
         );
     };

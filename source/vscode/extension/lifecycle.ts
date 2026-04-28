@@ -16,10 +16,10 @@ export class Lifecycle extends Disposable implements Service {
     //  PROPERTIES  //
 
     /** The underlying extension API. */
-    @Inversify.inject(Context) protected readonly m_context: Context;
+    @Inversify.inject(Context) protected readonly m_context!: Context;
 
     /** Extension Contributions Provider. */
-    @Dependency.inject(Contribution) protected readonly m_contributions: Dependency<Contribution>;
+    @Dependency.inject(Contribution) protected readonly m_contributions!: Dependency<Contribution>;
 
     //  LIFECYCLE METHODS  //
 

@@ -15,10 +15,10 @@ export class Contribution extends Disposable.Registry implements Service, Extens
     //  INJECTABLES  //
 
     /** Language Client Instance. */
-    @Inversify.inject(Client) protected readonly m_client: Client;
+    @Inversify.inject(Client) protected readonly m_client!: Client;
 
     /** Commands Registry. */
-    @Inversify.inject(Command.Registry) protected readonly m_commands: Command.Registry;
+    @Inversify.inject(Command.Registry) protected readonly m_commands!: Command.Registry;
 
     //  LIFECYCLE METHODS  //
 

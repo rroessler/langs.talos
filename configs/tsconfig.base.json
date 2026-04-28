@@ -3,6 +3,7 @@
         "noEmit": true,
         "alwaysStrict": true,
         "strictNullChecks": true,
+        "strictPropertyInitialization": true,
 
         "noImplicitAny": true,
         "noImplicitOverride": true,

@@ -38,6 +38,7 @@
         "advanced/resources",
         "advanced/type-system",
         "advanced/memory",
-        "advanced/policies"
+        "advanced/policies",
+        "advanced/language-server"
     ]
 }
