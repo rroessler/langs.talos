@@ -101,6 +101,9 @@ TALOS_MM_CHECK_NODE(Class, node, analyzer) {
     else if (auto _ = Type::Builder::resolve<Type::Prototype>(base)) proto->super() = base;
     else if (!base->is<Type::None>()) analyzer->report(node->base(), 3001001, node->name(), *base);
 
+    // ensure we declare the current outer shell now
+    world->outer() = world->depth(), world->loops() = -1;
+
     // prepare the self and super value to be used now as well
     world->values().declare("Self", instance)->unused(false);
 

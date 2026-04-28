@@ -82,6 +82,7 @@ To get started using the language server, see how to [set up your environment](/
 - Added: Laid the foundations for runtime decorator annotations. This includes: basic type-checking, and instantiation alongside compile-time attributes.
 - Fixed: Generic `type` declarations failed to be instantiated correctly. This was due to the use of an internal type-transform not resolving lazy generic instantiation.
 - Fixed: Type and value declarations did not merge their variable flags and were superseded by the last-most declaration. Now these flags are merged correctly and sanity-checked for potential mismatches (eg: when using `export` it must apply to both declarations or neither).
+- Fixed: Values that were captured as upvalues in `class` declarations were not flagged as such. Now the correct depths are used within type-analysis to fix this.
 
 <h4>Toolkit / talos bundle</h4>
 
