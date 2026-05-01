@@ -23,6 +23,10 @@ function(talos_vendors_require)
 
             # and require the incoming item now
             mono_vendor_require(${_target})
+
+            if (${_target} STREQUAL "spdlog")
+                __talos_vendors_spdlog()
+            endif ()
         endif ()
     endforeach ()
 endfunction()
@@ -99,6 +103,14 @@ macro(__talos_vendors_lief)
 
     set(LIEF_DEX OFF)
     set(LIEF_ART OFF)
+endmacro()
+
+# Handles setting required "spdlog" options
+macro(__talos_vendors_spdlog)
+    target_compile_definitions(spdlog PUBLIC
+        "SPDLOG_SHORT_LEVEL_NAMES={ \"T\", \"D\", \"I\", \"W\", \"E\", \"F\", \"O\" }"
+        "SPDLOG_LEVEL_NAMES={ \"TRACE\", \"DEBUG\", \"INFO \", \"WARN \", \"ERROR\", \"FATAL\", \"OFF\" }"
+    )
 endmacro()
 
 # --  MODULE DEFINITION  -- #
