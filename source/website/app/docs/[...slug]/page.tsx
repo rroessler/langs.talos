@@ -45,7 +45,7 @@ export default async function Docs(props: PageProps<'/docs/[...slug]'>) {
 
     // construct the necessary components to be used
     const components = Markdown.Components({
-        a: (props) => <Anchor component={createRelativeLink(Source.docs, page)} {...props} />,
+        a: (props) => <Anchor component={createRelativeLink(Source.docs as any, page)} {...props} />,
     });
 
     // prepare each of our components to be used
