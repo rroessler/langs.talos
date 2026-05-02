@@ -11,7 +11,7 @@ export function Components(components?: MDXComponents): MDXComponents {
     const builtins: MDXComponents = {
         a: Anchor,
         pre: Code.Native,
-        blockquote: Callout,
+        blockquote: Callout as any,
     };
 
     // and merge all the outgoing components now
