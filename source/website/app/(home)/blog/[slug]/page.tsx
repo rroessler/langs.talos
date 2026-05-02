@@ -36,7 +36,7 @@ export default async function Page(props: PageProps<'/blog/[slug]'>) {
 
     // construct the necessary components to be used
     const components = Markdown.Components({
-        a: (props) => <Anchor component={createRelativeLink(Source.blog, page)} {...props} />,
+        a: (props) => <Anchor component={createRelativeLink(Source.blog as any, page)} {...props} />,
     });
 
     // and finally construct the resulting blog-post
