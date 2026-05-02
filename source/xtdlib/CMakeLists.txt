@@ -23,9 +23,9 @@ talos_library_declare(${TALOS_TARGET_XTDLIB} PCH SOURCES ${TALOS_SOURCES_XTDLIB}
     fmt::fmt
     aster::aster
     glaze::glaze
+    spdlog::spdlog
     mono::warnings
     Boost::interprocess
-    spdlog::spdlog_header_only
     unordered_dense::unordered_dense
 )
 
