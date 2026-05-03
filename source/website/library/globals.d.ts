@@ -9,7 +9,8 @@ declare module '*.yaml' {
 
 /** Exposing a custom MDX module importer. */
 declare module '*.mdx' {
-    export { MDXContent as default } from 'mdx/types';
+    declare const content: import('mdx/types').MDXContent;
+    export default content; // expose the content now
 }
 
 /** The language module. */
