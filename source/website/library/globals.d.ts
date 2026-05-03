@@ -7,6 +7,11 @@ declare module '*.yaml' {
     export default content;
 }
 
+/** Exposing a custom MDX module importer. */
+declare module '*.mdx' {
+    export { MDXContent as default } from 'mdx/types';
+}
+
 /** The language module. */
 declare module '~/dist/vscode/syntaxes/talos.tmLanguage.json' {
     declare const syntax: import('shiki').LanguageInput;
