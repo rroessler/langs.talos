@@ -11,7 +11,9 @@
         "serve": "run-s bundle serve:impl",
         "serve:impl": "bunx serve -l 3000 out",
         "//  BUNDLE  //": "",
-        "bundle": "next build . --turbopack"
+        "bundle": "next build . --turbopack",
+        "//  CLEAN  //": "",
+        "clean": "rimraf .next .source out next-end.d.ts"
     },
     "dependencies": {
         "@fumadocs/ui": "^16.5.0",
@@ -24,7 +26,7 @@
         "fumadocs-mdx": "^14.3.2",
         "hast-util-to-jsx-runtime": "^2.3.6",
         "lucide-react": "^0.577.0",
-        "next": "^16.2.4",
+        "next": "^16.1.6",
         "next-themes": "^0.4.6",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
