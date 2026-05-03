@@ -7,6 +7,7 @@ import Content from './content.mdx';
 /** Preview Component. */
 export interface Forward extends Forward.Props {}
 export function Forward({ page }: Forward) {
+    void Content; /// DO NOT REMOVE: Next JS needs this
     return Registry.validate(page) ? <Content /> : null;
 }
 
