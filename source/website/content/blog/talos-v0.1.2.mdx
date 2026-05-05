@@ -51,7 +51,8 @@ task();
 As seen above, we could take the `@log_fn(label)` decorator and apply this to any function variable that we want to add scoped logging to. For more information regarding specifics for using decorators, see the [decorator fundamentals](/docs/language/fundamentals/decorators) section.
 
 <Callout title="Note:">
-    Currently, there are no typings available for runtime decorators. These are planned to be added in the future with support for declaration metadata, factory generation and additional library support.
+    Currently, there are no typings available for runtime decorators. These are planned to be added in the future with
+    support for declaration metadata, factory generation and additional library support.
 </Callout>
 
 ## Language Server
@@ -83,6 +84,7 @@ To get started using the language server, see how to [set up your environment](/
 - Fixed: Generic `type` declarations failed to be instantiated correctly. This was due to the use of an internal type-transform not resolving lazy generic instantiation.
 - Fixed: Type and value declarations did not merge their variable flags and were superseded by the last-most declaration. Now these flags are merged correctly and sanity-checked for potential mismatches (eg: when using `export` it must apply to both declarations or neither).
 - Fixed: Values that were captured as upvalues in `class` declarations were not flagged as such. Now the correct depths are used within type-analysis to fix this.
+- Fixed: Recursive checking for crate-files accidentally became recursive if none were found and as such has been fixed.
 
 <h4>Toolkit / talos bundle</h4>
 

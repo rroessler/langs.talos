@@ -13,11 +13,10 @@ $::Ptr::Unique<Talos::Crate::Manifest> Talos::Crate::Registry::scan(const $::URI
 
 $::Ptr::Unique<Talos::Crate::Manifest> Talos::Crate::Registry::scan(const $::Filesystem::Path& hint) {
     // prepare the parent path to be used
-    auto parent = hint;
+    $::Filesystem::Path parent = hint, root = $::System::root();
 
     // attempt scanning upwards for a suitable crate-file
     auto query = hint / Crate::Constants::filename();
-    auto root = $::Filesystem::Path().root_path();
 
     // iterate over the available paths now
     while (!$::Path::exists(query) && parent != root) {
