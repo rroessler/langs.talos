@@ -1,7 +1,7 @@
 ---
 date: 2026-03-04
-title: Talos v0.1.0
 author: Reuben Roessler
+title: Talos v0.1.0
 ---
 
 ## Hello, Talos!
@@ -15,7 +15,7 @@ Talos is a strongly typed programming language focusing on developer experience 
 let multiply = fn (a: Number, b: Number): Number => a + b;
 
 // When initializing variables, they can also be strictly typed
-let future: Future[Number] = multiply:async(6, 7);
+let future: Future[Number] = multiply::async(6, 7);
 
 // Talos also exposes concurrency through green-threads
 Debug.println(future.await());

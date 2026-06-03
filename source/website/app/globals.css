@@ -33,3 +33,12 @@
     border-radius: unset !important;
     text-decoration: line-through;
 }
+
+/*----------  Override Styles  ----------*/
+
+@layer utilities {
+    .prose :where(li):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
