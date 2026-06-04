@@ -1,5 +1,5 @@
 ---
-date: 2026-05-02
+date: 2026-06-04
 author: Reuben Roessler
 title: Talos v0.1.2
 ---
@@ -85,6 +85,7 @@ To get started using the language server, see how to [set up your environment](/
 - Fixed: Type and value declarations did not merge their variable flags and were superseded by the last-most declaration. Now these flags are merged correctly and sanity-checked for potential mismatches (eg: when using `export` it must apply to both declarations or neither).
 - Fixed: Values that were captured as upvalues in `class` declarations were not flagged as such. Now the correct depths are used within type-analysis to fix this.
 - Fixed: Recursive checking for crate-files accidentally became recursive if none were found and as such has been fixed.
+- Fixed: `Future.delay` duration value was not converted correctly from milliseconds into nanoseconds. Now all durations for delays are converted correctly.
 
 <h4>Toolkit / talos bundle</h4>
 

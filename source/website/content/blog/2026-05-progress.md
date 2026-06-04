@@ -1,5 +1,5 @@
 ---
-date: 2026-06-03
+date: 2026-06-05
 author: Reuben Roessler
 title: Progress / May 2026
 ---

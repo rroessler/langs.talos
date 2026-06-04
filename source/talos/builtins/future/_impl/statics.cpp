@@ -41,7 +41,7 @@ TALOS_MM_BUILTIN_STATIC(Async::Future, delay, isolate, args) {
     // construct a callback for the delay handler
     static constexpr auto s_callback = [](Runtime::Isolate* isolate, const Function::Arguments& args) {
         auto milliseconds = args.at<Number::Tagged>(0, Number::Tagged(0));
-        isolate->thread()->sleep($::Chrono::Duration(milliseconds.value()));
+        isolate->thread()->sleep($::Chrono::Milliseconds(milliseconds.value()));
         return args.size() > 1 ? isolate->invoke(args.at(1)) : Value::Void();
     };
 
