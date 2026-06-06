@@ -17,9 +17,7 @@ let log_fn = fn (label: String): Any {
 
 // A task that has the above decorator attached.
 @log_fn("task")
-let task = fn {
-    Debug.println("Executing my task...");
-};
+let task = fn => Debug.println("Executing my task...");
 
 // Calling the task will also invoke the output that log_fn" generates.
 task();

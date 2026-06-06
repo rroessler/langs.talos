@@ -25,5 +25,5 @@ TALOS_MM_FORMAT_STMT(Return, reader) {
     if (expression == nullptr) return expression;  // invalid parse
 
     // construct the resulting panic output now
-    return storage->group(keyword, storage->indent(storage->line().dynamic(), expression));
+    return storage->group(keyword, storage->space().hard(), expression);
 }

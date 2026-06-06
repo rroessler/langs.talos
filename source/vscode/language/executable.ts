@@ -13,11 +13,11 @@ export namespace Executable {
 
     /** Expected base locations available. */
     const m_locations = [
-        // prepare a valid location for the potential executable
-        path.resolve(os.homedir(), '.talos', 'bin', Product.executable),
-
         // as well as a development path as well (eg: located against build outputs)
         path.resolve(__dirname, '..', 'bin', Product.executable),
+
+        // prepare a valid location for the potential executable
+        path.resolve(os.homedir(), '.talos', 'bin', Product.executable),
     ];
 
     //  PUBLIC METHODS  //
