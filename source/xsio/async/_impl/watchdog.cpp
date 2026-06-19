@@ -39,17 +39,21 @@ void XSIO::Async::Watchdog::m_main() {
             // ignore if the worker is not actually running
             if (worker->state() != Virtual::State::WORKING) continue;
 
-            // stop if the worker thread is either invalid or a scheduler
-            if (auto* thread = worker->thread(); thread && !thread->is<Async::Loop>()) {
-                auto previous = thread->m_ts.load();  // get the old timestamp and validate
-                if (previous < Timer::Yield::VALID || previous >= m_clock.load()) continue;
+            // get the current thread instance to be checked
+            auto* thread = worker->thread();
+            if (thread == nullptr) continue;
 
-                // determine if we exceeded the maximum time slice
-                bool exceeded = (m_clock.load() - previous) > time_slice;
+            // ensure the thread is in a valid state
+            if (thread->state() == Virtual::State::CLEANED || thread->is<Async::Loop>()) continue;
 
-                // and force the thread to yield to the scheduler if it exceeded
-                if (exceeded) thread->m_ts.compare_exchange_strong(previous, Timer::Yield::SHOULD);
-            }
+            auto previous = thread->m_ts.load();  // get the old timestamp and validate
+            if (previous < Timer::Yield::VALID || previous >= m_clock.load()) continue;
+
+            // determine if we exceeded the maximum time slice
+            bool exceeded = (m_clock.load() - previous) > time_slice;
+
+            // and force the thread to yield to the scheduler if it exceeded
+            if (exceeded) thread->m_ts.compare_exchange_strong(previous, Timer::Yield::SHOULD);
         }
 
         // wait a little interval or exit when the manager does

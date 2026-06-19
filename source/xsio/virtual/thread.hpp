@@ -120,10 +120,13 @@ namespace XSIO::Virtual {
 
         /// @brief Handles recycling a thread instance.
         inline Memory::Stack* m_clean() {
+            // reset the state firstly
+            m_state = State::CLEANED;
+
+            // then reset the properties
             m_task = nullptr;
             m_worker = nullptr;
             m_context = nullptr;
-            m_state = State::CLEANED;
             m_ts = Timer::Yield::NEVER;
 
             auto* stack = m_stack;  // return

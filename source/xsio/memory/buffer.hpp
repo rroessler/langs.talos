@@ -27,7 +27,7 @@ namespace XSIO::Memory {
 
         //  PUBLIC METHODS  //
 
-        inline constexpr size_t size() const noexcept { return m_size - m_page() * 2; }
+        inline constexpr size_t size() const noexcept { return m_size; }
         inline constexpr void* data() const noexcept { return reinterpret_cast<void*>(m_address()); }
 
        private:
