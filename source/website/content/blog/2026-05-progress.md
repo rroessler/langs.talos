@@ -28,15 +28,15 @@ In reflection, Talos has some great bones for a new programming language but rea
 
 Looking ahead, I am currently in the process of rewriting portions of Talos in my spare time with these lofty goals in mind:
 
-- Improved AST Design &nbsp;&mdash;&nbsp; To facilitate language-server outputs.
-- Better Formatter Support &nbsp;&mdash;&nbsp; To fix quirks and add more options.
-- Rework Website Inputs &nbsp;&mdash;&nbsp; Some sections are all over the place.
-- Integrate Baseline JIT &nbsp;&mdash;&nbsp; Attempt to prioritize JIT over bytecode.
-- Decouple Module Compilation &nbsp;&mdash;&nbsp; Breakup compilation to be independent.
-- Performant Type-Checking &nbsp;&mdash;&nbsp; Type-checking needs major work for performance.
-- Bind Runtime to Linter &nbsp;&mdash;&nbsp; To accept plugins for writing linting rules.
-- Abstract Scheduling &nbsp;&mdash;&nbsp; Necessary for customized execution policies.
-- Update Foundataions &nbsp;&mdash;&nbsp; Implement arena-allocators, and rework foundations.
+- [ ] Improved AST Design &nbsp;&mdash;&nbsp; To facilitate language-server outputs.
+- [ ] Better Formatter Support &nbsp;&mdash;&nbsp; To fix quirks and add more options.
+- [ ] Rework Website Inputs &nbsp;&mdash;&nbsp; Some sections are all over the place.
+- [ ] Integrate Baseline JIT &nbsp;&mdash;&nbsp; Attempt to prioritize JIT over bytecode.
+- [ ] Decouple Module Compilation &nbsp;&mdash;&nbsp; Breakup compilation to be independent.
+- [ ] Performant Type-Checking &nbsp;&mdash;&nbsp; Type-checking needs major work for performance.
+- [ ] Bind Runtime to Linter &nbsp;&mdash;&nbsp; To accept plugins for writing linting rules.
+- [ ] Abstract Scheduling &nbsp;&mdash;&nbsp; Necessary for customized execution policies.
+- [ ] Update Foundations &nbsp;&mdash;&nbsp; Implement arena-allocators, and rework foundations.
 
 Although this will appear to be a large amount of work (and it probably is), these updates will enhance the codebase and give Talos the foundations it needs to be ready for library support. Over this next period, I plan to give monthly updates on the current progress of these rewrites. So far I have been working on the improved AST and formatter upgrades, after which I will tackle getting the foundations and abstract scheduling ready to then rebuild the runtime fully.
 
