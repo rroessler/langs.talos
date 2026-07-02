@@ -1,0 +1,44 @@
+---
+date: 2026-07-02
+author: Reuben Roessler
+title: Progress / June 2026
+---
+
+import { Anchor, Aside } from '@/website/components';
+
+## Status Update
+
+After a busy June, Talos is has been rebuilt (mostly) from the ground up to start facilitating the design improvements I posted in [last months blog](/blog/2026-05-progress) update.
+
+## Tokenized Comments
+
+To improve the Abstract Syntax Tree (AST) design, I started by modifying the syntax-node structure to consume a different set of bounds than what was originally implemented. Previously, syntax bounds were comprised of a range value <Anchor.Super index="1"/> that has a starting and ending position. Overall this works incredibly well, being both compact and expressive for rebuilding errors/exceptions at all runtime stages. The catch for these old-style ranges comes when I tried to resolve comments for syntax-nodes.
+
+The previous AST design did not trace comments during construction, and as such resulted in trying to match syntax-node bounds to a list of lexical tokens. This meant first translating a syntax-nodes range to the equivalent token-range, then using the resultant tokens to determine the leading comments. Not impossible per se, but exceptionally error prone due to the AST not having direct references to the backing tokens buffer.
+
+To alleviate this, the new AST design now uses bounds constructed purely from token references from the original tokens buffer. This solution is not only backed by a similar sized set of bounds <Anchor.Super index="2"/>, but also removes the range-to-token translation step through a more lossless approach <Anchor.Super index="3"/>. More simply, we can use the two token references the new bounds contain to backtrace leading comments for syntax-nodes.
+
+## Website Revamp
+
+For a small side-tangent, I wanted to revamp the website implementation and have so far implemented the following goals:
+
+- [x] Move all website content to a singular `docs` directory.
+- [ ] Fix dynamic sections (eg: `builtins` and `crates`) headings.
+
+> These changes won't be seen until the v0.2.0 rewrite for Talos is nearing completion.
+
+## Upcoming Work
+
+With the more foundational work completed, I will be soon moving onto the compilation and runtime reworks. For the most part these consist of porting over the previous implementations, with the exception of integrating a baseline JIT interpreter. The goal here is to keep the current bytecode compiler/interpreter but implement a template JIT that can glue bytecode outputs to more performant code generation. Currently, JIT compilation is possible in the previous design and I will aim to use this in generating templated compilation outputs.
+
+<Aside.Rewrite />
+
+## Footnotes
+
+<Anchor.Footnote index="1" /> &nbsp;&mdash;&nbsp; Or two ranges values to help express inner and outer bounds.
+
+<Anchor.Footnote index="2" /> &nbsp;&mdash;&nbsp; Previously had two range values (which was 32-bytes) and now uses one
+range and two token references (still 32-bytes).
+
+<Anchor.Footnote index="3" /> &nbsp;&mdash;&nbsp; There is still some loss as comment tokens in strange places (eg:
+between a declaration keyword and identifier) are unaccounted for.

@@ -4,6 +4,8 @@ author: Reuben Roessler
 title: Progress / May 2026
 ---
 
+import { Aside } from '@/website/components';
+
 ## Reflection
 
 With May behind us and a new release of v0.1.2, I figured it is a good time to reflect on what has been built so far for Talos. With this release, Talos now has some astounding functionality which includes the following:
@@ -28,12 +30,12 @@ In reflection, Talos has some great bones for a new programming language but rea
 
 Looking ahead, I am currently in the process of rewriting portions of Talos in my spare time with these lofty goals in mind:
 
-- [ ] Improved AST Design &nbsp;&mdash;&nbsp; To facilitate language-server outputs.
+- [x] Improved AST Design &nbsp;&mdash;&nbsp; To facilitate language-server outputs.
 - [ ] Better Formatter Support &nbsp;&mdash;&nbsp; To fix quirks and add more options.
-- [ ] Rework Website Inputs &nbsp;&mdash;&nbsp; Some sections are all over the place.
+- [x] Rework Website Inputs &nbsp;&mdash;&nbsp; Some sections are all over the place.
 - [ ] Integrate Baseline JIT &nbsp;&mdash;&nbsp; Attempt to prioritize JIT over bytecode.
 - [ ] Decouple Module Compilation &nbsp;&mdash;&nbsp; Breakup compilation to be independent.
-- [ ] Performant Type-Checking &nbsp;&mdash;&nbsp; Type-checking needs major work for performance.
+- [ ] Performant Type-Checking &nbsp;&mdash;&nbsp; Type-checking needs a rework for performance.
 - [ ] Bind Runtime to Linter &nbsp;&mdash;&nbsp; To accept plugins for writing linting rules.
 - [ ] Abstract Scheduling &nbsp;&mdash;&nbsp; Necessary for customized execution policies.
 - [ ] Update Foundations &nbsp;&mdash;&nbsp; Implement arena-allocators, and rework foundations.
@@ -42,4 +44,4 @@ Although this will appear to be a large amount of work (and it probably is), the
 
 As for a timeline of these upgrades, I really cannot say. My ideal timeline is to have these changes ready by December for a v0.2.0 release, in which I hope to do [Advent of Code](https://adventofcode.com/) with Talos. Until then, follow along with these monthly blog posts to see what progress is made!
 
-> The rewrite for Talos is currently being implemented privately to keep the current project state clean. I have done this since some sections are being rewriten potentially from the ground-up, which will simplify with the adoption of these substantial changes.
+<Aside.Rewrite />

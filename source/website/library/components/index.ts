@@ -1,5 +1,6 @@
 /// Component Exports
 export * from './anchor';
+export * from './aside';
 export * from './button';
 export * from './callout';
 export * from './code';
