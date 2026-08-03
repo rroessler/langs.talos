@@ -1,0 +1,74 @@
+---
+date: 2026-08-03
+author: Reuben Roessler
+title: Progress / July 2026
+---
+
+import { Anchor, Aside, Callout } from '@/website/components';
+
+## Status Update
+
+The month of July has been productive with a baseline rewrite soon to be ready <Anchor.Super index="1"/> for a nightly release. This month I have been rewriting the interpreter to be tail-called instead of directed-threaded <Anchor.Super index="2" /> which has lead to some intriguing results. Additionally, I have started investigating the viability of directly compiled various functions to a baseline JIT on initial compilation.
+
+## Interpreter Rework
+
+For some background, bytecode interpreters typically dispatch a sequence of instructions where a basic implementation would use a switch case:
+
+```talos
+// The program, a list of encoded instructions
+let bytecode: List[Number] = [...];
+
+// A simple decoder for instructions
+let decode = fn (encoded: Number): Instruction => Todo();
+
+// A basic handler for dispatching instructions using `match`
+let dispatch = fn (offset: Number) {
+    // Decode the incoming instruction
+    let instruction = decode(bytecode.get(offset));
+
+    // Other languages could use `switch` statements
+    match (instruction.opcode()) {
+        Opcode.ADD: Todo(),
+        Opcode.SUB: Todo(),
+        *: panic "Unknown Opcode",
+    }
+}
+
+// Iterate over the available encoded instructions
+for (offset in List.range(bytecode.size())) dispatch(offset);
+```
+
+Previously <Anchor.Super index="2"/>, Talos implemented the interpreter using direct-threading. Although this solution has great performance, it could be relatively finicky to fine-tune since it relied on all cases being perfectly inlined <Anchor.Super index="3"/> to maintain this performance. During the current rewrite, I decided to instead opt for a tail-call interpreter since this should come with similar benefits to the direct-thread approach whilst also simplifying compilation heuristics.
+
+<Callout title="Note:">
+    The `match` statement is currently unimplemented in v0.1.2 and will be available when v0.2.0 is released.
+</Callout>
+
+## Baseline JIT Compilation
+
+Many modern dynamic programming languages implement some form a JIT within their compilation/optimization process. For Talos, I wanted to make this JIT opt-in through a specialized attribute:
+
+```talos
+#[Internal.Optimize]
+let foo = fn => 42;
+```
+
+Since this is only a baseline JIT, it should be utilized sparingly to improve performance. This is because the current downside to this implementation is that the outputs require storage space with simple functions requiring a minimum of ~256 bytes <Anchor.Super index="4"/>. Statistics of jitted functions is availble through the hidden `--dump-assembly` flag.
+
+## Upcoming Work
+
+After work on the baseline JIT has been completed, the next goal is to prepare a nightly release for Talos from the work that has been implemented thus far. This nightly release will also include the foundations for the `match` statement.
+
+<Aside.Rewrite />
+
+## Footnotes
+
+<Anchor.Footnote index="1" /> &nbsp;&mdash;&nbsp; Currently GitHub CI integration needs to be revised for releases.
+
+<Anchor.Footnote index="2" /> &nbsp;&mdash;&nbsp; Only up to v0.1.2 was a direct-thread interpreter used.
+
+<Anchor.Footnote index="3" /> &nbsp;&mdash;&nbsp; Direct-thread interpreters work best with small functions as compiler
+heuristics may remove the indirect-jump if a function is too large effectively reversing the performance gain.
+
+<Anchor.Footnote index="4" /> &nbsp;&mdash;&nbsp; Functions that return constants/strings resolve to much smaller values
+(eg: around 16-36 bytes), whilst method calls can be much larger (around 200+ bytes).
