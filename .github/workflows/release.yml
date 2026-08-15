@@ -1,27 +1,23 @@
-name: Release Talos
+name: Release Worker
+description: Workflow for publishing a Talos release
 
 on:
-    workflow_dispatch:
+    workflow_call:
         inputs:
+            suffix:
+                type: string
+                default: ''
+                required: false
+                description: Version Suffix
             release:
-                type: choice
-                description: Release Type
-                options: [nightly, stable]
-            version:
                 type: string
                 required: true
-                description: Release Version
+                description: Release Type
 
 jobs:
     release-build:
-        name: Build Releases
-        uses: ./.github/workflows/build.yml
-
-    release-deploy:
-        name: Deploy Website
-        needs: [release-build]
-        if: inputs.release == 'stable'
-        uses: ./.github/workflows/deploy.yml
+        name: Build Release
+        uses: ./.github/workflows/builder.yml
 
     release-vscode:
         name: Publish VSCE
@@ -29,32 +25,16 @@ jobs:
         if: inputs.release == 'stable'
         uses: ./.github/workflows/vscode.yml
 
-    release-create:
-        name: Release GitHub
-        runs-on: ubuntu-latest
+    release-website:
+        name: Publish Website
         needs: [release-build]
-        steps:
-            - uses: actions/checkout@v6
+        if: inputs.release == 'stable'
+        uses: ./.github/workflows/website.yml
 
-            - name: Generate Changelog
-              uses: elieahd/templater@v1
-              with:
-                  file: "CHANGELOG.md"
-                  variables: "version=${{ inputs.version }}"
-                  template: ".github/templates/release-${{ inputs.release }}.md"
-
-            - name: Download Artifacts
-              uses: actions/download-artifact@v8
-              with:
-                  path: dist
-                  pattern: talos-*
-                  merge-multiple: true
-
-            - name: Generate Release
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  gh release create ${{ inputs.version }} "./dist/*" \
-                    --notes-file "CHANGELOG.md" \
-                    --repo "${{ github.repository }}" \
-                    --title "Talos ${{ inputs.version }}"
+    release-publish:
+        name: Publish Release
+        needs: [release-build]
+        uses: ./.github/workflows/publish.yml
+        with:
+            suffix: ${{ inputs.suffix }}
+            release: ${{ inputs.release }}

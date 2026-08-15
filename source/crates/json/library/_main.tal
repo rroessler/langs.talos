@@ -1,7 +1,7 @@
-//!
-//! Crate: "json"
-//! Description: Helpers for parsing and serializing JSON/JSONC.
-//!
+///
+/// @crate "json"
+/// @describe Helpers for parsing and serializing JSON/JSONC.
+///
 
 // Dynamic Modules
 import "dylib:json" as json;
@@ -11,15 +11,15 @@ import "talos:_detail" as Detail;
 
 // - HELPERS - //
 
-//! Brief: Internal helper to reduce bytecode output.
+//! @brief Internal helper to reduce bytecode output.
 let m_cast = Detail.Unsafe.cast;
 
 // - PUBLIC METHODS - //
 
-//! Brief: Stringifies Talos values into a JSON output.
-//! Param: value                Value to stringify.
+//! @brief Stringifies Talos values into a JSON output.
+//! @param value                Value to stringify.
 export let encode = m_cast[fn (value: Any) -> String](json.encode);
 
-//! Brief: Parses JSON inputs to a Talos value.
-//! Param: input                Input to parse.
+//! @brief Parses JSON inputs to a Talos value.
+//! @param input                Input to parse.
 export let decode = m_cast[fn [T = Any](input: String) -> T](json.decode);

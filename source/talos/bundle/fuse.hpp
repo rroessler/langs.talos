@@ -1,7 +1,7 @@
 #ifndef _TALOS_BUNDLE_FUSE_HPP
 #define _TALOS_BUNDLE_FUSE_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/forward/bundle.hpp"
 
 /**
@@ -19,9 +19,9 @@
 namespace Talos::Fuse {
 
 #define X(N, ...) extern XJCT::Sentinel::View N;
-    TALOS_XX_FUSES_LIST(X)
+TALOS_XX_FUSES_LIST(X)
 #undef X
 
-}  // namespace Talos::Fuse
+} // namespace Talos::Fuse
 
 #endif

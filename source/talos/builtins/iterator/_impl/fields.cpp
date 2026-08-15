@@ -1,53 +1,46 @@
-/// Talos Modules
-#include "talos/member/storage.hpp"
-
-/// Builtin Modules
+/// Builtin Includes
 #include "talos/builtins/_inline/assert.ipp"
-#include "talos/builtins/_inline/defines.ipp"
 
 //  TYPEDEFS  //
 
-#define TALOS_XX_FIELDS_DEFINE(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
-struct TALOS_BUILTIN_FIELDS(Iterable::Iterator) {
+#define TALOS_XX_FIELDS_DEFINE(N, ...) $_FWD(Talos::Builtins::Field, static Value::Any N(Isolate *, const Args &))
 #include "talos/builtins/iterator/_defines/fields.def"
-};
-#undef TALOS_XX_FIELDS_DEFINE
 
 //  PROPERTIES  //
 
-#define TALOS_XX_FIELDS_DEFINE(N, ...) { #N, Field::N },
-TALOS_BUILTIN_STORAGE(Iterable::Iterator) = Talos::Member::Storage(name(), {
+static auto s_members = Talos::Builtins::Storage<Talos::Iterable::Iterator>({
+#define TALOS_XX_FIELDS_DEFINE(N, ...) {#N, Talos::Builtins::Field::N},
 #include "talos/builtins/iterator/_defines/fields.def"
-                                                                           });
-#undef TALOS_XX_FIELDS_DEFINE
+});
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_BUILTIN_FIELD(Iterable::Iterator, done, isolate, args) {
-    TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::Iterator, args.self());
-    return Value::Boolean(args.self<Iterable::Iterator>().done());
+Talos::Value::Any Talos::Builtins::Field::done(Isolate *isolate, const Args &args) {
+  TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::Iterator, args.self());
+  return Value::Boolean(args.self<Iterable::Iterator>().done());
 }
 
-TALOS_MM_BUILTIN_FIELD(Iterable::Iterator, next, isolate, args) {
-    // validate the incoming iterator now
-    TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::Iterator, args.self());
+Talos::Value::Any Talos::Builtins::Field::next(Isolate *isolate, const Args &args) {
+  // validate the incoming iterator now
+  TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::Iterator, args.self());
 
-    // pull out our necessary details
-    auto iterator = args.self<Iterable::Iterator>();
-    Value::Any result = Value::Boolean(iterator.next(isolate));
+  // pull out our necessary details
+  auto iterator = args.self<Iterable::Iterator>();
+  Value::Any result = Value::Boolean(iterator.next(isolate));
 
-    // and validate the result now
-    return iterator.okay() ? result : Value::Failure();
+  // and validate the result now
+  return iterator.okay() ? result : Value::Failure();
 }
 
-TALOS_MM_BUILTIN_FIELD(Iterable::Iterator, index, isolate, args) {
-    TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::Iterator, args.self());
-    return Number::Tagged(args.self<Iterable::Iterator>().index());
+Talos::Value::Any Talos::Builtins::Field::index(Isolate *isolate, const Args &args) {
+  TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::Iterator, args.self());
+  return Number::Tagged(args.self<Iterable::Iterator>().index());
 }
 
 //  PRIVATE METHODS  //
 
-Talos::Member::View TALOS_BUILTIN_TRAITS(Iterable::Iterator)::m_attributes(
-    const Iterable::Iterator&, Value::Symbol symbol) {
-    return m_members.retrieve(symbol);
+Talos::Member::View Talos::Builtins::Wrapper<Talos::Iterable::Iterator>::m_attribute(
+    const Iterable::Iterator &, const Value::Symbol &symbol
+) {
+  return s_members.retrieve(symbol);
 }

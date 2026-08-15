@@ -1,300 +1,299 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/relint/analyzer.hpp"
-#include "talos/builtins/service.hpp"
-#include "talos/module/service.hpp"
+#include "talos/flow/unreachable.hpp"
+#include "talos/globals/service.hpp"
+#include "talos/import/service.hpp"
 #include "talos/runtime/container.hpp"
+#include "talos/syntax/tree.hpp"
 
-/// Type Modules
+/// Syntax Includes
+#include "talos/syntax/annotation/generics.hpp"
+#include "talos/syntax/declaration/variable.hpp"
+
+/// Type Includes
 #include "talos/type/_inline/type.ipp"
 
 //  PROPERTIES  //
 
 /// @brief Failure context to be used.
-static auto g_failure = Talos::Type::Context(Talos::Type::Builder::fail());
+static auto g_failure = Talos::Type::Exports(Talos::Type::New::fail());
 
 //  CONSTRUCTORS  //
 
 Talos::Type::Analyzer::Analyzer() : Analyzer($::Global::get<Runtime::Container>()) {}
-Talos::Type::Analyzer::Analyzer(XI::Container* services) : m_services(services) {
-    m_world = m_globals = m_services->get<Builtins::Service>()->types();
+Talos::Type::Analyzer::Analyzer(XI::Container *services) : m_services(services) {
+  m_world = m_services->get<Globals::Service>()->types();
 }
 
 //  PUBLIC METHODS  //
 
-$::Ptr::Unique<Talos::Type::Scope> Talos::Type::Analyzer::scope(const Syntax::Constructor* constructor,
-    const $::Ptr::Shared<Callable>& callable, const $::Ptr::Shared<Generic>& generic) noexcept {
-    // scope a new world to be used now
-    auto world = scope();
+$::Unique::Pointer<Talos::Type::World> Talos::Type::Analyzer::scope(
+    const Syntax::Constructor *constructor,
+    const $::Shared::Pointer<Callable> &callable,
+    const $::Shared::Pointer<Generic> &generic
+) {
+  // scope a new world to be used now
+  auto world = scope();
 
-    auto parameters = callable->parameters();  // get the base details now
-    auto spread = callable->packed() ? Type::Builder::list(parameters.back().value()) : nullptr;
+  auto parameters = callable->parameters(); // get the base details now
+  auto spread = callable->packed() ? New::list(parameters.back().value()) : nullptr;
 
-    // pre-define any generic type parameters now
-    for (const auto& constraint : generic ? generic->parameters() : Template()) {
-        auto entity = world->types().declare(constraint->name(), constraint);
-        if (entity == nullptr) report(4000400, constraint->name());  // dupe
-    }
+  // pre-define any generic type parameters now
+  for (const auto &constraint : generic ? generic->parameters() : Template()) {
+    auto entity = world->types().declare(constraint->name(), constraint);
+    if (entity == nullptr) report(4000400, constraint->name()); // dupe
+  }
 
-    // resolve all the necessary arguments now
-    for (const auto& [ii, parameter] : $::Each(constructor->parameters()->list())) {
-        // attempt getting the current details to be used
-        auto optional = parameter->optional();
-        auto packed = parameter == constructor->spread();
+  // resolve all the necessary arguments now
+  for (const auto &[ii, parameter] : $::Ranges::Each(constructor->parameters()->list())) {
+    // attempt getting the current details to be used
+    auto optional = parameter->optional();
+    auto packed = parameter == constructor->spread();
 
-        // prepare the incoming type to be used now
-        auto type = packed ? spread : parameters.at(ii).value();
+    // prepare the incoming type to be used now
+    auto type = packed ? spread : parameters.at(ii).value();
 
-        // stop on invalid parameter types
-        if (type == nullptr) break;
+    // stop on invalid parameter types
+    if (type == nullptr) break;
 
-        // if we are in spread-mode, then change to an array
-        if (optional) type = Builder::maybe(type);
+    // if we are in spread-mode, then change to an array
+    if (optional) type = New::maybe(type);
 
-        // and attempt declaring the incoming entity now
-        auto* entity = world->values().declare(sanity(parameter), type);
-        if (entity == nullptr) report(parameter, 4000401, parameter->name());
-    }
+    // and attempt declaring the incoming entity now
+    auto *entity = world->values().declare(sanity(parameter), type);
+    if (entity == nullptr) report(parameter, 4000401, parameter->name());
+  }
 
-    // return the current scoping
-    return world;
+  // return the current scoping
+  return world;
 }
 
-$::Ptr::Unique<Talos::Type::Context> Talos::Type::Analyzer::audit(
-    const Syntax::Tree* tree, Diagnostic::Reporter* reporter) {
-    auto failed = reporter && reporter->failed();  // pre-validate
-    if (failed) return $::New().unique<Type::Context>(Builder::fail());
+std::pair<$::String::View, Talos::Type::Erased> Talos::Type::Analyzer::vardef(const Syntax::Variable *variable) {
+  // get the internal name of the variable
+  auto name = variable->name();
 
-    // attempt running our auditing now as needed
-    m_world->m_deferred.clear(), m_reporter = reporter;
-    m_context = $::New().unique<Type::Context>();
-    check(tree), m_reporter = nullptr;  // check
+  // prepare the expected type based on the given annotation
+  auto expected = check(variable->hint()).type;
 
-    // attempt building all the linting details if necessary
-    if (m_services->get<Runtime::Options>()->flags.lint) {
-        auto linter = m_services->get<Relint::Analyzer>();
-        m_context->mirrors() = linter->audit(tree, reporter);
-    }
+  // prepare the initializer type based on what we have currently
+  auto initializer = check(variable->initializer()).type;
+  if (expected->is<Unset>()) expected = initializer;
+  if (expected->is<Unset>()) expected = New::any();
 
-    // and finally return the resulting now
-    return std::move(m_context);
+  // attempt unifying the value now if the expected value is not "any"
+  while (!expected->is<Any>() && variable->initializer()) {
+    if (variable->optional() && initializer->is<None>()) break;
+    else if (expected->unify(initializer)) break; // valid typing
+    return {name, report(variable, 3000300, *initializer, *expected).type};
+  }
+
+  // modify the expecting typing based on the optionality
+  if (variable->optional()) expected = New::maybe(expected);
+
+  // return the resulting type reference now
+  return {name, expected};
 }
 
-Talos::Type::Deduction Talos::Type::Analyzer::check(const Syntax::Node* node) { return check(node, Builder::unset()); }
-Talos::Type::Deduction Talos::Type::Analyzer::check(const Syntax::Node* node, const Erased& fallback) {
-    // stop early if the underlying node is invalid
-    if ($_UNLIKELY(node == nullptr)) return fallback;
+const Talos::Syntax::Declaration *Talos::Type::Analyzer::sanity(const Syntax::Declaration *node) {
+  // get the incoming node name
+  auto name = node->name();
 
-    // and resolve the final deduction to be used
-    auto deduction = Visitor::visit(node, this);
+  // get the entity instance to be checked against
+  auto *entity = m_world->lookup(name);
+  if (entity == nullptr) return node;
 
-    // update the current typing now
-    node->traits()->type() = deduction.type;
+  // ignore if our current export flags do not have a mismatch.
+  if (entity->exported() == node->modifiers().test(Variable::Flag::EXPORT)) return node;
 
-    // and return the resulting deduction
-    return deduction;
+  // since there is a mismatch we can report this merge error now
+  report(8000203, name);
+
+  // also resolve the current entity details
+  auto iter = m_world->m_ranges.find(name);
+  if (iter == m_world->m_ranges.end()) return node;
+
+  // can safely report the mismatch at the origin as well
+  return report(iter->second, 8000203, name), node;
 }
 
-Talos::Type::Deduction Talos::Type::Analyzer::check(const std::vector<Syntax::Node*>& nodes) {
-    Flow::Degree degree = -1, minimum = depth();  // get the current degree details
-    auto propagate = [minimum](Flow::Degree _) { return _ > -1 && _ <= minimum; };
-
-    // attempt checking all the incoming statements now
-    for (const auto& node : nodes) {
-        if (propagate(degree)) redundant(node), check(node);
-        else degree = check(node).flow->degree();  // update
-    }
-
-    // ensure that the instance is passable or not
-    return propagate(degree) ? unreachable(degree) : passable();
+Talos::Type::Deduction Talos::Type::Analyzer::redundant(const Syntax::Node *node) {
+  return report(node->trivia()->range(), 4000900);
 }
 
-std::vector<$::Ptr::Shared<Talos::Type::Parameter>> Talos::Type::Analyzer::check(const Syntax::Template& parameters) {
-    static constexpr auto cast = [](Erased&& node) { return std::static_pointer_cast<Parameter>(node); };
-    auto predicate = [&](const Syntax::Placeholder* parameter) { return cast(check(parameter).type); };
-    return $::Ranges::To(parameters | std::views::transform(predicate));  // can safely transform here
+void Talos::Type::Analyzer::deprecated(Entity *entity, const Syntax::Node *node) {
+  entity->unused(false); // always mark the entity as unused too
+  if (entity->deprecated()) report(node, 9000100, entity->notice());
 }
 
-Talos::Type::Deduction Talos::Type::Analyzer::preamble(const Syntax::Preamble* preamble, Entity* entity) {
-    // set the entity as the preamble target
-    m_world->m_preamble = entity;
-
-    // iterate over the available attributes and decorators
-    for (const auto* attribute : preamble->attributes()) check(attribute);
-    for (const auto* decorator : preamble->decorators()) check(decorator);
-
-    // unset the current preamble target now
-    m_world->m_preamble = nullptr;
-
-    // and return the resulting type deduction
-    return passable(entity->value());
+Talos::Type::Entity *Talos::Type::Analyzer::preamble() const noexcept {
+  auto *entity = m_world->preamble();
+  return entity->unused(false), entity;
 }
 
-Talos::Type::Erased Talos::Type::Analyzer::instantiate(const Erased& type, const Syntax::Specialization& arguments) {
-    // we need to resolve a suitable generic target
-    auto target = type->is<Transform>() ? type->as<Transform>()->reduce() : type;
+Talos::Type::Deduction Talos::Type::Analyzer::preamble(const Syntax::Preamble *preamble, Entity *entity) {
+  // set the entity as the preamble target
+  m_world->m_preamble = entity;
 
-    // ensure the type is actually generic before continuing with instantiating
-    if (!target->is<Generic>()) return arguments.empty() ? target : report(3000350, *target).type;
+  // iterate over the available attributes and decorators
+  for (const auto *attribute : preamble->attributes()) check(attribute);
+  for (const auto *decorator : preamble->decorators()) check(decorator);
 
-    // cast to the generic we want to instantiate
-    auto generic = target->as<Generic>();
+  // unset the current preamble target now
+  m_world->m_preamble = nullptr;
 
-    // pre-check the arity and adicity of the generic
-    auto total = arguments.size();
-    auto arity = generic->arity();
-    auto adicity = generic->adicity();
-
-    // ensure the totals are suitably valid before continuing
-    if (total < arity) return report(3000401, arity).type;
-    else if (total > adicity) return report(3000402, adicity).type;
-
-    // and attempt mapping the types into the desired format
-    auto predicate = [&](const Syntax::Annotation* argument) { return check(argument).type; };
-    return generic->instantiate($::Ranges::To(arguments | std::views::transform(predicate)));
+  // and return the resulting type deduction
+  return passable(entity->value());
 }
 
-Talos::Type::Deduction Talos::Type::Analyzer::branch(Deduction&& deduction, Branch&& left, Branch&& right) {
-    // execute our seperate branches now
-    auto lf = m_using(std::move(left)), rf = m_using(std::move(right));
-
-    // stop our deductions if the given one never succeeded
-    if (deduction.flow->unreachable()) return std::move(deduction);
-
-    // finally construct our resulting deduction to be used
-    return Deduction(Builder::any(), m_merge(std::move(lf), std::move(rf)));
-}
-
-const Talos::Type::Context* Talos::Type::Analyzer::import(
-    const $::String::View& path, const Resource::Location& location) {
-    Import::Service* modules = *m_services;  // resolve now
-    auto result = modules->resolve(path, resource().body());
-    if (result.has_value()) return import(*result, location);
-    return report(location, 8000000, result.error()), &g_failure;
-}
-
-const Talos::Type::Context* Talos::Type::Analyzer::import(const $::URI::View& resource, const Resource::Location&) {
-    // prepare the importer service to be used
-    Import::Service* modules = *m_services;
-
-    // ignore if we could not validly fetch our module
-    auto* found = modules->fetch(resource);
-    if (found == nullptr) return &g_failure;
-
-    // should be able to analyze the module now
-    found->analyze(m_services);
-
-    // and return the underlying type-context
-    return found->metadata<Module::Phase::TYPED>()->context().get();
-}
-
-Talos::Type::Deduction Talos::Type::Analyzer::passable() const { return { Builder::none() }; }
-Talos::Type::Deduction Talos::Type::Analyzer::passable(const Erased& type) const { return type; }
+Talos::Type::Deduction Talos::Type::Analyzer::passable(const Erased &type) const { return type; }
 
 Talos::Type::Deduction Talos::Type::Analyzer::unreachable(Flow::Effect effect) const {
-    return unreachable(depth(), effect);
+  return unreachable(depth(), effect);
 }
 
 Talos::Type::Deduction Talos::Type::Analyzer::unreachable(Flow::Degree degree, Flow::Effect effect) const {
-    return Deduction(Builder::never(), $::New().unique<Flow::Unreachable>(degree, effect));
+  return Deduction(New::never(), $::Unique::New<Flow::Unreachable>(degree, effect));
 }
 
-Talos::Type::Deduction Talos::Type::Analyzer::redundant(const Syntax::Node* node) {
-    return report(node->traits()->bounds(), 4000900);
+Talos::Type::Deduction Talos::Type::Analyzer::check(const Syntax::Node *node, const Erased &fallback) {
+  // stop early if the underlying node is invalid
+  if ($_UNLIKELY(node == nullptr)) return fallback;
+
+  // and resolve the final deduction to be used
+  auto deduction = Visitor::visit(node, this);
+
+  // update the current typing now
+  node->trivia()->type() = deduction.type;
+
+  // and return the resulting deduction
+  return deduction;
 }
 
-void Talos::Type::Analyzer::deprecated(const Entity* entity, const Syntax::Node*) {
-    if (auto message = entity->deprecated()) report(9000100, *message);
+Talos::Type::Deduction Talos::Type::Analyzer::check(const std::vector<Syntax::Node *> &nodes) {
+  Flow::Degree degree = -1, minimum = depth(); // get the current degree details
+  auto propagate = [minimum](Flow::Degree _) { return _ > -1 && _ <= minimum; };
+
+  // attempt checking all the incoming statements now
+  for (const auto &node : nodes) {
+    if (propagate(degree)) redundant(node), check(node);
+    else degree = check(node).flow->degree(); // update
+  }
+
+  // ensure that the instance is passable or not
+  return propagate(degree) ? unreachable(degree) : passable();
 }
 
-void Talos::Type::Analyzer::mark(const Syntax::Identifier* identifier, Entity* entity, Depth depth) {
-    // mark the entity as unused
-    entity->unused(false);
-
-    // check if the entity is deprecated at all
-    deprecated(entity, identifier);
-
-    // resolve the available captures
-    auto& captures = m_context->captures();
-
-    if (depth < 0) captures.global(identifier);  // expecting a global value
-    else if (depth >= m_world->outer()) captures.mark(identifier, entity->context());
-    else captures.leak(identifier, entity->context());  // otherwise a leaked upvalue
+void Talos::Type::Analyzer::check(const std::vector<Syntax::Expression *> &nodes) {
+  for (const auto *node : nodes) check(node);
 }
 
-Talos::Type::Erased Talos::Type::Analyzer::declare(const Syntax::Variable* variable) {
-    // prepare the expected type based on the given annotation
-    auto expected = check(variable->hint()).type;
-
-    // prepare the initializer type based on what we have currently
-    auto initializer = check(variable->initializer()).type;
-
-    if (expected->is<Unset>()) expected = initializer;
-    if (expected->is<Unset>()) expected = Builder::any();
-
-    // attempt unifying the value now if the expected value is not "any"
-    while (!expected->is<Any>() && variable->initializer()) {
-        if (variable->optional() && initializer->is<None>()) break;
-        else if (expected->unify(initializer)) break;  // valid typing
-        return report(variable, 3000300, *initializer, *expected).type;
-    }
-
-    // modify the expecting typing based on the optionality
-    if (variable->optional()) expected = Builder::maybe(expected);
-
-    // return the resulting type reference now
-    return expected;
+Talos::Type::Template Talos::Type::Analyzer::check(const Syntax::Template &parameters) {
+  static constexpr auto cast = [](Erased &&node) { return std::static_pointer_cast<Parameter>(node); };
+  auto predicate = [&](const Syntax::Placeholder *parameter) { return cast(check(parameter).type); };
+  return $::Ranges::To(parameters | std::views::transform(predicate)); // can safely transform here
 }
 
-const Talos::Syntax::Declaration* Talos::Type::Analyzer::sanity(const Syntax::Declaration* node) {
-    // get the incoming node name
-    auto name = node->name();
+$::Unique::Pointer<Talos::Type::Exports>
+Talos::Type::Analyzer::audit(const Syntax::Tree *tree, Diagnostic::Reporter *reporter) {
+  // check if the initial syntax failed to properly be typed
+  if (reporter->failed()) return $::Unique::New<Exports>(New::fail());
 
-    // get the entity instance to be checked against
-    auto [entity, depth] = m_world->lookup(name);
+  // attempt running our auditing now as needed
+  m_world->m_deferred.clear(), m_reporter = reporter;
 
-    // ignore if there is no valid entity (eg: new entity, or not same depth)
-    if (entity == nullptr || depth < m_world->m_depth) return node;
+  // prepare a formatted label to be used
+  auto label = fmt::format("import \"{0}\"", tree->resource().relative());
 
-    // ignore if our current export flags do not have a mismatch.
-    if (entity->exported() == node->modifiers().test(Variable::Flag::EXPORT)) return node;
+  // bind the baseline exports to be used
+  m_exports = $::Unique::New<Exports>(label);
 
-    // since there is a mismatch we can report this merge error now
-    report(8000203, name);
+  // and finally return the resulting now
+  return check(tree), m_reporter = nullptr, std::move(m_exports);
+}
 
-    // also resolve the current entity details
-    auto iter = m_world->m_locations.find(name);
-    if (iter == m_world->m_locations.end()) return node;
+Talos::Type::Erased Talos::Type::Analyzer::instantiate(const Erased &type, const Syntax::Specialization &arguments) {
+  // we need to resolve a suitable generic target
+  auto target = type->is<Transform>() ? type->as<Transform>()->reduce() : type;
 
-    // can safely report the mismatch at the origin as well
-    return report(iter->second, 8000203, name), node;
+  // ensure the type is actually generic before continuing with instantiating
+  if (!target->is<Generic>()) return arguments.empty() ? target : report(3000350, *target).type;
+
+  // cast to the generic we want to instantiate
+  auto generic = target->as<Generic>();
+
+  // pre-check the arity and adicity of the generic
+  auto total = arguments.size();
+  auto arity = generic->arity();
+  auto adicity = generic->adicity();
+
+  // ensure the totals are suitably valid before continuing
+  if (total < arity) return report(3000401, arity).type;
+  else if (total > adicity) return report(3000402, adicity).type;
+
+  // and attempt mapping the types into the desired format
+  auto predicate = [&](const Syntax::Annotation *argument) { return check(argument).type; };
+  return generic->instantiate($::Ranges::To(arguments | std::views::transform(predicate)));
+}
+
+Talos::Type::Control Talos::Type::Analyzer::merge(Control &&left, Control &&right) const noexcept {
+  // get the current degree values to be used
+  auto ld = left->degree(), rd = right->degree();
+  auto lp = left->passable(), rp = right->passable();
+
+  // if either are passable, then we succeed our merge
+  if (lp || rp) return $::Unique::New<Flow::Passable>();
+
+  // otherwise both are unreachable, so we push the most suitable
+  return std::max(ld, rd) == rd ? std::move(left) : std::move(right);
+}
+
+Talos::Type::Deduction Talos::Type::Analyzer::branch(Deduction &&deduction, Branch &&left, Branch &&right) {
+  /// TODO: prepare the necessary narrowings to be used
+  //   auto narrowings = deduction.narrowings;
+  //   auto inverted = m_invert(narrowings);
+
+  // execute our seperate branches now with their narrowings
+  auto lf = m_using(std::move(left)), rf = m_using(std::move(right));
+
+  // stop our deductions if the given one never succeeded
+  if (deduction.flow->unreachable()) return std::move(deduction);
+
+  // finally construct our resulting deduction to be used
+  return Deduction(New::any(), merge(std::move(lf), std::move(rf)));
+}
+
+const Talos::Type::Exports *Talos::Type::Analyzer::import(const $::String::View &path, const XLSP::Range &range) {
+  Import::Service *modules = *m_services; // resolve now
+  auto result = modules->resolve(path, resource().body());
+  if (result.has_value()) return import(*result, range);
+  return report(range, 8000000, result.error()), &g_failure;
+}
+
+const Talos::Type::Exports *Talos::Type::Analyzer::import(const $::URI::Buffer &resource, const XLSP::Range &) {
+  // prepare the importer service to be used
+  Import::Service *modules = *m_services;
+
+  // ignore if we could not validly fetch our module
+  auto *found = modules->fetch(resource);
+  if (found == nullptr) return &g_failure;
+
+  // should be able to analyze the module now
+  found->analyze(m_services);
+
+  // and return the underlying type-context
+  return found->metadata<Module::Phase::TYPED>()->exports().get();
 }
 
 //  PRIVATE METHODS  //
 
-$::Ptr::Unique<Talos::Flow::Control> Talos::Type::Analyzer::m_using(Branch&& branch) {
-    auto* previous = m_world;
-    auto current = World(*previous);
-    m_world = &current;  // alias now
+Talos::Type::Control Talos::Type::Analyzer::m_using(Branch &&branch) {
+  /// TODO: we bind deductions to the current world
 
-    // attempt running our branch now
-    auto flow = branch(this);
+  // attempt running our branch now
+  auto flow = branch(this);
 
-    // update the current branch
-    m_world = previous;
+  /// TODO: post-update after using required deductions
 
-    // and return the final flow
-    return flow;
-}
-
-$::Ptr::Unique<Talos::Flow::Control> Talos::Type::Analyzer::m_merge(
-    $::Ptr::Unique<Flow::Control>&& left, $::Ptr::Unique<Flow::Control>&& right) const noexcept {
-    // get the current degree values to be used
-    auto ld = left->degree(), rd = right->degree();
-    auto lu = left->unreachable(), ru = right->unreachable();
-
-    // if both are unreachable, then fail
-    if (lu && ru) return std::max(ld, rd) == rd ? std::move(left) : std::move(right);
-
-    // otherwise declare as suitably passable now
-    return $::New().unique<Flow::Passable>();
+  // and return the final flow
+  return flow;
 }

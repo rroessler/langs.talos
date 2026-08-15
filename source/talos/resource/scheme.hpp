@@ -1,32 +1,38 @@
-#ifndef _TALOS_RESOURCE_SCHEME_HPP
-#define _TALOS_RESOURCE_SCHEME_HPP
+#ifndef _TALOS_RESOURCE_RESOLVE_HPP
+#define _TALOS_RESOURCE_RESOLVE_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/forward/resource.hpp"
 
 //  X-MACROS  //
 
-#define TALOS_XX_RESOURCE_SCHEMES(X)      \
-    X(HREF, $::URI::Scheme::HREF, false)  \
-    X(SCRIPT, $::URI::Scheme::FILE, true) \
-                                          \
-    X(ARCHIVE, "arch", false)             \
-    X(DYNAMIC, "dylib", true)             \
-    X(INTERNAL, "talos", false)           \
-    X(EXTERNAL, "crate", false)
+/// @brief All available resource schemes.
+#define TALOS_XX_RESOURCE_SCHEMES(X) \
+  X(FILE, "file", true)              \
+  X(HREF, "href", false)             \
+  X(ARCH, "arch", false)             \
+  X(DYLIB, "dylib", true)            \
+  X(TALOS, "talos", false)           \
+  X(CRATE, "crate", false)
 
 //  NAMESPACES  //
 
 namespace Talos::Resource {
 
-    /// @brief Available Resource Schemes.
-    $_XX_ENUM_CLASS(Scheme, uint8_t, TALOS_XX_RESOURCE_SCHEMES);
+//  TYPEDEFS  //
 
-#define X(N, _, B, ...) (Scheme::N == S && B) ||
-    template <Scheme S>
-    concept Loadable = TALOS_XX_RESOURCE_SCHEMES(X) false;
+/// @brief Lookup Result Typing.
+using Result = std::expected<$::URI::Buffer, $::String::Buffer>;
+
+#define X(N, S, ...) $_FWD(Scheme, static constexpr $::String::Literal N = S)
+// prepare the baseline schemes that we allow
+TALOS_XX_RESOURCE_SCHEMES(X)
+
+// ensure that some of the schemes have valid correlations
+static_assert(Scheme::FILE == $::URI::Scheme::FILE);
+static_assert(Scheme::HREF == $::URI::Scheme::HREF);
 #undef X
 
-}  // namespace Talos::Resource
+} // namespace Talos::Resource
 
 #endif

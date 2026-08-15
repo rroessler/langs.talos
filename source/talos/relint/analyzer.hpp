@@ -1,161 +1,143 @@
 #ifndef _TALOS_RELINT_ANALYZER_HPP
 #define _TALOS_RELINT_ANALYZER_HPP
 
-/// Talos Modules
+/// Talos Includes
+#include "talos/diagnostic/scope.hpp"
 #include "talos/relint/context.hpp"
 #include "talos/relint/options.hpp"
 #include "talos/syntax/node.hpp"
 
 namespace Talos::Relint {
 
-    /// @brief Linter Analyzer.
-    struct Analyzer : public XI::Define<Analyzer, XI::Unique, Context> {
-        //  CONSTRUCTORS  //
+/// @brief Linter Analyzer.
+struct Analyzer : public XI::Transient, public Context {
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs an analyzer instance.
-         * @param services                  Services container.
-         */
-        explicit Analyzer();
-        explicit Analyzer(XI::Container* services);
+  /**
+   * @brief Constructs an analyzer instance.
+   * @param services                  Services container.
+   */
+  explicit Analyzer();
+  explicit Analyzer(XI::Container *services);
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets the current scoped references.
-        inline constexpr Scope* references() noexcept { return m_scope; }
+  /// @brief Gets the current scoped references.
+  inline constexpr Scope *references() noexcept { return m_scope; }
 
-        /// @brief Current analyzer metadata.
-        inline constexpr Metadata* mirrors() noexcept { return m_mirrors.get(); }
+  /// @brief Current analyzer metadata.
+  inline constexpr Exports *mirrors() noexcept { return m_mirrors.get(); }
 
-        /// @brief Handles scoping deferred callbacks.
-        inline constexpr auto scope() {
-            // construct the current scoping now
-            auto scope = $::New().unique<Scope>(m_scope);
-
-            // update the current reference
-            m_scope = scope.get();
-
-            // and defer destruction handling now
-            return $::Functor::Defer([&, scope = std::move(scope)] { m_scope = scope->m_ancestor; });
-        }
-
-        /// @brief Handles scoping symbols.
-        inline constexpr auto symbol(const Syntax::Declaration* node, XLSP::Symbol::Kind kind) {
-            m_symbol = m_symbolize(node->name(), node, kind);
-            return $::Functor::Defer([&] { m_symbol = nullptr; });
-        }
-
-        /// @brief Handles scoping symbols.
-        template <std::derived_from<Syntax::Node> T>
-        inline constexpr auto symbol(const $::String::View& name, const T* node, XLSP::Symbol::Kind kind) {
-            // handle the result to be returned now
-            auto* symbol = m_symbolize(name, node, kind);
-
-            // determine whether or not we have a scopable item
-            static constexpr auto s_scoped = std::same_as<T, Syntax::Lambda>;
-
-            if constexpr (!s_scoped) return;  // ignore anything that is not scopedhere
-            else return m_symbol = symbol, $::Functor::Defer([&] { m_symbol = nullptr; });
-        }
-
-        /**
-         * @brief Handles tracing reporter resources.
-         * @param node                      Node to trace.
-         */
-        inline constexpr Diagnostic::Scope trace(const Syntax::Node* node) {
-            return node ? trace(node->traits()->location()) : Diagnostic::Scope();
-        }
-
-        /**
-         * @brief Handles tracing reporter resources.
-         * @param location                  Location to trace.
-         */
-        inline constexpr Diagnostic::Scope trace(const Resource::Location& location) {
-            return Diagnostic::Scope(m_reporter, location);
-        }
-
-        /**
-         * @brief Handles running a complete linter-audit.
-         * @param tree                      Syntax tree node.
-         * @param reporter                  Diagnostic reporter.
-         */
-        $::Ptr::Unique<Metadata> audit(const Syntax::Tree* tree, Diagnostic::Reporter* reporter);
-
-        /**
-         * @brief Handles linting a singular node.
-         * @param node                      Node to lint.
-         * @param parent                    Parent to bind.
-         * @param visit                     Visit children.
-         */
-        Mirror* verify(const Syntax::Node* node, const Syntax::Node* parent = nullptr, bool visit = true);
-
-        /**
-         * @brief Handles linting a multiple nodes.
-         * @param nodes                     Nodes to lint.
-         * @param parent                    Parent to bind.
-         * @param visit                     Visit children.
-         */
-        template <std::derived_from<Syntax::Node> T>
-        inline constexpr std::vector<Mirror*> verify(
-            const std::vector<T*>& nodes, const Syntax::Node* parent = nullptr, bool visit = true) {
-            auto predicate = [&](const T* node) { return verify(node, parent, visit); };
-            return $::Ranges::To(nodes | std::views::transform(predicate));  // resolve
-        }
-
-        /**
-         * @brief Handles traversing a node.
-         * @param node                      Node to traverse.
-         */
-        void traverse(const Syntax::Node* node);
-
-        /**
-         * @brief Handles traversing a multiple nodes.
-         * @param nodes                     Nodes to lint.
-         */
-        template <std::derived_from<Syntax::Node> T>
-        inline constexpr void traverse(const std::vector<T*>& nodes) {
-            for (const auto* node : nodes) traverse(node);
-        }
-
-        /**
-         * @brief Handles importing module references.
-         * @param path                      Resource to import.
-         */
-        const Scope* import(const $::String::View& path);
-        const Scope* import(const $::URI::View& resource);
-
-       private:
-        //  PRIVATE METHODS  //
-
-        /**
-         * @brief Handles finalizing mirror data (eg: comments, ...).
-         * @param mirror                    Mirror to finalize.
-         */
-        void m_finalize(Mirror* mirror);
-
-        /**
-         * @brief Handles constructing symbols.
-         * @param name                      Name of symbol.
-         * @param node                      Node of symbol.
-         * @param kind                      Kind of symbol.
-         */
-        inline constexpr XLSP::Symbol* m_symbolize(
-            const $::String::View& name, const Syntax::Node* node, XLSP::Symbol::Kind kind) {
-            // get the current context for which we should bind the symbol
-            auto& siblings = m_symbol ? m_symbol->children : m_mirrors->m_symbols;
-
-            // construct this symbol instance now
-            auto symbol = XLSP::Symbol(name, kind);
-
-            // update the symbol location as well for use
-            symbol.range = node->traits()->bounds().client();
-            symbol.selection = node->traits()->range().client();
-
-            // resolve this symbol reference
-            return &siblings.emplace_back(symbol);
-        }
+  /// @brief Handles scoping deferred callbacks.
+  inline constexpr auto scope() {
+    // prepare a lambda for generating a reference
+    auto bind = [&] {
+      auto scope = $::Unique::New<Scope>(m_scope);
+      return m_scope = scope.get(), std::move(scope);
     };
 
-}  // namespace Talos::Relint
+    // and defer destruction handling now
+    return $::Lambda::Defer([&, scope = bind()] { m_scope = scope->m_ancestor; });
+  }
+
+  /// @brief Handles scoping symbols.
+  inline constexpr auto symbol(const Syntax::Declaration *node, XLSP::Symbol::Kind kind) {
+    m_symbol = m_bind(XLSP::Symbol(node->name(), kind), node);
+    return $::Lambda::Defer([&] { m_symbol = nullptr; });
+  }
+
+  /// @brief Handles scoping symbols.
+  template <std::derived_from<Syntax::Node> T>
+  inline constexpr auto symbol(const $::String::View &name, const T *node, XLSP::Symbol::Kind kind) {
+    // handle the result to be returned now
+    auto *symbol = m_bind(XLSP::Symbol(name, kind), node);
+
+    // determine whether or not we have a scopable item
+    static constexpr auto s_scoped = std::same_as<T, Syntax::Lambda>;
+
+    if constexpr (!s_scoped) return; // ignore anything that is not scoped here
+    else return m_symbol = symbol, $::Lambda::Defer([&] { m_symbol = nullptr; });
+  }
+
+  /**
+   * @brief Handles tracing reporter resources.
+   * @param node                      Node to trace.
+   */
+  inline constexpr Diagnostic::Scope trace(const Syntax::Node *node) {
+    return node ? trace(node->trivia()->range()) : Diagnostic::Scope();
+  }
+
+  /**
+   * @brief Handles tracing reporter resources.
+   * @param range                     Range to trace.
+   */
+  inline constexpr Diagnostic::Scope trace(const XLSP::Range &range) { return Diagnostic::Scope(m_reporter, range); }
+
+  /**
+   * @brief Handles importing module references.
+   * @param path                      Resource to import.
+   */
+  const Scope *import(const $::String::View &path);
+  const Scope *import(const $::URI::Buffer &resource);
+
+  /**
+   * @brief Handles running a complete linter-audit.
+   * @param tree                      Syntax tree node.
+   * @param reporter                  Diagnostic reporter.
+   */
+  $::Unique::Pointer<Exports> audit(const Syntax::Tree *tree, Diagnostic::Reporter *reporter);
+
+  /**
+   * @brief Handles linting a singular node.
+   * @param node                      Node to lint.
+   * @param parent                    Parent to bind.
+   * @param visit                     Visit children.
+   */
+  Mirror *verify(const Syntax::Node *node, const Syntax::Node *parent = nullptr, bool visit = true);
+
+  /**
+   * @brief Handles linting a multiple nodes.
+   * @param nodes                     Nodes to lint.
+   * @param parent                    Parent to bind.
+   * @param visit                     Visit children.
+   */
+  template <std::derived_from<Syntax::Node> T>
+  inline constexpr std::vector<Mirror *> verify(const std::vector<T *> &nodes, const Syntax::Node *parent = nullptr) {
+    auto predicate = [&](const T *node) { return verify(node, parent); };
+    return $::Ranges::To(nodes | std::views::transform(predicate));
+  }
+
+  /**
+   * @brief Handles traversing a node.
+   * @param node                      Node to traverse.
+   */
+  void traverse(const Syntax::Node *node);
+
+  /**
+   * @brief Handles traversing a multiple nodes.
+   * @param nodes                     Nodes to lint.
+   */
+  template <std::derived_from<Syntax::Node> T> inline constexpr void traverse(const std::vector<T *> &nodes) {
+    for (const auto *node : nodes) traverse(node);
+  }
+
+private:
+  //  PRIVATE METHODS  //
+
+  /**
+   * @brief Handles finalizing mirror data (eg: comments, ...).
+   * @param mirror                    Mirror to finalize.
+   */
+  void m_finalize(Mirror *mirror);
+
+  /**
+   * @brief Handles constructing symbols.
+   * @param symbol                    Symbol to bind
+   * @param node                      Node of symbol.
+   */
+  XLSP::Symbol *m_bind(XLSP::Symbol &&symbol, const Syntax::Node *node);
+};
+
+} // namespace Talos::Relint
 
 #endif

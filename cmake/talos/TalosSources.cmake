@@ -15,7 +15,7 @@ function(talos_sources_tests _output)
     mono_sources_glob(OUTPUT _sources BUILTINS)
 
     # attempt scanning for further tests now
-    file(GLOB_RECURSE _tests ${TALOS_DIRECTORY_SOURCE}/*.test.cpp)
+    file(GLOB_RECURSE _tests ${TALOS_DIRENT_SOURCE}/*.test.cpp)
     list(APPEND _sources ${_tests}) # append the testing modules
 
     # and return the final result now

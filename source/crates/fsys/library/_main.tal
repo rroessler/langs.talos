@@ -1,6 +1,6 @@
-//!
-//! Crate: "fsys"
-//! Description: Helpers for working with the filesystem.
-//!
+///
+/// @crate "fsys"
+/// @describe Helpers for working with the filesystem.
+///
 
 Todo("Unimplemented Crate - 'talos:fsys'");

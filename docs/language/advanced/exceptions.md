@@ -4,7 +4,7 @@ title: Exceptions
 description: Modern error handling for recoverable/unrecoverable states
 ---
 
-Talos inherently aims to catch [errors at compile-time](/docs/language/toolkit/linting), however this is not always possible for programs working with external inputs. For example, suppose that an input given to a program references a non-existent file. Since this could not be known during compilation, the act of dealing with this failure is called error handling.
+Talos inherently aims to catch [errors at compile-time](/language/toolkit/linting), however this is not always possible for programs working with external inputs. For example, suppose that an input given to a program references a non-existent file. Since this could not be known during compilation, the act of dealing with this failure is called error handling.
 
 There are a couple of ways that Talos allows developers deal with errors. At the language level, these include the `panic` keyword and the `Todo` object. For runtime handling of exceptions, a `Maybe` or `Result` value should be used.
 

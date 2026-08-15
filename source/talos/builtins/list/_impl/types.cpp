@@ -1,165 +1,165 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
+/// Builtin Includes
+#include "talos/builtins/_inline/apply.ipp"
+#include "talos/builtins/_inline/builtins.ipp"
 
-/// Builtin Inlines
-#include "talos/builtins/_inline/defines.ipp"
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
 
 /// Forward Declarations
-$_FWD(Talos::Builtins, namespace TB = Type::Builder)
-$_FWD(Talos::Builtins, using Self = Type::Protocol)
+$_FWD(Talos::Builtins::Constraint, static const $::Shared::Pointer<Type::Parameter> &T())
+
+/// Forward Definitions
+$_FWD(Talos::Builtins, using TN = Type::New)
+$_FWD(Talos::Builtins, using Self = Type::Structure)
 
 //  TYPEDEFS  //
 
-#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N(const Self*);
-struct TALOS_BUILTIN_FIELDS(Iterable::List) {
+#define TALOS_XX_FIELDS_DEFINE(N, ...) $_FWD(Talos::Builtins::Field, static Type::Entity N(const Self *))
 #include "talos/builtins/list/_defines/fields.def"
-};
-#undef TALOS_XX_FIELDS_DEFINE
 
-#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
-struct TALOS_BUILTIN_STATICS(Iterable::List) {
+#define TALOS_XX_STATICS_DEFINE(N, ...) $_FWD(Talos::Builtins::Static, static Type::Entity N())
 #include "talos/builtins/list/_defines/statics.def"
-};
-#undef TALOS_XX_STATICS_DEFINE
-
-struct TALOS_MM_BUILTIN_ODECL(Iterable::List, unary, binary);
-
-//  PROPERTIES  //
-
-/// @brief The core prototype constraint.
-static auto g_T = Talos::Builtins::TB::constraint("T", Talos::Builtins::TB::any(), Talos::Builtins::TB::any());
 
 //  PUBLIC METHODS  //
 
-Talos::Type::Erased TALOS_BUILTIN_TRAITS(Iterable::List)::typing() {
-    return TB::generic(prototype()->instantiate(), std::vector({ g_T }));
+const $::Shared::Pointer<Talos::Type::Parameter> &Talos::Builtins::Constraint::T() {
+  static auto s_T = TN::constraint("T", TN::any(), TN::any());
+  return s_T; // define the necessary type-parameter now
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, size, const Self*) { return { TB::function(TB::number()) }; }
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, empty, const Self*) { return { TB::function(TB::boolean()) }; }
-
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, get, const Self* self) {
-    return { TB::function(self->constraints(0), TB::arguments(TB::number())) };
+$::Shared::Pointer<Talos::Type::Generic> Talos::Builtins::Wrapper<Talos::Iterable::List>::generic() {
+  return TN::generic(typeclass()->instantiate(), Constraint::T());
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, set, const Self* self) {
-    return { TB::function(self->constraints(0), TB::arguments(TB::number(), self->constraints(0))) };
+$::Shared::Pointer<Talos::Type::Prototype> Talos::Builtins::Wrapper<Talos::Iterable::List>::typeclass() {
+  return m_typeclass([](const $::Shared::Pointer<Type::Prototype> &prototype) {
+    // bind the required constraints (List [T = Any])
+    prototype->constraints() = {Constraint::T()};
+  });
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, front, const Self* self) { return back(self); }
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, back, const Self* self) { return { TB::function(self->constraints(0)) }; }
+Talos::Type::Entity Talos::Builtins::Field::size(const Self *) { return TN::function(TN::number()); }
+Talos::Type::Entity Talos::Builtins::Field::empty(const Self *) { return TN::function(TN::boolean()); }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, map, const Self* self) {
-    // prepare the constraint
-    auto V = TB::constraint("V", TB::any(), TB::any());
-
-    // prepare the incoming values now
-    auto index = TB::optional(TB::number());
-    auto value = TB::optional(self->constraints(0));
-
-    // prepare the mapping signature
-    auto callback = TB::function(V, TB::arguments(value, index));
-    auto signature = TB::function(TB::list(V), TB::arguments(callback));
-
-    // and construct the resulting generic now
-    return { TB::generic(signature, TB::parameters(V)) };
+Talos::Type::Entity Talos::Builtins::Field::get(const Self *self) {
+  return TN::function(self->constraints(0), TN::number());
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, fold, const Self* self) {
-    auto V = TB::constraint("V", TB::any(), TB::any());
-    auto callback = TB::function(V, TB::arguments(V, self->constraints(0)));
-    auto signature = TB::function(V, TB::arguments(V, callback));
-    return { TB::generic(signature, TB::parameters(V)) };
+Talos::Type::Entity Talos::Builtins::Field::set(const Self *self) {
+  return TN::function(self->constraints(0), TN::number(), self->constraints(0));
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, erase, const Self* self) { return slice(self); }
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, slice, const Self* self) {
-    auto start = TB::optional(TB::number()), end = TB::optional(TB::number());
-    return { TB::function(TB::list(self->constraints(0)), TB::arguments(start, end)) };
+Talos::Type::Entity Talos::Builtins::Field::front(const Self *self) { return back(self); }
+Talos::Type::Entity Talos::Builtins::Field::back(const Self *self) { return TN::function(self->constraints(0)); }
+
+Talos::Type::Entity Talos::Builtins::Field::map(const Self *self) {
+  // prepare the constraint
+  auto V = TN::constraint("V", TN::any(), TN::any());
+
+  // prepare the incoming values now
+  auto index = TN::optional(TN::number());
+  auto value = TN::optional(self->constraints(0));
+
+  // prepare the mapping signature
+  auto callback = TN::function(V, value, index);
+  auto signature = TN::function(TN::list(V), callback);
+
+  // and construct the resulting generic now
+  return TN::generic(signature, V);
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, filter, const Self* self) {
-    auto args = TB::arguments(TB::optional(self->constraints(0)));
-    auto callback = TB::optional(TB::function(TB::boolean(), args));
-    return { TB::function(TB::list(self->constraints(0)), TB::arguments(callback)) };
+Talos::Type::Entity Talos::Builtins::Field::fold(const Self *self) {
+  auto V = TN::constraint("V", TN::any(), TN::any());
+  auto callback = TN::function(V, V, self->constraints(0));
+  return TN::generic(TN::function(V, V, callback), V);
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, reverse, const Self* self) {
-    return { TB::function(TB::list(self->constraints(0))) };
+Talos::Type::Entity Talos::Builtins::Field::erase(const Self *self) { return slice(self); }
+Talos::Type::Entity Talos::Builtins::Field::slice(const Self *self) {
+  auto start = TN::optional(TN::number()), end = TN::optional(TN::number());
+  return TN::function(TN::list(self->constraints(0)), start, end);
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, push_front, const Self* self) { return push_back(self); }
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, push_back, const Self* self) {
-    return { TB::variadic(TB::number(), TB::arguments(self->constraints(0))) };
+Talos::Type::Entity Talos::Builtins::Field::filter(const Self *self) {
+  auto value = TN::optional(self->constraints(0));
+  auto callback = TN::optional(TN::function(TN::boolean(), value));
+  return TN::function(TN::list(self->constraints(0)), callback);
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, pop_front, const Self* self) { return { TB::function(self->constraints(0)) }; }
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, pop_back, const Self* self) { return { TB::function(self->constraints(0)) }; }
-
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, first_index_of, const Self* self) { return last_index_of(self); }
-TALOS_MM_BUILTIN_FTYPE(Iterable::List, last_index_of, const Self* self) {
-    return { TB::function(TB::number(), TB::arguments(self->constraints(0))) };
+Talos::Type::Entity Talos::Builtins::Field::reverse(const Self *self) {
+  return {TN::function(TN::list(self->constraints(0)))};
 }
 
-TALOS_MM_BUILTIN_STYPE(Iterable::List, from) {
-    auto T = TB::constraint("T");  // prepare the constraints
-    auto signature = TB::variadic(TB::list(T), TB::arguments(T));
-    return { TB::generic(signature, TB::parameters(T)) };
+Talos::Type::Entity Talos::Builtins::Field::push_front(const Self *self) { return push_back(self); }
+Talos::Type::Entity Talos::Builtins::Field::push_back(const Self *self) {
+  return TN::variadic(TN::number(), self->constraints(0));
 }
 
-TALOS_MM_BUILTIN_STYPE(Iterable::List, empty) {
-    auto T = TB::constraint("T", TB::any(), TB::any());
-    auto signature = TB::function(TB::list(T));
-    return { TB::generic(signature, TB::parameters(T)) };
+Talos::Type::Entity Talos::Builtins::Field::pop_front(const Self *self) { return TN::function(self->constraints(0)); }
+Talos::Type::Entity Talos::Builtins::Field::pop_back(const Self *self) { return TN::function(self->constraints(0)); }
+
+Talos::Type::Entity Talos::Builtins::Field::first_index_of(const Self *self) { return last_index_of(self); }
+Talos::Type::Entity Talos::Builtins::Field::last_index_of(const Self *self) {
+  return TN::function(TN::number(), self->constraints(0));
 }
 
-TALOS_MM_BUILTIN_STYPE(Iterable::List, range) {
-    auto index = TB::optional(TB::number());
-    auto instance = TB::iterator(TB::number());
-    auto args = TB::arguments(index, index, index);
-    return { TB::function(instance, args) };
+Talos::Type::Entity Talos::Builtins::Static::from() {
+  auto T = TN::constraint("T"); // prepare the constraints
+  return TN::generic(TN::variadic(TN::list(T), T), T);
 }
 
-TALOS_MM_BUILTIN_STYPE(Iterable::List, filled) {
-    auto size = TB::number();
-    auto V = TB::constraint("V");
-    auto args = TB::arguments(size, V);
-    auto signature = TB::function(TB::list(V), args);
-    return { TB::generic(signature, TB::parameters(V)) };
+Talos::Type::Entity Talos::Builtins::Static::empty() {
+  auto T = TN::constraint("T", TN::any(), TN::any());
+  return TN::generic(TN::function(TN::list(T)), T);
 }
 
-TALOS_MM_BUILTIN_OTYPE(Iterable::List, unary, const Self* self, Operator::Kind kind) {
-    switch (kind) {
-        case Operator::Kind::ITER: return self->constraints().at(0);
-        default: return TB::unset();  // resolve accordingly
-    }
+Talos::Type::Entity Talos::Builtins::Static::range() {
+  auto index = TN::optional(TN::number());
+  auto instance = TN::iterator(TN::number());
+  auto args = std::vector<Type::Entity>({index, index, index});
+  return TN::function(instance, args); // bind the function
 }
 
-TALOS_MM_BUILTIN_OTYPE(Iterable::List, binary, const Self*, Operator::Kind, const Type::Erased&) { return TB::unset(); }
+Talos::Type::Entity Talos::Builtins::Static::filled() {
+  auto V = TN::constraint("V"); // prepare the baseline constraint
+  return TN::generic(TN::function(TN::list(V), TN::number(), V), V);
+}
+
+template <>
+Talos::Type::Erased
+Talos::Builtins::Apply<Talos::Iterable::List>::unary(const Type::Structure *self, Operator::Kind kind) {
+  switch (kind) {
+  case Operator::Kind::ITER: return self->constraints(0);
+  default: return TN::unset(); // resolve accordingly
+  }
+}
+
+template <>
+Talos::Type::Erased
+Talos::Builtins::Apply<Talos::Iterable::List>::binary(const Type::Structure *, Operator::Kind, const Type::Erased &) {
+  return TN::unset();
+}
 
 //  PRIVATE METHODS  //
 
-void TALOS_BUILTIN_TRAITS(Iterable::List)::m_typedefs(Type::World* globals) {
-    // prepare the prototype to be constructed
-    auto proto = prototype();
-    auto& fields = proto->fields();
-    auto& statics = proto->statics();
+void Talos::Builtins::Wrapper<Talos::Iterable::List>::m_typedefs(Type::World *globals) {
+  // prepare the baseline details
+  auto prototype = typeclass();
+  auto &fields = prototype->fields();
+  auto &statics = prototype->statics();
 
-    // prepare the parameter typings now
-    proto->constraints() = { g_T };
+  // bind the decision tree for operators
+  prototype->operators() = Apply<Iterable::List>::decide;
 
-    // bind the decision handler for operators
-    proto->operators() = Apply::decide;
-
+// define the fields for symbols
 #define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N);
 #include "talos/builtins/list/_defines/fields.def"
-#undef TALOS_XX_FIELDS_DEFINE
 
+// define the statics for symbols
 #define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
 #include "talos/builtins/list/_defines/statics.def"
-#undef TALOS_XX_STATICS_DEFINE
 
-    // and assign the resulting entity to be used
-    globals->types().declare(name(), typing());
-    globals->values().declare(name(), proto);
+  // define the baseline types
+  globals->values().declare(name(), prototype);
+  globals->types().declare(name(), generic());
 }

@@ -1,7 +1,7 @@
 #ifndef _XSIO_FORWARD_TIMER_HPP
 #define _XSIO_FORWARD_TIMER_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Definitions

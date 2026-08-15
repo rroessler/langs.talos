@@ -1,57 +1,45 @@
 #ifndef _TALOS_BUILTINS_RESULT_HPP
 #define _TALOS_BUILTINS_RESULT_HPP
 
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
-#include "talos/monad/result.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 namespace Talos::Builtins {
 
-    /// @brief Tagged Result Builtin Traits.
-    template <>
-    struct Traits<Monad::Result> : public Define<Monad::Result, "Result">,
-                                   public Features<Adapter::FIELDS, Adapter::GLOBALS, Adapter::TYPEDEFS> {
-        //  TYPEDEFS  //
+/// @brief Tagged Result Builtin Traits.
+template <> struct Wrapper<Monad::Result> : public Blueprint<Monad::Result, "Result"> {
+  //  PUBLIC METHODS  //
 
-        /// @brief Helper for constructing outputs.
-        struct Field;
-        struct Static;
+  /// @brief Gets the generic typing for this builtin.
+  static $::Shared::Pointer<Type::Generic> generic();
 
-       private:
-        //  PROPERTIES  //
+  /// @brief Gets the baseline list type-class.
+  static $::Shared::Pointer<Type::Prototype> typeclass();
 
-        /// @brief Available field descriptors.
-        static Member::Storage m_members;
+protected:
+  //  PRIVATE METHODS  //
 
-       public:
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-        /// @brief Gets the underlying "Result" typing.
-        static Type::Erased typing();
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   * @param prototype                 Prototype instance.
+   */
+  static Value::Any m_globals(Isolate *isolate, const Object::Class &prototype);
 
-       protected:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles looking up value fields.
+   * @param self                      Value instance.
+   * @param symbol                    Field symbol.
+   */
+  static Member::View m_attribute(const Monad::Result &self, const Value::Symbol &symbol);
+};
 
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
-
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
-
-        /**
-         * @brief Handles looking up value fields.
-         * @param self                      Self value.
-         * @param symbol                    Field symbol.
-         */
-        static Member::View m_attributes(const Monad::Result& self, Value::Symbol symbol);
-    };
-
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

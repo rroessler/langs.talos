@@ -1,85 +1,69 @@
 #ifndef _XSIO_ASYNC_SHUTDOWN_HPP
 #define _XSIO_ASYNC_SHUTDOWN_HPP
 
-/// XSIO Modules
+/// XSIO Includes
 #include "xsio/forward/async.hpp"
 #include "xsio/forward/timer.hpp"
 
 namespace XSIO::Async {
 
-    /// @brief Explicit Shutdown Handler.
-    class Shutdown {
-        //  PROPERTIES  //
+/// @brief Explicit Shutdown Handler.
+class Shutdown {
+  //  PROPERTIES  //
 
-        /// @brief Associated exit-code.
-        int32_t m_errc = 0;
+  /// @brief Associated exit-code.
+  int32_t m_errc = 0;
 
-        /// @brief Current exited state.
-        $::Atomic<bool> m_requested = false;
+  /// @brief The requested exit signaller.
+  $::Async::Signaller m_requested;
 
-        $::Mutex::Auto &m_mutex;       // Bound mutex value.
-        std::condition_variable m_cv;  // Condition variable.
+public:
+  //  CONSTRUCTORS  //
 
-       public:
-        //  CONSTRUCTORS  //
+  /**
+   * @brief Constructs a shutdown handler.
+   * @param mutex                     Mutex to bind.
+   */
+  explicit Shutdown($::Mutex::Auto &mutex) : m_requested(mutex) {}
 
-        /**
-         * @brief Constructs a shutdown handler.
-         * @param mutex                     Mutex to bind.
-         */
-        explicit Shutdown($::Mutex::Auto &mutex) : m_mutex(mutex) {}
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Gets the resulting exit-code.
+  inline int32_t code() const noexcept { return m_errc; }
 
-        /// @brief Gets the resulting exit-code.
-        inline int32_t code() const noexcept { return m_errc; }
+  /// @brief Gets the current flag state.
+  inline bool state() const noexcept { return m_requested.state(); }
 
-        /// @brief Gets the current flag state.
-        inline bool state() const noexcept { return m_requested; }
+  /// @brief Waits for flag to be released.
+  inline void wait() { m_requested.wait(); }
 
-        /// @brief Waits for flag to be released.
-        inline void wait() {
-            auto lock = $::Lock::scope(m_mutex);  // lock the state
-            m_cv.wait(lock, [&] -> bool { return m_requested; });
-        }
+  /**
+   * @brief Waits for a shutdown or duration to occur.
+   * @param duration                  Duration to wait.
+   */
+  inline void wait(const Timer::Ticks &duration) { m_requested.wait(duration); }
 
-        /**
-         * @brief Waits for a shutdown or duration to occur.
-         * @param duration                  Duration to wait.
-         */
-        inline void wait(const Timer::Ticks &duration) {
-            auto lock = $::Lock::scope(m_mutex);  // prepare the lock now
-            m_cv.wait_for(lock, duration.underlying(), [&] -> bool { return m_requested; });
-        }
+  /**
+   * @brief Notifies about the shutdown request.
+   * @param exit_code                 Exit-code.
+   */
+  inline void request(int32_t exit_code = EXIT_SUCCESS) {
+    if (m_requested.notify()) m_shutdown(exit_code);
+  }
 
-        /**
-         * @brief Notifies about the shutdown request.
-         * @param exit_code                 Exit-code.
-         */
-        inline void request(int32_t exit_code = $_EXIT_SUCCESS) {
-            if (m_notify()) m_shutdown(exit_code);
-        }
+private:
+  //  PRIVATE METHODS  //
 
-       private:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles latching the exit state.
+   * @param exit_code                 Exit-code.
+   */
+  inline void m_shutdown(int32_t exit_code) {
+    $_UNUSED $_AUTO = m_requested.guard();
+    m_errc = exit_code; // update exit-code
+  }
+};
 
-        /// @brief Handles notifying about the shutdown.
-        inline bool m_notify() {
-            auto lock = $::Lock::scope(m_mutex);  // lock the state
-            bool first = m_requested.compare_exchange_strong(false, true);
-            return lock.unlock(), m_cv.notify_all(), first;
-        }
-
-        /**
-         * @brief Handles latching the exit state.
-         * @param exit_code                 Exit-code.
-         */
-        inline void m_shutdown(int32_t exit_code) {
-            $_UNUSED $_AUTO = $::Lock::guard(m_mutex);
-            m_errc = exit_code;  // update the exit-code
-        }
-    };
-
-}  // namespace XSIO::Async
+} // namespace XSIO::Async
 
 #endif

@@ -1,10 +1,13 @@
 {
     "$schema": "vscode://schemas/vscode-extensions",
 
+    "name": "talos-lang",
     "publisher": "talos",
     "icon": "icons/talos.png",
+    "author": "Reuben Roessler",
     "displayName": "Talos Programming Language",
     "repository": "https://github.com/rroessler/langs.talos",
+    "description": "Support for the Talos programming language",
 
     "activationEvents": [],
     "engines": { "vscode": "^1.22.0" },
@@ -16,6 +19,7 @@
             { "category": "Talos", "command": "talos.settings", "title": "Open Extension Settings" }
         ],
 
+        "configurationDefaults": { "[talos]": { "editor.formatOnSave": true } },
         "configuration": {
             "title": "Talos",
             "properties": {
@@ -25,7 +29,6 @@
                     "scope": "machine",
                     "description": "A path to the Talos executable."
                 },
-
                 "talos.server.loggingLevel": {
                     "default": "warn",
                     "type": "string",
@@ -35,8 +38,6 @@
                 }
             }
         },
-
-        "configurationDefaults": { "[talos]": { "editor.formatOnSave": true } },
 
         "languages": [
             {

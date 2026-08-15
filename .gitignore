@@ -6,11 +6,15 @@ node_modules/
 build/
 dist/
 
+# Profiling Outputs
+valgrind.out.*
+callgrind.out.*
+
+# TS Outputs
+*.tsbuildinfo
+
 # Environment Files
 .env
-
-# Profiling Outputs
-callgrind.out.*
 
 # Platform Files
 .DS_Store

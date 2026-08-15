@@ -1,12 +1,11 @@
 /// Vendor Modules
-import { Metadata } from 'next';
-import { PropsWithChildren } from 'react';
-import { HomeLayout } from '@fumadocs/base-ui/layouts/home';
+import { type Metadata } from 'next';
+import { HomeLayout } from 'fumadocs-ui/layouts/home';
+import { LinkItemType } from 'fumadocs-ui/layouts/shared';
 
-/// Library Modules
+/// Website Modules
 import { Options } from '@/website/options';
 import { Product } from '@/website/product';
-import { LinkItemType } from '@fumadocs/ui/link-item';
 
 /** Common item metadata. */
 export const metadata: Metadata = {
@@ -17,18 +16,19 @@ export const metadata: Metadata = {
     },
 };
 
-/** Constructs a home-page layout. */
-export default function Layout({ children }: PropsWithChildren) {
-    // prepare the links to be used
+/** Documentation Layout Component. */
+export default function Layout({ children }: React.PropsWithChildren) {
+    // define some common home links to be used
     const links: LinkItemType[] = [
         { text: 'Blog', url: '/blog' },
-        { text: 'Docs', url: '/docs' },
-        { text: 'Crates', url: '/docs/crates' },
+        { text: 'Docs', url: '/language' },
+        { text: 'Crates', url: '/crates' },
     ];
 
-    // prepare the main content
-    const content = <div className="flex flex-col flex-1 w-screen max-w-[1100px] p-5" children={children} />;
-
-    // and construct the home-layout now
-    return <HomeLayout {...Options({ links })} children={content} />;
+    // and construct the home layout to be shown
+    return (
+        <HomeLayout {...Options({ links })}>
+            <div className="flex flex-col flex-1 w-screen max-w-[1100px] p-5" children={children} />
+        </HomeLayout>
+    );
 }

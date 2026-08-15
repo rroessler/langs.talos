@@ -1,79 +1,83 @@
-#ifndef _XLSP_EVENTS_CACHE_HPP
-#define _XLSP_EVENTS_CACHE_HPP
-
-/// C++ Includes
-#include <deque>
+#ifndef _XLSP_EVENT_STORAGE_HPP
+#define _XLSP_EVENT_STORAGE_HPP
 
 /// XLSP Includes
-#include "xlsp/event/responder.hpp"
+#include "xlsp/forward/event.hpp"
+#include "xlsp/forward/server.hpp"
+#include "xlsp/message/request.hpp"
 
 namespace XLSP::Event {
 
-    /// @brief Function Collection Mapping.
-    template <class F>
-    using Collection = $::Record<$::Functor::Unique<F>>;
+/// @brief Callback Answer Callback.
+using Answer = $::Unique::Functor<void(const Message::Result<$::Serde::Value> &) const>;
 
-    /// @brief Reply Answer Callback.
-    using Answer = $::Functor::Unique<void(const Message::Result<$::Serde::Value>&)>;
+/// @brief Event Storage Container.
+class Storage {
+  //  TYPEDEFS  //
 
-    /// @brief Pending Response Typing.
-    struct Pending {
-        //  PROPERTIES  //
+  /// @brief Allow the server internal access.
+  friend class Server::Connection;
 
-        /// @brief Bound answer value.
-        Answer answer;
+  /// @brief Function Collection Mapping.
+  template <class F> using Collection = $::Map::Record<$::Unique::Functor<F>>;
 
-        /// @brief Response identifier.
-        $::String::Buffer identifier;
+  /// @brief Pending Response Typing.
+  struct Pending {
+    //  PROPERTIES  //
 
-        //  CONSTRUCTORS  //
+    /// @brief Bound answer value.
+    Answer answer;
 
-        /**
-         * @brief Constructs a pending response.
-         * @param identifier                Response identifier.
-         * @param answer                    Answer to formulate.
-         */
-        constexpr Pending(const $::String::Buffer& identifier, Answer&& answer) :
-            answer(answer), identifier(identifier) {}
+    /// @brief Response identifier.
+    $::String::Buffer identifier;
 
-        //  OPERATOR METHODS  //
+    //  CONSTRUCTORS  //
 
-        /// @brief Explicit operators available.
-        inline constexpr bool operator==(const Pending& other) const noexcept { return identifier == other.identifier; }
-        inline constexpr bool operator!=(const Pending& other) const noexcept { return identifier != other.identifier; }
-    };
+    /**
+     * @brief Constructs a pending response.
+     * @param identifier                Response identifier.
+     * @param answer                    Answer to formulate.
+     */
+    constexpr Pending(const $::String::Buffer &identifier, Answer &&answer) :
+        answer(std::move(answer)), identifier(identifier) {}
 
-    /// @brief Events Storage Container.
-    struct Storage {
-        //  PROPERTIES  //
+    //  OPERATOR METHODS  //
 
-        /// @brief Current call-identifier.
-        int64_t identifier = 0;
+    /// @brief Explicit operators available.
+    inline constexpr bool operator==(const Pending &other) const noexcept { return identifier == other.identifier; }
+    inline constexpr bool operator!=(const Pending &other) const noexcept { return identifier != other.identifier; }
+  };
 
-        /// @brief Available event mutexes.
-        struct {
-            mutable $::Mutex::Auto reply;   // Response mutex.
-            mutable $::Mutex::Auto cancel;  // Cancellation mutex.
-        } mutex;
+public:
+  //  PROPERTIES  //
 
-        /// @brief Pending response callbacks.
-        std::deque<Pending> responses = {};
+  /// @brief Current call-identifier.
+  int64_t identifier = 0;
 
-        /// @brief Currently pending cancellations.
-        $::Set<$::String::Buffer> cancellations = {};
+  /// @brief Available event mutexes.
+  struct {
+    mutable $::Mutex::Auto reply;  // Response mutex.
+    mutable $::Mutex::Auto cancel; // Cancellation mutex.
+  } mutex;
 
-        /// @brief Currently bound notifications.
-        Collection<void(const $::Serde::Value&)> notifications = {};
+  /// @brief Pending response callbacks.
+  std::deque<Pending> responses = {};
 
-        /// @brief Currently bound requests.
-        Collection<void(const $::Serde::Value&, Answer&&)> requests = {};
+  /// @brief Currently pending cancellations.
+  $::Map::Set<$::String::Buffer> cancellations = {};
 
-        //  CONSTRUCTORS  //
+  /// @brief Currently bound notifications.
+  Collection<void(const $::Serde::Value &) const> notifications = {};
 
-        /// @brief Constructs a defaulted cache instance.
-        explicit Storage() = default;
-    };
+  /// @brief Currently bound requests.
+  Collection<void(const $::Serde::Value &, Answer &&) const> requests = {};
 
-}  // namespace XLSP::Event
+  //  CONSTRUCTORS  //
+
+  /// @brief Constructs a defaulted cache instance.
+  constexpr Storage() = default;
+};
+
+} // namespace XLSP::Event
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef _XSIO_FORWARD_MEMORY_HPP
 #define _XSIO_FORWARD_MEMORY_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations

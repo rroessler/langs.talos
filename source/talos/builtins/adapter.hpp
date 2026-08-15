@@ -1,14 +1,21 @@
 #ifndef _TALOS_BUILTINS_ADAPTER_HPP
 #define _TALOS_BUILTINS_ADAPTER_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/forward/builtins.hpp"
 
 namespace Talos::Builtins {
 
-    /// @brief Associated Adapter Enumeration.
-    enum class Adapter : uint8_t { FIELDS, GLOBALS, TYPEDEFS, OPERATORS };
+/// @brief Associated Adapter Enumeration.
+enum class Adapter : uint8_t {
+  GLOBALS,   // Global value registration.
+  TYPEDEFS,  // Type definition registration.
+  PROTOTYPE, // Defines a class-prototype.
 
-}  // namespace Talos::Builtins
+  FIELDS,    // Attributes callbacks resolution.
+  OPERATORS, // Operator callback resolution.
+};
+
+} // namespace Talos::Builtins
 
 #endif

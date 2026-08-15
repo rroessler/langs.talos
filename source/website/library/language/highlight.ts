@@ -1,21 +1,23 @@
 /// Vendor Modules
-import * as React from 'react';
-import * as shiki from 'shiki';
-import * as runtime from 'react/jsx-runtime';
+import type * as shiki from 'shiki';
+import * as react from 'react/jsx-runtime';
 import * as hast from 'hast-util-to-jsx-runtime';
+import { createShikiFactory } from 'fumadocs-core/highlight/shiki';
 
 /// Package Modules
 import { Grammar } from './grammar';
+import { Transformer } from './transformer';
 
-/** Highlighting Functionality. */
+/** Available Theming. */
+export type Themes = shiki.CodeOptionsMultipleThemes['themes'];
+export const Themes = { light: 'github-light', dark: 'github-dark' } as const satisfies Themes;
+
+/** Code Highlighting Funtionality. */
 export namespace Highlight {
     //  TYPEDEFS  //
 
-    export type Engine = 'js' | 'oniguruma';
-    export type Root = import('hast').Root;
-    export type Themes = shiki.CodeOptionsThemes;
-    export type Options = Common & (Themes | Record<never, never>);
-    export type Common = shiki.CodeOptionsMeta &
+    export type Engine = 'js' | 'wasm';
+    export type Options = shiki.CodeOptionsMeta &
         Omit<shiki.CodeToHastOptionsCommon, 'lang' | 'theme'> & {
             lang?: string;
             engine?: Engine;
@@ -24,102 +26,78 @@ export namespace Highlight {
 
     //  PROPERTIES  //
 
-    /** Languages that we require. */
-    const m_langs = Object.keys(shiki.bundledLanguages);
-
-    /** Available themes for use. */
-    const m_themes: Record<string, shiki.BundledTheme> = { light: 'github-light', dark: 'github-dark' };
-
-    /** Currently cached higlighters. */
-    const m_highlighters = new Map<string, Promise<shiki.Highlighter>>();
+    const m_js = m_factory((details) => async () => details.createJavaScriptRegexEngine());
+    const m_wasm = m_factory((details) => () => details.createOnigurumaEngine(import('shiki/wasm')));
 
     //  PUBLIC METHODS  //
 
     /**
-     * Handles rendering code.
-     * @param code              Code to render.
-     * @param options           Code options.
+     * Handles rendering code-blocks.
+     * @param code              Code to highlight.
+     * @param options           Highlight options.
      */
-    export const render = (code: string, options: Options = {}): Promise<React.ReactNode> =>
-        m_highlight(code, options).then((root) => m_jsxify(root, { components: options.components }));
+    export async function render(code: string, { components, ...options }: Options = {}) {
+        // resolve a suitable engine to be used
+        const engine = options.engine ?? 'wasm';
+        const factory = engine === 'js' ? m_js : m_wasm;
+        const highlighter = await factory.getOrInit();
 
-    /**
-     * Handles resolving highlighters.
-     * @param engine            Engine to bind.
-     * @param options           Highlighter options.
-     */
-    export const resolve = async (
-        engine: Engine,
-        options: Omit<
-            shiki.BundledHighlighterOptions<shiki.BundledLanguage, shiki.BundledTheme>,
-            'engine' | 'langs' | 'themes'
-        >,
-    ) => {
-        // prepare the higlighter creation handler
-        const { createHighlighter } = await import('shiki');
+        // resolve the options to be used now
+        const resolved = m_resolve(options);
 
-        // if the higlighter exists, then resolve now
-        const highlighter =
-            m_highlighters.get(engine) ??
-            createHighlighter({
-                ...options,
-                engine: m_engine(engine),
-                themes: Object.values(m_themes),
-                langs: [await Grammar(), ...m_langs],
-            });
+        // attempt highlighting the language now
+        await m_missing(highlighter, resolved.lang);
+        const root = highlighter.codeToHast(code, resolved);
 
-        // ensure we forcibly update the current highlighters available
-        if (!m_highlighters.has(engine)) m_highlighters.set(engine, highlighter);
-
-        // and finally resolve the higlighter instance
-        return highlighter;
-    };
+        // and finally convert to our desired runtime
+        return hast.toJsxRuntime(root, { ...react, development: false, components });
+    }
 
     //  PRIVATE METHODS  //
 
     /**
-     * Converts "hast" to "jsx".
-     * @param root                  Root to convert.
-     * @param options               Given options.
+     * Handles resolving highlighting options.
+     * @param options                   Options to resolve.
      */
-    const m_jsxify = (root: Root, options: Partial<hast.Options> = {}) =>
-        hast.toJsxRuntime(root, {
-            jsx: runtime.jsx,
-            jsxs: runtime.jsxs,
-            development: false,
-            Fragment: React.Fragment,
-            ...options,
+    function m_resolve({ lang = 'text', ...options }: Omit<Options, 'engine' | 'components'>): shiki.CodeToHastOptions {
+        (options.transformers ??= []).push(Transformer.Deprecated());
+        return { lang, defaultColor: false, themes: Themes, ...options };
+    }
+
+    /**
+     * Handles resolving missing languages.
+     * @param highlighter               Highlighter instance.
+     * @param langs                     Languages to resolve.
+     */
+    async function m_missing(higlighter: shiki.HighlighterCore, ...langs: string[]) {
+        // prepare the bundled set of languages
+        const bundled = higlighter.getBundledLanguages();
+
+        // and attempt loading any that are missing now
+        for (const lang of langs) {
+            try {
+                if (lang in bundled) higlighter.getLanguage(lang);
+            } catch {
+                await higlighter.loadLanguage(lang as never);
+            }
+        }
+    }
+
+    /**
+     * Handles constructing factories.
+     * @param engine                Engine builder.
+     */
+    function m_factory(engine: (details: typeof shiki) => () => Promise<shiki.RegexEngine>) {
+        return createShikiFactory({
+            async init(options) {
+                const details = await import('shiki');
+                return details.createHighlighter({
+                    langs: [Grammar()],
+                    engine: engine(details)(),
+                    langAlias: options?.langAlias,
+                    themes: Array.from(Object.values(Themes)),
+                });
+            },
         });
-
-    /**
-     * Handles resolving shiki engines.
-     * @param engine                Engine to inherit.
-     */
-    const m_engine = async (engine?: Engine) => {
-        if (engine === 'js') return import('shiki/engine/javascript').then((res) => res.createJavaScriptRegexEngine());
-        return import('shiki/engine/oniguruma').then((res) => res.createOnigurumaEngine(import('shiki/wasm')));
-    };
-
-    /**
-     * Handles highlighting code.
-     * @param code                  Code to highlight.
-     * @param options               Highlight options.
-     */
-    const m_highlight = async (code: string, options: Options): Promise<Root> => {
-        // prepare the baseline options to be handled now
-        const { lang: original, components: _, engine = 'oniguruma', ...rest } = options;
-
-        // alias the incoming language now
-        const lang = original as shiki.CodeToHastOptionsCommon['lang'];
-
-        // attempt resolving the desired higlighter now
-        return resolve(engine, {}).then((instance) =>
-            instance.codeToHast(code, {
-                lang,
-                themes: m_themes,
-                defaultColor: false,
-                ...rest,
-            }),
-        );
-    };
+    }
 }

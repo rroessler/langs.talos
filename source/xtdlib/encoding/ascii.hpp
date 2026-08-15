@@ -1,8 +1,8 @@
 #ifndef _XTDLIB_ENCODING_ASCII_HPP
 #define _XTDLIB_ENCODING_ASCII_HPP
 
-/// C++ Modules
-#include <cstdint>
+/// Library Includes
+#include "xtdlib/portable/stdlib.hpp"
 
 //  MACROS  //
 
@@ -12,17 +12,30 @@
 
 namespace $::Encoding::ASCII {
 
-    //  PUBLIC METHODS  //
+//  PUBLIC METHODS  //
 
-    inline bool is_digit(int64_t cp) { return MM_BETWEEN(cp, '0', '9'); }
-    inline bool is_bin(int64_t cp) { return cp == '0' || cp == '1'; }
-    inline bool is_oct(int64_t cp) { return MM_BETWEEN(cp, '0', '7'); }
-    inline bool is_hex(int64_t cp) { return is_digit(cp) || MM_BETWEEN(cp, 'a', 'f') || MM_BETWEEN(cp, 'A', 'F'); }
-    inline bool is_alpha(int64_t cp) { return MM_BETWEEN(cp, 'a', 'z') || MM_BETWEEN(cp, 'A', 'Z'); }
-    inline bool is_ident(int64_t cp) { return is_alpha(cp) || cp == '_' || cp >= 0x80; }
-    inline bool is_vws(int64_t cp) { return cp == ' ' || cp == '\t' || cp == '\v' || cp == '\r'; }
+/// @brief Validates suitable binary characters.
+inline bool bin(int64_t cp) { return cp == '0' || cp == '1'; }
 
-}  // namespace $::Encoding::ASCII
+/// @brief Validates suitable octal characters.
+inline bool oct(int64_t cp) { return MM_BETWEEN(cp, '0', '7'); }
+
+/// @brief Validates suitable numeric characters.
+inline bool num(int64_t cp) { return MM_BETWEEN(cp, '0', '9'); }
+
+/// @brief Validates suitable hexadecimal characters.
+inline bool hex(int64_t cp) { return num(cp) || MM_BETWEEN(cp, 'a', 'f') || MM_BETWEEN(cp, 'A', 'F'); }
+
+/// @brief Validates suitable alphabetical characters.
+inline bool alpha(int64_t cp) { return MM_BETWEEN(cp, 'a', 'z') || MM_BETWEEN(cp, 'A', 'Z'); }
+
+/// @brief Validates suitable identifier characters.
+inline bool ident(int64_t cp) { return alpha(cp) || cp == '_' || cp >= 0x80; }
+
+/// @brief Validates horizontal whitespace.
+inline bool hws(int64_t cp) { return cp == ' ' || cp == '\t' || cp == '\v' || cp == '\r'; }
+
+} // namespace $::Encoding::ASCII
 
 //  UNDEFINES  //
 

@@ -1,41 +1,34 @@
 #ifndef _TALOS_ANNOTATION_INTERFACE_HPP
 #define _TALOS_ANNOTATION_INTERFACE_HPP
 
-/// Syntax Modules
+/// Syntax Includes
 #include "talos/syntax/declaration/variable.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Interface Annotation Node.
-    class Interface : public Abstract<Interface, Annotation> {
-        //  PROPERTIES  //
+/// @brief Interface Annotation Node.
+class Interface : public Mixin<Interface, Annotation> {
+  //  PROPERTIES  //
 
-        /// @brief Record elements.
-        std::vector<Syntax::Variable*> m_properties = {};
+  /// @brief Record elements.
+  std::vector<Syntax::Variable *> m_properties = {};
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs an empty interface.
-         * @param location                  Resource location.
-         */
-        explicit Interface(const Bounds& location = {}) : Abstract(location) {}
+  /**
+   * @brief Constructs an interface annotation.
+   * @param properties                Interface fields.
+   */
+  explicit Interface(const std::vector<Syntax::Variable *> &properties = {}) : m_properties(properties) {}
 
-        /**
-         * @brief Constructs an interface annotation.
-         * @param properties                Interface fields.
-         * @param location                  Resource location.
-         */
-        explicit Interface(const std::vector<Syntax::Variable*>& properties, const Bounds& location = {}) :
-            Abstract(location), m_properties(properties) {}
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  inline constexpr bool empty() const noexcept { return m_properties.empty(); }
+  inline constexpr size_t size() const noexcept { return m_properties.size(); }
+  inline constexpr const std::vector<Syntax::Variable *> &properties() const noexcept { return m_properties; }
+};
 
-        /// @brief Gets the underlying elements.
-        inline constexpr const std::vector<Syntax::Variable*>& properties() const noexcept { return m_properties; }
-    };
-
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

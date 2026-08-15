@@ -1,69 +1,52 @@
 #ifndef _TALOS_BUILTINS_LIST_HPP
 #define _TALOS_BUILTINS_LIST_HPP
 
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
-#include "talos/iterable/list.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 namespace Talos::Builtins {
 
-    /// @brief Tagged List Builtin Traits.
-    template <>
-    struct Traits<Iterable::List>
-        : public Define<Iterable::List, "List">,
-          public Features<Adapter::FIELDS, Adapter::GLOBALS, Adapter::OPERATORS, Adapter::TYPEDEFS> {
-        //  TYPEDEFS  //
+/// @brief Tagged List Builtin Traits.
+template <> struct Wrapper<Iterable::List> : public Blueprint<Iterable::List, "List", Adapter::OPERATORS> {
+  //  PUBLIC METHODS  //
 
-        /// @brief Helpers for constructing outputs.
-        struct Apply;
-        struct Field;
-        struct Static;
+  /// @brief Gets the generic typing for this builtin.
+  static $::Shared::Pointer<Type::Generic> generic();
 
-       private:
-        //  PROPERTIES  //
+  /// @brief Gets the baseline list type-class.
+  static $::Shared::Pointer<Type::Prototype> typeclass();
 
-        /// @brief Available field descriptors.
-        static Member::Storage m_members;
+protected:
+  //  PRIVATE METHODS  //
 
-        /// @brief Available operator descriptors.
-        static Operator::Storage<Iterable::List> m_operators;
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-       public:
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   * @param prototype                 Prototype instance.
+   */
+  static Value::Any m_globals(Isolate *isolate, const Object::Class &prototype);
 
-        /// @brief Gets the underlying "List" instance typing.
-        static Type::Erased typing();
+  /**
+   * @brief Handles looking up value fields.
+   * @param self                      Value instance.
+   * @param symbol                    Field symbol.
+   */
+  static Member::View m_attribute(const Iterable::List &self, const Value::Symbol &symbol);
 
-       protected:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles looking up operator methods.
+   * @param self                      Value instance.
+   * @param kind                      Operator kind.
+   */
+  static Member::View m_operator(const Iterable::List &self, Operator::Kind kind);
+};
 
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
-
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
-
-        /**
-         * @brief Handles looking up value fields.
-         * @param self                      Self value.
-         * @param symbol                    Field symbol.
-         */
-        static Member::View m_attributes(const Iterable::List& self, Value::Symbol symbol);
-
-        /**
-         * @brief Handles looking up operator fields.
-         * @param self                      Self value.
-         * @param kind                      Operator kind.
-         */
-        static Member::View m_attributes(const Iterable::List& self, Operator::Kind kind);
-    };
-
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

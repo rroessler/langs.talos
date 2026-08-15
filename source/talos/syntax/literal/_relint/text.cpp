@@ -1,8 +1,5 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/relint/visitor.hpp"
-
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
 
 //  PUBLIC METHODS  //
 

@@ -1,46 +1,68 @@
-/// Talos Modules
-#include "talos/module/archived.hpp"
-#include "talos/module/interface.hpp"
+/// Talos Includes
+#include "talos/module/abstract.hpp"
+#include "talos/module/dynamic.hpp"
+#include "talos/module/script.hpp"
+#include "talos/runtime/options.hpp"
 
-/// Metadata Modules
+/// Metadata Includes
 #include "talos/bytecode/metadata.hpp"
+#include "talos/syntax/metadata.hpp"
 #include "talos/type/metadata.hpp"
+
+//  X-MACROS  //
+
+#define XX_MODULE_DUMPS(X)        \
+  X(SYNTAX, syntax, PARSED)       \
+  X(TYPEDEFS, types, TYPED)       \
+  X(BYTECODE, bytecode, COMPILED)
+
+#define X(D, N, P, ...) $_FWD(Talos::Module::Print, void N(const Abstract *, const Metadata::Wrapper<Phase::P> *))
+XX_MODULE_DUMPS(X)
+#undef X
 
 //  PUBLIC METHODS  //
 
-template <>
-void Talos::Module::Interface::dump<Talos::Module::Dump::SYNTAX>() const noexcept {
-    // ignore for non-script values now
-    if (!is<Script>()) return;
+void Talos::Module::Print::syntax(const Abstract *self, const Metadata::Wrapper<Phase::PARSED> *) {
+  // ignore when we have non-script values given
+  if (!self->is<Script>()) return;
 
-    // show the baseline dump details now
-    $::IO::println("\n===== Syntax Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
+  // show the baseline dump details now
+  $::Debug::println("\n===== Abstract Syntax Tree '{0}' =====\n", self->resource().relative().string());
 
-    /// TODO: show all the syntax for this module
-    $_ABORT("Unimplemented 'Syntax Dump'");
+  /// TODO: show all the syntax for this module
+  $_ABORT("Unimplemented 'Syntax Dump'");
 }
 
-template <>
-void Talos::Module::Interface::dump<Talos::Module::Dump::TYPEDEFS>() const noexcept {
-    // ignore for non-script values now
-    if (!is<Script>()) return;
+void Talos::Module::Print::types(const Abstract *self, const Metadata::Wrapper<Phase::TYPED> *) {
+  // ignore when we have non-script values given
+  if (!self->is<Script>()) return;
 
-    // show the baseline dump details now
-    $::IO::println("\n===== Types Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
+  // show the baseline dump details now
+  $::Debug::println("\n===== Type Definitions '{0}' =====\n", self->resource().relative().string());
 
-    /// TODO: show all the types for this module
-    $_ABORT("Unimplemented 'Types Dump'");
+  /// TODO: show all the syntax for this module
+  $_ABORT("Unimplemented 'Types Dump'");
 }
 
-template <>
-void Talos::Module::Interface::dump<Talos::Module::Dump::BYTECODE>() const noexcept {
-    // ignore for non-script values now
-    if (!(is<Script>() || is<Archived>())) return;
+void Talos::Module::Print::bytecode(const Abstract *self, const Metadata::Wrapper<Phase::COMPILED> *metadata) {
+  // ignore when we have non-compiled modules
+  if (self->is<Dynamic>()) return;
 
-    // show the baseline dump details now
-    $::IO::println("\n===== Bytecode Dump '{0}' =====\n", $::Path::relative(resource().body()).string());
+  // show the baseline dump details now
+  $::Debug::println("\n===== Bytecode Dump '{0}' =====\n", self->resource().relative().string());
 
-    // print the arena if it has some functions
-    auto* arena = metadata<Phase::COMPILED>()->arena();
-    if (arena->functions.size()) $::IO::println("{0}\n", *arena);
+  // print the arena if it has some functions
+  if (metadata->arena()->functions.size()) $::Debug::println("{0}\n", *metadata->arena());
+}
+
+//  PRIVATE METHODS  //
+
+void Talos::Module::Abstract::m_dump(Dump type, XI::Container *services) const noexcept {
+#define X(D, N, P, ...)                                        \
+  case Dump::D: {                                              \
+    if (options->dump.N) Print::N(this, metadata<Phase::P>()); \
+  } break;
+
+  switch (Runtime::Options *options = *services; type) { XX_MODULE_DUMPS(X) default : break; }
+#undef X
 }

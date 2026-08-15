@@ -1,16 +1,15 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
+/// Builtin Includes
+#include "talos/builtins/_inline/builtins.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Builtins, namespace TB = Type::Builder)
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
 
-//  PUBLIC METHODS  //
-
-Talos::Type::Erased TALOS_BUILTIN_TRAITS(Value::Void)::typing() { return TB::none(); }
+/// Forward Definitions
+$_FWD(Talos::Builtins, using TN = Type::New)
 
 //  PRIVATE METHODS  //
 
-void TALOS_BUILTIN_TRAITS(Value::Void)::m_typedefs(Type::World* globals) {
-    globals->types().declare(name(), typing());
-    globals->values().declare(name(), typing());
+void Talos::Builtins::Wrapper<Talos::Value::Void>::m_typedefs(Type::World *globals) {
+  globals->types().declare(name(), TN::none());
+  globals->values().declare(name(), TN::none());
 }

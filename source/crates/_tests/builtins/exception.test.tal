@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "Exception" Functionality.
-//! Description: Coordinates testing the builtin "Exception".
-//!
+///
+/// @testing Builtin "Exception" Functionality.
+/// @describe Coordinates testing the builtin "Exception".
+///
 
 // Talos Modules
 import "talos:test" as Test;

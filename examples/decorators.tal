@@ -1,7 +1,7 @@
-//!
-//! Example: "decorators.tal"
-//! Description: Showcases a simple logging decorator.
-//!
+///
+/// @example "decorators.tal"
+/// @describe Showcases a simple logging decorator.
+///
 
 // A decorator factory for logging function scopes.
 let log_fn = fn (label: String): Any {

@@ -1,131 +1,108 @@
 #ifndef _XLSP_PROTOCOL_POSITION_HPP
 #define _XLSP_PROTOCOL_POSITION_HPP
 
-/// XLSP Modules
+/// XLSP Includes
 #include "xlsp/protocol/encoding.hpp"
 
 namespace XLSP {
 
-    /// @brief Baseline Cursor Position (to reduce `Position` and `Range` sizes).
-    struct Cursor {
-        //  PROPERTIES  //
+/// @brief Position Structure.
+struct Position {
+  //  PROPERTIES  //
 
-        uint32_t line = 0;    // Line-number (zero-offset).
-        uint32_t column = 0;  // Character-number (zero-offset).
+  uint32_t line = 0;   // Line-number (zero-offset).
+  uint32_t column = 0; // Character-number (zero-offset).
 
-        //  CONSTRUCTORS  //
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs an empty cursor (0, 0).
-        constexpr Cursor() = default;
+  /// @brief Constructs an empty position (0, 0).
+  constexpr Position() = default;
 
-        /**
-         * @brief Constructs a cursor.
-         * @param ln                        Line of cursor.
-         * @param col                       Column of cursor.
-         */
-        constexpr Cursor(uint32_t ln, uint32_t col) : line(ln), column(col) {}
+  /**
+   * @brief Constructs a position.
+   * @param ln                        Line of position.
+   * @param col                       Column of position.
+   */
+  constexpr Position(uint32_t ln, uint32_t col) : line(ln), column(col) {}
 
-        //  OPERATOR METHODS  //
+  //  OPERATOR METHODS  //
 
-        /// @brief Equality operator for positions.
-        inline constexpr auto operator==(const Cursor& other) const -> bool {
-            return line == other.line && column == other.column;
-        }
+  /// @brief Equality operator for positions.
+  inline constexpr auto operator==(const Position &other) const -> bool {
+    return line == other.line && column == other.column;
+  }
 
-        /// @brief Comparison operator for positions.
-        inline constexpr auto operator<=>(const Cursor& other) const {
-            return std::tie(line, column) <=> std::tie(other.line, other.column);
-        }
+  /// @brief Comparison operator for positions.
+  inline constexpr auto operator<=>(const Position &other) const {
+    return std::tie(line, column) <=> std::tie(other.line, other.column);
+  }
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets a client version of a cursor.
-        inline constexpr Cursor client() const noexcept {
-            return *this == Cursor() ? *this : Cursor(line - 1, column - 1);
-        }
+  /// @brief Gets a client version of a position.
+  inline constexpr Position client() const noexcept {
+    return *this == Position() ? *this : Position(line - 1, column - 1);
+  }
 
-        /// @brief Gets a server version of a cursor.
-        inline constexpr Cursor server() const noexcept {
-            return *this == Cursor() ? *this : Cursor(line + 1, column + 1);
-        }
+  /// @brief Gets a server version of a position.
+  inline constexpr Position server() const noexcept {
+    return *this == Position() ? *this : Position(line + 1, column + 1);
+  }
 
-        /**
-         * @brief Gets a suitable offset of a view.
-         * @param view                      Variable to get offset of.
-         * @param encoding                  Encoding to determine offset.
-         */
-        inline constexpr int64_t offset(const $::String::View& view, const Encoding::Type& encoding) const {
-            // prepare the placeholder for a start-of-line
-            uint32_t som = 0;
+  /**
+   * @brief Gets a suitable offset of a view.
+   * @param view                      Variable to get offset of.
+   * @param encoding                  Encoding to determine offset.
+   */
+  inline constexpr int64_t offset(const $::String::View &view, const Encoding::Type &encoding) const {
+    // prepare the placeholder for a start-of-line
+    uint32_t som = 0;
 
-            // attempt getting the start-of-line length
-            for (uint32_t ii = 0; ii < line; ++ii) {
-                auto nl = view.find('\n', som);
-                if (nl == $::String::View::npos) return -1;
-                som = nl + 1;  // and increment passed the line
-            }
+    // attempt getting the start-of-line length
+    for (uint32_t ii = 0; ii < line; ++ii) {
+      auto nl = view.find('\n', som);
+      if (nl == $::String::View::npos) return -1;
+      som = nl + 1; // and increment passed the line
+    }
 
-            // get the current line details now
-            auto end = view.find('\n', som);
-            auto ln = view.substr(som, end);
+    // get the current line details now
+    auto end = view.find('\n', som);
+    auto ln = view.substr(som, end);
 
-            // attempt measuring now
-            auto total = som + Encoding::measure(ln, column, encoding);
+    // attempt measuring now
+    auto total = som + Encoding::measure(ln, column, encoding);
 
-            // return the final result now
-            return total > view.size() ? -1 : total;
-        }
-    };
+    // return the final result now
+    return total > view.size() ? -1 : total;
+  }
 
-    /// @brief Position Structure.
-    struct Position : public Cursor, public $::Printable {
-        //  CONSTRUCTORS  //
+protected:
+  //  PRIVATE METHODS  //
 
-        /// @brief Inherit the base constructors.
-        using Cursor::Cursor;
+  /**
+   * @brief Handles encoding positions.
+   * @param self                      Position instance.
+   */
+  static inline $::Serde::Object m_encode(const Position &self) {
+    return {{"line", self.line}, {"character", self.column}};
+  }
 
-        /// @brief We allow direct conversions from cursor values.
-        constexpr Position(const Cursor& cursor) : Cursor(cursor) {}
+  /**
+   * @brief Handles decoding positions.
+   * @param value                     JSON value to decode.
+   */
+  static inline Position m_decode(const $::Serde::Value &value) {
+    return {value.at<uint32_t>("line", 0), value.at<uint32_t>("character", 0)};
+  }
 
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Handles printing positions.
+   * @param os                        Output stream.
+   * @param self                      Position to print.
+   */
+  static inline void m_print(std::ostream &os, const Position &self) { os << self.line << ':' << self.column; }
+};
 
-        /// @brief Gets a client version of a cursor.
-        inline constexpr Position client() const noexcept {
-            return *this == Position() ? *this : Position(line - 1, column - 1);
-        }
-
-        /// @brief Gets a server version of a cursor.
-        inline constexpr Position server() const noexcept {
-            return *this == Position() ? *this : Position(line + 1, column + 1);
-        }
-
-       protected:
-        //  PRIVATE METHODS  //
-
-        /**
-         * @brief Handles encoding positions.
-         * @param position                  Position instance.
-         */
-        static $::Serde::Object m_encode(const Position& position) {
-            return { { "line", position.line }, { "character", position.column } };
-        }
-
-        /**
-         * @brief Handles decoding positions.
-         * @param value                     JSON value to decode.
-         */
-        static Position m_decode(const $::Serde::Value& value) {
-            return { value.at<uint32_t>("line"), value.at<uint32_t>("character") };
-        }
-
-        /**
-         * @brief Handles printing positions.
-         * @param os                        Output stream.
-         * @param self                      Position to print.
-         */
-        static void m_print($::Stream::Output& os, const Position& self) { os << self.line << ':' << self.column; }
-    };
-
-}  // namespace XLSP
+} // namespace XLSP
 
 #endif

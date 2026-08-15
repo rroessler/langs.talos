@@ -1,59 +1,52 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
+/// Builtin Includes
+#include "talos/builtins/_inline/builtins.ipp"
 
-/// Builtin Inlines
-#include "talos/builtins/_inline/defines.ipp"
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Builtins, namespace TB = Type::Builder)
+/// Forward Definitions
+$_FWD(Talos::Builtins, using TN = Type::New)
 
 //  TYPEDEFS  //
 
-#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
-struct TALOS_BUILTIN_STATICS(Object::Enum) {
+#define TALOS_XX_STATICS_DEFINE(N, ...) $_FWD(Talos::Builtins::Static, static Type::Entity N())
 #include "talos/builtins/enum/_defines/statics.def"
-};
-#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_BUILTIN_STYPE(Object::Enum, name) {
-    auto E = TB::constraint("E");
-    auto arguments = TB::arguments(E, TB::number());
-    auto signature = TB::function(TB::string(), arguments);
-    return { TB::generic(signature, TB::parameters(E)) };
+$::Shared::Pointer<Talos::Type::Prototype> Talos::Builtins::Wrapper<Talos::Object::Enum>::typeclass() {
+  return m_typeclass([](const $::Shared::Pointer<Type::Prototype> &prototype) {
+    // update the underlying super-type to be used
+    prototype->super() = Wrapper<Number::Tagged>::typeclass();
+  });
 }
 
-TALOS_MM_BUILTIN_STYPE(Object::Enum, label) {
-    auto E = TB::constraint("E");
-    auto arguments = TB::arguments(E, TB::number());
-    auto signature = TB::function(TB::string(), arguments);
-    return { TB::generic(signature, TB::parameters(E)) };
+Talos::Type::Entity Talos::Builtins::Static::name() { return label(); }
+Talos::Type::Entity Talos::Builtins::Static::label() {
+  auto E = TN::constraint("E"); // prepare the constraint
+  auto signature = TN::function(TN::string(), E, TN::number());
+  return TN::generic(signature, E); // build the generic now
 }
 
-TALOS_MM_BUILTIN_STYPE(Object::Enum, value) {
-    auto E = TB::constraint("E");
-    auto arguments = TB::arguments(E, TB::number());
-    auto signature = TB::function(TB::number(), arguments);
-    return { TB::generic(signature, TB::parameters(E)) };
+Talos::Type::Entity Talos::Builtins::Static::value() {
+  auto E = TN::constraint("E"); // prepare the constraint
+  auto signature = TN::function(TN::number(), E, TN::number());
+  return TN::generic(signature, E); // build the generic now
 }
 
 //  PRIVATE METHODS  //
 
-void TALOS_BUILTIN_TRAITS(Object::Enum)::m_typedefs(Type::World* globals) {
-    // prepare the prototype to be constructed
-    auto proto = prototype();
-    auto& statics = proto->statics();
-    auto instance = proto->instantiate();
+void Talos::Builtins::Wrapper<Talos::Object::Enum>::m_typedefs(Type::World *globals) {
+  // get the underlying prototype instance
+  auto prototype = typeclass();
+  auto instance = prototype->instantiate();
+  auto &statics = prototype->statics();
 
-    // update the underlying prototype now to be numeric
-    proto->super() = Traits<Number::Tagged>::prototype();
-
+// define the underlying statics for enumerations
 #define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
 #include "talos/builtins/enum/_defines/statics.def"
-#undef TALOS_XX_STATICS_DEFINE
 
-    // and assign the resulting entity to be used
-    globals->types().declare(name(), instance);
-    globals->values().declare(name(), proto);
+  // and define the baseline typings now
+  globals->values().declare(name(), prototype);
+  globals->types().declare(name(), instance);
 }

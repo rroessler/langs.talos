@@ -1,4 +1,5 @@
 name: Publish VSCE
+description: Workflow for publishing the Talos VSC extension
 on: [workflow_dispatch, workflow_call]
 
 permissions:
@@ -17,7 +18,7 @@ jobs:
               run: bun install
 
             - name: Build Extension
-              run: bun run build
+              run: bun vscode bundle
 
             - name: Package Extension
               run: bunx vsce package --no-dependencies

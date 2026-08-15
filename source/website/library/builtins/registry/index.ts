@@ -6,6 +6,7 @@ import * as JSONC from 'jsonc-parser';
 
 /// Website Modules
 import { Assets } from '@/website/assets';
+import { TOC } from '@/website/components';
 
 /// Package Modules
 import { Property } from '../property';
@@ -25,6 +26,7 @@ export namespace Registry {
 
     /** Replacements factory to be used. */
     const m_replacements = (type: string): Replacer[] => [
+        { re: `#include\\s*"[^"]+"`, pp: '' },
         { re: `TALOS_XX_${type}_HEADER\\(\\)`, pp: '{' },
         { re: `TALOS_XX_${type}_DEFINE\\((\\w+)\\)`, pp: '"name": "$1",' },
         { re: `TALOS_XX_${type}_TYPEDEF\\("([^"]*)"\\)`, pp: '"typedef": "$1",' },
@@ -43,7 +45,7 @@ export namespace Registry {
         const resolved = fs.readdirSync(source).map((name) => resolve(name));
 
         // filter all the available files now
-        return resolved.filter(m_filter);
+        return resolved.filter(m_filter).sort((a, b) => a.name.localeCompare(b.name));
     }
 
     /**
@@ -64,6 +66,35 @@ export namespace Registry {
         return { ...m_details(name), fields, statics };
     }
 
+    /**
+     * Handles transform source table-of-contents.
+     * @param source                Source to transform.
+     */
+    export function transform(source: typeof import('@/website/source').Source.builtins, prefix = 'builtins') {
+        // prepare the table-of-contents header
+        const header = TOC.seed('Overview');
+
+        // prepare a set of keyed items
+        const keys = new Set<string>();
+        const index = `${prefix}/index.mdx`;
+
+        // iteratively update the source files now
+        for (const file of source.files) {
+            if (file.type === 'meta' || file.path === index) continue;
+
+            const key = file.path.split('/')[1]; // prepare the key
+            const { fields, statics } = resolve(key) ?? {};
+
+            // rebuild the table-of-contents to be used
+            const toc = [header].concat(m_seed('fields', fields), m_seed('statics', statics));
+
+            (keys.add(key), (file.data.toc = toc));
+        }
+
+        // attempt removing the collapsible items
+        for (const key of keys) source.files.push(TOC.meta(key, prefix));
+    }
+
     //  PRIVATE METHODS  //
 
     /**
@@ -72,6 +103,16 @@ export namespace Registry {
      */
     function m_filter(builtin?: Descriptor): builtin is Descriptor {
         return typeof builtin === 'object';
+    }
+
+    /**
+     * Handles seeding table-of-contents properties.
+     * @param section               Section to seed.
+     * @param properties            Properties to seed.
+     */
+    function m_seed(section: string, properties: Property[] = []): TOC {
+        const toc = properties.map(({ name }) => TOC.seed(name, { url: `#${section}-${name}`, depth: 3 }));
+        return toc.length ? [TOC.seed(section[0].toUpperCase() + section.slice(1))].concat(toc) : [];
     }
 
     /**

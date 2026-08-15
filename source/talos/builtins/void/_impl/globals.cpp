@@ -1,6 +1,9 @@
-/// Builtin Modules
-#include "talos/builtins/_inline/assert.ipp"
+/// Talos Includes
+#include "talos/value/void.hpp"
+
+/// Builtin Includes
+#include "talos/builtins/_inline/builtins.ipp"
 
 //  PRIVATE METHODS  //
 
-Talos::Value::Any TALOS_BUILTIN_TRAITS(Value::Void)::m_globals(Runtime::Isolate*) { return Value::Void(); }
+Talos::Value::Any Talos::Builtins::Wrapper<Talos::Value::Void>::m_globals(Isolate *) { return Value::Void(); }

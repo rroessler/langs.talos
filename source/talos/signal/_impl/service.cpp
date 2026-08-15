@@ -1,25 +1,24 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/signal/service.hpp"
+#include "talos/runtime/container.hpp"
 
 //  CONSTRUCTORS  //
 
-Talos::Signal::Service::Service(XI::Container* services) : m_async(*services) {
-    m_async->signals()->bind([&](const XSIO::Signal::Code& code) { return m_dispatch(code); });
+Talos::Signal::Service::Service() : Service($::Global::get<Runtime::Container>()) {}
+Talos::Signal::Service::Service(XI::Container *services) : m_async(*services) {
+  m_async->signals()->attach([&](const Code &code) { m_dispatch(code); });
 }
 
 //  PRIVATE METHODS  //
 
-void Talos::Signal::Service::m_dispatch(const XSIO::Signal::Code& code) {
-    /// TODO: check if we can catch the incoming code at all
-    if (auto* isolate = m_async->isolate(); isolate && !m_handler.is<Value::Void>()) $_ABORT("UNIMPLEMENTED");
+void Talos::Signal::Service::m_dispatch(const Code &code) {
+  /// TODO: check if we can catch the incoming signal
 
-    // attempt stopping all the running threads
-    for (const auto& thread : m_async->scheduler()->threads()) {
-        if (!thread->is<Runtime::Executor>()) continue;  // should cast
-        reinterpret_cast<Runtime::Executor*>(thread->task())->interrupt();
-    }
+  /// TODO: stop all the running threads from executing
 
-    // and now we can safely exit the routine as necessary
-    m_async->exit($_EXIT_CUSTOM(code.underlying()));
-    if (!$_PLATFORM_WINDOWS) $::IO::println();
+  // if we reach here then we need to exit using the signal
+  m_async->exit(code.errc());
+
+  // for non-windows platforms we also print a newline
+  if constexpr (!$_PLATFORM_WINDOWS) $::Debug::eprintln();
 }

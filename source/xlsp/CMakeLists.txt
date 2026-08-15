@@ -1,20 +1,23 @@
 # --  PACKAGE SETUP  -- #
 
-# Prepare all the packages to be required
-talos_package_require(${TALOS_TARGET_XTDLIB})
+# Attempt requiring the desired packages
+talos_package_require(xtdlib)
 
 # --  PACKAGE PROPERTIES  -- #
 
-# Get all the availble sources for the project
+# Define the target to be used
+set(TALOS_TARGET_XLSP "xlsp" CACHE INTERNAL "")
+
+# Get all the sources for the runtime
 talos_sources_glob(TALOS_SOURCES_XLSP)
 
-# --  PACKAGE DEFINITION  -- #
+# --  PACKAGE DEFINITIONS  -- #
 
-# Define the project now
+# Define the standard library project now
 project(${TALOS_TARGET_XLSP} VERSION ${TALOS_VERSION_SHORT} LANGUAGES CXX)
 
-# Define the base library now
+# Define the runtime library now
 talos_library_declare(${TALOS_TARGET_XLSP} PCH SOURCES ${TALOS_SOURCES_XLSP} LIBRARIES
+    mono::common
     talos::xtdlib
-    mono::warnings
 )

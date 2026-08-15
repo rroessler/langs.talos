@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "List" Functionality.
-//! Description: Coordinates testing the builtin "List".
-//!
+///
+/// @testing Builtin "List" Functionality.
+/// @describe Coordinates testing the builtin "List".
+///
 
 // Talos Modules
 import "talos:test" as Test;

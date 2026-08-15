@@ -7,8 +7,13 @@
 #include "xjct/archive/options.hpp"
 #include "xjct/archive/provider.hpp"
 
+/// Blob Modules
+#include "xjct/blob/decoder.hpp"
+#include "xjct/blob/encoder.hpp"
+
 /// Sentinel Modules
 #include "xjct/sentinel/fuse.hpp"
+#include "xjct/sentinel/view.hpp"
 
 /// Target Modules
 #include "xjct/target/abstract.hpp"

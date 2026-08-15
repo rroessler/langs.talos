@@ -1,177 +1,188 @@
 #ifndef _TALOS_PARSER_STREAM_HPP
 #define _TALOS_PARSER_STREAM_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/diagnostic/reporter.hpp"
 #include "talos/parser/snapshot.hpp"
+#include "talos/syntax/tree.hpp"
 
 namespace Talos::Parser {
 
-    /// @brief Parser Constructor Options.
-    struct Options {
-        Syntax::Tree* storage = nullptr;
-        Diagnostic::Reporter* reporter = nullptr;
-    };
+/// @brief Syntax Parser Stream.
+class Stream : public Lexer::Visitor {
+  //  PROPERTIES  //
 
-    /// @brief Syntax Parser Implementation.
-    class Stream : public Lexer::Visitor {
-        //  PROPERTIES  //
+  /// @brief Denotes if a synchronizable error occured.
+  bool m_panicking = false;
 
-        /// @brief Denotes if a synchronizable error occured.
-        bool m_panicking = false;
+  /// @brief The outgoing syntax buffer.
+  Syntax::Tree *m_syntax = nullptr;
 
-        /// @brief The outgoing syntax buffer.
-        Syntax::Tree* m_storage = nullptr;
+  /// @brief Diagnostics emitter instance.
+  Diagnostic::Reporter *m_reporter = nullptr;
 
-        /// @brief Diagnostics emitter instance.
-        Diagnostic::Reporter* m_reporter = nullptr;
+public:
+  //  CONSTRUCTORS  //
 
-       public:
-        //  CONSTRUCTORS  //
+  /**
+   * @brief Constructs a syntax parser.
+   * @param tokens                  Tokens buffer.
+   * @param syntax                  Syntax tree instance.
+   * @param reporter                Diagnostic reporter.
+   */
+  explicit Stream(const Lexer::Buffer *tokens, Syntax::Tree *syntax, Diagnostic::Reporter *reporter = nullptr) :
+      Visitor(tokens), m_syntax(syntax), m_reporter(reporter) {
+    m_skip(); // skip any leading whitespace/comment tokens now
+  }
 
-        /**
-         * @brief Constructs a parser stream.
-         * @param tokens                    Tokens visitor.
-         * @param options                   Stream options.
-         */
-        explicit Stream(const Lexer::Buffer* tokens, const Options& options = {}) :
-            Lexer::Visitor(tokens), m_storage(options.storage), m_reporter(options.reporter) {}
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Denotes if the stream is currently panicking.
+  inline constexpr bool panicking() const noexcept { return m_panicking; }
 
-        /// @brief Denotes if the stream is currently panicking.
-        inline constexpr bool panicking() const noexcept { return m_panicking; }
+  /// @brief Gets a snapshot of the stream.
+  inline constexpr Snapshot snapshot() const noexcept { return Snapshot(this); }
 
-        /// @brief Gets a snapshot of the stream.
-        inline constexpr Snapshot snapshot() const noexcept { return Snapshot(this); }
+  /// @brief Handles advancing the token stream.
+  inline constexpr const Lexer::Token *advance() noexcept {
+    if (eos()) return &s_invalid; // ignore end-of-stream
+    m_previous = current();       // cache previous value
+    ++m_index, m_skip();          // skip over any whitespace
+    return m_previous;            // and return previous token
+  }
 
-        /// @brief Checks the current token against various kinds.
-        template <std::same_as<Lexer::Kind>... As>
-        inline bool check(const As&... kinds) const {
-            return ((kinds == current()->kind()) || ...);
-        }
+  /// @brief Attempts peeking the next available token.
+  inline constexpr const Lexer::Token *peek() const {
+    // scan whilst possible to find a suitable token now
+    for (size_t offset = m_index + 1; offset < m_tokens.size(); ++offset) {
+      auto *token = &m_tokens.at(offset); // get current token
+      if (token->kind() != Lexer::Kind::MISC_CMT) return token;
+    }
 
-        /// @brief Checks the current token against various flags.
-        template <std::same_as<Lexer::Flag>... Fs>
-        inline bool check(const Fs&... flags) const {
-            return current()->flags().test(flags...);
-        }
+    // failed to find a suitable token
+    return &s_invalid;
+  }
 
-        /// @brief Attempts matching a token and advances the visitor if it does.
-        template <std::same_as<Lexer::Kind>... As>
-        inline bool match(const As&... kinds) {
-            return check(kinds...) ? advance(), true : false;
-        }
+  /// @brief Checks the current token against various kinds.
+  template <std::same_as<Lexer::Kind>... As> inline bool check(const As &...kinds) const {
+    return ((kinds == current()->kind()) || ...);
+  }
 
-        /// @brief Attempts matching a token and advances the visitor if it does.
-        template <std::same_as<Lexer::Flag>... Fs>
-        inline bool match(const Fs&... flags) {
-            return check(flags...) ? advance(), true : false;
-        }
+  /// @brief Checks the current token against various flags.
+  template <std::same_as<Lexer::Flag>... Fs> inline bool check(const Fs &...flags) const {
+    return current()->flags().test(flags...);
+  }
 
-        /**
-         * @brief Consumes a valid current token.
-         * @param kind                  Kind to consume.
-         * @param code                  Diagnostic code.
-         * @param args                  Format arguments.
-         */
-        template <class... As>
-        inline bool consume(Lexer::Kind kind, Diagnostic::Code code, As&&... args) {
-            return $_LIKELY(match(kind)) ? true : (report(code, std::forward<As>(args)...), false);
-        }
+  /// @brief Attempts matching a token and advances the visitor if it does.
+  template <std::same_as<Lexer::Kind>... As> inline bool match(const As &...kinds) {
+    return check(kinds...) ? advance(), true : false;
+  }
 
-        /**
-         * @brief Forces a token to be expected.
-         * @param kind                  Kind of token.
-         * @param args                  Format arguments.
-         */
-        template <class... As>
-        inline bool expect(Lexer::Kind kind, As&&... args) {
-            // stop early if necessary to do so
-            if ($_LIKELY(match(kind))) return true;
+  /// @brief Attempts matching a token and advances the visitor if it does.
+  template <std::same_as<Lexer::Flag>... Fs> inline bool match(const Fs &...flags) {
+    return check(flags...) ? advance(), true : false;
+  }
 
-            // prepare the quoted symbol to be used
-            auto symbol = Lexer::Traits::symbol(kind);
-            auto quoted = fmt::format("'{0}'", symbol);
+  /**
+   * @brief Consumes a valid current token.
+   * @param kind                  Kind to consume.
+   * @param code                  Diagnostic code.
+   * @param args                  Format arguments.
+   */
+  template <class... As> inline bool consume(Lexer::Kind kind, Diagnostic::Code code, As &&...args) {
+    return $_LIKELY(match(kind)) ? true : (report(code, std::forward<As>(args)...), false);
+  }
 
-            // and return the resulting failure that occured
-            return report(sizeof...(As) ? 2000101 : 2000100, quoted, std::forward<As>(args)...), false;
-        }
+  /**
+   * @brief Forces a token to be expected.
+   * @param kind                  Kind of token.
+   * @param args                  Format arguments.
+   */
+  template <class... As> inline bool expect(Lexer::Kind kind, As &&...args) {
+    // stop early if necessary to do so
+    if ($_LIKELY(match(kind))) return true;
 
-        /// @brief Handles forcing the parser into a suitable state after panicking.
-        inline void synchronize() {
-            // declare as not currently panicking
-            m_panicking = false;
+    // prepare the quoted symbol to be used
+    auto symbol = Lexer::Inspect::symbol(kind);
+    auto quoted = fmt::format("'{0}'", symbol);
 
-            // attempt advancing the instance now
-            for (; !eos(); advance()) {
-                if (match(Lexer::Kind::PUNC_TERM)) break;  // terminators or syncable
-                else if (current()->flags().test(Lexer::Flag::SYNCABLE)) break;
-            }
-        }
+    // and return the resulting failure that occured
+    return report(sizeof...(As) ? 2000101 : 2000100, quoted, std::forward<As>(args)...), false;
+  }
 
-        /**
-         * @brief Handles allocating a syntax-node.
-         * @param args                  Node arguments.
-         */
-        template <std::derived_from<Syntax::Node> T, class... As>
-        inline constexpr T* allocate(As&&... args) {
-            return m_storage->m_allocate<T, As...>(std::forward<As>(args)...);
-        }
+  /// @brief Handles forcing the parser into a suitable state after panicking.
+  inline void synchronize() {
+    // declare as not currently panicking
+    m_panicking = false;
 
-        /**
-         * @brief Handles reporting errors.
-         * @param location              Source location.
-         * @param code                  Diagnostic code.
-         * @param args                  Message arguments.
-         */
-        template <class... As>
-        inline std::nullptr_t report(const Resource::Location& location, Diagnostic::Code code, As&&... args) {
-            // ignore if currently panicking
-            if (m_panicking) return nullptr;
+    // attempt advancing the instance now
+    for (; !eos(); advance()) {
+      if (match(Lexer::Kind::PUNC_TERM)) break; // terminators or syncable
+      else if (current()->flags().test(Lexer::Flag::SYNCABLE)) break;
+    }
+  }
 
-            if (m_reporter) m_panicking = m_reporter->emit(location, code, std::forward<As>(args)...);
-            else m_panicking = Diagnostic::Traits::severity(code) == Diagnostic::Severity::ERROR;
+  /**
+   * @brief Handles allocating a syntax-node.
+   * @param args                  Node arguments.
+   */
+  template <std::derived_from<Syntax::Node> T, class... As> inline constexpr T *allocate(As &&...args) {
+    return m_syntax->allocate<T>(std::forward<As>(args)...);
+  }
 
-            // and return an empty storage value for use
-            return nullptr;
-        }
+  /**
+   * @brief Handles reporting errors.
+   * @param code                  Diagnostic code.
+   * @param args                  Message arguments.
+   */
+  template <class... As> inline std::nullptr_t report(Diagnostic::Code code, As &&...args) {
+    return report(eos() ? previous() : current(), code, std::forward<As>(args)...);
+  }
 
-        /**
-         * @brief Handles reporting errors.
-         * @param code                  Diagnostic code.
-         * @param args                  Message arguments.
-         */
-        template <class... As>
-        inline std::nullptr_t report(Diagnostic::Code code, As&&... args) {
-            return report(eos() ? previous() : current(), code, std::forward<As>(args)...);
-        }
+  /**
+   * @brief Handles reporting errors.
+   * @param token                 Token of error.
+   * @param code                  Diagnostic code.
+   * @param args                  Message arguments.
+   */
+  template <class... As> inline std::nullptr_t report(const Lexer::Token *token, Diagnostic::Code code, As &&...args) {
+    return $_LIKELY(token) ? report(token->range(), code, std::forward<As>(args)...) : nullptr;
+  }
 
-        /**
-         * @brief Handles reporting errors.
-         * @param token                 Token of error.
-         * @param code                  Diagnostic code.
-         * @param args                  Message arguments.
-         */
-        template <class... As>
-        inline std::nullptr_t report(const Lexer::Token* token, Diagnostic::Code code, As&&... args) {
-            if ($_UNLIKELY(token == nullptr)) return nullptr;  // ignore invalid
-            else return report(token->location(), code, std::forward<As>(args)...);
-        }
+  /**
+   * @brief Handles reporting errors.
+   * @param node                  Node of error.
+   * @param code                  Diagnostic code.
+   * @param args                  Message arguments.
+   */
+  template <class... As> inline std::nullptr_t report(const Syntax::Node *node, Diagnostic::Code code, As &&...args) {
+    return $_LIKELY(node) ? report(node->trivia()->range(), code, std::forward<As>(args)...) : nullptr;
+  }
 
-        /**
-         * @brief Handles reporting errors.
-         * @param node                  Node of error.
-         * @param code                  Diagnostic code.
-         * @param args                  Message arguments.
-         */
-        template <class... As>
-        inline std::nullptr_t report(const Syntax::Node* node, Diagnostic::Code code, As&&... args) {
-            if (node == nullptr) return nullptr;  // ignore if the node is currently empty
-            return report(node->traits()->location(), code, std::forward<As>(args)...);
-        }
-    };
+  /**
+   * @brief Handles reporting errors.
+   * @param range                   Source range.
+   * @param code                    Diagnostic code.
+   * @param args                    Message arguments.
+   */
+  template <class... As> inline std::nullptr_t report(const XLSP::Range &range, Diagnostic::Code code, As &&...args) {
+    // ignore if currently panicking
+    if (m_panicking) return nullptr;
 
-}  // namespace Talos::Parser
+    if (m_reporter) m_panicking = m_reporter->emit(range, code, std::forward<As>(args)...);
+    else m_panicking = Diagnostic::Inspect::severity(code) == Diagnostic::Severity::ERROR;
+
+    // and return an empty storage value for use
+    return nullptr;
+  }
+
+private:
+  //  PRIVATE METHODS  //
+
+  /// @brief Handles skipping any current whitespace.
+  inline constexpr void m_skip() { for (; !eos() && m_current()->kind() == Lexer::Kind::MISC_CMT; ++m_index); }
+};
+
+} // namespace Talos::Parser
 
 #endif

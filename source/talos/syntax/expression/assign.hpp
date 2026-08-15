@@ -1,46 +1,37 @@
 #ifndef _TALOS_ASSIGN_EXPRESSION_HPP
 #define _TALOS_ASSIGN_EXPRESSION_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/syntax/node.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Assignment Node.
-    class Assign : public Abstract<Assign, Expression> {
-        //  PROPERTIES  //
+/// @brief Assignment Node.
+class Assign : public Mixin<Assign, Expression> {
+  //  PROPERTIES  //
 
-        /// @brief Assignment value.
-        Expression* m_value;
+  /// @brief Assignment value.
+  Expression *m_value;
 
-        /// @brief Identifier name.
-        Expression* m_target;
+  /// @brief Identifier name.
+  Expression *m_target;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs an assignment node.
-         * @param target                    Assignment target.
-         * @param value                     Value to assign.
-         */
-        explicit Assign(Expression* target, Expression* value) : Assign(target, value, target->traits()->location()) {}
+  /**
+   * @brief Constructs an assignment node.
+   * @param target                    Assignment target.
+   * @param value                     Value to assign.
+   */
+  explicit Assign(Expression *target, Expression *value) : m_value(value), m_target(target) {}
 
-        /**
-         * @brief Constructs an assignment node.
-         * @param target                    Assignment target.
-         * @param value                     Value to assign.
-         * @param location                  Resource location.
-         */
-        explicit Assign(Expression* target, Expression* value, const Bounds& location) :
-            Abstract(location), m_value(value), m_target(target) {}
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  inline constexpr const Expression *value() const noexcept { return m_value; }
+  inline constexpr const Expression *target() const noexcept { return m_target; }
+};
 
-        inline constexpr Expression* value() const noexcept { return m_value; }
-        inline constexpr Expression* target() const noexcept { return m_target; }
-    };
-
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

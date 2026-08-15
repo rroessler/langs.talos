@@ -2,12 +2,10 @@
 #include "talos/bytecode/invoker.hpp"
 #include "talos/bytecode/visitor.hpp"
 
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
-
 //  PRIVATE METHODS  //
 
 TALOS_MM_LOWER_NODE(Call, node, compiler, destination) {
-    $_UNUSED $_AUTO = compiler->trace(node);  // prepare the baseline trace to be used
-    Bytecode::Invoker(node->callee()).invoke(compiler, destination, node->arguments());
+  $_UNUSED $_AUTO = compiler->trace(node); // prepare trace
+  auto invoker = Bytecode::Invoker(node->callee(), false);
+  invoker.compile(compiler, destination, node->arguments());
 }

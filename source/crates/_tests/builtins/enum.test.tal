@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "Enum" Functionality.
-//! Description: Coordinates testing the builtin "Enum".
-//!
+///
+/// @testing Builtin "Enum" Functionality.
+/// @describe Coordinates testing the builtin "Enum".
+///
 
 // Talos Modules
 import "talos:test" as Test;

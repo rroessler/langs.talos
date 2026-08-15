@@ -1,7 +1,7 @@
-//!
-//! Example: "futures.tal"
-//! Description: Showcases delayed concurrency with `Future` values.
-//!
+///
+/// @example "futures.tal"
+/// @describe Showcases delayed concurrency with `Future` values.
+///
 
 // Prepare a random set of durations.
 let durations = [100, 50, 400, 250, 500, 10];

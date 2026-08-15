@@ -1,4 +1,4 @@
 // - PUBLIC METHODS - //
 
-//! Brief: Allows recasting values to any typing (unsafe).
+//! @brief Allows recasting values to any typing (unsafe).
 export let cast = fn [T](value: Any): T => value as T;

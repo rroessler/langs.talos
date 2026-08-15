@@ -1,19 +1,24 @@
 #ifndef _TALOS_BUILTINS_ASSERT_IPP
 #define _TALOS_BUILTINS_ASSERT_IPP
 
-/// Talos Modules
+/// Talos Includes
+#include "talos/member/factory.hpp"
 #include "talos/number/math.hpp"
+#include "talos/operator/storage.hpp"
 #include "talos/runtime/isolate.hpp"
 
-/// Builtin Modules
+/// Builtin Includes
 #include "talos/builtins/_inline/builtins.ipp"
+
+/// Value Includes
+#include "talos/value/_inline/value.ipp"
 
 //  MACROS  //
 
-#define TALOS_MM_ASSERT_THAT(I, C, ...)                     \
-    $_PP_BLOCK({                                            \
-        if ($_UNLIKELY(!(C))) return I->panic(__VA_ARGS__); \
-    })
+#define TALOS_MM_ASSERT_THAT(I, C, ...)                 \
+  $_PP_BLOCK({                                          \
+    if ($_UNLIKELY(!(C))) return I->panic(__VA_ARGS__); \
+  })
 
 #define TALOS_MM_ASSERT_ARGC(I, S, MIN, ...) TALOS_MM_ASSERT_THAT(I, S >= MIN, 6000251, MIN)
 #define TALOS_MM_ASSERT_TYPEOF(I, T, V, ...) TALOS_MM_ASSERT_THAT(I, (V).is<T>(), 6000253, #V, #T)
@@ -22,7 +27,7 @@
 #define TALOS_MM_ASSERT_LOWER(I, V, MIN, ...) TALOS_MM_ASSERT_THAT(I, V >= MIN, 6000602, MIN)
 #define TALOS_MM_ASSERT_UPPER(I, V, MAX, ...) TALOS_MM_ASSERT_THAT(I, V <= MAX, 6000601, MAX)
 #define TALOS_MM_ASSERT_BOUNDS(I, V, MIN, MAX, ...) \
-    TALOS_MM_ASSERT_LOWER(I, V, MIN);               \
-    TALOS_MM_ASSERT_UPPER(I, V, MAX)
+  TALOS_MM_ASSERT_LOWER(I, V, MIN);                 \
+  TALOS_MM_ASSERT_UPPER(I, V, MAX)
 
 #endif

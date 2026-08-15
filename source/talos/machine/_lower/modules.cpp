@@ -1,73 +1,60 @@
-/// Talos Modules
-#include "talos/engine/dispatch.hpp"
-#include "talos/engine/exports.hpp"
-#include "talos/machine/frame.hpp"
-#include "talos/object/instance.hpp"
-#include "talos/runtime/isolate.hpp"
-
-/// Inline Modules
+/// Machine Includes
 #include "talos/machine/_inline/macros.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Machine::Dispatch, Reference open(Runtime::Isolate*))
-$_FWD(Talos::Machine::Dispatch, Reference close(Runtime::Isolate*))
-$_FWD(Talos::Machine::Dispatch, Reference import(Runtime::Isolate*, const String::Intern*))
-
-//  PUBLIC METHODS  //
-
-Talos::Machine::Reference Talos::Machine::Dispatch::open(Runtime::Isolate* isolate) {
-    const auto* frame = isolate->frame()->as<Machine::Frame>();
-    return isolate->exports(frame->resource())->open(isolate).pointer();
-}
-
-Talos::Machine::Reference Talos::Machine::Dispatch::close(Runtime::Isolate* isolate) {
-    const auto* frame = isolate->frame()->as<Machine::Frame>();
-    return isolate->exports(frame->resource())->close().pointer();
-}
-
-Talos::Machine::Reference Talos::Machine::Dispatch::import(Runtime::Isolate* isolate, const String::Intern* intern) {
-    const auto* frame = isolate->frame()->as<Machine::Frame>();  // get the base frame
-    auto trace = frame->backtrace(Resource::Group::IMPORT);      // prepare the trace now
-    return isolate->import(intern->view(), frame->resource().body(), trace).pointer();
-}
-
-//  PRIVATE METHODS  //
+//  EMITTER METHODS  //
 
 TALOS_MM_MACHINE_EMIT(MODULE_OPEN, builder, instruction) {
-    auto dx = __ee__ resolve(instruction->get<0>());
-    __ee__ invoke(Dispatch::open, dx, builder->isolate);
+  auto dx = __ee__ slot(instruction->get<0>());
+  __ee__ call(Glue::open, dx, builder->isolate, builder->frame);
 }
 
 TALOS_MM_MACHINE_EMIT(MODULE_CLOSE, builder, instruction) {
-    auto dx = __ee__ resolve(instruction->get<0>());
-    __ee__ invoke(Dispatch::close, dx, builder->isolate);
+  auto dx = __ee__ slot(instruction->get<0>());
+  __ee__ call(Glue::close, dx, builder->isolate, builder->frame);
 }
 
-TALOS_MM_MACHINE_UNIMPLEMENTED(MODULE_BARREL, , )
+TALOS_MM_MACHINE_EMIT(MODULE_BARREL, builder, instruction) {
+  // get the barrel register to be used
+  auto tx = __ee__ slot(instruction->get<0>());
+
+  // and attempt calling our necessary handler
+  __ee__ call(Glue::barrel, tx, builder->isolate, builder->frame, tx);
+
+  // check if we have an empty result and panic when we do
+  __ee__ test(tx, Validate::FAST);
+}
 
 TALOS_MM_MACHINE_EMIT(MODULE_IMPORT, builder, instruction) {
-    // prepare the necessary arguments
-    auto dx = __ee__ resolve(instruction->get<0>());
-    auto ix = __ee__ intern(instruction->get<1>());
+  // prepare the necessary arguments
+  auto dx = __ee__ slot(instruction->get<0>());
 
-    // attempt importing into the required slot
-    __ee__ invoke(Dispatch::import, dx, builder->isolate, ix);
+  // prepare the intern reference to be used now
+  auto index = instruction->get<1>();
+  auto *arena = builder->info->arena();
+  auto *intern = &arena->strings[index];
 
-    // validate the outgoing result
-    __ee__ validate(dx, Validate::FAST);
+  // attempt importing into the required slot
+  __ee__ call(Glue::import, dx, builder->isolate, builder->frame, Immediate(intern));
+
+  // validate the outgoing result
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(MODULE_EXPORT, builder, instruction) {
-    // prepare a suitable output register
-    auto dx = __cc__ new_gp64("@dx");
+  // prepare a suitable output register
+  auto dx = __cc__ new_gp64();
 
-    // prepare the necessary arguments
-    auto sx = __ee__ resolve(instruction->get<0>());
-    auto ix = __ee__ intern(instruction->get<1>());
+  // prepare the necessary arguments
+  auto sx = __ee__ slot(instruction->get<0>());
 
-    // attempt exporting the value now
-    __ee__ invoke(Engine::Dispatch::expose, dx, builder->isolate, sx, ix);
+  // prepare the intern reference to be used now
+  auto index = instruction->get<1>();
+  auto *arena = builder->info->arena();
+  auto *intern = &arena->strings[index];
 
-    // validate the outgoing result
-    __ee__ validate(dx, Validate::FAST);
+  // attempt exporting the value now
+  __ee__ call(Glue::expose, dx, builder->isolate, builder->frame, sx, Immediate(intern));
+
+  // validate the outgoing result
+  __ee__ test(dx, Validate::FAST);
 }

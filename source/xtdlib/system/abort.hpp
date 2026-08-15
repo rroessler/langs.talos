@@ -1,19 +1,15 @@
 #ifndef _XTDLIB_SYSTEM_ABORT_HPP
 #define _XTDLIB_SYSTEM_ABORT_HPP
 
-/// C++ Modules
-#include <cstdlib>
-
-/// Library Modules
+/// Library Includes
 #include "xtdlib/macros/attributes.hpp"
+#include "xtdlib/portable/stdlib.hpp"
 
 namespace $::System {
 
-    //  PUBLIC METHODS  //
+/// @brief Internal abort handler.
+$_NORETURN $_INLINE_FORCE static void abort() { std::abort(); }
 
-    /// @brief Internal abort handler.
-    $_NORETURN $_INLINE_FORCE static void abort() { std::abort(); }
-
-}  // namespace $::System
+} // namespace $::System
 
 #endif

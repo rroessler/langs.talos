@@ -1,56 +1,39 @@
 #ifndef _TALOS_EXPRESSION_CALL_HPP
 #define _TALOS_EXPRESSION_CALL_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/function/policy.hpp"
 #include "talos/syntax/node.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Call Expression Node.
-    class Call : public Abstract<Call, Expression> {
-        //  PROPERTIES  //
+/// @brief Call Expression Node.
+class Call : public Mixin<Call, Expression> {
+  //  PROPERTIES  //
 
-        /// @brief Callee expression value.
-        Expression* m_callee;
+  /// @brief Callee expression value.
+  Expression *m_callee;
 
-        /// @brief Calling arguments.
-        std::vector<Expression*> m_arguments;
+  /// @brief Calling arguments.
+  std::vector<Expression *> m_arguments;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a call expression.
-         * @param callee                    Callee value.
-         * @param location                  Resource location.
-         */
-        explicit Call(Expression* callee, const Bounds& location) : Abstract(location), m_callee(callee) {}
+  /**
+   * @brief Constructs a call expression.
+   * @param callee                    Callee value.
+   * @param arguments                 Bound arguments.
+   */
+  explicit Call(Expression *callee, const std::vector<Expression *> &arguments = {})
+      : m_callee(callee), m_arguments(arguments) {}
 
-        /**
-         * @brief Constructs a call expression.
-         * @param callee                    Callee value.
-         * @param arguments                 Bound arguments.
-         * @param location                  Resource location.
-         */
-        explicit Call(Expression* callee, const std::vector<Expression*>& arguments) :
-            Call(callee, arguments, callee->traits()->location()) {}
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Constructs a call expression.
-         * @param callee                    Callee value.
-         * @param arguments                 Bound arguments.
-         * @param location                  Resource location.
-         */
-        explicit Call(Expression* callee, const std::vector<Expression*>& arguments, const Bounds& location) :
-            Abstract(location), m_callee(callee), m_arguments(arguments) {}
+  inline constexpr const Expression *callee() const noexcept { return m_callee; }
+  inline constexpr const std::vector<Expression *> &arguments() const noexcept { return m_arguments; }
+};
 
-        //  PUBLIC METHODS  //
-
-        inline constexpr Expression* callee() const noexcept { return m_callee; }
-        inline constexpr const std::vector<Expression*>& arguments() const noexcept { return m_arguments; }
-    };
-
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

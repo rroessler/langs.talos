@@ -1,8 +1,8 @@
 /// Vendor Modules
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { createRelativeLink } from '@fumadocs/base-ui/mdx';
-import { InlineTOC } from '@fumadocs/base-ui/components/inline-toc';
+import { createRelativeLink } from 'fumadocs-ui/mdx';
+import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
 
 /// Website Modules
 import { Source } from '@/website/source';
@@ -10,11 +10,15 @@ import { Release } from '@/website/release';
 import { Anchor } from '@/website/components';
 import { Markdown } from '@/website/markdown';
 
+//  PROPERTIES  //
+
 /** Ensure no caching of documentation. */
 export const revalidate = false;
 
 /** Ensure the parameters are not dynamic. */
 export const dynamicParams = false;
+
+//  PUBLIC METHODS  //
 
 /** Handles getting static parameters. */
 export async function generateStaticParams() {
@@ -31,13 +35,13 @@ export default async function Page(props: PageProps<'/blog/[slug]'>) {
     const page = Source.blog.getPage(await props.params.then((params) => [params.slug]));
     if (typeof page === 'undefined') notFound(); // ignore when we have invalid pages
 
-    // alias the incoming "MDX" content as necessary
-    const { body: Content, toc, title, description, date, author } = page.data;
-
     // construct the necessary components to be used
     const components = Markdown.Components({
-        a: (props) => <Anchor component={createRelativeLink(Source.blog as any, page)} {...props} />,
+        a: (props) => <Anchor component={createRelativeLink(Source.blog, page)} {...props} />,
     });
+
+    // alias the incoming "MDX" content as necessary
+    const { body: Content, toc, title, description, date, author } = page.data;
 
     // and finally construct the resulting blog-post
     return (

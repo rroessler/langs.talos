@@ -1,31 +1,32 @@
 #ifndef _TALOS_VARIABLE_MODIFIERS_HPP
 #define _TALOS_VARIABLE_MODIFIERS_HPP
 
-/// Talos Modules
-#include "talos/forward/syntax.hpp"
+/// Talos Includes
+#include "talos/forward/variable.hpp"
 
 namespace Talos::Variable {
 
-    /// @brief Variable Flags Available.
-    enum class Flag : uint16_t {
-        MUTABLE,     // Denotes readonly/mutability.
-        OPTIONAL,    // Whether or not a typing is optional.
-        DISPOSABLE,  // Denotes if variable is disposable.
+/// @brief Variable Flags Available.
+enum class Flag : uint16_t {
+  MUTABLE,    // Denotes readonly/mutability.
+  OPTIONAL,   // Whether or not a typing is optional.
+  DISPOSABLE, // Denotes if variable is disposable.
 
-        VIRTUAL,   // Encapsulates virtual/abstract variables.
-        OVERRIDE,  // Encapsulates field/virtual overrides.
+  VIRTUAL,  // Encapsulates virtual/abstract variables.
+  OVERRIDE, // Encapsulates field/virtual overrides.
 
-        PUBLIC,     // Publicly available fields.
-        PRIVATE,    // Privately available fields.
-        PROTECTED,  // Protected object fields.
+  PUBLIC,    // Publicly available fields.
+  PRIVATE,   // Privately available fields.
+  PROTECTED, // Protected object fields.
 
-        EXPORT,  // Denotes if a variable has been exported.
-        OWNED,   // Denotes if a variable is used/owned at all.
-    };
+  EXPORT, // Denotes if a variable has been exported.
+  OWNED,  // Denotes if a variable is used/owned at all.
+  NOTICE, // Denotes a deprecation notice as attached.
+};
 
-    /// @brief Explicit Modifier Flags.
-    using Modifiers = $::Enum::Flags<Flag>;
+/// @brief Explicit Modifier Flags.
+using Modifiers = $::Enum::Flags<Flag>;
 
-}  // namespace Talos::Variable
+} // namespace Talos::Variable
 
 #endif

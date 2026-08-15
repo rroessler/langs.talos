@@ -1,32 +1,40 @@
 #ifndef _TALOS_TYPE_METADATA_HPP
 #define _TALOS_TYPE_METADATA_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/module/metadata.hpp"
-#include "talos/type/context.hpp"
+#include "talos/relint/exports.hpp"
+#include "talos/type/exports.hpp"
 
 namespace Talos::Module {
 
-    /// @brief Constructs a set of typed metadata.
-    template <>
-    class Metadata::Attributes<Phase::TYPED> : public Metadata {
-        //  PROPERTIES  //
+/// @brief Constructs a set of typed metadata.
+template <> class Metadata::Wrapper<Phase::TYPED> : public Metadata {
+  //  PROPERTIES  //
 
-        /// @brief Construct the underlying type-context.
-        $::Ptr::Unique<Type::Context> m_context = $::New().unique<Type::Context>();
+  /// @brief Linting Mirror Exports.
+  $::Unique::Pointer<Relint::Exports> m_mirrors = $::Unique::New<Relint::Exports>();
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Type Environment Exports.
+  $::Unique::Pointer<Type::Exports> m_exports = $::Unique::New<Type::Exports>(Type::New::any());
 
-        /// @brief Constructs a set of exports.
-        explicit Attributes() = default;
+public:
+  //  CONSTRUCTORS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Constructs a set of exports.
+  explicit Wrapper() = default;
 
-        inline constexpr $::Ptr::Unique<Type::Context>& context() noexcept { return m_context; }
-        inline constexpr const Type::Context* context() const noexcept { return m_context.get(); }
-    };
+  //  PUBLIC METHODS  //
 
-}  // namespace Talos::Module
+  /// @brief Gets the internal type exports.
+  inline constexpr $::Unique::Pointer<Type::Exports> &exports() noexcept { return m_exports; }
+  inline constexpr const Type::Exports *exports() const noexcept { return m_exports.get(); }
+
+  /// @brief Gets the internal mirror exports
+  inline constexpr $::Unique::Pointer<Relint::Exports> &mirrors() noexcept { return m_mirrors; }
+  inline constexpr const Relint::Exports *mirrors() const noexcept { return m_mirrors.get(); }
+};
+
+} // namespace Talos::Module
 
 #endif

@@ -1,7 +1,7 @@
-//!
-//! Testing: Syntax "is" Expression.
-//! Description: Coordinates testing the inferrence expression "is".
-//!
+///
+/// @testing Syntax "is" Expression.
+/// @describe Coordinates testing the inferrence expression "is".
+///
 
 // Talos Modules
 import "talos:test" as Test;

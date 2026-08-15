@@ -1,6 +1,8 @@
 /// Vendor Modules
-import * as React from 'react';
-import { Heading } from '@fumadocs/base-ui/components/heading';
+import { Heading } from 'fumadocs-ui/components/heading';
+
+/// Website Modules
+import { Fragment } from '@/website/components';
 
 /// Package Modules
 import { Registry } from '../registry';
@@ -14,12 +16,12 @@ export function Component({ name, children }: Component) {
 
     // and return the resulting documentation
     return (
-        <React.Fragment>
+        <Fragment>
             <Heading as="h2" id="overview" children="Overview" />
             {children ?? <p>Unimplemented...</p>}
             <Heading as="h2" id="exports" children="Exports" />
             <p>Unimplemented...</p>
-        </React.Fragment>
+        </Fragment>
     );
 }
 

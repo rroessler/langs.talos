@@ -1,34 +1,26 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/module/dynamic.hpp"
 #include "talos/crate/service.hpp"
 #include "talos/runtime/isolate.hpp"
-#include "talos/type/builder.hpp"
 
-/// Metadata Modules
-#include "talos/engine/metadata.hpp"
+/// Metadata Includes
+#include "talos/syntax/metadata.hpp"
 #include "talos/type/metadata.hpp"
 
 //  PRIVATE METHODS  //
 
-void Talos::Module::Dynamic::m_parse(XI::Container*, Metadata::Attributes<Phase::PARSED>*) {}
-void Talos::Module::Dynamic::m_analyze(XI::Container*, Metadata::Attributes<Phase::TYPED>* types) {
-    types->context() = $::New().unique<Type::Context>(Type::Builder::object());  // prepare now
-}
+Talos::Async::Thenable *
+Talos::Module::Dynamic::m_interpret(Runtime::Isolate *isolate, Metadata::Wrapper<Phase::EXPORTED> *exports) {
+  auto *thenable = exports->thenable(); // prepare
+  auto *crates = isolate->service<Crate::Service>();
 
-void Talos::Module::Dynamic::m_compile(XI::Container*, Metadata::Attributes<Phase::COMPILED>*) {}
+  // prepare the result to be returned
+  auto result = crates->dylib(isolate, name());
+  auto okay = result.pointer().okay();
 
-Talos::Async::Thenable* Talos::Module::Dynamic::m_interpret(
-    Runtime::Isolate* isolate, Metadata::Attributes<Phase::EXPORTED>* exports) {
-    auto* thenable = exports->deferred();  // prepare
-    auto* crates = isolate->service<Crate::Service>();
+  if (result.pointer().okay()) okay = thenable->resolve(isolate, result);
+  else okay = thenable->reject(isolate, isolate->exception());
 
-    // prepare the result to be returned
-    auto result = crates->dylib(isolate, name());
-    auto okay = result.traits().okay();
-
-    if (result.traits().okay()) okay = thenable->resolve(isolate, result);
-    else okay = thenable->reject(isolate, isolate->exception());
-
-    // and resolve to the final details now
-    return okay ? thenable : nullptr;
+  // and resolve to the final details now
+  return okay ? thenable : nullptr;
 }

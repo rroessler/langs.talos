@@ -1,22 +1,19 @@
 /// Talos Modules
 #include "talos/bytecode/visitor.hpp"
 
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
-
 //  PUBLIC METHODS  //
 
 TALOS_MM_LOWER_NODE(Accessor, node, compiler, destination) {
-    // ensure we load the parent into the accumulator
-    compiler->lower(node->parent(), destination);
+  // ensure we load the parent into the accumulator (side-effects)
+  compiler->lower(node->parent(), destination);
 
-    // ignore loading the field if the destination is nowhere
-    if (destination.nowhere()) return;
+  // ignore loading the field if the destination is nowhere
+  if (destination.nowhere()) return;
 
-    // prepare the trace for the node now
-    $_UNUSED $_AUTO = compiler->trace(node);
+  // prepare the trace for the node now
+  $_UNUSED $_AUTO = compiler->trace(node);
 
-    // attempt loading the field as necessary now
-    auto symbol = compiler->symbol(node->field()->name());
-    compiler->emit<Syllable::LOAD_FIELD>(destination, destination, symbol);
+  // attempt loading the field as necessary now
+  auto symbol = compiler->symbol(node->field()->name());
+  compiler->emit<Glyph::LOAD_FIELD>(destination, destination, symbol);
 }

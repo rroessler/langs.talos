@@ -1,50 +1,70 @@
-/// Talos Modules
-#include "talos/type/visitor.hpp"
+/// Talos Includes
+#include "talos/variable/visitor.hpp"
 
-/// Syntax Modules
-#include "talos/syntax/_inline/annotation.ipp"
+/// Talos Includes
+#include "talos/type/_inline/type.ipp"
 
 //  PUBLIC METHODS  //
 
+TALOS_MM_CAPTURE_NODE(Qualifier, node, analyzer) {
+
+  /**
+   * We only visit the initial qualifier segment as this
+   * is all we need for typical capture resolution (since
+   * fields do not require capturing).
+   */
+
+  const auto &segments = node->segments(); // resolve now
+  if (segments.size()) analyzer->visit(segments.front());
+}
+
 TALOS_MM_CHECK_NODE(Qualifier, node, analyzer) {
-    // get the underlying segments
-    const auto& segments = node->segments();
+  // get the underlying segments
+  const auto &segments = node->segments();
 
-    // ensure that we actually have some segments to begin with
-    $_ASSERT(!segments.empty(), "Qualifier segments cannot be empty");
+  // ensure that we actually have some segments to begin with
+  $_ASSERT(!segments.empty(), "Qualifier segments cannot be empty");
 
-    // get the current identifier to be used
-    auto* identifier = segments.front();
-    auto name = identifier->name();
-    auto chain = $::String::Buffer(name);
+  // get the current identifier to be used
+  auto *identifier = segments.front();
+  auto name = identifier->name();
+  auto chain = $::String::Buffer(name);
 
-    auto [entity, depth] = analyzer->world()->lookup(name);  // get the entity
-    if (entity == nullptr) return analyzer->report(identifier, 4000300, chain);
+  auto *entity = analyzer->world()->lookup(name); // get the current entity
+  if (entity == nullptr) return analyzer->report(identifier, 4000300, chain);
 
-    // update the entity reference flag now and mark the first identifier
-    analyzer->mark(identifier, entity, depth);
+  // update the entity reference flag now and mark the first identifier
+  analyzer->deprecated(entity, identifier);
 
-    // construct the iterator element now
-    auto segment = *entity;
+  // construct the iterator element now
+  auto segment = *entity;
 
-    // iterate through the available fields now
-    for (size_t ii = 1; ii < segments.size(); ++ii) {
-        // ensure the current entity is opaque and can be used
-        if (!segment.opaque()) return analyzer->report(identifier, 3000200, chain);
+  // iterate through the available fields now
+  for (size_t ii = 1; ii < segments.size(); ++ii) {
+    // ensure the current entity is opaque and can be used
+    if (!segment.opaque()) return analyzer->report(identifier, 3000200, chain);
 
-        identifier = segments.at(ii);  // update our details
-        segment = segment.value()->lookup(identifier->name());
+    // update the previous identifiers typing now
+    identifier->trivia()->type() = segment.type();
 
-        // fail immediately if there is no valid reference
-        if (segment.unset()) return analyzer->report(identifier, 4000200, chain, name);
+    // jump to the next available identifier and chain segment
+    identifier = segments.at(ii), segment = segment.value()->lookup(identifier->name());
 
-        // post-update the current chain to be used
-        chain += "." + $::String::Buffer(identifier->name());
-    }
+    // fail immediately if there is no valid reference
+    if (segment.unset()) return analyzer->report(identifier, 4000200, chain, name);
 
-    // ensure the final segment we have is transient before inferring the type
-    if (!segment.transient()) return analyzer->report(identifier, 3000201, chain);
+    // post-update the current chain to be used
+    chain += "." + $::String::Buffer(identifier->name());
+  }
 
-    $_UNUSED $_AUTO = analyzer->trace(node);  // ensure we trace errors here as well
-    return analyzer->passable(analyzer->instantiate(segment.type(), node->types()));
+  // ensure the final segment we have is transient before inferring the type
+  if (!segment.transient()) return analyzer->report(identifier, 3000201, chain);
+
+  // ensure we trace errors here as well
+  $_UNUSED $_AUTO = analyzer->trace(node);
+
+  // bind the last identifiers associated typing as well
+  auto base = identifier->trivia()->type() = segment.type();
+  auto type = analyzer->instantiate(base, node->types());
+  return analyzer->passable(type); // return the final result
 }

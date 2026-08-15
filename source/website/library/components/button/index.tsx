@@ -1,6 +1,8 @@
 /// Vendor Modules
-import React from 'react';
-import { clsx } from 'clsx';
+import { Children } from 'react';
+
+/// Website Modules
+import { cn } from '@/website/utilities';
 
 /// Package Modules
 import { Icon } from '../icon';
@@ -18,14 +20,14 @@ export function Button({ variant = 'primary', href, className, icon, ...props }:
     });
 
     // update the children if they are empty at all as necessary
-    if (React.Children.count(props.children) === 0) props.children = props.title;
+    if (Children.count(props.children) === 0) props.children = props.title;
 
-    const count = React.Children.count(props.children); // prepare the icon
+    const count = Children.count(props.children); // prepare the icon
     const prefix = <Button.Prefix key="prefix" icon={icon} count={count} />;
     props.children = [prefix, props.children]; // finally update the children
 
     // prepare the class-name to be used no
-    className = clsx(
+    className = cn(
         className,
         classes,
         'inline-flex justify-center rounded font-medium px-2 py-1 border transition-colors',
@@ -52,7 +54,7 @@ export namespace Button {
         if (typeof icon === 'undefined') return null;
 
         // prepare the class-name to be used now
-        const className = clsx('flex items-center justify-center', count && 'me-2');
+        const className = cn('flex items-center justify-center', count && 'me-2');
 
         // construct the necessary prefix now
         return <span className={className}>{Icon.Dynamic(icon as any)}</span>;

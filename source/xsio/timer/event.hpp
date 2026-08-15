@@ -1,73 +1,78 @@
 #ifndef _XSIO_TIMER_EVENT_HPP
 #define _XSIO_TIMER_EVENT_HPP
 
-/// XSIO Modules
-#include "xsio/forward/context.hpp"
+/// XSIO Includes
 #include "xsio/forward/virtual.hpp"
 #include "xsio/timer/action.hpp"
 
 namespace XSIO::Timer {
 
-    /// @brief Timer Event.
-    class Event {
-        //  PROPERTIES  //
+/// @brief Timer Event.
+class Event {
+  //  PROPERTIES  //
 
-        Point m_ts;       // Timestamp value.
-        Identifier m_id;  // Timer identifier.
+  /// @brief Timestamp value
+  Point m_timestamp;
 
-        /// @brief Bound event action.
-        $::Ptr::Unique<Action> m_action;
+  /// @brief Timer identifier.
+  Identifier m_identifier;
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Bound event action.
+  $::Unique::Pointer<Action> m_action;
 
-        /**
-         * @brief Constructs a timer-event.
-         * @param ts                Timestamp value.
-         * @param action            Action to run.
-         */
-        explicit Event(const Point& ts, $::Ptr::Unique<Action>&& action) :
-            m_ts(ts), m_id(m_next()), m_action(std::move(action)) {}
+  /// @brief Internal global identifier.
+  static inline $::Async::Atomic<Identifier> s_identifier = 0;
 
-        //  PUBLIC METHODS  //
+public:
+  //  CONSTRUCTORS  //
 
-        inline constexpr Point timestamp() const noexcept { return m_ts; }
-        inline constexpr Identifier identifier() const noexcept { return m_id; }
+  /**
+   * @brief Constructs a timer-event.
+   * @param timestamp         Timestamp value.
+   * @param action            Action to run.
+   */
+  explicit Event(const Point &timestamp, $::Unique::Pointer<Action> &&action)
+      : m_timestamp(timestamp), m_identifier(m_next()), m_action(std::move(action)) {}
 
-        /**
-         * @brief Handles firing the event.
-         * @param thread            Thread instance.
-         * @param processor         Processor instance.
-         */
-        inline void fire(Virtual::Thread* thread, Virtual::Processor* processor) const noexcept {
-            m_action->execute(thread, processor);
-        }
+  //  PUBLIC METHODS  //
 
-       private:
-        //  PRIVATE METHODS  //
+  /// @brief Gets the associated event timestamp.
+  inline constexpr Point timestamp() const noexcept { return m_timestamp; }
 
-        /// @brief Handles generating new timer identifiers.
-        static inline Identifier m_next() {
-            static $::Atomic<Identifier> s_identifier = 0;
-            return s_identifier++;  // get the next identifier
-        }
-    };
+  /// @brief Gets the identifier for the event.
+  inline constexpr Identifier identifier() const noexcept { return m_identifier; }
 
-    /// @brief Ranges Heap Comparator.
-    struct Comparator {
-        //  CONSTRUCTORS  //
+  /**
+   * @brief Handles firing the event.
+   * @param thread            Thread instance.
+   * @param processor         Processor instance.
+   */
+  inline void fire(Virtual::Thread *thread, Virtual::Processor *processor) const noexcept {
+    m_action->execute(thread, processor);
+  }
 
-        /// @brief Constructs a comparator function.
-        explicit Comparator() = default;
+private:
+  //  PRIVATE METHODS  //
 
-        //  OPERATOR METHODS  //
+  /// @brief Handles generating new timer identifiers.
+  static inline Identifier m_next() { return s_identifier++; }
+};
 
-        /// @brief Compares two events against their timestamp.
-        constexpr bool operator()(const Event& left, const Event& right) const {
-            return left.timestamp() > right.timestamp();
-        }
-    };
+/// @brief Ranges Heap Comparator.
+struct Comparator {
+  //  CONSTRUCTORS  //
 
-}  // namespace XSIO::Timer
+  /// @brief Constructs a comparator function.
+  explicit Comparator() = default;
+
+  //  OPERATOR METHODS  //
+
+  /// @brief Compares two events against their timestamp.
+  inline constexpr bool operator()(const Event &left, const Event &right) const {
+    return left.timestamp() > right.timestamp();
+  }
+};
+
+} // namespace XSIO::Timer
 
 #endif

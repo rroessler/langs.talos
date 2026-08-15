@@ -1,108 +1,107 @@
 #ifndef _TALOS_TYPE_GENERIC_HPP
 #define _TALOS_TYPE_GENERIC_HPP
 
-/// Type Modules
+/// Talos Includes
+#include "talos/type/entity.hpp"
+
+/// Type Includes
 #include "talos/type/utility/parameter.hpp"
 
 namespace Talos::Type {
 
-    /// @brief Generic Typing.
-    class Generic : public Abstract<Generic> {
-        //  PROPERTIES  //
+/// @brief Generic Typing.
+class Generic : public Mixin<Generic> {
+  //  PROPERTIES  //
 
-        /// @brief Encapsulated body.
-        Erased m_target;
+  /// @brief Encapsulated body.
+  Erased m_target;
 
-        /// @brief Generic parameters list.
-        Template m_parameters;
+  /// @brief Generic parameters list.
+  Template m_parameters;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a generic type.
-         * @param target                    Target to wrap.
-         * @param parameters                Parameter types.
-         */
-        explicit Generic(const Erased& target, const Template& parameters = {}) :
-            m_target(target), m_parameters(parameters) {}
+  /**
+   * @brief Constructs a generic type.
+   * @param target                    Target to wrap.
+   * @param parameters                Parameter types.
+   */
+  explicit Generic(const Erased &target, const Template &parameters = {}) :
+      m_target(target), m_parameters(parameters) {}
 
-        //  PROPERTIES  //
+  //  PROPERTIES  //
 
-        /// @brief Gets the arity of the generic typing.
-        inline constexpr size_t arity() const noexcept {
-            static constexpr auto s_predicate = [](const auto& parameter) { return parameter->required(); };
-            return std::ranges::count_if(m_parameters, s_predicate);  // count all items that are required
-        }
+  /// @brief Gets the arity of the generic typing.
+  inline constexpr size_t arity() const noexcept {
+    static constexpr auto s_predicate = [](const auto &parameter) { return parameter->required(); };
+    return std::ranges::count_if(m_parameters, s_predicate); // count all items that are required
+  }
 
-        /// @brief Gets the adicity of the generic typing.
-        inline constexpr size_t adicity() const noexcept { return m_parameters.size(); }
+  /// @brief Gets the adicity of the generic typing.
+  inline constexpr size_t adicity() const noexcept { return m_parameters.size(); }
 
-        inline constexpr Lattice lattice() const noexcept final { return m_target->lattice(); }
-        inline constexpr $::Ternary truthiness() const noexcept final { return m_target->truthiness(); }
+  /// @brief Gets the truthiness of a generic.
+  inline constexpr $::Unit::Ternary truthiness() const noexcept final { return m_target->truthiness(); }
 
-        inline constexpr const Erased& target() const noexcept { return m_target; }
-        inline constexpr const Template& parameters() const noexcept { return m_parameters; }
+  /// @brief Gets the target of a generic.
+  inline constexpr const Erased &target() const noexcept { return m_target; }
 
-        /**
-         * @brief Instantiates a generic with arguments.
-         * @param arguments                 Arguments to instantiate.
-         */
-        Erased instantiate(std::vector<Erased> arguments) const;
+  /// @brief Gets the bound parameters for a generic.
+  inline constexpr const Template &parameters() const noexcept { return m_parameters; }
 
-        /**
-         * @brief Handles looking up fields.
-         * @param field                     Field to lookup.
-         */
-        inline Entity lookup(const $::String::View& field) const final { return m_target->lookup(field); }
+  /// @brief Gets the shape of a generic.
+  inline constexpr Shape::Underlying shape() const noexcept final { return m_target->shape(); }
 
-        /**
-         * @brief Handles transforming the type.
-         * @param kind                      Operator kind.
-         */
-        inline Erased apply(Operator::Kind kind) const final { return m_target->apply(kind); }
+  /**
+   * @brief Instantiates a generic with arguments.
+   * @param arguments                 Arguments to instantiate.
+   */
+  Erased instantiate(const std::vector<Erased> &arguments) const;
 
-        /**
-         * @brief Handles transforming the type.
-         * @param kind                      Operator kind.
-         * @param right                     RHS value to use.
-         */
-        inline Erased apply(Operator::Kind kind, const Erased& right) const final {
-            return m_target->apply(kind, right);
-        }
+  /**
+   * @brief Handles looking up fields.
+   * @param field                     Field to lookup.
+   */
+  inline Entity lookup(const $::String::View &field) const final { return m_target->lookup(field); }
 
-       protected:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles transforming the type.
+   * @param kind                      Operator kind.
+   */
+  inline Erased apply(Operator::Kind kind) const final { return m_target->apply(kind); }
 
-        /**
-         * @brief Handles validating generic shapes.
-         * @param shape                     Shape to validate.
-         */
-        inline constexpr bool m_extends(Shape::Underlying shape) const noexcept final {
-            return m_target->m_extends(shape);
-        }
+  /**
+   * @brief Handles transforming the type.
+   * @param kind                      Operator kind.
+   * @param right                     RHS value to use.
+   */
+  inline Erased apply(Operator::Kind kind, const Erased &right) const final { return m_target->apply(kind, right); }
 
-        /**
-         * @brief Handles instantiating a generic.
-         * @param constraints               Generic constraints.
-         */
-        Erased m_infer(const Constraints& constraints) const final;
+protected:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handles running a unification pass.
-         * @param candidate                 Candidate to unify.
-         * @param constraints               Generic constraints.
-         */
-        bool m_unify(const Erased& candidate, const Constraints& constraints) const final;
+  /**
+   * @brief Handles instantiating a generic.
+   * @param constraints               Generic constraints.
+   */
+  Erased m_infer(Constraints *constraints) const final;
 
-        /**
-         * @brief Handles printing the type.
-         * @param os                        Output stream.
-         * @param self                      Type instance.
-         */
-        void m_print($::Stream::Output& os) const final;
-    };
+  /**
+   * @brief Handles running a unification pass.
+   * @param candidate                 Candidate to unify.
+   * @param constraints               Generic constraints.
+   */
+  bool m_unify(const Erased &candidate, Constraints *constraints) const final;
 
-}  // namespace Talos::Type
+  /**
+   * @brief Handles printing the type.
+   * @param os                        Output stream.
+   * @param self                      Type instance.
+   */
+  static void m_print(std::ostream &os, const Generic &self);
+};
+
+} // namespace Talos::Type
 
 #endif

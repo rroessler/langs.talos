@@ -13,8 +13,10 @@
             "request": "launch",
             "name": "Talos: Test Natives",
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/build/source/testing/testing",
-            "windows": { "program": "${workspaceFolder}/build/source/testing/testing.exe" }
+            "program": "${workspaceFolder}/build/source/tests/tests",
+            "windows": {
+                "program": "${workspaceFolder}/build/source/tests/tests.exe"
+            }
         },
         {
             "type": "lldb",
@@ -22,7 +24,7 @@
             "name": "Talos: Test Builtins",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/dist/bin/talos",
-            "args": ["test", "--internal-hardware-vprocs", "4"],
+            "args": ["test"],
             "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
         },
         {
@@ -40,7 +42,7 @@
             "name": "Talos: Lint Sandbox",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/dist/bin/talos",
-            "args": ["lint", "--internal-hardware-vprocs", "4", "${workspaceFolder}"],
+            "args": ["lint", "${workspaceFolder}"],
             "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
         },
         {
@@ -58,7 +60,7 @@
             "name": "Talos: Bundle Sandbox",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/dist/bin/talos",
-            "args": ["bundle", "--internal-hardware-vprocs", "4", "${workspaceFolder}"],
+            "args": ["bundle", "${workspaceFolder}/examples/sandbox.tal"],
             "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
         },
         {
@@ -67,7 +69,7 @@
             "name": "Talos: Launch Sandbox",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/dist/bin/talos",
-            "args": ["run", "--internal-hardware-vprocs", "4", "${workspaceFolder}"],
+            "args": ["run", "${workspaceFolder}/examples/sandbox.tal"],
             "windows": { "program": "${workspaceFolder}/dist/bin/talos.exe" }
         }
     ]

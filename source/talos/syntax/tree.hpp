@@ -1,93 +1,156 @@
 #ifndef _TALOS_SYNTAX_TREE_HPP
 #define _TALOS_SYNTAX_TREE_HPP
 
-/// Talos Modules
-#include "talos/forward/lexer.hpp"
-#include "talos/forward/parser.hpp"
+/// Talos Includes
+#include "talos/syntax/node.hpp"
+#include "talos/variable/captures.hpp"
 
-/// Syntax Modules
+/// Syntax Includes
 #include "talos/syntax/literal/lambda.hpp"
+#include "talos/syntax/statement/block.hpp"
 #include "talos/syntax/statement/import.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Syntax Tree Container.
-    class Tree : public Abstract<Tree> {
-        //  TYPEDEFS  //
+/// @brief Aliased Variable Captures.
+using Captures = ::Talos::Variable::Captures;
 
-        /// @brief Allow the parser internal access.
-        friend class Parser::Stream;
+/// @brief Syntax Node Storage.
+class Storage {
+  //  TYPEDEFS  //
 
-        //  PROPERTIES  //
+  /// @brief Allow syntax-trees internal access.
+  friend class Tree;
 
-        /// @brief The underlying main function node.
-        Lambda* m_main = nullptr;
+  //  PROPERTIES  //
 
-        /// @brief The underlying module body.
-        Block* m_block = nullptr;
+  /// @brief The storage reference for nodes.
+  std::vector<$::Unique::Pointer<Node>> m_nodes = {};
 
-        /// @brief Associated tree resource.
-        $::URI::View m_resource = $::URI::Anonymous();
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief All available tree nodes.
-        std::vector<$::Ptr::Unique<Node>> m_storage = {};
+  /// @brief Constructs a storage container.
+  constexpr Storage() = default;
 
-       public:
-        //  CONSTRUCTORS  //
+  /**
+   * @brief Constructs a storage container.
+   * @param capacity                Initial capacity.
+   */
+  constexpr Storage(size_t capacity) : Storage() { m_nodes.reserve(capacity); }
 
-        /**
-         * @brief Constructs a defaulted tree instance.
-         * @param resource              Resource URI.
-         */
-        explicit Tree(const $::URI::View& resource = $::URI::Anonymous());
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Constructs a syntax tree.
-         * @param capacity              Initial capacity.
-         * @param resource              Resource URI.
-         */
-        explicit Tree(size_t capacity, const $::URI::View& resource = $::URI::Anonymous()) : Tree(resource) {
-            statements().reserve(capacity);  // reserve an initial capacity when given
-            m_storage.reserve(capacity);     // and also fill the storage nodes as well
-        }
+  /**
+   * @brief Handles allocating a syntax-node.
+   * @param bounds                  Bounds of node.
+   * @param args                    Arguments to bind.
+   */
+  template <std::derived_from<Node> T, class B, class... As> inline constexpr T *allocate(B bounds, As &&...args) {
+    // we start by constructing the node to be used now
+    auto node = $::Unique::New<T>(std::forward<As>(args)...);
 
-        //  PUBLIC METHODS  //
+    // we then forcibly construct the nodes associated trivia and comments
+    node->m_trivia = $::Unique::New<Trivia>(node.get(), bounds);
 
-        inline constexpr Lambda* main() const noexcept { return m_main; }
-        inline constexpr $::URI::View resource() const noexcept { return m_resource; }
+    // and lastly convert our node back to the required storage
+    return static_cast<T *>(m_nodes.emplace_back(std::move(node)).get());
+  }
+};
 
-        inline constexpr std::vector<Node*>& statements() noexcept { return m_block->statements(); }
-        inline constexpr const std::vector<Node*>& statements() const noexcept { return m_block->statements(); }
+/// @brief Syntax Tree Container.
+class Tree : public Mixin<Tree> {
+  //  PROPERTIES  //
 
-        /// @brief Gets a list of all viable syntax dependencies (unresolved).
-        inline constexpr Dependencies dependencies() const noexcept {
-            // prepare the output value to be used
-            auto output = Dependencies();
+  /// @brief The underlying main function node.
+  Lambda *m_main = nullptr;
 
-            // iterate over the available storage
-            for (const auto& node : m_storage) {
-                if (!node->is<Import>()) continue;  // ignorable
-                output.emplace_back(node->as<Import>()->path());
-            }
+  /// @brief The syntax-tree block statements.
+  Block *m_block = nullptr;
 
-            // return the final dependencies found
-            return output;
-        }
+  /// @brief The storage reference for nodes.
+  Storage m_storage = {};
 
-       protected:
-        //  PRIVATE METHODS  //
+  /// @brief The associated tree resource.
+  $::URI::View m_resource = {};
 
-        /**
-         * @brief Handles allocating a syntax-node.
-         * @param args                  Arguments to bind.
-         */
-        template <std::derived_from<Node> T, class... As>
-        inline constexpr T* m_allocate(As&&... args) {
-            auto node = $::New().unique<T>(std::forward<As>(args)...);
-            return static_cast<T*>(m_storage.emplace_back(std::move(node)).get());
-        }
-    };
+  /// @brief Currently captured variable extents.
+  Captures m_captures = {};
 
-}  // namespace Talos::Syntax
+public:
+  //  CONSTRUCTORS  //
+
+  /**
+   * @brief Constructs a syntax tree.
+   * @param capacity                Initial capacity.
+   * @param resource                Resource identifier.
+   */
+  explicit Tree(const $::URI::View &resource = {});
+  explicit Tree(size_t capacity, const $::URI::View &resource = {});
+  explicit Tree(const std::vector<Lexer::Token> &tokens, const $::URI::View &resource = {});
+
+  //  PUBLIC METHODS  //
+
+  /// @brief Gets the module entry-point function.
+  inline constexpr Lambda *main() const noexcept { return m_main; }
+
+  /// @brief Gets the resource view for the syntax-tree.
+  inline constexpr $::URI::View resource() const noexcept { return m_resource; }
+
+  /// @brief Gets the available variable captures.
+  inline constexpr Captures *captures() noexcept { return &m_captures; }
+  inline constexpr const Captures *captures() const noexcept { return &m_captures; }
+
+  /// @brief Gets the syntax-trees available statements.
+  inline constexpr std::vector<Node *> &statements() noexcept { return m_block->statements(); }
+  inline constexpr const std::vector<Node *> &statements() const noexcept { return m_block->statements(); }
+
+  /// @brief Storage container for nodes and their metadata.
+  inline constexpr Storage &storage() noexcept { return m_storage; }
+  inline constexpr const Storage &storage() const noexcept { return m_storage; }
+
+  /// @brief Gets a list of all viable syntax dependencies (unresolved).
+  inline constexpr Dependencies dependencies() const noexcept {
+    // prepare the output value to be used
+    auto output = Dependencies();
+
+    // iterate over the available storage
+    for (const auto &node : m_storage.m_nodes) {
+      if (!node->is<Import>()) continue; // ignorable
+      output.emplace_back(node->as<Import>()->path());
+    }
+
+    // return the final dependencies found
+    return output;
+  }
+
+  /**
+   * @brief Handles allocating a syntax-node.
+   * @param args                  Arguments to bind.
+   */
+  template <std::derived_from<Node> T, class... As> inline constexpr T *allocate(As &&...args) {
+    return m_storage.allocate<T>(Bounds(), std::forward<As>(args)...);
+  }
+
+  /**
+   * @brief Handles allocating a syntax-node.
+   * @param bounds                Bounds of node.
+   * @param args                  Arguments to bind.
+   */
+  template <std::derived_from<Node> T, class... As> inline constexpr T *allocate(Bounds &&bounds, As &&...args) {
+    return m_storage.allocate<T>(std::move(bounds), std::forward<As>(args)...);
+  }
+
+  /**
+   * @brief Handles allocating a syntax-node.
+   * @param bounds                Bounds of node.
+   * @param args                  Arguments to bind.
+   */
+  template <std::derived_from<Node> T, class... As> inline constexpr T *allocate(const Bounds &bounds, As &&...args) {
+    return m_storage.allocate<T>(bounds, std::forward<As>(args)...);
+  }
+};
+
+} // namespace Talos::Syntax
 
 #endif

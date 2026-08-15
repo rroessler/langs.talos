@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "Function" Functionality.
-//! Description: Coordinates testing the builtin "Function".
-//!
+///
+/// @testing Builtin "Function" Functionality.
+/// @describe Coordinates testing the builtin "Function".
+///
 
 // Talos Modules
 import "talos:test" as Test;
@@ -17,10 +17,14 @@ namespace Mock {
     export let addition = fn (a: Number, b: Number): Number => a + b;
 
     //! This function subtracts two numbers.
-    export let subtraction = fn (a: Number, b: Number): Number { return a - b; };
+    export let subtraction = fn (a: Number, b: Number): Number {
+        return a - b;
+    };
 
     //! This function encloses a given value.
-    export let encapsulate = fn (value: Any): fn -> Any { return fn => value; };
+    export let encapsulate = fn (value: Any): fn -> Any {
+        return fn => value;
+    };
 
     //! Tests for optional parameters.
     export let optional = fn (value: Number = 42): Number => value;
@@ -66,7 +70,7 @@ Test.suite("Methods", fn {
     // test whether or not we can rebind the receiver
     Test.case("Function.bind 'Self'", fn {
         let list = [0, 1, 2];
-        let szl = [].size.bind(list);
+        let szl = Function.bind([].size, list);
 
         Assert.equals(szl(), list.size());
         Assert.equals(szl.receiver(), list);

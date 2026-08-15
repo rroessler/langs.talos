@@ -2,8 +2,7 @@
 import * as path from 'node:path';
 
 /// Vendor Modules
-import * as React from 'react';
-import { File, Files, Folder } from '@fumadocs/base-ui/components/files';
+import { File, Files, Folder } from 'fumadocs-ui/components/files';
 
 /// Package Modules
 import { Icon as _Icon } from '../icon';

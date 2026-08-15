@@ -1,18 +1,17 @@
 #ifndef _XTDLIB_MUTEX_TYPES_HPP
 #define _XTDLIB_MUTEX_TYPES_HPP
 
-/// C++ Modules
-#include <mutex>
-#include <shared_mutex>
+/// Library Includes
+#include "xtdlib/portable/stdlib.hpp"
 
 namespace $::Mutex {
 
-    //  TYPEDEFS  //
+//  TYPEDEFS  //
 
-    using Auto = std::mutex;
-    using Shared = std::shared_mutex;
-    using Recursive = std::recursive_mutex;
+using Auto = std::mutex;
+using Shared = std::shared_mutex;
+using Recursive = std::recursive_mutex;
 
-}  // namespace $::Mutex
+} // namespace $::Mutex
 
 #endif

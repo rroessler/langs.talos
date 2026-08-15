@@ -1,7 +1,7 @@
 #ifndef _TALOS_FORWARD_ITERABLE_HPP
 #define _TALOS_FORWARD_ITERABLE_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations

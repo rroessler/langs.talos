@@ -1,22 +1,13 @@
 /// Vendor Modules
-import * as React from 'react';
-import { Heading } from '@fumadocs/base-ui/components/heading';
+import { Heading } from 'fumadocs-ui/components/heading';
 
 /// Website Modules
 import { Markdown } from '@/website/markdown';
 import { Anchor, Code } from '@/website/components';
 
-/** Code Snippet Component. */
-export type Snippet = { code: string };
-export function Snippet({ code }: Snippet) {
-    if (typeof code === 'undefined') return; // ignore
-    const rendered = <Code.Dynamic lang="talos" code={code} />;
-    return <Code.Block children={rendered} />;
-}
-
 /** Builtins Property Component. */
 export interface Property extends Property.Props {}
-export function Property({ name, parent, typedef, describe, ancillary }: Property) {
+export function Property({ name, parent, describe, typedef, ancillary }: Property) {
     // prepare the href to be used now
     const href = `#${parent ? `${parent}-` : ''}${name}`;
 
@@ -26,9 +17,9 @@ export function Property({ name, parent, typedef, describe, ancillary }: Propert
     // construct the resulting fragments to be used now
     return (
         <div className="mb-4">
-            <Heading as="h3" children={title} />
-            {typedef && <Snippet code={typedef} />}
-            <Markdown.Embed markdown={describe} />
+            <Heading as="h3" id={href.slice(1)} children={title} />
+            {typedef && <Code.Dynamic lang="talos" code={typedef} />}
+            <Markdown.Dynamic markdown={describe} />
             {ancillary /** additional details */}
         </div>
     );

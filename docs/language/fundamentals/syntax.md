@@ -141,7 +141,7 @@ let add = fn (a: Number, b: Number): Number { return a + b; };
 let sub = fn (a, b: Any) => a + b;
 ```
 
-The first thing to note is that functions are values. As such, they must be explicitly bound to a variable. The reasoning for this is part of how Talos aims to be [colorless](/docs/language/advanced/colorless) in calling conventions and concurrency.
+The first thing to note is that functions are values. As such, they must be explicitly bound to a variable. The reasoning for this is part of how Talos aims to be [colorless](/language/advanced/colorless) in calling conventions and concurrency.
 
 Breaking apart `add` we can see that:
 
@@ -216,11 +216,11 @@ let value = "abc";
 let guard = (value) => value == "ab";
 
 match (value) {
-    "a": Debug.println("Matches exactly 'a'");
-    String: Debug.println("Value is a string");
-    Number: Debug.println("Value is a number");
-    guard: Debug.println("Matched guard function");
-    *: Debug.println("Did not match anything")
+    "a": Debug.println("Matches exactly 'a'"),
+    String: Debug.println("Value is a string"),
+    Number: Debug.println("Value is a number"),
+    guard: Debug.println("Matched guard function"),
+    *: Debug.println("Did not match anything"),
 };
 ```
 
@@ -301,16 +301,17 @@ printer(Derived("another"));    // Valid!
 
 ### Attributes
 
-During compile-time, there are some additional properties that a developer may want to declare. To do this, Talos introduces attributes with the `#[]` syntax above a declaration.
+During compile-time, there are some additional properties that a developer may want to declare. To do this, Talos introduces attributes with the `#[...]` syntax above a declaration.
 
 This allows us to alter certain properties of values. The current attributes available are:
 
-| Attribute    | Explanation                                     |
-| ------------ | ----------------------------------------------- |
-| `Class`      | Allows altering compile-time `class` properties |
-| `Operator`   | Allows defining operators for `Object` values   |
-| `Overload`   | Allows overloading function signatures          |
-| `Deprecated` | Emits deprecation messages as diagnostics       |
+| Attribute    | Explanation                               |
+| ------------ | ----------------------------------------- |
+| `Class`      | Alters compile-time `class` properties    |
+| `Operator`   | Defines operators for `Object` values     |
+| `Overload`   | Allows overloading function signatures    |
+| `Internal`   | Exposes internal compilation features     |
+| `Deprecated` | Emits deprecation messages as diagnostics |
 
 ### Decorators
 

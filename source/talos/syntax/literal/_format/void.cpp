@@ -1,8 +1,5 @@
-/// Talos Modules
-#include "talos/format/dispatch.hpp"
-
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
+/// Format Includes
+#include "talos/format/_inline/macros.ipp"
 
 //  PRIVATE METHODS  //
 

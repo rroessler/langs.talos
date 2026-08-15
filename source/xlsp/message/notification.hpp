@@ -2,25 +2,19 @@
 #define _XLSP_MESSAGE_NOTIFICATION_HPP
 
 /// XLSP Includes
-#include "xlsp/message/traits.hpp"
-
-//  MACROS  //
-
-/// @brief Helper for building notifications.
-#define XLSP_NOTIFICATION(N) ::XLSP::Notification::Params<::XLSP::Message::Type::N>
-
-//  NAMESPACES  //
+#include "xlsp/message/channel.hpp"
 
 namespace XLSP::Notification {
 
-    /// @brief Handles validating notifications.
-    template <Message::Type T>
-    concept Validate = T < Message::Type::$_NOTIFICATION;
+/// @brief Notification Parameters Declaration.
+template <Message::Channel> struct Params;
 
-    /// @brief Available Notification Parameters.
-    template <Message::Type T>
-    requires Validate<T> struct Params;
+/// @brief Denotes Empty Notification Parameters.
+template <Message ::Channel C> using Empty = Message::Empty<Params<C>>;
 
-}  // namespace XLSP::Notification
+/// @brief Denotes Nullish Notification Parameters.
+template <Message::Channel C> using Nullish = Message::Nullish<Params<C>>;
+
+} // namespace XLSP::Notification
 
 #endif

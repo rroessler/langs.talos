@@ -1,11 +1,10 @@
 #ifndef _TALOS_MACHINE_FRAME_HPP
 #define _TALOS_MACHINE_FRAME_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/engine/frame.hpp"
-#include "talos/forward/machine.hpp"
-#include "talos/function/arguments.hpp"
-#include "talos/function/context.hpp"
+#include "talos/function/args.hpp"
+#include "talos/function/environ.hpp"
 #include "talos/machine/info.hpp"
 
 /*
@@ -15,86 +14,103 @@
  * |    LABEL    |  OFFSET  |         DESCRIPTION          |
  * | ----------- | -------- | ---------------------------- |
  * |  STK_ENVP   |    0     | The environment context.     |
- * |  STK_ARGV   |    1     | Pointer to stack arguments.  |
- * |  STK_DATA   |    2     | Pointer to local arguments.  |
+ * |  STK_ARGV   |    1     | Pointer to frame arguments.  |
+ * |  STK_DATA   |    2     | Pointer to callee arguments. |
  *
  */
 
 namespace Talos::Machine::Offset {
 
-    //  PROPERTIES  //
+static inline constexpr size_t STK_OPTR = 0;            // Offset pointer.
+static inline constexpr size_t STK_ENVP = STK_OPTR + 1; // Environment value.
+static inline constexpr size_t STK_PASS = STK_ENVP + 1; // Local arguments.
+static inline constexpr size_t STK_DATA = STK_PASS + 1; // Calling arguments.
+static inline constexpr size_t STK_SIZE = STK_DATA + 1; // Size of stack.
 
-    static inline constexpr size_t STK_ENVP = Function::Offset::ARGS_SIZE;
-    static inline constexpr size_t STK_PASS = Function::Offset::ARGS_SELF;
-    static inline constexpr size_t STK_DATA = Function::Offset::ARGS_DATA;
-    static inline constexpr size_t STK_SIZE = STK_DATA + 1;  // get sizing
-
-}  // namespace Talos::Machine::Offset
+} // namespace Talos::Machine::Offset
 
 namespace Talos::Machine {
 
-    /// @brief Machine Frame.
-    class Frame : public Engine::Frame::Abstract<Frame> {
-        //  PROPERTIES  //
+/// @brief Derived Machine Frame.
+class Frame : public Engine::Frame::Mixin<Frame> {
+  //  PROPERTIES  //
 
-        /// @brief Shared function information.
-        const Info* m_info;
+  /// @brief Shared function information.
+  const Info *m_info;
 
-        /// @brief The underlying constructed stack.
-        Value::Any* m_stack = nullptr;
+  /// @brief The underlying constructed stack.
+  Value::Any *m_stack = nullptr;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a function frame.
-         * @param isolate               Runtime isolate.
-         * @param info                  Function information.
-         */
-        constexpr Frame(Runtime::Isolate* isolate, const Info* info = nullptr) :
-            Abstract<Frame>(isolate), m_info(info) {}
+  /**
+   * @brief Constructs a function frame.
+   * @param isolate               Runtime isolate.
+   * @param info                  Function information.
+   * @param stack                 Frame stack to bind.
+   */
+  constexpr Frame(Runtime::Isolate *isolate, const Info *info = nullptr, Value::Any *stack = nullptr) :
+      Mixin(isolate), m_info(info), m_stack(stack) {}
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets the underlying arena reference.
-        inline constexpr const Linker::Arena* arena() const noexcept final { return m_info->arena(); }
+  /// @brief Current function information.
+  inline constexpr const Info *info() const noexcept { return m_info; }
 
-        /// @brief Handles getting the current self value.
-        inline constexpr Value::Any self() const noexcept { return argv()->self(); }
+  /// @brief Available compilation arena.
+  inline constexpr const Image::Arena *arena() const noexcept final { return m_info->arena(); }
 
-        /// @brief Casts underlying arguments pointer into an arguments structure.
-        inline constexpr const Function::Arguments* argv() const noexcept {
-            return reinterpret_cast<const Function::Arguments*>(m_stack + Offset::STK_DATA);
-        }
+  /// @brief Gets the underlying frame resource.
+  inline constexpr $::URI::View resource() const noexcept final { return m_info->resource(); }
 
-        /// @brief Current stack details.
-        inline constexpr Value::Any*& stack() noexcept { return m_stack; }
-        inline constexpr Value::Any* stack() const noexcept { return m_stack; }
+  /// @brief Gets the current instruction offset.
+  inline constexpr uintptr_t offset() const noexcept { return m_stack[Offset::STK_OPTR].pointer(); }
 
-        /// @brief The bound context.
-        inline constexpr Value::Any& context() noexcept { return m_stack[Offset::STK_ENVP]; }
-        inline constexpr Function::Context context() const noexcept {
-            return Function::Context(m_stack[Offset::STK_ENVP]);
-        }
+  /// @brief Current stack details.
+  inline constexpr Value::Any *&stack() noexcept { return m_stack; }
+  inline constexpr Value::Any *stack() const noexcept { return m_stack; }
 
-        /// @brief Gets the underlying frame resource.
-        inline constexpr $::URI::View resource() const noexcept final { return m_info->resource(); }
+  /// @brief Handles getting the current self value.
+  inline constexpr Value::Any self() const noexcept { return argv()->self(); }
 
-        /// @brief Handles constructing suitable backtrace values.
-        inline constexpr Resource::Trace backtrace() const noexcept final { return backtrace(m_group()); }
-        inline constexpr Resource::Trace backtrace(Resource::Group group) const noexcept {
-            return Resource::Trace(resource(), group);
-        }
+  /// @brief Gets the bound context instance.
+  inline constexpr const Function::Environ &context() const noexcept {
+    return *reinterpret_cast<Function::Environ *>(&m_stack[Offset::STK_ENVP]);
+  }
 
-       private:
-        //  PRIVATE METHODS  //
+  /// @brief Casts underlying arguments pointer into an arguments structure.
+  inline constexpr const Function::Args *argv() const noexcept {
+    return reinterpret_cast<const Function::Args *>(m_stack + Offset::STK_DATA);
+  }
 
-        /// @brief Gets the associated resource-group.
-        inline constexpr Resource::Group m_group() const noexcept {
-            return m_info->main() ? Resource::Group::SCRIPT : Resource::Group::METHOD;
-        }
-    };
+  /// @brief Handles constructing suitable backtrace values.
+  inline constexpr Resource::Trace backtrace() const noexcept final { return backtrace(m_info->group()); }
+  inline constexpr Resource::Trace backtrace(Resource::Group group) const noexcept {
+    const auto &binary = arena()->binary; // prepare binary
+    auto ptr = offset() + m_info->bytecode().offset();
+    auto *entry = binary.records().before(ptr); // resolve
+    auto *position = entry ? &entry->position : nullptr;
+    return Resource::Trace(resource(), group, position);
+  }
 
-}  // namespace Talos::Machine
+  /**
+   * @brief Allows iterating over the roots.
+   * @param yield               Each callback.
+   */
+  inline constexpr void roots(Globals::Each &yield) noexcept final {
+    yield(m_stack[Offset::STK_ENVP]), yield(m_locals());
+  }
+
+private:
+  //  PRIVATE METHODS  //
+
+  /// @brief Gets the frames local passthrough values.
+  inline constexpr std::span<Value::Any> m_locals() noexcept {
+    return {&m_stack[Offset::STK_PASS], m_info->locals() + Function::Offset::ARGS_DATA};
+  }
+};
+
+} // namespace Talos::Machine
 
 #endif

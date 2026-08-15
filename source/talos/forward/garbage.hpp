@@ -1,7 +1,7 @@
 #ifndef _TALOS_FORWARD_GARBAGE_HPP
 #define _TALOS_FORWARD_GARBAGE_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <xinv/xinv.hpp>
 
 /// Forward Declarations

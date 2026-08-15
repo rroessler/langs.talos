@@ -1,7 +1,7 @@
-//!
-//! Crate: "mem"
-//! Description: Utility functions for reading memory usage.
-//!
+///
+/// @crate "mem"
+/// @describe Utility functions for reading memory usage.
+///
 
 // Dynamic Modules
 import "dylib:mem" as mem;
@@ -11,7 +11,7 @@ import "talos:_detail" as Detail;
 
 // - HELPERS - //
 
-//! Brief: Internal helper to reduce bytecode output.
+//! @brief Internal helper to reduce bytecode output.
 let m_cast = Detail.Unsafe.cast;
 
 // - NAMESPACES - //
@@ -19,25 +19,25 @@ let m_cast = Detail.Unsafe.cast;
 export namespace Heap {
     // - PUBLIC METHODS - //
 
-    //! Brief: Gets the total heap memory.
+    //! @brief Gets the total heap memory.
     export let total = m_cast[fn -> Number](mem.heap_total);
 
-    //! Brief: Gets the current heap memory usage.
+    //! @brief Gets the current heap memory usage.
     export let usage = m_cast[fn -> Number](mem.heap_usage);
 
-    //! Brief: Gets the current heap memory available.
+    //! @brief Gets the current heap memory available.
     export let avail = m_cast[fn -> Number](mem.heap_avail);
 };
 
 export namespace Thread {
     // - PUBLIC METHODS - //
 
-    //! Brief: Gets the total thread-stack memory.
+    //! @brief Gets the total thread-stack memory.
     export let total = m_cast[fn -> Number](mem.thread_total);
 
-    //! Brief: Gets the current thread-stack memory usage.
+    //! @brief Gets the current thread-stack memory usage.
     export let usage = m_cast[fn -> Number](mem.thread_usage);
 
-    //! Brief: Gets the current thread-stack memory available.
+    //! @brief Gets the current thread-stack memory available.
     export let avail = m_cast[fn -> Number](mem.thread_avail);
 };

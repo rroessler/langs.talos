@@ -1,7 +1,7 @@
-//!
-//! Example: "benchmarks/leibniz.bench.tal"
-//! Description: Traces different "leibniz" benchmarks.
-//!
+///
+/// @example "benchmarks/leibniz.bench.tal"
+/// @describe Traces different "leibniz" benchmarks.
+///
 
 // Talos Modules
 import "talos:test" as Test;

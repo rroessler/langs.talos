@@ -1,116 +1,116 @@
 #ifndef _TALOS_BYTECODE_REQUEST_HPP
 #define _TALOS_BYTECODE_REQUEST_HPP
 
-/// C++ Modules
-#include <queue>
-
-/// Talos Modules
+/// Talos Includes
 #include "talos/bytecode/routine.hpp"
-#include "talos/variable/context.hpp"
+#include "talos/variable/scope.hpp"
 
-/// Syntax Modules
+/// Syntax Includes
 #include "talos/syntax/declaration/class.hpp"
 
 namespace Talos::Bytecode {
 
-    /// @brief Routine Request.
-    class Request {
-        //  TYPEDEFS  //
+/// @brief Routine Request.
+class Request {
+  //  TYPEDEFS  //
 
-        /// @brief Allow the compiler internal access.
-        friend class Compiler;
+  /// @brief Allow the compiler internal access.
+  friend class Compiler;
 
-        //  PROPERTIES  //
+  //  PROPERTIES  //
 
-        /// @brief Bound function body.
-        const Syntax::Node* m_body = nullptr;
+  /// @brief Bound function body.
+  const Syntax::Node *m_body = nullptr;
 
-        /// @brief The super constructor details.
-        const Syntax::Call* m_super = nullptr;
+  /// @brief The super constructor details.
+  const Syntax::Call *m_super = nullptr;
 
-        /// @brief Bound function signature.
-        const Syntax::Constructor* m_signature = nullptr;
+  /// @brief Bound function signature.
+  const Syntax::Constructor *m_signature = nullptr;
 
-        /// @brief Routine to compile to.
-        $::Ptr::Unique<Routine> m_routine = nullptr;
+  /// @brief Routine to compile to.
+  $::Unique::Pointer<Routine> m_routine = nullptr;
 
-        /// @brief Allocator for underlying registers.
-        $::Ptr::Unique<Allocator> m_registers = nullptr;
+  /// @brief Allocator for underlying registers.
+  $::Unique::Pointer<Allocator> m_registers = nullptr;
 
-        /// @brief Variables reference.
-        $::Ptr::Shared<Variable::Context> m_variables = nullptr;
+  /// @brief Variables reference.
+  $::Shared::Pointer<Variable::Scope> m_variables = nullptr;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a compilation request.
-         * @param function              Function to compile.
-         * @param upvalues              Optional upvalues.
-         */
-        explicit Request(const Syntax::Lambda* function);
-        explicit Request(const Syntax::Class* prototype);
-        explicit Request(const Syntax::Lambda* function, const $::Ptr::Shared<Variable::Context>& upvalues);
-        explicit Request(const Syntax::Class* prototype, const $::Ptr::Shared<Variable::Context>& upvalues);
+  /**
+   * @brief Constructs a compilation request.
+   * @param function              Function to compile.
+   * @param upvalues              Optional upvalues.
+   */
+  explicit Request(const Syntax::Lambda *function, const $::Shared::Pointer<Variable::Scope> &upvalues = nullptr);
+  explicit Request(const Syntax::Class *prototype, const $::Shared::Pointer<Variable::Scope> &upvalues = nullptr);
 
-        /**
-         * @brief Constructs a compilation request.
-         * @param constructor           Constructor details.
-         * @param body                  Function body.
-         * @param upvalues              Optional upvalues.
-         */
-        explicit Request(const Syntax::Constructor* constructor, const Syntax::Node* body);
-        explicit Request(const Syntax::Constructor* constructor, const Syntax::Node* body,
-            const $::Ptr::Shared<Variable::Context>& upvalues);
+  /**
+   * @brief Constructs a compilation request.
+   * @param constructor           Constructor details.
+   * @param body                  Function body.
+   * @param upvalues              Optional upvalues.
+   */
+  explicit Request(
+      const Syntax::Constructor *constructor,
+      const Syntax::Node *body,
+      const $::Shared::Pointer<Variable::Scope> &upvalues = nullptr
+  );
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        inline constexpr Routine* routine() const noexcept { return m_routine.get(); }
-        inline constexpr Allocator* registers() const noexcept { return m_registers.get(); }
-        inline constexpr Variable::Context* variables() const noexcept { return m_variables.get(); }
+  inline constexpr Routine *routine() const noexcept { return m_routine.get(); }
+  inline constexpr Allocator *registers() const noexcept { return m_registers.get(); }
+  inline constexpr Variable::Scope *variables() const noexcept { return m_variables.get(); }
 
-        /// @brief Scopes a new set of variables.
-        inline constexpr auto scope() {
-            m_variables = $::New().shared<Variable::Context>(m_variables);  // scope
-            return $::Functor::Defer([&] { m_variables = m_variables->ancestor(); });
-        }
-    };
+  /// @brief Scopes a new set of variables.
+  inline constexpr auto scope() {
+    m_variables = $::Shared::New<Variable::Scope>(m_variables); // scope now
+    return $::Lambda::Defer([&] { m_variables = m_variables->ancestor(); });
+  }
+};
 
-    /// @brief Routine Compilation Queue.
-    class Queue {
-        //  PROPERTIES  //
+/// @brief Routine Compilation Queue.
+class Queue {
+  //  PROPERTIES  //
 
-        /// @brief Current compilation offset.
-        Index m_offset = 0;
+  /// @brief Current compilation offset.
+  Index m_offset = 0;
 
-        /// @brief Currently queued compilation requests.
-        std::queue<$::Ptr::Unique<Request>> m_requests = {};
+  /// @brief Currently queued compilation requests.
+  std::queue<$::Unique::Pointer<Request>> m_requests = {};
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs a compilation queue.
-        explicit Queue() = default;
+  /// @brief Constructs a compilation queue.
+  explicit Queue() = default;
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        inline constexpr bool empty() const noexcept { return m_requests.empty(); }
-        inline constexpr size_t size() const noexcept { return m_requests.size(); }
+  /// @brief Denotes if the queue is currently empty.
+  inline constexpr bool empty() const noexcept { return m_requests.empty(); }
 
-        /**
-         * @brief Handles enqueing functions.
-         * @param function                  Function to enqueue.
-         * @param upvalues                  Upvalues reference.
-         */
-        Index enqueue(const Syntax::Lambda* function);
-        Index enqueue(const Syntax::Class* prototype);
-        Index enqueue(const Syntax::Lambda* function, const $::Ptr::Shared<Variable::Context>& upvalues);
-        Index enqueue(const Syntax::Class* prototype, const $::Ptr::Shared<Variable::Context>& upvalues);
+  /// @brief Gets the current size of the queue.
+  inline constexpr size_t size() const noexcept { return m_requests.size(); }
 
-        /// @brief Pops the front queue entry.
-        $::Ptr::Unique<Request> dequeue() noexcept;
-    };
+  /**
+   * @brief Handles enqueing functions.
+   * @param function                  Function to enqueue.
+   * @param upvalues                  Upvalues reference.
+   */
+  Index enqueue(const Syntax::Lambda *function);
+  Index enqueue(const Syntax::Class *prototype);
+  Index enqueue(const Syntax::Lambda *function, const $::Shared::Pointer<Variable::Scope> &upvalues);
+  Index enqueue(const Syntax::Class *prototype, const $::Shared::Pointer<Variable::Scope> &upvalues);
 
-}  // namespace Talos::Bytecode
+  /// @brief Pops the front queue entry.
+  $::Unique::Pointer<Request> dequeue() noexcept;
+};
+
+} // namespace Talos::Bytecode
 
 #endif

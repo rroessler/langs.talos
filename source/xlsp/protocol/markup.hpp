@@ -1,74 +1,69 @@
 #ifndef _XLSP_PROTOCOL_MARKUP_HPP
 #define _XLSP_PROTOCOL_MARKUP_HPP
 
-/// XLSP Modules
+/// XLSP Include
 #include "xlsp/forward/protocol.hpp"
 
 namespace XLSP::Markup {
 
-    /// @brief Markup Content Container.
-    class Content {
-        //  PROPERTIES  //
+/// @brief Markup Content Container.
+class Content {
+  //  PROPERTIES  //
 
-        /// @brief Streamed content value.
-        $::String::Stream m_value = {};
+  /// @brief The attached markup kind.
+  $::String::Buffer m_kind = "plaintext";
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Streamed content value.
+  std::stringstream m_os = {};
 
-        /// @brief Constructs a defaulted set of markup content.
-        constexpr Content() = default;
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Allow default construction.
-        virtual ~Content() = default;
+  /// @brief Allow default construction.
+  constexpr Content() = default;
 
-        //  PUBLIC METHODS  //
+  /// @brief Allow assigning a desired kind.
+  constexpr Content(const $::String::Buffer &kind) : m_kind(kind) {}
 
-        /// @brief The associated markup kind.
-        virtual inline constexpr $::String::View kind() const noexcept { return "plaintext"; }
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets the underlying stream value.
-        inline constexpr $::String::Stream& stream() noexcept { return m_value; }
+  /// @brief Denotes if the string-stream is empty.
+  inline constexpr bool empty() const noexcept { return m_os.view().empty(); }
 
-        /// @brief Gets a view of the markup stream buffer.
-        inline constexpr $::String::Buffer buffer() const noexcept { return m_value.str(); }
+  /// @brief The associated markup kind.
+  inline constexpr $::String::View kind() const noexcept { return m_kind; }
 
-       protected:
-        //  PRIVATE METHODS  //
+  /// @brief Gets the underlying stream value.
+  inline constexpr std::ostream &stream() noexcept { return m_os; }
 
-        /**
-         * @brief Handles encoding markup content.
-         * @param self                      Content to encode.
-         */
-        static $::Serde::Object m_encode(const Content& self) {
-            return { { "kind", self.kind() }, { "value", self.buffer() } };
-        }
-    };
+  /// @brief Gets a view of the markup stream buffer.
+  inline constexpr $::String::Buffer buffer() const noexcept { return m_os.str(); }
 
-    /// @brief Denotes "markdown" Content.
-    struct Formatted : public Content {
-        //  CONSTRUCTORS  //
+protected:
+  //  PRIVATE METHODS  //
 
-        /// @brief Inherit the base constructor.
-        using Content::Content;
+  /**
+   * @brief Handles encoding markup content.
+   * @param self                      Content to encode.
+   */
+  static $::Serde::Object m_encode(const Content &self) { return {{"kind", self.kind()}, {"value", self.buffer()}}; }
+};
 
-        //  PUBLIC METHODS  //
+//  PUBLIC METHODS  //
 
-        /// @brief Gets the associated markup kind.
-        inline constexpr $::String::View kind() const noexcept final { return "markdown"; }
-    };
+/// @brief Factory for constructing "markdown" based content.
+inline constexpr Content Formatted() { return Content("markdown"); }
 
-    //  PUBLIC METHODS  //
+/**
+ * @brief Constructs a code-block.
+ * @param content               Code content.
+ * @param language              Optional language.
+ */
+inline constexpr std::vector<$::String::Buffer>
+Code(const $::String::Buffer &content, const $::String::Buffer &language = "") {
+  return {"```" + language, content, "```"};
+}
 
-    /**
-     * @brief Constructs a code-block.
-     * @param content               Code content.
-     * @param language              Optional language.
-     */
-    inline constexpr $::String::Buffer Code(const $::String::Buffer& content, const $::String::Buffer& language = "") {
-        return "```" + language + '\n' + content + "\n```";
-    }
-
-}  // namespace XLSP::Markup
+} // namespace XLSP::Markup
 
 #endif

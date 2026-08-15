@@ -1,11 +1,16 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/toolchain/audit.hpp"
-#include "talos/runtime/container.hpp"
+#include "talos/relint/analyzer.hpp"
 #include "talos/type/analyzer.hpp"
 
 //  PUBLIC METHODS  //
 
-$::Ptr::Unique<Talos::Type::Context> Talos::Toolchain::audit(const Syntax::Tree *syntax, const Type::Options &options) {
-    auto *services = options.services ? options.services : $::Global::get<Runtime::Container>();
-    return services->get<Type::Analyzer>()->audit(syntax, options.reporter);
+$::Unique::Pointer<Talos::Type::Exports>
+Talos::Toolchain::audit(const Syntax::Tree *syntax, XI::Container *services, Diagnostic::Reporter *reporter) {
+  return services->get<Type::Analyzer>()->audit(syntax, reporter);
+}
+
+$::Unique::Pointer<Talos::Relint::Exports>
+Talos::Toolchain::lint(const Syntax::Tree *syntax, XI::Container *services, Diagnostic::Reporter *reporter) {
+  return services->get<Relint::Analyzer>()->audit(syntax, reporter);
 }

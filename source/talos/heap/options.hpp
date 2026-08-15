@@ -7,25 +7,25 @@
 
 namespace Talos::Heap {
 
-    /// @brief Heap Address Typing.
-    using Address = Pointer::Underlying;
+/// @brief Heap Address Typing.
+using Address = Pointer::Underlying;
 
-    /// @brief Heap Options.
-    struct Options {
-        //  PROPERTIES  //
+/// @brief Heap Options.
+struct Options {
+  //  PROPERTIES  //
 
-        size_t garbage_attempts = 4;    // GC attempts allowed.
-        size_t garbage_survivors = 15;  // Senior survivor count.
+  size_t garbage_attempts = 4;   // GC attempts allowed.
+  size_t garbage_survivors = 15; // Senior survivor count.
 
-        float growth_factor = 1.5f;  // Default heap growth factor.
-        float shrink_factor = 0.5f;  // Default heap shrink factor.
+  float growth_factor = 1.5f; // Default heap growth factor.
+  float shrink_factor = 0.5f; // Default heap shrink factor.
 
-        //  CONSTRUCTORS  //
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs a defaulted set of options.
-        constexpr Options() = default;
-    };
+  /// @brief Constructs a defaulted set of options.
+  constexpr Options() = default;
+};
 
-}  // namespace Talos::Heap
+} // namespace Talos::Heap
 
 #endif

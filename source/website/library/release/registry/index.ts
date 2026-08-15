@@ -1,22 +1,32 @@
 /// Website Modules
-import { Source } from '@/website/source';
 import { Product } from '@/website/product';
+import { Source } from '@/website/source';
 
 /** Release Registry Details. */
-export type Details = ReturnType<typeof Source.blog.getPage>;
+export type Details = ReturnType<typeof Source.blog.getPages>[number];
+
+/** Release Registry Functionality. */
 export namespace Registry {
+    //  PROPERTIES  //
+
+    /** Expected release prefix. */
+    export const prefix = `${Product.shortName} v`;
+
     //  PUBLIC METHODS  //
 
-    /**
-     * Gets a list of available release pages.
-     * @param pages                 Pages to filter.
-     */
-    export const list = (pages = Source.blog.getPages()) =>
-        pages.filter(validate).sort((a, b) => a.path.localeCompare(b.path));
+    /** Gets a list of available release pages. */
+    export function list() {
+        return Source.blog
+            .getPages()
+            .filter(validate)
+            .sort((a, b) => a.path.localeCompare(b.path));
+    }
 
     /**
      * Handles validating pages.
      * @param page                  Page to validate.
      */
-    export const validate = (page?: NonNullable<Details>) => !!page?.data.title.startsWith(`${Product.shortName} v`);
+    export function validate(page?: Details) {
+        return !!page?.data.title.startsWith(prefix);
+    }
 }

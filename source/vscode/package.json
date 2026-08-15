@@ -1,0 +1,24 @@
+{
+    "private": true,
+    "name": "@talos/vscode",
+    "scripts": {
+        "--  BUNDLE  --": "",
+        "bundle": "npm-run-all clean lint --parallel bundle:*",
+        "bundle:icons": "bun run ../../tools/icons",
+        "bundle:syntax": "bun run ../../tools/syntax",
+        "bundle:plugin": "bun run ../../tools/builder",
+        "--  LINT  --": "",
+        "lint": "tsc --noEmit --project .",
+        "--  CLEAN  --": "",
+        "clean": "rimraf ../../dist/vscode"
+    },
+    "dependencies": {
+        "inversify": "^8.2.3",
+        "reflect-metadata": "^0.2.2",
+        "vscode-languageclient": "^10.1.0",
+        "vscode-languageserver-protocol": "^3.18.2"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.125.0"
+    }
+}

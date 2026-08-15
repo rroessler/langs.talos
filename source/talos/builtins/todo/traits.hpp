@@ -1,41 +1,39 @@
 #ifndef _TALOS_BUILTINS_TODO_HPP
 #define _TALOS_BUILTINS_TODO_HPP
 
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 /// Forward Declarations
-TALOS_BUILTIN_CUSTOM(Todo)
+$_FWD(Talos::Builtins::Custom, struct Todo)
 
 namespace Talos::Builtins {
 
-    /// @brief Todo Custom Builtin Traits.
-    template <>
-    struct Traits<Custom::Todo> : public Define<Custom::Todo, "Todo">,
-                                  public Features<Adapter::GLOBALS, Adapter::TYPEDEFS> {
-       protected:
-        //  PRIVATE METHODS  //
+/// @brief Todo Custom Builtin Traits.
+template <> struct Wrapper<Custom::Todo> : public Define<Custom::Todo, "Todo", Adapter::GLOBALS, Adapter::TYPEDEFS> {
+protected:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   */
+  static Value::Any m_globals(Isolate *isolate);
 
-        /**
-         * @brief Handles "Todo" panics.
-         * @param isolate                   Runtime isolate.
-         * @param args                      Native arguments.
-         */
-        static Value::Any m_panic(Runtime::Isolate* isolate, const Function::Arguments& args);
-    };
+  /**
+   * @brief Handles executing panics for the "Todo" builtin.
+   * @param isolate                   Runtime isolate.
+   * @param args                      Function arguments.
+   */
+  static Value::Any m_panic(Isolate *isolate, const Function::Args &args);
+};
 
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

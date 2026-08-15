@@ -1,6 +1,8 @@
 /// Vendor Modules
-import * as React from 'react';
-import { Heading } from '@fumadocs/base-ui/components/heading';
+import { Heading } from 'fumadocs-ui/components/heading';
+
+/// Website Modules
+import { Fragment } from '@/website/components';
 
 /// Package Modules
 import { Property } from '../property';
@@ -16,13 +18,13 @@ export function Component({ name, ancillary, children }: Component) {
 
     // and return the resulting documentation
     return (
-        <React.Fragment>
+        <Fragment>
             <Heading as="h2" id="overview" children="Overview" />
             {children /* all the children come from website side */}
 
             <Component.Section id="fields" heading="Fields" items={builtin.fields} />
             <Component.Section id="statics" heading="Statics" items={builtin.statics} />
-        </React.Fragment>
+        </Fragment>
     );
 }
 
@@ -46,10 +48,10 @@ export namespace Component {
 
         // otherwise resolve as normal
         return (
-            <React.Fragment>
+            <Fragment>
                 <Heading as="h2" id={id} className="mt-5" children={heading} />
                 {properties}
-            </React.Fragment>
+            </Fragment>
         );
     }
 }

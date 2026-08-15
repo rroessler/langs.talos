@@ -1,93 +1,104 @@
 #ifndef _TALOS_BYTECODE_BINDER_HPP
 #define _TALOS_BYTECODE_BINDER_HPP
 
-/// C++ Modules
-#include <stack>
-
-/// Talos Modules
+/// Talos Includes
 #include "talos/bytecode/block.hpp"
 #include "talos/bytecode/request.hpp"
 
 namespace Talos::Bytecode {
 
-    /// @brief Labels Allocator.
-    class Binder {
-        //  TYPEDEFS  //
+/// @brief Labels Allocator.
+class Binder {
+  //  TYPEDEFS  //
 
-        /// @brief Allow loops internal access.
-        friend class Loop;
+  /// @brief Allow loops internal access.
+  friend class Loop;
 
-        /// @brief Allow the compiler internal access.
-        friend class Compiler;
+  /// @brief Allow the compiler internal access.
+  friend class Compiler;
 
-        //  PROPERTIES  //
+  //  PROPERTIES  //
 
-        /// @brief Current block instance.
-        Block* m_head = nullptr;
+  /// @brief Current block instance.
+  Block *m_head = nullptr;
 
-        /// @brief The current compilation request.
-        Request** m_request = nullptr;
+  /// @brief The current compilation request.
+  Request **m_request = nullptr;
 
-        /// @brief Current block references.
-        $::Map<Label, Block*> m_blocks = {};
+  /// @brief Current block references.
+  $::Map::Base<Label, Block *> m_blocks = {};
 
-        std::stack<Label> m_breaks = {};     // Current break labels.
-        std::stack<Label> m_returns = {};    // Current return labels.
-        std::stack<Label> m_continues = {};  // Current continue labels.
+  /// @brief Current break labels.
+  std::stack<Label> m_breaks = {};
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Current return labels.
+  std::stack<Label> m_returns = {};
 
-        /**
-         * @brief Constructs a label binder.
-         * @param request               Request to bind.
-         */
-        explicit Binder(Request** request = nullptr) : m_request(request) {}
+  /// @brief Current continue labels.
+  std::stack<Label> m_continues = {};
 
-        //  PUBLIC METHODS  //
+public:
+  //  CONSTRUCTORS  //
 
-        inline constexpr Block* head() const noexcept { return m_head; }
-        inline constexpr Label reserve() noexcept { return (*m_request)->routine()->head++; }
+  /**
+   * @brief Constructs a label binder.
+   * @param request               Request to bind.
+   */
+  explicit Binder(Request **request = nullptr) : m_request(request) {}
 
-        inline constexpr $::Map<Label, Block*>& blocks() noexcept { return m_blocks; }
-        inline constexpr const $::Map<Label, Block*>& blocks() const noexcept { return m_blocks; }
+  //  PUBLIC METHODS  //
 
-        inline constexpr Label breaks() const noexcept { return m_breaks.top(); }
-        inline constexpr Label returns() const noexcept { return m_returns.top(); }
-        inline constexpr Label continues() const noexcept { return m_continues.top(); }
+  /// @brief The current top-most block.
+  inline constexpr Block *head() const noexcept { return m_head; }
 
-        /// @brief Handles clearing the labels binder.
-        inline constexpr void clear() noexcept { m_head = nullptr, m_blocks = {}; }
+  /// @brief Gets the current breaks label.
+  inline constexpr Label breaks() const noexcept { return m_breaks.top(); }
 
-        /// @brief Constructs a new top-most block.
-        inline constexpr Block* scope() {
-            // ensure the underlying request actually exists
-            $_ASSERT(m_request && *m_request, "Expected a compilation request");
+  /// @brief Gets the current returns label.
+  inline constexpr Label returns() const noexcept { return m_returns.top(); }
 
-            // ensure that every block has at least one label bound to represent it
-            if (m_head && m_head->labels().empty()) m_head->labels().emplace(reserve());
+  /// @brief Gets the current continues label.
+  inline constexpr Label continues() const noexcept { return m_continues.top(); }
 
-            // push back a new block onto the current request
-            return m_head = (*m_request)->routine()->blocks.emplace_back($::New().unique<Block>()).get();
-        }
+  /// @brief Gets all allocated blocks.
+  inline constexpr $::Map::Base<Label, Block *> &blocks() noexcept { return m_blocks; }
+  inline constexpr const $::Map::Base<Label, Block *> &blocks() const noexcept { return m_blocks; }
 
-        /**
-         * @brief Handles patching a label.
-         * @param label                 Label to patch.
-         */
-        inline constexpr void patch() { patch(reserve()); }
-        inline constexpr void patch(const Label& label) {
-            // ensure that we have a top-most block available
-            $_ASSERT(m_head, "Expected a top-most block");
+  /// @brief Reserves the next top-most label.
+  inline constexpr Label reserve() noexcept { return (*m_request)->routine()->head++; }
 
-            // prepare a block to be used currently as needed
-            auto* head = m_head->empty() ? m_head : scope();
+  /// @brief Handles clearing the labels binder.
+  inline constexpr void clear() noexcept { m_head = nullptr, m_blocks = {}; }
 
-            // and bind our details as necessary onto the block
-            head->labels().emplace(label), m_blocks.emplace(label, head);
-        }
-    };
+  /// @brief Constructs a new top-most block.
+  inline constexpr Block *scope() {
+    // ensure the underlying request actually exists
+    $_ASSERT(m_request && *m_request, "Expected a compilation request");
 
-}  // namespace Talos::Bytecode
+    // ensure that every block has at least one label bound to represent it
+    if (m_head && m_head->labels().empty()) m_head->labels().emplace(reserve());
+
+    // push back a new block onto the current request
+    return m_head = (*m_request)->routine()->blocks.emplace_back($::Unique::New<Block>()).get();
+  }
+
+  /**
+   * @brief Handles patching a label.
+   * @param label                 Label to patch.
+   */
+  inline constexpr void patch() { patch(reserve()); }
+  inline constexpr void patch(const Label &label) {
+    // ensure that we have a top-most block available
+    $_ASSERT(m_head, "Expected a top-most block");
+
+    // prepare a block to be used currently as needed
+    auto *head = m_head->empty() ? m_head : scope();
+
+    // and bind our details as necessary onto the block
+    head->labels().emplace(label), m_blocks.emplace(label, head);
+  }
+};
+
+} // namespace Talos::Bytecode
 
 #endif

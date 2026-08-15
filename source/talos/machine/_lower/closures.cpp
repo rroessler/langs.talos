@@ -1,163 +1,219 @@
-/// Talos Modules
-#include "talos/engine/dispatch.hpp"
-#include "talos/machine/frame.hpp"
-#include "talos/runtime/isolate.hpp"
-
-/// Inline Modules
+/// Machine Includes
 #include "talos/machine/_inline/macros.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Machine::Dispatch, Reference passthrough(Runtime::Isolate*))
-$_FWD(Talos::Machine::Dispatch, Reference closure(Runtime::Isolate*, const Function::Info*))
-
-//  PUBLIC METHODS  //
-
-Talos::Machine::Reference Talos::Machine::Dispatch::passthrough(Runtime::Isolate* isolate) {
-    // get the underlying frame instance to be used
-    const auto* frame = isolate->frame()->as<Machine::Frame>();
-
-    // get the context to be destructured
-    auto* args = frame->argv();
-    auto context = frame->context();
-
-    // ensure that are context and arguments are matched
-    $_ASSERT(args->self() == frame->self());
-
-    // should safely be able to invoke the call
-    return Engine::Call::any(isolate, context.load(0), *args).pointer();
-}
-
-Talos::Machine::Reference Talos::Machine::Dispatch::closure(Runtime::Isolate* isolate, const Function::Info* info) {
-    const auto* frame = isolate->frame()->as<Machine::Frame>();  // get frame to be used now
-    return isolate->create<Function::Closure>(info, frame->self(), frame->context()).pointer();
-}
-
-//  PRIVATE METHODS  //
+//  EMITTER METHODS  //
 
 TALOS_MM_MACHINE_EMIT(CLOSURE_MAKE, builder, instruction) {
-    // prepare the function information to be encoded
-    auto index = instruction->get<1>();
-    auto* arena = builder->info->arena();
-    auto* info = arena->functions.at(index).get();
+  // prepare the function information to be encoded
+  auto index = instruction->get<1>();
+  auto *arena = builder->info->arena();
+  auto &info = arena->functions.at(index);
 
-    // prepare a destination register to be used now
-    auto dv = instruction->get<0>();
-    auto dx = __cc__ new_gpz("@dx");
+  // prepare the output destination register
+  auto dx = __ee__ slot(instruction->get<0>());
 
-    // move the initial function information here
-    __cc__ mov(dx, info);
+  // request constructing the closure as necessary
+  __ee__ call(Glue::closure, dx, builder->isolate, builder->frame, Immediate(info.get()));
+}
 
-    // request constructing the outgoing details now
-    __ee__ invoke(Dispatch::closure, dx, builder->isolate, dx);
-
-    // finally emplace the result in the destination
-    __ee__ move(dv, dx);
+TALOS_MM_MACHINE_EMIT(CLOSURE_LIFT, builder, instruction) {
+  auto dx = __ee__ slot(instruction->get<0>());
+  __ee__ call(Glue::upgrade, dx, builder->isolate, dx);
 }
 
 TALOS_MM_MACHINE_EMIT(CLOSURE_PASS, builder, instruction) {
-    // prepare the necessary registers
-    auto dx = __ee__ resolve(instruction->get<0>());
+  // prepare the output destination register
+  auto dx = __ee__ slot(instruction->get<0>());
 
-    // then we want to attempt an invocation now
-    __ee__ invoke(Dispatch::passthrough, dx, builder->isolate);
+  // attempt passing the invocation onwards
+  __ee__ call(Glue::pass, dx, builder->isolate, builder->frame);
 
-    // validate the outgoing result is alright
-    __ee__ validate(dx, Validate::FAST);
+  // test the outgoing result is safe to be returned
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(CALL_0_VOID, builder, instruction) {
-    // prepare the incoming registers
-    auto dv = instruction->get<0>();
+  // prepare the register slots we require
+  auto dx = __ee__ slot(instruction->get<0>());
+  auto tx = __ee__ slot(Register::Accumulator);
 
-    // and attempt compiling the invocation now
-    __tm__ invoke(builder, dv, Engine::Accumulator());
+  // we define an empty set of parameters
+  __ee__ params();
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::invoke, dx, builder->isolate, tx, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(CALL_N_VOID, builder, instruction) {
-    // prepare the incoming registers
-    auto dv = instruction->get<0>();
+  // prepare the span to be used
+  auto span = instruction->get<1>();
 
-    // prepare the necessary arguments span
-    auto span = instruction->get<1>();
+  // prepare the register slots we require
+  auto tx = __ee__ slot(span.first());
+  auto dx = __ee__ slot(instruction->get<0>());
 
-    // and attempt compiling the invocation now
-    __tm__ invoke(builder, dv, span.first(), span.slice(1));
+  // we define a baseline set of parameters
+  __ee__ params(span.slice(1));
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::invoke, dx, builder->isolate, tx, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
 }
 
-TALOS_MM_MACHINE_EMIT(CALL_0_INLINE, builder, instruction) { __tm__ recall(builder, instruction->get<0>()); }
+TALOS_MM_MACHINE_EMIT(CALL_0_INLINE, builder, instruction) {
+  // prepare the register slots we require
+  auto info = Immediate(builder->info);
+  auto dx = __ee__ slot(instruction->get<0>());
+
+  // we define an empty set of parameters
+  __ee__ params();
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::recall, dx, builder->isolate, info, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
+}
+
 TALOS_MM_MACHINE_EMIT(CALL_N_INLINE, builder, instruction) {
-    __tm__ recall(builder, instruction->get<0>(), instruction->get<1>());
+  // prepare the register slots we require
+  auto info = Immediate(builder->info);
+  auto dx = __ee__ slot(instruction->get<0>());
+
+  // we define a baseline set of parameters
+  __ee__ params(instruction->get<1>());
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::recall, dx, builder->isolate, info, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(CALL_0_FIELD, builder, instruction) {
-    // prepare the incoming registers
-    auto dv = instruction->get<0>();
-    auto index = instruction->get<1>();
-    auto target = Engine::Accumulator();
+  // prepare the arena details to be used
+  auto index = instruction->get<1>();
 
-    // attempt getting the callee value
-    auto cx = __tm__ getter(builder, target, index);
+  // prepare the register slots we require
+  auto vx = __cc__ new_gp64();
+  auto dx = __ee__ slot(instruction->get<0>());
+  auto tx = __ee__ slot(Register::Accumulator);
 
-    // since a success, attempt the necessary invocation now
-    __tm__ invoke(builder, dv, cx, target);
+  // start by getting the required field here
+  __ee__ getter(vx, tx, index);
+
+  // we define a baseline set of parameters
+  __ee__ params(Register::Accumulator);
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::invoke, dx, builder->isolate, vx, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(CALL_N_FIELD, builder, instruction) {
-    // prepare the incoming registers
-    auto dv = instruction->get<0>();
-    auto index = instruction->get<1>();
-    auto span = instruction->get<2>();
-    auto target = span.first();
+  // prepare the arena details to be used
+  auto index = instruction->get<1>();
+  auto span = instruction->get<2>();
 
-    // attempt getting the callee value
-    auto cx = __tm__ getter(builder, target, index);
+  // prepare the register slots we require
+  auto vx = __cc__ new_gp64();
+  auto tx = __ee__ slot(span.first());
+  auto dx = __ee__ slot(instruction->get<0>());
 
-    // since a success, attempt the necessary invocation now
-    __tm__ invoke(builder, dv, cx, target, span.slice(1));
+  // start by getting the required field here
+  __ee__ getter(vx, tx, index);
+
+  // we define a baseline set of parameters
+  __ee__ params(span.first(), span.slice(1));
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::invoke, dx, builder->isolate, vx, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(SPAWN_0_VOID, builder, instruction) {
-    // prepare the incoming registers
-    auto dv = instruction->get<0>();
+  // prepare the register slots we require
+  auto dx = __ee__ slot(instruction->get<0>());
+  auto tx = __ee__ slot(Register::Accumulator);
 
-    // and attempt compiling the invocation now
-    __tm__ spawn(builder, dv, Engine::Accumulator());
+  // we define an empty set of parameters
+  __ee__ params();
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::spawn, dx, builder->isolate, tx, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(SPAWN_N_VOID, builder, instruction) {
-    // prepare the incoming registers
-    auto dv = instruction->get<0>();
+  // prepare the span to be used
+  auto span = instruction->get<1>();
 
-    // prepare the necessary arguments span
-    auto span = instruction->get<1>();
+  // prepare the register slots we require
+  auto tx = __ee__ slot(span.first());
+  auto dx = __ee__ slot(instruction->get<0>());
 
-    // and attempt compiling the invocation now
-    __tm__ spawn(builder, dv, span.first(), span.slice(1));
+  // we define a baseline set of parameters
+  __ee__ params(span.slice(1));
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::invoke, dx, builder->isolate, tx, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(SPAWN_0_FIELD, builder, instruction) {
-    // prepare the incoming registers
-    auto dv = instruction->get<0>();
-    auto index = instruction->get<1>();
-    auto target = Engine::Accumulator();
+  // prepare the arena details to be used
+  auto index = instruction->get<1>();
 
-    // attempt getting the callee value
-    auto cx = __tm__ getter(builder, target, index);
+  // prepare the register slots we require
+  auto vx = __cc__ new_gp64();
+  auto dx = __ee__ slot(instruction->get<0>());
+  auto tx = __ee__ slot(Register::Accumulator);
 
-    // since a success, attempt the necessary invocation now
-    __tm__ spawn(builder, dv, cx, target);
+  // start by getting the required field here
+  __ee__ getter(vx, tx, index);
+
+  // we define a baseline set of parameters
+  __ee__ params(Register::Accumulator);
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::spawn, dx, builder->isolate, vx, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(SPAWN_N_FIELD, builder, instruction) {
-    // prepare the incoming registers
-    auto dv = instruction->get<0>();
-    auto index = instruction->get<1>();
-    auto span = instruction->get<2>();
-    auto target = span.first();
+  // prepare the arena details to be used
+  auto index = instruction->get<1>();
+  auto span = instruction->get<2>();
 
-    // attempt getting the callee value
-    auto cx = __tm__ getter(builder, target, index);
+  // prepare the register slots we require
+  auto vx = __cc__ new_gp64();
+  auto tx = __ee__ slot(span.first());
+  auto dx = __ee__ slot(instruction->get<0>());
 
-    // since a success, attempt the necessary invocation now
-    __tm__ spawn(builder, dv, cx, target, span.slice(1));
+  // start by getting the required field here
+  __ee__ getter(vx, tx, index);
+
+  // we define a baseline set of parameters
+  __ee__ params(span.first(), span.slice(1));
+
+  // and then start calling the necessary glue method
+  __ee__ call(Glue::spawn, dx, builder->isolate, vx, builder->params);
+
+  // finally do a fast test after the invocation
+  __ee__ test(dx, Validate::FAST);
 }

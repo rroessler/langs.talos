@@ -1,46 +1,42 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/document/publisher.hpp"
-#include "talos/crate/service.hpp"
-#include "talos/module/service.hpp"
+#include "talos/import/service.hpp"
+#include "talos/runtime/container.hpp"
 #include "talos/server/connection.hpp"
+
+//  CONSTRUCTORS  //
+
+Talos::Document::Publisher::Publisher() : Publisher($::Global::get<Runtime::Container>()) {}
+Talos::Document::Publisher::Publisher(XI::Container *services) :
+    m_services(services), m_connection(services->when<Server::Connection>()) {}
 
 //  PUBLIC METHODS  //
 
-void Talos::Document::Publisher::clear(const $::URI::View& resource) {
-    publish(resource, {});  // remove resource here now as needed
+void Talos::Document::Publisher::clear(const $::URI::View &resource) {
+  publish(resource, {}); // remove resource here now as needed
 }
 
-void Talos::Document::Publisher::refresh(const $::URI::View& resource) {
-    if (auto* drafts = m_drafts()) drafts->remove(resource);
+void Talos::Document::Publisher::refresh(const $::URI::View &resource) {
+  if (auto *modules = m_modules()) modules->storage()->remove(resource);
 }
 
-void Talos::Document::Publisher::refresh(const std::vector<$::URI::View>& resources) {
-    for (const auto& resource : resources) refresh(resource);
+void Talos::Document::Publisher::refresh(const std::vector<$::URI::View> &resources) {
+  for (const auto &resource : resources) refresh(resource);
 }
 
-void Talos::Document::Publisher::refresh(const std::vector<$::URI::Buffer>& resources) {
-    for (const auto& resource : resources) refresh(resource);
+void Talos::Document::Publisher::refresh(const std::vector<$::URI::Buffer> &resources) {
+  for (const auto &resource : resources) refresh(resource);
 }
 
 void Talos::Document::Publisher::publish(
-    const $::URI::View& resource, const std::vector<XLSP::Diagnostic>& diagnostics) {
-    using Notification = typename XLSP_NOTIFICATION(PUBLISH_DIAGNOSTICS);  // prepare typing now
-    if (auto* connection = m_connection()) connection->notify(Notification(resource, diagnostics));
+    const $::URI::View &resource, const std::vector<XLSP::Diagnostic> &diagnostics
+) {
+  using Notification = Server::Notification::DIAGNOSTICS_PUBLISH; // prepare typing
+  if (m_connection) m_connection->notify(Notification(resource.buffer(), diagnostics));
 }
 
 //  PRIVATE METHODS  //
 
-Talos::Import::Drafts* Talos::Document::Publisher::m_drafts() {
-    // ensure the underlying services container is valid first
-    if (m_services == nullptr) return nullptr;
-
-    // then ensure the services has a server connection
-    if (!m_services->exists<Import::Service>()) return nullptr;
-
-    // attempt resolving the final connection now
-    return m_services->get<Import::Service>()->drafts();
-}
-
-Talos::Server::Connection* Talos::Document::Publisher::m_connection() {
-    return m_services ? m_services->when<Server::Connection>() : nullptr;
+Talos::Import::Service *Talos::Document::Publisher::m_modules() noexcept {
+  return m_services && m_connection ? m_services->get<Import::Service>() : nullptr;
 }

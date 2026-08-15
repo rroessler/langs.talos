@@ -1,79 +1,80 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
+/// Builtins Includes
+#include "talos/builtins/_inline/builtins.ipp"
 
-/// Value Modules
-#include "talos/value/_inline/value.ipp"
-
-//  PUBLIC METHODS  //
-
-Talos::Type::Entity Talos::Type::Callable::lookup(const $::String::View& field) const {
-    if (field != "bind") return Builtins::Proxy<Function::Dynamic>::prototype()->instantiate()->lookup(field);
-    else return { Builder::function(m_clone()->as<Callable>(), Builder::arguments(Builder::any())) };
-}
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
 
 //  PRIVATE METHODS  //
 
-Talos::Type::Erased Talos::Type::Callable::m_infer(const Constraints& constraints) const {
-    // prepare the cloned callable instance
-    auto callable = m_clone()->as<Callable>();
+Talos::Type::Entity Talos::Type::Callable::m_lookup(const $::String::View &field) const {
+  // prepare a global function instance to get field-types from
+  static auto s_instance = Builtins::Wrapper<Function::Any>::typeclass()->instantiate();
 
-    // ignore if not given any generics
-    if (constraints == nullptr) return callable;
-
-    // otherwise rebuild the parameters and return value
-    callable->returns() = m_returns->infer(constraints);
-
-    // instantiate all the parameters
-    for (const auto& [ii, p] : $::Each(m_parameters)) callable->m_parameters[ii] = p.infer(constraints);
-
-    // and return the resulting callable instance now
-    return callable;
+  // return the field that we can determine
+  return s_instance->lookup(field);
 }
 
-bool Talos::Type::Callable::m_unify(const Erased& candidate, const Constraints& constraints) const {
-    auto other = Builder::resolve<Callable>(candidate);
-    if (other == nullptr) return false;  // failed here
+Talos::Type::Erased Talos::Type::Callable::m_infer(Constraints *constraints) const {
+  // prepare the cloned callable instance
+  auto callable = $::Shared::New<Callable>(*this);
 
-    // ensure we validate our size of parameters before continuing
-    if (arity() > other->arity() || adicity() < other->adicity()) return false;
+  // ignore if not given any generics
+  if (constraints == nullptr) return callable;
 
-    auto maximum = m_parameters.size();  // prepare details
-    auto spread = packed() ? m_parameters.back() : Entity();
+  // otherwise rebuild the parameters and return value
+  callable->returns() = m_returns->infer(constraints);
 
-    // stop if any of the parameters are invalid
-    for (const auto& [ii, right] : $::Each(other->m_parameters)) {
-        const auto& left = ii < maximum ? m_parameters.at(ii) : spread;
-        $_ASSERT(left.opaque() && right.opaque(), "Parameters should be opaque");
-        if (!left.value()->unify(right.value(), constraints)) return false;
-    }
+  // instantiate all the parameters
+  for (const auto &[ii, p] : $::Ranges::Each(m_parameters)) callable->m_parameters[ii] = p.infer(constraints);
 
-    // finally ensures the return value is also the same
-    return m_returns->unify(other->m_returns, constraints);
+  // and return the resulting callable instance now
+  return callable;
 }
 
-void Talos::Type::Callable::m_print($::Stream::Output& os) const {
-    // prepare the transformation predicate to be used
-    constexpr auto predicate = [](const Entity& entity) {
-        return fmt::format("{0}", *entity.value()) + (entity.optional() ? "?" : "");
-    };
+bool Talos::Type::Callable::m_unify(const Erased &candidate, Constraints *constraints) const {
+  auto other = New::cast<Callable>(candidate);
+  if (other == nullptr) return false; // failed
 
-    // build our parameters to be printed as necessary
-    auto parameters = $::Ranges::To(m_parameters | std::views::transform(predicate));
+  // ensure we validate our size of parameters before continuing
+  if (arity() > other->arity() || adicity() < other->adicity()) return false;
 
-    // prepare the packed details to be used now
-    auto spread = packed() ? m_parameters.back().value() : nullptr;
-    if (spread != nullptr) parameters.pop_back();  // pop spread now
+  auto maximum = m_parameters.size(); // prepare details
+  auto spread = packed() ? m_parameters.back() : Entity();
 
-    // get the current emptiness to be used
-    auto empty = parameters.empty();
-    auto parens = !empty || spread;
+  // stop if any of the parameters are invalid
+  for (const auto &[ii, right] : $::Ranges::Each(other->m_parameters)) {
+    const auto &left = ii < maximum ? m_parameters.at(ii) : spread;
+    $_ASSERT(left.opaque() && right.opaque(), "Parameters should be opaque");
+    if (!left.value()->unify(right.value(), constraints)) return false;
+  }
 
-    // test for the "Any" function instance
-    if (spread && empty && spread->is<Any>() && m_returns->is<Any>()) {
-        os << Value::Proxy<Function::Dynamic>::name();
-    } else {
-        os << "fn" << (parens ? " (" : "") << $::Convert::join(parameters);
-        if (spread) os << (empty ? "" : ", ") << "..." << *spread;
-        os << (parens ? ")" : "") << " -> " << *m_returns;
-    }
+  // finally ensures the return value is also the same
+  return m_returns->unify(other->m_returns, constraints);
+}
+
+void Talos::Type::Callable::m_print(std::ostream &os, const Callable &self) {
+  // prepare the transformation predicate to be used
+  constexpr auto s_predicate = [](const Entity &entity) {
+    return fmt::format("{0}", *entity.value()) + (entity.optional() ? "?" : "");
+  };
+
+  // build our parameters to be printed as necessary
+  auto parameters = $::Ranges::To(self.m_parameters | std::views::transform(s_predicate));
+
+  // prepare the packed details to be used now
+  auto spread = self.packed() ? self.m_parameters.back().value() : nullptr;
+  if (spread != nullptr) parameters.pop_back(); // pop the spread typing now
+
+  // get the current emptiness to be used
+  auto empty = parameters.empty();
+  auto parens = !empty || spread;
+
+  // test for the "Any" function instance
+  if (spread && empty && spread->is<Any>() && self.m_returns->is<Any>()) {
+    os << Builtins::Inspect<Function::Any>::name();
+  } else {
+    os << fmt::format("fn{0}{1}", parens ? " (" : "", fmt::join(parameters, ", "));
+    if (spread) os << (empty ? "" : ", ") << "..." << *spread;
+    os << (parens ? ")" : "") << " -> " << *self.m_returns;
+  }
 }

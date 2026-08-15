@@ -1,30 +1,50 @@
 #ifndef _XTDLIB_RTTI_HASH_HPP
 #define _XTDLIB_RTTI_HASH_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <xhash/xhash.hpp>
 
-/// Library Modules
+/// Library Includes
 #include "xtdlib/rtti/name.hpp"
+#include "xtdlib/system/switch.hpp"
 
 namespace $::RTTI {
 
-    //  TYPEDEFS  //
+//  TYPEDEFS  //
 
-    /// @brief Internal tag-typing.
-    using Tag = uint64_t;
+/// @brief Internal Type Tagging.
+using Tag = $_ARCH_TYPED(uint64_t, uint32_t);
 
-    /// @brief Allows tagging invalid types.
-    struct $_ABSTRACT Invalid : public Never {};
+//  PUBLIC METHODS  //
 
-    //  PUBLIC METHODS  //
+/**
+ * @brief Resolves a named hash.
+ * @param name                  Name to hash.
+ */
+static inline consteval Tag Hash(const String::View &name) {
+  if constexpr ($_ARCH_TEST()) return XH::FNV::U64(name);
+  else return XH::FNV::U32(name); // received 32-bit value
+}
 
-    /// @brief Handles hashing type-names.
-    template <class T = Invalid>
-    $_INLINE_PERF static consteval Tag Hash() {
-        return XH::FNV::U64(Name::of<T>());
-    };
+/// @brief Resolves a typed hash.
+template <class T = void> static inline consteval Tag Hash() {
+  if constexpr (std::same_as<T, void>) return Hash<struct Invalid>();
+  else return Hash(Name<std::remove_cvref_t<T>>()); // resolve the hash
+}
 
-}  // namespace $::RTTI
+/**
+ * @brief Handles asserting types.
+ * @param hash                  Hash to check.
+ */
+template <class T> $_INLINE_PERF static constexpr void Assert($_UNUSED Tag hash) {
+  // prepare some statically assigned items
+  $_UNUSED auto s_name = Name<T>();
+  $_UNUSED auto s_expect = Hash(s_name);
+
+  // and we check in debugging only instances
+  $_ASSERT(s_expect == hash, "Value is not of type '{0}'", s_name);
+}
+
+} // namespace $::RTTI
 
 #endif

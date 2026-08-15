@@ -1,43 +1,42 @@
 #ifndef _TALOS_BUILTINS_BOOLEAN_HPP
 #define _TALOS_BUILTINS_BOOLEAN_HPP
 
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
-#include "talos/value/boolean.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 namespace Talos::Builtins {
 
-    /// @brief Tagged Boolean Builtin Traits.
-    template <>
-    struct Traits<Value::Boolean> : public Define<Value::Boolean, "Boolean">,
-                                    public Features<Adapter::GLOBALS, Adapter::TYPEDEFS> {
-        //  TYPEDEFS  //
+/// @brief Tagged Boolean Builtin Traits.
+template <> struct Wrapper<Value::Boolean> : public Blueprint<Value::Boolean, "Boolean"> {
+  //  PUBLIC METHODS  //
 
-        /// @brief Helpers for constructing outputs.
-        struct Field;
-        struct Static;
+  /// @brief Gets the baseline boolean type-class.
+  static $::Shared::Pointer<Type::Prototype> typeclass();
 
-        //  PUBLIC METHODS  //
+protected:
+  //  PRIVATE METHODS  //
 
-        /// @brief Gets the underlying "Boolean" typing.
-        static Type::Erased typing();
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-       protected:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   * @param prototype                 Prototype instance.
+   */
+  static Value::Any m_globals(Isolate *isolate, const Object::Class &prototype);
 
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
+  /**
+   * @brief Handles looking up value fields.
+   * @param self                      Value instance.
+   * @param symbol                    Field symbol.
+   */
+  static Member::View m_attribute(const Value::Boolean &self, const Value::Symbol &symbol);
+};
 
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
-    };
-
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

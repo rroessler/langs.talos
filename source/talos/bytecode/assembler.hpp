@@ -1,77 +1,67 @@
 #ifndef _TALOS_BYTECODE_ASSEMBLER_HPP
 #define _TALOS_BYTECODE_ASSEMBLER_HPP
 
-/// Talos Modules
-#include "talos/linker/arena.hpp"
-#include "talos/runtime/options.hpp"
+/// Talos Includes
+#include "talos/bytecode/block.hpp"
+#include "talos/image/arena.hpp"
 
 namespace Talos::Bytecode {
 
-    /// @brief Bytecode Assembler Service.
-    class Assembler : public XI::Define<Assembler, XI::Unique> {
-        //  TYPEDEFS  //
+/// @brief Bytecode Assembler Service.
+class Assembler : public XI::Transient {
+  //  TYPEDEFS  //
 
-        /// @brief Allow the compiler internal access.
-        friend class Compiler;
+  /// @brief Allow the compiler internal access.
+  friend class Compiler;
 
-        /// @brief Instruction cache typing.
-        using Cache = std::vector<const Instruction*>;
+  //  PROPERTIES  //
 
-        //  PROPERTIES  //
+  /// @brief Current top-most label.
+  Label m_head = 0;
 
-        /// @brief Current top-most label.
-        Label m_head = 0;
+  /// @brief Available source positions.
+  Mapping m_positions = {};
 
-        /// @brief Available source positions.
-        Mapping m_positions = {};
+  /// @brief All labels that have been placed.
+  Label::Placed m_placed = {};
 
-        /// @brief All labels that have been placed.
-        Label::Placed m_placed = {};
+  /// @brief All labels that are unresolved.
+  Label::Unresolved m_unresolved = {};
 
-        /// @brief All labels that are unresolved.
-        Label::Unresolved m_unresolved = {};
+public:
+  //  CONSTRUCTORS  //
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Constructs a bytecode assembler.
+  explicit Assembler();
+  explicit Assembler(XI::Container *services);
 
-        /// @brief Constructs a bytecode assembler.
-        explicit Assembler();
-        explicit Assembler(XI::Container* services);
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Handles assembling a routine.
+   * @param routine                   Routine to assemble.
+   * @param arena                     Bytecode output arena.
+   */
+  Image::Slice process(Routine *routine, Image::Arena *arena);
 
-        /**
-         * @brief Handles assembling a routine.
-         * @param routine                   Routine to assemble.
-         * @param arena                     Bytecode output arena.
-         */
-        Linker::View process(Routine* routine, Linker::Arena* arena);
+private:
+  //  PRIVATE METHODS  //
 
-       private:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles patching all unresolved labels.
+   * @param binary                    Binary to patch.
+   * @param arena                     Arena to be patched.
+   */
+  void m_patch(Image::Binary &binary, Image::Arena *arena) const;
 
-        /**
-         * @brief Handles patching all unresolved labels.
-         * @param buffer                    Buffer to patch.
-         * @param arena                     Arena to be patched.
-         */
-        void m_patch(Linker::Buffer& buffer, Linker::Arena* arena) const;
+  /**
+   * @brief Handles encoding instructions.
+   * @param instruction               Instruction to encode.
+   * @param offset                    Current offset for the instruction.
+   */
+  uint64_t m_encode(const Instruction *instruction, Label::Encoded offset);
+};
 
-        /**
-         * @brief Handles encoding instructions.
-         * @param instruction               Instruction to encode.
-         * @param offset                    Current offset for the instruction.
-         */
-        uint64_t m_encode(const Instruction* instruction, Label::Encoded offset);
-
-        /**
-         * @brief Elides necessary instructions.
-         * @param instructions              Instruction list.
-         * @param next                      Current instruction.
-         */
-        int32_t m_elide(Cache& instructions, const Instruction* current) const;
-    };
-
-}  // namespace Talos::Bytecode
+} // namespace Talos::Bytecode
 
 #endif

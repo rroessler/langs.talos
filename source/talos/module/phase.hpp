@@ -1,35 +1,30 @@
 #ifndef _TALOS_MODULE_PHASE_HPP
 #define _TALOS_MODULE_PHASE_HPP
 
-/// Talos Modules
+/// Talos Includes
+#include "talos/forward/import.hpp"
 #include "talos/forward/module.hpp"
-
-//  X-MACROS  //
-
-/// @brief Available Module Phases.
-#define TALOS_XX_MODULE_PHASES(X) \
-    X(CLEANED)                    \
-    X(PARSED)                     \
-    X(TYPED)                      \
-    X(COMPILED)                   \
-    X(EXPORTED)
-
-/// @brief Available Modules Dumps.
-#define TALOS_XX_MODULE_DUMPS(X) \
-    X(SYNTAX)                    \
-    X(TYPEDEFS)                  \
-    X(BYTECODE)
-
-//  NAMESPACES  //
 
 namespace Talos::Module {
 
-    /// @brief Available Printing Dumps.
-    $_XX_ENUM_CLASS(Dump, uint8_t, TALOS_XX_MODULE_DUMPS);
+/// @brief Available Printing Dumps.
+enum class Dump : uint8_t {
+  SYNTAX,   // Show syntax-tree.
+  TYPEDEFS, // Show final type-world.
+  BYTECODE, // Show bytecode outputs.
+};
 
-    /// @brief Available Module Phases.
-    $_XX_ENUM_CLASS(Phase, uint8_t, TALOS_XX_MODULE_PHASES);
+/// @brief Module Runtime Phase.
+enum class Phase : uint8_t {
+  CLEANED,  // No available metadata.
+  PARSED,   // Syntax has been parsed.
+  TYPED,    // Type-checking completed.
+  COMPILED, // Bytecode compilation done.
+  EXPORTED, // Module has exported values.
 
-}  // namespace Talos::Module
+  MAXIMUM = EXPORTED, // Artifacts total size.
+};
+
+} // namespace Talos::Module
 
 #endif

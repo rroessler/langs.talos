@@ -1,7 +1,11 @@
-/// Shell Modules
-#include "shell/application/program.hpp"
+/// Talos Includes
+#include <talos/bundle/fuse.hpp>
+#include <talos/toolchain/launch.hpp>
 
-/// Shell Actions
+/// Shell Includes
+#include "shell/command/program.hpp"
+
+/// Action Includes
 #include "shell/bundle/action.hpp"
 #include "shell/format/action.hpp"
 #include "shell/launch/action.hpp"
@@ -16,28 +20,28 @@
  * @param argc                  Argument count.
  * @param argv                  Variadic arguments.
  */
-int32_t main(int32_t argc, char** argv) {
-    // initialize "stdio" handling now
-    $_UNUSED $_AUTO = $::Stream::Setup();
+int32_t main(int32_t argc, char **argv) {
+  // ensure the underlying terminal can use utf-8
+  $::Terminal::utf8();
 
-    // if the bundle fuse has been set, then we should immediately launch the runtime
-    if (Talos::Fuse::BUNDLED.exists()) return Talos::Toolchain::launch(argc, argv);
+  // check if we have a bundled program to bypass
+  if (Talos::Fuse::BUNDLED.exists()) return Talos::Toolchain::launch(argc, argv);
 
-    // construct the underlying program
-    auto program = Shell::Program();
+  // construct the underlying program
+  auto program = Shell::Command::Program();
 
-    // subscribe all the available actions now
-    program.subscribe<Shell::Launch::Action>();
-    program.subscribe<Shell::Task::Action>();
-    program.subscribe<Shell::Test::Action>();
+  // subscribe all the available actions now
+  program.subscribe<Shell::Launch::Action>();
+  program.subscribe<Shell::Task::Action>();
+  program.subscribe<Shell::Test::Action>();
 
-    program.subscribe<Shell::Bundle::Action>();
-    program.subscribe<Shell::Format::Action>();
-    program.subscribe<Shell::Lint::Action>();
-    program.subscribe<Shell::Serve::Action>();
+  program.subscribe<Shell::Bundle::Action>();
+  program.subscribe<Shell::Format::Action>();
+  program.subscribe<Shell::Lint::Action>();
+  program.subscribe<Shell::Serve::Action>();
 
-    program.subscribe<Shell::Upgrade::Action>();
+  program.subscribe<Shell::Upgrade::Action>();
 
-    // and finally launch the program
-    return program.launch(argc, argv);
+  // and finally attempt launching the program
+  return program.launch(argc, argv);
 }

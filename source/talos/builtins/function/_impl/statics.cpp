@@ -1,62 +1,94 @@
-/// Talos Modules
-#include "talos/member/factory.hpp"
-
-/// Builtin Modules
+/// Builtin Includes
 #include "talos/builtins/_inline/assert.ipp"
-#include "talos/builtins/_inline/defines.ipp"
 
 //  TYPEDEFS  //
 
-#define TALOS_XX_STATICS_DEFINE(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
-struct TALOS_BUILTIN_STATICS(Function::Dynamic) {
+#define TALOS_XX_STATICS_DEFINE(N, ...) $_FWD(Talos::Builtins::Static, static Value::Any N(Isolate *, const Args &))
 #include "talos/builtins/function/_defines/statics.def"
-};
-#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_BUILTIN_STATIC(Function::Dynamic, vlimit, , ) { return Number::Tagged(UINT64_MAX); }
+const Talos::Function::Info *Talos::Builtins::Wrapper<Talos::Function::Any>::glue() {
+  // prepare the baseline items to be prepared
+  static const Function::Info *s_info = nullptr;
+  static $::URI::Buffer s_resource = $::URI::Evaluate("Function.bind()");
+  static $::Shared::Pointer<Image::Arena> s_arena = $::Shared::New<Image::Arena>();
 
-TALOS_MM_BUILTIN_STATIC(Function::Dynamic, call, isolate, args) {
-    // ensure we have some valid values as necessary now
-    TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);
-    TALOS_MM_ASSERT_TYPEOF(isolate, Function::Dynamic, args[0]);
+  // the expected bytecode to be emplaced
+  static std::vector<Bytecode::Instruction> s_bytecode = {
+      TALOS_MM_BIR(CLOSURE_PASS, Register::Accumulator),
+      TALOS_MM_BIR(EXEC_RETURN), // and return the value
+  };
 
-    // prepare the dynamic arguments now
-    auto functor = args.at<Function::Dynamic>(0);
+  // if the information is available, then return now
+  if (s_info != nullptr) return s_info;
 
-    // attempt calling the instance now
-    return isolate->invoke(functor, args.slice(1));
+  // prepare the shared information to be used
+  auto shared = Bytecode::Shared();
+
+  // ensure we define as variadic
+  shared.locals = UINT32_MAX;
+  shared.adicity = UINT64_MAX;
+
+  // prepare the arena details to be used now
+  s_arena->resource = s_resource;
+
+  // construct a new set of function information to be used now
+  auto info = $::Unique::New<Function::Info>(s_arena.get(), shared);
+
+  // bind the bytecode to call the instance now
+  for (const auto &instruction : s_bytecode) s_arena->binary.write(instruction.encode());
+
+  // update the buffer before continuing now
+  info->bytecode() = s_arena->binary.slice();
+
+  // ensure the function is emplace as the "main" module now
+  return s_info = s_arena->functions.emplace_back(std::move(info)).get();
 }
 
-TALOS_MM_BUILTIN_STATIC(Function::Dynamic, apply, isolate, args) {
-    // ensure we have some valid values as necessary now
-    TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);
-    TALOS_MM_ASSERT_TYPEOF(isolate, Function::Dynamic, args[0]);
+Talos::Value::Any Talos::Builtins::Static::vlimit(Isolate *, const Args &) { return Number::Tagged(UINT64_MAX); }
 
-    // prepare the dynamic arguments and callable
-    auto functor = args.at<Function::Dynamic>(0);
+Talos::Value::Any Talos::Builtins::Static::bind(Isolate *isolate, const Args &args) {
+  TALOS_MM_ASSERT_ARGC(isolate, args.size(), 2);
+  TALOS_MM_ASSERT_TYPEOF(isolate, Function::Any, args[0]);
+  return isolate->bind(args.at<Function::Any>(0), args[1]);
+}
+Talos::Value::Any Talos::Builtins::Static::call(Isolate *isolate, const Args &args) {
+  // ensure we have some valid values as necessary now
+  TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);
+  TALOS_MM_ASSERT_TYPEOF(isolate, Function::Any, args[0]);
 
-    // this means we have a baseline callable value
-    if (args.size() == 1) return isolate->invoke(functor);
+  // prepare the dynamic arguments now
+  auto functor = args.at<Function::Any>(0);
 
-    // ensure we now have an iterable list now
-    TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::List, args[1]);
-    return isolate->invoke(functor, args.at<Iterable::List>(1).span());
+  // attempt calling the instance now
+  return isolate->invoke(functor, args.slice(1));
+}
+
+Talos::Value::Any Talos::Builtins::Static::apply(Isolate *isolate, const Args &args) {
+  // ensure we have some valid values as necessary now
+  TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);
+  TALOS_MM_ASSERT_TYPEOF(isolate, Function::Any, args[0]);
+
+  // prepare the dynamic arguments and callable
+  auto functor = args.at<Function::Any>(0);
+
+  // this means we have a baseline callable value
+  if (args.size() == 1) return isolate->invoke(functor);
+
+  // ensure we now have an iterable list now
+  TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::List, args[1]);
+  return isolate->invoke(functor, args.at<Iterable::List>(1).span());
 }
 
 //  PRIVATE METHODS  //
 
-Talos::Value::Any TALOS_BUILTIN_TRAITS(Function::Dynamic)::m_globals(Runtime::Isolate* isolate) {
-    // construct the base object instance
-    auto self = isolate->create<Object::Class>(name(), shape());
-
-// assign the necessary fields now
-#define TALOS_XX_STATICS_DEFINE(N, ...) \
-    self.statics().emplace(#N, Member::Factory::native(isolate, Static::N, name(), #N));
+Talos::Value::Any
+Talos::Builtins::Wrapper<Talos::Function::Any>::m_globals(Isolate *isolate, const Object::Class &self) {
+#define TALOS_XX_STATICS_DEFINE(N, ...)                                                \
+  self.statics().emplace(#N, Member::Factory::native(isolate, Static::N, name(), #N));
 #include "talos/builtins/function/_defines/statics.def"
-#undef TALOS_XX_STATICS_DEFINE
 
-    // and return the resulting instance
-    return self;
+  // and return the resulting instance
+  return self;
 }

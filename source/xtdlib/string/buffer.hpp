@@ -1,14 +1,11 @@
 #ifndef _XTDLIB_STRING_BUFFER_HPP
 #define _XTDLIB_STRING_BUFFER_HPP
 
-/// C++ Includes
-#include <string>
+/// Library Includes
+#include "xtdlib/macros/forward.hpp"
+#include "xtdlib/portable/stdlib.hpp"
 
-namespace $::String {
-
-    /// @brief String-Buffer Reference.
-    using Buffer = std::string;
-
-}  // namespace $::String
+/// Forward Definitions
+$_FWD($::String, using Buffer = std::string)
 
 #endif

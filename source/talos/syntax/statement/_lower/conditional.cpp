@@ -1,32 +1,32 @@
 /// Talos Modules
 #include "talos/bytecode/visitor.hpp"
 
-/// Syntax Modules
-#include "talos/syntax/_inline/statement.ipp"
-
 //  PUBLIC METHODS  //
 
 TALOS_MM_LOWER_NODE(Conditional, node, compiler, ) {
-    // get the base condition to be handled
-    auto* condition = node->condition();
-    auto type = condition->traits()->lattice();
+  // get the base condition to be handled
+  auto *condition = node->condition();
 
-    // bypass everything if the condition is expected to be truthy/falsey
-    if (type.truthy()) return compiler->lower(condition), compiler->lower(node->consequence());
-    if (type.falsey()) return compiler->lower(condition), compiler->lower(node->alternative());
+  // get the incoming truthiness value to be used
+  auto truthiness = condition->trivia()->truthiness();
 
-    auto* labels = compiler->labels();  // prepare labels
-    auto skip = labels->reserve(), exit = labels->reserve();
+  // bypass everything if the condition is expected to be truthy/falsey
+  if (truthiness.roughly(true)) return compiler->lower(condition), compiler->lower(node->consequence());
+  if (truthiness.roughly(false)) return compiler->lower(condition), compiler->lower(node->alternative());
 
-    compiler->lower(condition, Accumulator());  // conditional
-    compiler->emit<Syllable::JUMP_FALSEY>(skip, Accumulator());
+  auto *labels = compiler->labels(); // prepare labels
+  auto skip = labels->reserve(), exit = labels->reserve();
 
-    // prepare the consequence handler now
-    compiler->lower(node->consequence()), compiler->emit<Syllable::JUMP_TO>(exit);
+  // prepare the incoming conditional to be used
+  compiler->lower(condition, Register::Accumulator);
+  compiler->emit<Glyph::JUMP_FALSEY>(skip, Register::Accumulator);
 
-    // prepare the alternative handler now
-    labels->patch(skip), compiler->lower(node->alternative());
+  // prepare the consequence handler now
+  compiler->lower(node->consequence()), compiler->emit<Glyph::JUMP_TO>(exit);
 
-    // and finally patch the exit label
-    labels->patch(exit);
+  // prepare the alternative handler now
+  labels->patch(skip), compiler->lower(node->alternative());
+
+  // and finally patch the exit label
+  labels->patch(exit);
 }

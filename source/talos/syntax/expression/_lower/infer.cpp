@@ -1,33 +1,30 @@
 /// Talos Modules
 #include "talos/bytecode/visitor.hpp"
 
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
+/// Type Includes
+#include "talos/type/utility/intrinsics.hpp"
 
 //  PUBLIC METHODS  //
 
 TALOS_MM_LOWER_NODE(Infer, node, compiler, destination) {
-    // prepare the trace handler to be used
-    $_UNUSED $_AUTO = compiler->trace(node);
+  // prepare the trace handler to be used
+  $_UNUSED $_AUTO = compiler->trace(node);
 
-    // get some information about the cast now
-    auto guard = node->guard()->traits()->lattice();
+  // if the guard is dynamic, then we can return a constant result immediately
+  if (node->guard()->trivia()->type()->is<Type::Any>()) {
+    if (node->negate()) return compiler->plug<Glyph::LOAD_FALSE>(destination);
+    else return compiler->plug<Glyph::LOAD_TRUE>(destination); // always truthy
+  }
 
-    // if the guard is dynamic, then we can return a constant result immediately
-    if (guard.dynamic()) {
-        if (node->negate()) return compiler->plug<Syllable::LOAD_FALSE>(destination);
-        else return compiler->plug<Syllable::LOAD_TRUE>(destination);  // always truthy
-    }
+  auto bx = Register::Accumulator; // prepare ax/bx
+  auto ax = compiler->registers()->temporary();
 
-    auto bx = Accumulator();  // prepare ax/bx
-    auto ax = compiler->registers()->temporary();
+  // lower the left-hand side and the right-hand side
+  compiler->lower(node->value(), ax), compiler->lower(node->guard(), bx);
 
-    // lower the left-hand side and the right-hand side
-    compiler->lower(node->value(), ax), compiler->lower(node->guard(), bx);
+  // force a runtime guard to occur now as necessary
+  compiler->plug<Glyph::TYPE_GUARD>(destination, ax, bx);
 
-    // force a runtime guard to occur now as necessary
-    compiler->plug<Syllable::TYPE_GUARD>(destination, ax, bx);
-
-    // handle the negation of results if necessary
-    if (node->negate()) compiler->emit<Syllable::UNOP_NOT>(destination, destination);
+  // handle the negation of results if necessary
+  if (node->negate()) compiler->emit<Glyph::UNOP_NOT>(destination, destination);
 }

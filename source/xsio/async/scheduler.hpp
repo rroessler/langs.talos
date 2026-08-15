@@ -1,181 +1,187 @@
 #ifndef _XSIO_ASYNC_SCHEDULER_HPP
 #define _XSIO_ASYNC_SCHEDULER_HPP
 
-/// XSIO Modules
+/// XSIO Includes
 #include "xsio/async/storage.hpp"
 #include "xsio/memory/stack.hpp"
-#include "xsio/virtual/processor.hpp"
-#include "xsio/virtual/thread.hpp"
-#include "xsio/virtual/worker.hpp"
-
-//  X-MACROS  //
-
-/// @brief Available scheduler targets.
-#define XX_SCHEDULER_TARGETS(X) \
-    X(Memory::Stack)            \
-    X(Virtual::Thread)          \
-    X(Virtual::Processor)
-
-//  NAMESPACES  //
 
 namespace XSIO::Async {
 
-    /// @brief Event Loop Scheduler.
-    class Scheduler {
-        //  PROPERTIES  //
+/// @brief Asynchronous Scheduler.
+class Scheduler {
+  //  PROPERTIES  //
 
-        /// @brief Underlying manager instance.
-        Async::Manager* m_manager;
+  /// @brief Asynchronous runtime manager.
+  Manager *m_runtime;
 
-        /// @brief Runtime storage.
-        $::Ptr::Unique<Storage> m_storage;
+  /// @brief Scheduler storage to be bound.
+  Storage *m_storage;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Do not allow default construction.
-        explicit Scheduler() = delete;
+  /// @brief Do not allow default construction.
+  explicit Scheduler() = delete;
 
-        /**
-         * @brief Constructs a scheduler instance.
-         * @param manager                   Asynchronous manager.
-         */
-        explicit Scheduler(Manager* manager);
+  /**
+   * @brief Constructs a scheduler instance.
+   * @param runtime                   Asynchronous runtime.
+   */
+  explicit Scheduler(Manager *runtime);
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        inline constexpr Task::Queue* tasks() const noexcept { return m_storage->tasks.get(); }
-        inline constexpr const auto& threads() const noexcept { return m_storage->instances.threads; }
-        inline constexpr const auto& workers() const noexcept { return m_storage->instances.workers; }
-        inline constexpr const auto& processors() const noexcept { return m_storage->instances.processors; }
+  /// @brief Gets the underlying queue of tasks.
+  inline constexpr Task::Queue *tasks() const noexcept { return m_storage->tasks.get(); }
 
-        /// @brief Gets the total task-queue size.
-        inline constexpr size_t pending() const noexcept {
-            auto predicate = [](size_t acc, const auto& processor) { return acc + processor->pending(); };
-            return std::ranges::fold_left(processors(), m_storage->tasks->size(), predicate);
-        }
+  /// @brief Gets all the available threads.
+  inline constexpr const auto &threads() const noexcept { return m_storage->instances.threads; }
 
-        /// @brief Joins all scheduler workers.
-        inline void join() {
-            for (const auto& worker : workers()) worker->awaken();  // first awaken, then join
-            for (const auto& worker : workers()) worker->join(), $_EXPECT(!worker->running());
-        }
+  /// @brief Gets all the available workers.
+  inline constexpr const auto &workers() const noexcept { return m_storage->instances.workers; }
 
-        /// @brief Pauses execution of all the available workers.
-        inline constexpr auto pause() {
-            for (const auto& worker : workers()) worker->pause();
-            return $::Functor::Defer([&] { resume(); });  // resume
-        }
+  /// @brief Gets all the available processors.
+  inline constexpr const auto &processors() const noexcept { return m_storage->instances.processors; }
 
-        /// @brief Resumes execution of all workers.
-        inline constexpr void resume() {
-            for (const auto& worker : workers()) worker->resume();
-        }
+  /// @brief Gets the total task-queue size.
+  inline constexpr size_t pending() const noexcept {
+    auto predicate = [](size_t acc, const auto &processor) { return acc + processor->pending(); };
+    return std::ranges::fold_left(processors(), m_storage->tasks->size(), predicate);
+  }
 
-        /// @brief Handles acquiring various items.
-        template <class T>
-        T* acquire();
+  /// @brief Joins all scheduler workers.
+  inline void join() {
+    for (const auto &worker : workers()) worker->awaken(); // first awaken, then join
+    for (const auto &worker : workers()) worker->join(), $_EXPECT(!worker->running());
+  }
 
-        /**
-         * @brief Handles releasing various values.
-         * @param value                     Value to recycle.
-         */
-        template <class T>
-        void recycle(T* value);
+  /// @brief Pauses execution of all the available workers.
+  inline constexpr auto suspend() {
+    for (const auto &worker : workers()) worker->suspend();
+    return $::Lambda::Defer([&] { resume(); }); // resume
+  }
 
-        /**
-         * @brief Handles assigning a processor to a worker.
-         * @param worker                    Worker to assign to.
-         */
-        bool assign(Virtual::Worker* worker);
+  /// @brief Resumes execution of all workers.
+  inline constexpr void resume() {
+    for (const auto &worker : workers()) worker->resume();
+  }
 
-        /**
-         * @brief Handles releasing a processor from a worker.
-         * @param worker                    Worker to release from.
-         */
-        void release(Virtual::Worker* worker);
+  /// @brief Handles acquiring various storage items.
+  template <class T> inline T *acquire() { return m_storage->acquire; }
 
-        /**
-         * @brief Attempts stealing threads from another processor.
-         * @param target                    Target to steal from.
-         */
-        inline bool steal(Virtual::Processor* target) {
-            // attempt stealing from other processor now
-            for (const auto& processor : processors()) {
-                if (processor.get() == target) continue;
-                if (processor->balance(target)) return true;
-            }
+  /**
+   * @brief Handles recycling thread stacks.
+   * @param stack                    Stack to recycle.
+   */
+  inline void recycle(Memory::Stack *stack) { return m_recycle(stack); }
 
-            // failed to balance any processors
-            return false;
-        }
+  /**
+   * @brief Handles recycling virtual threads.
+   * @param thread                   Thread to recycle.
+   */
+  inline void recycle(Virtual::Thread *thread) { return m_recycle(thread); }
 
-        /**
-         * @brief Handles scheduling a thread for execution.
-         * @param thread                    Thread to schedule.
-         * @param processor                 Optional processor.
-         */
-        inline void schedule(Virtual::Thread* thread, Virtual::Processor* processor = nullptr) {
-            // ensure the thread is actually ready for running
-            $_ASSERT(thread->state() == Virtual::State::READY);
+  /**
+   * @brief Handles recycling virtual processors.
+   * @param processor                 Processor to recycle.
+   */
+  inline void recycle(Virtual::Processor *processor) { return m_recycle(processor); }
 
-            // if we can push onto a processor, then do so
-            if (processor) return processor->schedule(thread);
+  /**
+   * @brief Handles assigning a processor to a worker.
+   * @param worker                    Worker to assign to.
+   */
+  inline bool assign(Virtual::Worker *worker) { return m_assign(worker); }
 
-            // attempt pushing the thread onto the global task-queue
-            m_storage->tasks->schedule(thread), m_awaken();
-        }
+  /**
+   * @brief Handles releasing a processor from a worker.
+   * @param worker                    Worker to release from.
+   */
+  inline void release(Virtual::Worker *worker) { return m_release(worker); }
 
-        /**
-         * @brief Handles scheduling an executor.
-         * @param args                      Arguments to bind.
-         */
-        template <std::derived_from<Task::Executor> T, class... As>
-        inline T* schedule(As&&... args) {
-            Virtual::Processor* processor = nullptr;  // global task
-            return schedule<T>(processor, std::forward<As>(args)...);
-        }
+  /**
+   * @brief Attempts stealing threads from another processor.
+   * @param target                    Target to steal from.
+   */
+  inline bool steal(Virtual::Processor *target) {
+    // attempt stealing from other processor now
+    for (const auto &processor : processors()) {
+      if (processor.get() == target) continue;
+      if (processor->balance(target)) return true;
+    }
 
-        /**
-         * @brief Handles scheduling an executor.
-         * @param processor                 Processor to bind.
-         * @param args                      Arguments to bind.
-         */
-        template <std::derived_from<Task::Executor> T, class... As>
-        inline T* schedule(Virtual::Processor* processor, As&&... args) {
-            auto* thread = acquire<Virtual::Thread>();  // force acquire
-            auto* task = thread->assign<T>(std::forward<As>(args)...);
-            return thread->awaken(), schedule(thread, processor), task;
-        }
+    // failed to balance any processors
+    return false;
+  }
 
-       private:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles scheduling a thread for execution.
+   * @param thread                    Thread to schedule.
+   * @param processor                 Optional processor.
+   */
+  inline void schedule(Virtual::Thread *thread, Virtual::Processor *processor = nullptr) {
+    // ensure the thread is actually ready for running
+    $_ASSERT(thread->state() == Virtual::State::READY);
 
-        /** Attempts trying to awaken a worker instance. */
-        inline void m_awaken() {
-            for (const auto& worker : workers()) {
-                if (worker->state() != Virtual::State::WAITING) continue;
-                if (worker->awaken()) return;  // successfully awoken one
-            }
-        }
-    };
+    // if we can push onto a processor, then do so
+    if (processor) return processor->schedule(thread);
 
-}  // namespace XSIO::Async
+    // attempt pushing the thread onto the global task-queue
+    m_storage->tasks->schedule(thread), m_awaken();
+  }
 
-//  SPECIALIZATIONS  //
+  /**
+   * @brief Handles scheduling an executor.
+   * @param args                      Arguments to bind.
+   */
+  template <std::derived_from<Task::Executor> T, class... As> inline T *schedule(As &&...args) {
+    return schedule<T>(static_cast<Virtual::Processor *>(nullptr), std::forward<As>(args)...);
+  }
 
-#define X(T, ...)                               \
-    template <>                                 \
-    XSIO::T* XSIO::Async::Scheduler::acquire(); \
-                                                \
-    template <>                                 \
-    void XSIO::Async::Scheduler::recycle(T*);
+  /**
+   * @brief Handles scheduling an executor.
+   * @param processor                 Processor to bind.
+   * @param args                      Arguments to bind.
+   */
+  template <std::derived_from<Task::Executor> T, class... As>
+  inline T *schedule(Virtual::Processor *processor, As &&...args) {
+    auto *thread = acquire<Virtual::Thread>(); // force acquire
+    auto *task = thread->assign<T>(std::forward<As>(args)...);
+    return thread->awaken(), schedule(thread, processor), task;
+  }
 
-XX_SCHEDULER_TARGETS(X)
-#undef X
+private:
+  //  PRIVATE METHODS  //
 
-//  UNDEFINES  //
+  /** Attempts trying to awaken a worker instance. */
+  inline void m_awaken() {
+    for (const auto &worker : workers()) {
+      if (worker->state() != Virtual::State::SLEEPING) continue;
+      if (worker->awaken()) return; // successfully awoke worker
+    }
+  }
 
-#undef XX_SCHEDULER_TARGETS
+  /**
+   * @brief Handles recycling virtual values.
+   * @param value                     Item to recycle.
+   */
+  void m_recycle(Memory::Stack *stack);
+  void m_recycle(Virtual::Thread *thread);
+  void m_recycle(Virtual::Processor *processor);
+
+  /**
+   * @brief Handles assigning a processor to a worker.
+   * @param worker                    Worker to assign to.
+   */
+  bool m_assign(Virtual::Worker *worker);
+
+  /**
+   * @brief Handles releasing a processor from a worker.
+   * @param worker                    Worker to release from.
+   */
+  void m_release(Virtual::Worker *worker);
+};
+
+} // namespace XSIO::Async
 
 #endif

@@ -1,11 +1,27 @@
-/// Inline Linter Rules
-#include "talos/relint/_rules/no-empty-blocks.ipp"
-#include "talos/relint/_rules/no-unsafe-accessors.ipp"
-#include "talos/relint/_rules/no-unsafe-assignments.ipp"
-#include "talos/relint/_rules/no-unsafe-calls.ipp"
-#include "talos/relint/_rules/no-unsafe-returns.ipp"
+#ifndef _TALOS_RELINT_RULES_IPP
+#define _TALOS_RELINT_RULES_IPP
 
-//  UNDEFINES  //
+/// Talos Includes
+#include "talos/relint/context.hpp"
+#include "talos/relint/service.hpp"
 
-#undef TALOS_MM_RELINT_DEFINE
-#undef TALOS_MM_RELINT_REGISTER
+//  X-MACROS  //
+
+#define TALOS_XX_RELINT_RULES(X)                    \
+  X(NO_EMPTY_BLOCKS, "no-empty-blocks")             \
+  X(NO_UNSAFE_ACCESSORS, "no-unsafe-accessors")     \
+  X(NO_UNSAFE_ASSIGNMENTS, "no-unsafe-assignments") \
+  X(NO_UNSAFE_CALLS, "no-unsafe-calls")             \
+  X(NO_UNSAFE_RETURNS, "no-unsafe-returns")
+
+//  NAMESPACES  //
+
+namespace Talos::Relint::Label {
+
+#define X(N, L, ...) static constexpr $::String::Literal N = L;
+TALOS_XX_RELINT_RULES(X)
+#undef X
+
+} // namespace Talos::Relint::Label
+
+#endif

@@ -7,13 +7,4 @@
 #include <cstdint>
 #include <string_view>
 
-namespace XH {
-
-    //  TYPEDEFS  //
-
-    /// @brief Allow expsing underlying string-view inputs.
-    using Input = std::string_view;
-
-}  // namespace XH
-
 #endif

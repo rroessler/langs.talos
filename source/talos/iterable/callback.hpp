@@ -1,16 +1,15 @@
 #ifndef _TALOS_OBJECT_ITERABLE_HPP
 #define _TALOS_OBJECT_ITERABLE_HPP
 
-/// Talos Modules
-#include "talos/forward/iterable.hpp"
-#include "talos/object/abstract.hpp"
+/// Talos Includes
+#include "talos/object/mixin.hpp"
 
 namespace Talos::Iterable {
 
-    /// @brief Iteration Callback.
-    template <std::derived_from<Value::Any> T>
-    using Callback = $::Functor::Unique<Value::Any(Runtime::Isolate*, T, size_t)>;
+/// @brief Iteration Callback.
+template <std::derived_from<Value::Any> T>
+using Callback = $::Unique::Functor<Value::Any(Runtime::Isolate *, const T &, size_t) const>;
 
-}  // namespace Talos::Iterable
+} // namespace Talos::Iterable
 
 #endif

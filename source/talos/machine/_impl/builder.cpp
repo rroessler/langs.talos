@@ -1,70 +1,70 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/machine/builder.hpp"
 #include "talos/machine/frame.hpp"
-#include "talos/machine/signature.hpp"
-#include "talos/runtime/isolate.hpp"
-#include "talos/string/small.hpp"
 
-/// Forward Declarations
-$_FWD(Talos::Machine::Dispatch, void cancel(Runtime::Isolate*))
+/// Machine Includes
+#include "talos/machine/_inline/glue.ipp"
 
-//  CONSTRUCTORS  //
+//  PRIVATE METHODS  //
 
-Talos::Machine::Builder::Builder(Info* info, Compiler* compiler) :
-    info(info), compiler(compiler), emitter(this), registers(compiler) {
-    // construct the underlying function
-    auto* node = Signature(compiler);
+void Talos::Machine::Builder::m_prolog() {
+  // construct the underlying function
+  auto *node = XASM::Function::Build<Reference, Runtime::Isolate *, const Frame *, const Value::Any &>(compiler);
 
-    // bind all the incoming base registers to be used
-    isolate = compiler->new_gpz("@runtime.isolate/ptr");
-    stack = compiler->new_gpz("@runtime.stack/ptr");
-    frame = compiler->new_gpz("@runtime.frame/ptr");
-    argv = compiler->new_gpz("@runtime.argv/ptr");
-    envp = compiler->new_gpz("@runtime.envp/ptr");
+  // bind all the incoming base registers to be used
+  isolate = compiler->new_gpz();
+  feedback = compiler->new_gpz();
+  frame = compiler->new_gpz();
+  params = compiler->new_gpz();
+  argv = compiler->new_gpz();
+  envp = compiler->new_gpz();
 
-    // register the incoming accumulator as well now
-    result = registers.allocate(Engine::Accumulator());
+  // prepare the incoming frame details
+  auto stack = compiler->new_gpz();
 
-    // bind all the incoming labels necessary
-    panic = compiler->new_named_label("_panic");
-    interrupt = compiler->new_named_label("_interrupt");
+  // register the incoming accumulator as well now
+  result = registers->allocate(Register::Accumulator);
 
-    // declare that we are setting up the function
-    emitter.header("-- Function Prolog --\n");
+  // bind all the incoming labels necessary
+  panic = compiler->new_named_label("_panic");
+  interrupt = compiler->new_named_label("_interrupt");
 
-    // then we want to bind our arguments now
-    node->set_arg(0, isolate);
-    node->set_arg(1, frame);
+  // declare that we are setting up the function
+  logger->header("-- Function Prolog --");
 
-    // preload the stack pointer for references
-    compiler->load_u64(frame, emitter.memory(frame));
+  // then we want to bind our arguments now
+  node->set_arg(0, isolate);
+  node->set_arg(1, frame);
+  node->set_arg(2, stack);
 
-    // ensure we pre-load the incoming context, arguments and stack
-    compiler->load_u64(envp, emitter.memory(frame, Offset::STK_ENVP * sizeof(Value::Any)));
-    compiler->load_u64(argv, emitter.memory(frame, Offset::STK_DATA * sizeof(Value::Any)));
-    compiler->load_u64(stack, emitter.memory(frame, Offset::STK_PASS * sizeof(Value::Any)));
+  // preload the frame pointer for references to the environment, args and stack
+  if (facts.any()) logger->spacing();
 
-    // declare that we are now in the user-code
-    emitter.header("-- Function Code --");
+  // panic offset are held at the top of the stack
+  if (facts.panics()) compiler->mov(feedback, stack);
+
+  // ensure we pre-load the incoming context, arguments and stack
+  if (facts.envp()) compiler->load_u64(envp, emitter->mem(stack, Offset::STK_ENVP * sizeof(Value::Any)));
+  if (facts.params()) compiler->load_u64(params, emitter->mem(stack, Offset::STK_PASS * sizeof(Value::Any)));
+  if (facts.argv()) compiler->load_u64(argv, emitter->mem(stack, Offset::STK_DATA * sizeof(Value::Any)));
+
+  // declare that we are now in the user-code
+  logger->header("-- Function Code --");
 }
 
-Talos::Machine::Builder::~Builder() {
-    // show that we are emitting exceptions
-    emitter.header("--  Function Exceptions --\n");
+void Talos::Machine::Builder::m_epilog() {
+  // show that we are emitting exceptions
+  logger->header("--  Function Exceptions --\n");
 
-    // bind the fallback return condition
-    emitter.returns(Value::Void());
+  // bind the fallback return condition
+  emitter->ret(Constants::Void);
 
-    // bind the optimizable interrupt condition
-    compiler->bind(interrupt), emitter.invoke(Dispatch::cancel, isolate);
+  // bind the optimizable interrupt condition
+  compiler->bind(interrupt), emitter->call(Glue::cancel, isolate);
 
-    // bind the optimizable panic condition
-    compiler->bind(panic), emitter.returns(Value::Failure());
+  // bind the optimizable panic condition
+  compiler->bind(panic), emitter->ret(Constants::Fail);
 
-    // and annotate the incoming function epilog
-    emitter.header("-- Function Epilog --\n");
+  // and annotate the incoming function epilog
+  logger->header("-- Function Epilog --\n");
 }
-
-//  PUBLIC METHODS  //
-
-void Talos::Machine::Dispatch::cancel(Runtime::Isolate* isolate) { isolate->panic(9000200); }

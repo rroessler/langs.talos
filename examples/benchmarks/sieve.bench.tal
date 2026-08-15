@@ -1,7 +1,7 @@
-//!
-//! Example: "benchmarks/sieve.bench.tal"
-//! Description: Traces different "sieve" benchmarks.
-//!
+///
+/// @example "benchmarks/sieve.bench.tal"
+/// @describe Traces different "sieve" benchmarks.
+///
 
 // Talos Modules
 import "talos:test" as Test;

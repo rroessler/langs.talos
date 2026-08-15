@@ -1,8 +1,9 @@
 #ifndef _TALOS_FORWARD_DIAGNOSTIC_HPP
 #define _TALOS_FORWARD_DIAGNOSTIC_HPP
 
-/// Talos Includes
-#include "talos/forward/resource.hpp"
+/// Vendor Includes
+#include <xinv/xinv.hpp>
+#include <xlsp/xlsp.hpp>
 
 /// Forward Declarations
 $_FWD(Talos::Diagnostic, class View)

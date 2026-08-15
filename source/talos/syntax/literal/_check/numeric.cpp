@@ -1,9 +1,10 @@
-/// Talos Modules
-#include "talos/type/visitor.hpp"
+/// Talos Includes
+#include "talos/variable/visitor.hpp"
 
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
+/// Talos Includes
+#include "talos/type/_inline/type.ipp"
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_CHECK_NODE(Numeric, , ) { return { Type::Builder::number() }; }
+TALOS_MM_CAPTURE_NODE(Numeric, , ) {}
+TALOS_MM_CHECK_NODE(Numeric, , ) { return Type::New::number(); }

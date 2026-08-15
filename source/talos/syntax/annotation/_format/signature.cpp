@@ -1,43 +1,40 @@
-/// Talos Modules
-#include "talos/format/dispatch.hpp"
-
-/// Syntax Modules
-#include "talos/syntax/_inline/annotation.ipp"
+/// Format Includes
+#include "talos/format/_inline/macros.ipp"
 
 //  PRIVATE METHODS  //
 
-Talos::Format::Node* Talos::Format::Dispatch::m_signature(Reader* reader, bool compressed) {
-    // ensure we have a leading "fn" keyword
-    if (!reader->match(Lexer::Kind::DECL_FUNC)) return nullptr;
+Talos::Format::Piece *Talos::Format::Dispatch::m_signature(Reader *reader, bool compressed) {
+  // ensure we have a leading "fn" keyword
+  if (!reader->match(Lexer::Kind::DECL_FUNC)) return nullptr;
 
-    // attempt constructing the base prototype now
-    auto* prototype = m_constructor(reader, compressed);
-    if (prototype == nullptr) return nullptr;
+  // attempt constructing the base prototype now
+  auto *prototype = m_constructor(reader, compressed);
+  if (prototype == nullptr) return nullptr;
 
-    // prepare the storage instance now
-    auto* storage = reader->storage();
-    auto* space = storage->space().hard();
+  // prepare the storage instance now
+  auto *storage = reader->storage();
+  auto *space = storage->space().hard;
 
-    // ensure the prototype is safely prepended with a space when needed
-    if (!prototype->is<Node::Empty>()) prototype = storage->append(space, prototype);
+  // ensure the prototype is safely prepended with a space when needed
+  if (!prototype->is<Piece::Empty>()) prototype = storage->append(space, prototype);
 
-    // rebuild the prototype to include the "fn" keyword
-    prototype = storage->group(storage->unicode("fn"), prototype);
+  // rebuild the prototype to include the "fn" keyword
+  prototype = storage->group(storage->unicode("fn"), prototype);
 
-    // prepare the incoming colon-typing now
-    Node* colon = nullptr;
+  // prepare the incoming colon-typing now
+  Piece *colon = nullptr;
 
-    // if we do not have a colon, then ignore the return value
-    if (reader->match(Lexer::Kind::PUNC_COLON)) colon = storage->colon();
-    else if (!reader->match(Lexer::Kind::ARROW_THIN)) return prototype;
-    else colon = storage->list(space, storage->arrow().thin());
+  // if we do not have a colon, then ignore the return value
+  if (reader->match(Lexer::Kind::PUNC_COLON)) colon = storage->colon();
+  else if (!reader->match(Lexer::Kind::ARROW_THIN)) return prototype;
+  else colon = storage->list(space, storage->arrow().thin);
 
-    // otherwise we want to parse the incoming annotation again
-    auto callback = [](Reader* reader) { return m_annotation(reader); };
-    auto* returns = m_leading(reader, Callback(callback));  // and parse
+  // otherwise we want to parse the incoming annotation again
+  auto callback = [](Reader *reader) { return m_annotation(reader); };
+  auto *returns = m_leading(reader, Callback(callback)); // and parse
 
-    // update the returns instance to be it's own grouping
-    return returns ? storage->append(prototype, colon, space, returns) : nullptr;
+  // update the returns instance to be it's own grouping
+  return returns ? storage->append(prototype, colon, space, returns) : nullptr;
 }
 
 TALOS_MM_FORMAT_HINT(Signature, reader) { return m_signature(reader, true); }

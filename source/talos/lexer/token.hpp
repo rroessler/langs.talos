@@ -1,102 +1,89 @@
 #ifndef _TALOS_LEXER_TOKEN_HPP
 #define _TALOS_LEXER_TOKEN_HPP
 
-/// Talos Modules
-#include "talos/lexer/traits.hpp"
-#include "talos/resource/location.hpp"
-#include "talos/string/intern.hpp"
-
-//  X-MACROS  //
-
-#define XX_TOKEN_FLAGS(X)                               \
-    X(ASSIGNABLE) /** Assignment tokens. */             \
-    X(RESERVED)   /** Reserved keywords. */             \
-    X(SYNCABLE)   /** Can be synchronized on. */        \
-    X(VARIABLE)   /** Denotes variable declarations. */ \
-    X(ANNOTATION) /** Could be an annotation. */        \
-    X(MODIFIER)   /** Potential modifier keyword. */    \
-    X(ACCESSOR)   /** Accessor modifier keyword. */     \
-    X(DECORATES)  /** Adds decoration to variables. */  \
-    X(LEADING)    /** Valid leading tokens. */          \
-    X(TRAILING)   /** Valid panic trailing tokens. */   \
-    X(WHITESPACE) /** Any whitespace tokens. */         \
-    X(NUMERIC)    /** For all numeric literals. */      \
-    X(BOOLEAN)    /** For all boolean literals. */
-
-//  NAMESPACES  //
+/// Talos Includes
+#include "talos/lexer/inspect.hpp"
 
 namespace Talos::Lexer {
 
-    /// @brief Available Token Flags.
-    $_XX_ENUM_CLASS(Flag, uint16_t, XX_TOKEN_FLAGS);
+/// @brief Available Lexical Flags.
+enum class Flag : uint16_t {
+  RESERVED, // Denotes a reserved keyword.
 
-    /// @brief Token Structure.
-    class Token : public $::Printable {
-        //  PROPERTIES  //
+  ASSIGNS,   // Denotes an assignment operator.
+  DEFINES,   // Denotes any variable declaration.
+  MODIFIER,  // Potentially a "modifier" keyword.
+  ACCESSOR,  // Potentially an "accessor" keyword.
+  DECORATES, // Denotes an attribute/decorator operator.
+  ANNOTATES, // Denotes any valid identifier keyword.
 
-        Kind m_kind;                    // Kind of token.
-        $::String::Buffer m_lexeme;     // Raw lexeme value.
-        Resource::Location m_location;  // Resource location.
+  LEADING,    // Valid leading tokens.
+  TRAILING,   // Valid trailing tokens.
+  WHITESPACE, // Whitespace specific tokens.
+
+  VOID,    // Any void literal.
+  STRING,  // Any string literal.
+  NUMERIC, // Any numeric literal.
+  BOOLEAN, // Any boolean literal.
+
+  SYNCABLE, // Valid synchronization token.
+};
+
+/// @brief Available Token Kinds.
+class Token {
+  //  PROPERTIES  //
+
+  Kind m_kind;                     // Kind of token.
+  XLSP::Range m_range = {};        // Range of token.
+  $::String::Buffer m_lexeme = {}; // Raw lexeme value.
 
 #define TALOS_XX_TOKEN_BASE(_, ...) $::Enum::Flags<Flag>(__VA_ARGS__),
-        static constexpr size_t m_maximum = static_cast<size_t>(Kind::MISC_MAX) + 1;
-        static constexpr std::array<$::Enum::Flags<Flag>, m_maximum> m_flags = {
+  static constexpr size_t s_maximum = static_cast<size_t>(Kind::MISC_MAX) + 1;
+  static constexpr std::array<$::Enum::Flags<Flag>, s_maximum> s_flags = {
 #include "talos/lexer/_defines/tokens.def"
-        };
+  };
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs a default invalid token.
-        constexpr Token() : Token(Kind::MISC_MAX) {}
+  /**
+   * @brief Constructs a token value.
+   * @param kind                  Token kind.
+   * @param lexeme                Lexeme value.
+   * @param range                 Range of token.
+   */
+  constexpr Token() : Token(Kind::MISC_MAX) {}
+  constexpr Token(Kind kind, const XLSP::Range &range = {}) : Token(kind, Inspect::symbol(kind), range) {}
+  constexpr Token(Kind kind, const $::String::View &lexeme, const XLSP::Range &range = {})
+      : m_kind(kind), m_range(range), m_lexeme(lexeme) {}
 
-        /**
-         * @brief Constructs a token value.
-         * @param kind                  Token kind.
-         * @param location              Resource location.
-         */
-        constexpr Token(Kind kind, const Resource::Location& location = {}) :
-            m_kind(kind), m_lexeme(Traits::symbol(kind)), m_location(location) {}
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Constructs a token value.
-         * @param kind                  Token kind.
-         * @param lexeme                Lexeme value.
-         * @param location              Resource location.
-         */
-        constexpr Token(Kind kind, const $::String::View& lexeme, const Resource::Location& location = {}) :
-            m_kind(kind), m_lexeme(lexeme), m_location(location) {}
+  inline constexpr Kind kind() const noexcept { return m_kind; }
+  inline constexpr $::String::View lexeme() const noexcept { return m_lexeme; }
+  inline constexpr const XLSP::Range &range() const noexcept { return m_range; }
+  inline constexpr const $::Enum::Flags<Flag> &flags() const noexcept {
+    return s_flags.at(static_cast<size_t>(m_kind));
+  }
 
-        //  PUBLIC METHODS  //
+protected:
+  //  PRIVATE METHODS  //
 
-        inline constexpr Kind kind() const noexcept { return m_kind; }
-        inline constexpr $::String::View lexeme() const noexcept { return m_lexeme; }
-        inline constexpr const XLSP::Range& range() const noexcept { return m_location.range(); }
-        inline constexpr const Resource::Location& location() const noexcept { return m_location; }
-        inline constexpr $::Enum::Flags<Flag> flags() const noexcept { return m_flags.at(static_cast<size_t>(m_kind)); }
+  /**
+   * @brief Handles printing tokens.
+   * @param os                    Output stream.
+   * @param self                  Token to print.
+   */
+  static inline void m_print(std::ostream &os, const Token &self) {
+    // resolve the incoming details to be shown
+    auto position = self.m_range.start;
+    auto name = Inspect::name(self.m_kind);
 
-       protected:
-        //  PRIVATE METHODS  //
+    // print the resulting token now for debug viewing
+    os << fmt::format("[{0} / {1}] = '{2}'", name, position, self.m_lexeme);
+  }
+};
 
-        /**
-         * @brief Handles printing tokens.
-         * @param os                    Output stream.
-         * @param self                  Token to print.
-         */
-        static inline void m_print($::Stream::Output& os, const Token& self) {
-            // resolve the incoming details to be shown
-            $::String::View name = Traits::name(self.m_kind);
-            XLSP::Position position = self.m_location.range().start;
-
-            // print the resulting token now for debug viewing
-            os << fmt::format("[{0} / {1}] = '{2}'", name, position, self.m_lexeme);
-        }
-    };
-
-}  // namespace Talos::Lexer
-
-//  UNDEFINES  //
-
-#undef XX_TOKEN_FLAGS
+} // namespace Talos::Lexer
 
 #endif

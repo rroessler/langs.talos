@@ -1,39 +1,50 @@
 #ifndef _XTEST_HANDLE_CASE_HPP
 #define _XTEST_HANDLE_CASE_HPP
 
-/// XT Modules
-#include "xtest/handle/abstract.hpp"
+/// Testing Includes
+#include "xtest/handle/mixin.hpp"
 
-namespace XT {
+namespace XT::Handle {
 
-    /// @brief Testing Case Container.
-    class Case : public Handle::Abstract<Case> {
-        //  PROPERTIES  //
+/// @brief Encapsulates a Basic Test.
+class Case : public Mixin<Case> {
+  //  PROPERTIES  //
 
-        /// @brief Handles running a test-callback.
-        Handle::Callback m_callback;
+  /// @brief The callback for benchmarking.
+  Callback m_callback = [](Session::Runner *) {};
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a test-case.
-         * @param title                 Case title.
-         * @param location              Source location.
-         * @param callback              Test callback.
-         */
-        explicit Case(const $::String::Buffer& title, const Location& location, Handle::Callback&& callback) :
-            Abstract(title, location), m_callback(std::move(callback)) {}
+  /**
+   * @brief Constructs a test-case.
+   * @param title               Title of test.
+   * @param callback            Benchmark callback.
+   */
+  constexpr Case(const $::String::Buffer &title, Callback &&callback) : Case(title, {}, std::move(callback)) {}
 
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Constructs a test-case.
+   * @param title               Title of test.
+   * @param location            Test location.
+   * @param callback            Benchmark callback.
+   */
+  constexpr Case(const $::String::Buffer &title, const Trivia::Location &location, Callback &&callback)
+      : Mixin(title, location), m_callback(std::move(callback)) {}
 
-        /**
-         * @brief Handles running the callback.
-         * @param runner                Test runner.
-         */
-        void execute(Session::Runner* runner) const final;
-    };
+protected:
+  //  PRIVATE METHODS  //
 
-}  // namespace XT
+  /// @brief Gets the total count of the benchmark.
+  size_t m_count() const noexcept final;
+
+  /**
+   * @brief Handles running the callback.
+   * @param runner                Test runner.
+   */
+  void m_execute(Session::Runner *runner) const final;
+};
+
+} // namespace XT::Handle
 
 #endif

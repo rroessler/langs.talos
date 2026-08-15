@@ -1,81 +1,78 @@
 #ifndef _TALOS_LIFECYCLE_SERVICE_HPP
 #define _TALOS_LIFECYCLE_SERVICE_HPP
 
-/// C++ Modules
-#include <future>
-
-/// Talos Modules
+/// Talos Includes
 #include "talos/forward/runtime.hpp"
 #include "talos/lifecycle/scope.hpp"
 
 namespace Talos::Lifecycle {
 
-    /// @brief Disposable Callback.
-    using Disposable = $::Functor::Unique<void()>;
+/// @brief Disposable Callback.
+using Disposable = $::Unique::Functor<void() const>;
 
-    /// @brief Constructs a lifecycle service.
-    class Service : public XI::Define<Service, XI::Shared> {
-        //  PROPERTIES  //
+/// @brief Constructs a lifecycle service.
+class Service : public XI::Singleton {
+  //  PROPERTIES  //
 
-        /// @brief Internal disposable identifiers.
-        size_t m_identifier = 0;
+  /// @brief Internal disposable identifiers.
+  size_t m_identifier = 0;
 
-        /// @brief Services container.
-        XI::Container* m_services;
+  /// @brief Services container.
+  XI::Container *m_services;
 
-        /// @brief All available disposables.
-        $::Map<size_t, Disposable> m_disposables = {};
+  /// @brief All available disposables.
+  $::Map::Base<size_t, Disposable> m_disposables = {};
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a lifecycle service.
-         * @param services                  Services container.
-         */
-        explicit Service();
-        explicit Service(XI::Container* services);
+  /**
+   * @brief Constructs a lifecycle service.
+   * @param services                  Services container.
+   */
+  explicit Service();
+  explicit Service(XI::Container *services);
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Scopes a lifecycle sequence.
-         * @param isolate                   Runtime isolate.
-         */
-        Scope scope(Runtime::Isolate* isolate = nullptr);
+  /**
+   * @brief Scopes a lifecycle sequence.
+   * @param isolate                   Runtime isolate.
+   */
+  Scope scope(Runtime::Isolate *isolate = nullptr);
 
-        /**
-         * @brief Handles preloading the lifecycle.
-         * @param isolate                   Runtime isolate.
-         */
-        void preload(Runtime::Isolate* isolate = nullptr);
+  /**
+   * @brief Handles preloading the lifecycle.
+   * @param isolate                   Runtime isolate.
+   */
+  void preload(Runtime::Isolate *isolate = nullptr);
 
-        /**
-         * @brief Handles finalizing the lifecycle.
-         * @param isolate                   Runtime isolate.
-         */
-        void unload(Runtime::Isolate* isolate = nullptr);
+  /**
+   * @brief Handles finalizing the lifecycle.
+   * @param isolate                   Runtime isolate.
+   */
+  void unload(Runtime::Isolate *isolate = nullptr);
 
-        /**
-         * @brief Handles subscribing a disposable.
-         * @param disposable                Disposable to subscribe.
-         */
-        inline constexpr Disposable subscribe(Disposable&& disposable) {
-            auto identifier = m_identifier++;  // prepare next identifier
-            m_disposables.emplace(identifier, std::move(disposable));
-            return [identifier, this] { m_disposables.erase(identifier); };
-        }
+  /**
+   * @brief Handles subscribing a disposable.
+   * @param disposable                Disposable to subscribe.
+   */
+  inline constexpr Disposable subscribe(Disposable &&disposable) {
+    auto identifier = m_identifier++; // prepare next identifier
+    m_disposables.emplace(identifier, std::move(disposable));
+    return [identifier, this] { m_disposables.erase(identifier); };
+  }
 
-       private:
-        //  PRIVATE METHODS  //
+private:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Ensures some globals are preloaded.
-         * @param isolate                   Runtime isolate.
-         */
-        void m_globals(Runtime::Isolate* isolate);
-    };
+  /**
+   * @brief Ensures some globals are preloaded.
+   * @param isolate                   Runtime isolate.
+   */
+  void m_globals(Runtime::Isolate *isolate);
+};
 
-}  // namespace Talos::Lifecycle
+} // namespace Talos::Lifecycle
 
 #endif

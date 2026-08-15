@@ -1,55 +1,67 @@
 #ifndef _TALOS_TESTING_SERVICE_HPP
 #define _TALOS_TESTING_SERVICE_HPP
 
-/// Talos Modules
-#include "talos/async/service.hpp"
+/// Talos Includes
 #include "talos/runtime/options.hpp"
-#include "talos/testing/main.hpp"
-#include "talos/testing/options.hpp"
+#include "talos/testing/storage.hpp"
 
 namespace Talos::Testing {
 
-    /// @brief Constructs a testing service.
-    class Service : public XI::Define<Service, XI::Shared> {
-        //  PROPERTIES  //
+/// @brief Constructs a testing service.
+class Service : public XI::Singleton {
+  //  PROPERTIES  //
 
-        /// @brief Available services container.
-        XI::Container* m_services;
+  /// @brief Available services container.
+  XI::Container *m_services;
 
-        /// @brief Asynchrononous runtime service.
-        Async::Service* m_async;
+  /// @brief The current session instance.
+  Runner *m_session = nullptr;
 
-        /// @brief The underlying session instance.
-        Session* m_session;
+  /// @brief The underlying registry instance.
+  $::Unique::Pointer<Storage> m_storage = nullptr;
 
-        /// @brief The underlying registry instance.
-        Registry* m_registry;
+public:
+  //  CONSTRUCTORS  //
 
-       public:
-        //  CONSTRUCTORS  //
+  /**
+   * @brief Constructs a runtime service.
+   * @param services                  Services container.
+   */
+  explicit Service();
+  explicit Service(XI::Container *services);
 
-        /**
-         * @brief Constructs a runtime service.
-         * @param services                  Services container.
-         */
-        explicit Service();
-        explicit Service(XI::Container* services);
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Gets the current testing session.
+  inline constexpr Runner *session() noexcept { return m_session; }
+  inline constexpr const Runner *session() const noexcept { return m_session; }
 
-        /// @brief Gets the underlying services container.
-        inline constexpr XI::Container* services() const noexcept { return m_services; }
+  /// @brief Gets the testing registry.
+  inline constexpr Storage *storage() noexcept { return m_storage.get(); }
+  inline constexpr const Storage *storage() const noexcept { return m_storage.get(); }
 
-        /// @brief Gets the testing session.
-        inline constexpr Session* session() const noexcept { return m_session; }
+  /// @brief Spawns the current testing runtime.
+  inline constexpr int32_t spawn() { return m_spawn(); }
 
-        /// @brief Gets the testing registry.
-        inline constexpr Registry* registry() const noexcept { return m_registry; }
+  /**
+   * @brief Requests a testing session.
+   * @param options             Options to use.
+   */
+  inline constexpr int32_t invoke(const Options &options = {}) { return m_invoke(options); }
 
-        /// @brief Handles launching the runtime.
-        inline int32_t launch() { return m_async->launch<Main>(m_services); }
-    };
+private:
+  //  PRIVATE METHODS  //
 
-}  // namespace Talos::Testing
+  /// @brief Handles launching the testing runtime.
+  int32_t m_spawn();
+
+  /**
+   * @brief Requests a testing session.
+   * @param options             Options to use.
+   */
+  int32_t m_invoke(const Options &options);
+};
+
+} // namespace Talos::Testing
 
 #endif

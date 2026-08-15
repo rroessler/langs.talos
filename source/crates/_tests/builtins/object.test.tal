@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "Object" Functionality.
-//! Description: Coordinates testing the builtin "Object".
-//!
+///
+/// @testing Builtin "Object" Functionality.
+/// @describe Coordinates testing the builtin "Object".
+///
 
 // Talos Modules
 import "talos:test" as Test;

@@ -27,4 +27,4 @@ let x = [0, 1, 2];
 
 ## Explicit Resources
 
-Alongside the `let` and `mut` keywords, is the `use` declaration which declares a variable as a disposable resource. Such variables are immutable, and only available within their declaring scope (eg: cannot be exported). This is so that upon the closure of their encompassing scope, they are disposed of. For more information, see the [explicit resource management](/docs/language/advanced/resources) section.
+Alongside the `let` and `mut` keywords, is the `use` declaration which declares a variable as a disposable resource. Such variables are immutable, and only available within their declaring scope (eg: cannot be exported). This is so that upon the closure of their encompassing scope, they are disposed of. For more information, see the [explicit resource management](/language/advanced/resources) section.

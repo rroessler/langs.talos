@@ -1,12 +1,12 @@
 #ifndef _XLSP_FORWARD_TRANSPORT_HPP
 #define _XLSP_FORWARD_TRANSPORT_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <xtdlib/xtdlib.hpp>
 
-/// Forward Implementations
-$_FWD(XLSP::Transport, struct Abstract)
-$_FWD(XLSP::Transport, struct Console)
+/// Forward Declarations
 $_FWD(XLSP::Transport, class Stream)
+$_FWD(XLSP::Transport, struct Console)
+$_FWD(XLSP::Transport, struct Abstract)
 
 #endif

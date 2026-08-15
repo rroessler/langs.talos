@@ -1,5 +1,4 @@
 /// JSON Modules
-import { version as v } from '~/package.json';
 import { description as d } from '../../package.json';
 import { publisher, displayName } from '~/configs/extension.json';
 
@@ -13,9 +12,6 @@ export namespace Product {
     /** Available extension typing. */
     export const extension = '.tal';
 
-    /** The baseline domain value. */
-    export const domain = 'https://talos.rroessler.io';
-
     /** The baseline github URL. */
     export const github = 'https://github.com/rroessler/langs.talos';
 
@@ -28,11 +24,8 @@ export namespace Product {
     /** Long descriptor name. */
     export const longName = displayName;
 
-    /** The version of the extension. */
-    export const version = v.split('-').at(0) ?? '0.0.0';
-
-    /** The current version-branch included. */
-    export const branch = v.split('-').at(1) ?? '';
+    /** Denotes the latest Talos version. */
+    export const version = process.env.TALOS_VERSION?.substring(1);
 
     /** Checks if currently in development. */
     export const development = process.env.NODE_ENV === 'development';

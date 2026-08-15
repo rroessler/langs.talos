@@ -2,7 +2,7 @@
 
 This extension provides support for the [Talos](https://talos.rroessler.io/) programming langauge.
 
-Since this extension requires Talos to be installed locally, the [installation instructions](https://talos.rroessler.io/docs/language/development/installation) should be followed before installing this extension.
+Since this extension requires Talos to be installed locally, the [installation instructions](https://talos.rroessler.io/language/development/installation) should be followed before installing this extension.
 
 ## Available Features
 

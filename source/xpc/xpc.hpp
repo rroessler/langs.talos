@@ -1,11 +1,7 @@
 #ifndef _XPC_HPP
 #define _XPC_HPP
 
-/// Core Modules
-#include "xpc/core/child.hpp"
-#include "xpc/core/identifier.hpp"
-
-/// Pipe Modules
+/// Pipe Includes
 #include "xpc/pipe/direct.hpp"
 #include "xpc/pipe/duplex.hpp"
 #include "xpc/pipe/handle.hpp"
@@ -14,7 +10,11 @@
 #include "xpc/pipe/unique.hpp"
 #include "xpc/pipe/writer.hpp"
 
-/// Shell Modules
+/// Process Includes
+#include "xpc/process/child.hpp"
+#include "xpc/process/identifier.hpp"
+
+/// Shell Includes
 #include "xpc/shell/guard.hpp"
 #include "xpc/shell/path.hpp"
 #include "xpc/shell/types.hpp"

@@ -1,13 +1,12 @@
-#ifndef _XLSP_FORWARD_EVENTS_HPP
-#define _XLSP_FORWARD_EVENTS_HPP
+#ifndef _XLSP_FORWARD_EVENT_HPP
+#define _XLSP_FORWARD_EVENT_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <xtdlib/xtdlib.hpp>
 
-/// Forward Implementations
+/// Forward Declarations
 $_FWD(XLSP::Event, class Binder)
-$_FWD(XLSP::Event, struct Storage)
-$_FWD(XLSP::Event, class Responder)
-$_FWD(XLSP::Event, class Dispatcher)
+$_FWD(XLSP::Event, class Emitter)
+$_FWD(XLSP::Event, class Storage)
 
 #endif

@@ -6,26 +6,18 @@ import * as cp from 'node:child_process';
 /// Vendor Modules
 import * as YAML from 'yaml';
 import * as JSONC from 'jsonc-parser';
+import * as TYPES from 'type-fest';
 
-//  PROPERTIES  //
-
-const g_root_dir = process.cwd();
-const g_examples_dir = path.resolve(g_root_dir, 'examples');
-const g_crates_dir = path.resolve(g_root_dir, 'source', 'crates');
-const g_version_path = path.resolve(g_root_dir, 'configs', 'version.txt');
-const g_version_nightly = cp.execSync('git branch --show-current').toString().trim() === 'nightly';
-const g_version_text = fs.readFileSync(g_version_path, 'utf-8').trim() + `${g_version_nightly ? '-nightly' : ''}`;
-
-const g_targets: string[] = [
-    path.resolve(g_root_dir, '_crate.jsonc'),
-    path.resolve(g_root_dir, 'package.json'),
-    ...fs
-        .readdirSync(g_crates_dir)
-        .concat([g_examples_dir])
-        .map((name) => path.resolve(g_crates_dir, name, '_crate.jsonc')),
-];
+/// Tool Modules
+import { Assets } from '@/tools/assets';
 
 //  PRIVATE METHODS  //
+
+/** Resolves the current version to assign. */
+function m_version() {
+    const nightly = cp.execSync('git branch --show-current').toString().trim() === 'nightly';
+    return fs.readFileSync(Assets.configs('version.txt'), 'utf-8').trim() + `${nightly ? '-nightly' : ''}`;
+}
 
 /**
  * Handles parsing details.
@@ -57,9 +49,10 @@ function m_stringify(extension: string, details: any): string {
 
 /**
  * Handles replacing files version values.
+ * @param version                  Version to assign.
  * @param target                   Target to update.
  */
-async function m_replace(target: string) {
+async function m_replace(version: string, target: string) {
     // ignore if the file does not actually exist
     if (!fs.existsSync(target)) return;
 
@@ -69,10 +62,10 @@ async function m_replace(target: string) {
     const stringify = m_stringify.bind(undefined, extension);
 
     // prepare the base outputs to be used
-    const details: any = await fs.promises.readFile(target, 'utf-8').then(parse);
+    const details: TYPES.PackageJson = await fs.promises.readFile(target, 'utf-8').then(parse);
 
     // update and replace as necessary now
-    details.version = g_version_text;
+    details.version = version;
 
     // rebuild the output content now
     await fs.promises.writeFile(target, stringify(details) + '\n');
@@ -81,6 +74,23 @@ async function m_replace(target: string) {
 //  TOOL RUNNER  //
 
 (async () => {
-    console.log(`Setting Version: '${g_version_text}'`);
-    await Promise.all(g_targets.map(m_replace));
+    // get the current version to be assigned
+    const version = m_version();
+
+    // note to the user what version we are assigning now
+    console.log(`Setting Version: '${version}'`);
+
+    // prepare all the crate files to be targeted
+    const crates = fs
+        .readdirSync(Assets.crates())
+        .concat([Assets.examples()])
+        .map((name) => path.resolve(Assets.crates(), name, '_crate.jsonc'));
+
+    /// TODO: prepare all the source packages to resolve
+
+    // prepare all the necessary targets to be replaced
+    const targets = [Assets.root('_crate.jsonc'), Assets.root('package.json')].concat(crates);
+
+    // and attempt replacing all the necessary targets now
+    await Promise.all(targets.map(m_replace.bind(undefined, version)));
 })();

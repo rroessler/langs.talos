@@ -1,35 +1,32 @@
 # --  PACKAGE SETUP  -- #
 
-# Prepare all the vendors to be required
-talos_vendors_require(ankerl aster boost fmt glaze spdlog)
+# Attempt requiring the desired packages
+talos_package_require(xhash)
 
-# Prepare all the packages to be required
-talos_package_require(${TALOS_TARGET_XHASH})
+# Prepare all the vendors to be required
+talos_vendors_require(aster boost fmt function2 glaze spdlog)
 
 # --  PACKAGE PROPERTIES  -- #
 
-# Get all the availble sources for the project
+# Define the target to be used
+set(TALOS_TARGET_XTDLIB "xtdlib" CACHE INTERNAL "")
+
+# Get all the sources for the runtime
 talos_sources_glob(TALOS_SOURCES_XTDLIB)
 
-# --  PACKAGE DEFINITION  -- #
+# --  PACKAGE DEFINITIONS  -- #
 
-# Define the project now
+# Define the standard library project now
 project(${TALOS_TARGET_XTDLIB} VERSION ${TALOS_VERSION_SHORT} LANGUAGES CXX)
 
-# Define the base library now
+# Define the runtime library now
 talos_library_declare(${TALOS_TARGET_XTDLIB} PCH SOURCES ${TALOS_SOURCES_XTDLIB} LIBRARIES
-    ${TALOS_TARGET_XHASH}
-
     fmt::fmt
     aster::aster
     glaze::glaze
+    mono::common
+    talos::xhash
     spdlog::spdlog
-    mono::warnings
     Boost::interprocess
-    unordered_dense::unordered_dense
-)
-
-# Set the underlying options now
-target_compile_definitions(${TALOS_TARGET_XTDLIB} PUBLIC
-    -D_XTDLIB_ENABLE_MTRACE=$<BOOL:${TALOS_OPTION_MTRACE}>
+    function2::function2
 )

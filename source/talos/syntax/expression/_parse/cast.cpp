@@ -1,19 +1,19 @@
-/// Syntax Modules
+/// Syntax Includes
 #include "talos/syntax/_inline/expression.ipp"
 
 //  PRIVATE METHODS  //
 
 TALOS_MM_PARSE_INFIX(Cast, parser, value, ) {
-    // prepare the snapshot now
-    auto snapshot = parser->snapshot().offset(value->traits()->bounds());
+  // prepare the snapshot now
+  auto snapshot = parser->snapshot().offset(value);
 
-    // ensure the cast operator is actually available
-    m_assert(parser->advance(), Lexer::Kind::BINOP_AS);
+  // ensure the cast operator is actually available
+  auto *token = m_assert(parser->advance(), Lexer::Kind::BINOP_AS);
 
-    // validate the incoming guard to be used
-    auto* guard = m_annotation(parser);
-    if (guard == nullptr) return nullptr;
+  // validate the incoming guard to be used
+  auto *guard = m_annotation(parser);
+  if (guard == nullptr) return nullptr;
 
-    // and construct the resulting guard now
-    return parser->allocate<Syntax::Cast>(value, guard, snapshot.enclose(value));
+  // and construct the resulting guard now
+  return parser->allocate<Syntax::Cast>(snapshot.enclose(token), value, guard);
 }

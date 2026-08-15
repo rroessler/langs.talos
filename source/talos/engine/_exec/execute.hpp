@@ -8,13 +8,22 @@
 
 TALOS_MM_ENGINE_EXECUTE(EXEC_INVALID, , , ) { $::System::unreachable(); }
 
-TALOS_MM_ENGINE_EXECUTE(EXEC_NOOP, , , ) { return Mode::NEXT; }
-TALOS_MM_ENGINE_EXECUTE(EXEC_RETURN, , , ) { return Mode::RETURN; }
-TALOS_MM_ENGINE_EXECUTE(EXEC_CANCEL, , , ) { return Mode::INTERRUPT; }
-TALOS_MM_ENGINE_EXECUTE(EXEC_ABORT, isolate, , instruction) { isolate->thread()->shutdown(instruction->get<0>()); }
-TALOS_MM_ENGINE_EXECUTE(EXEC_PANIC, isolate, frame, ) { return isolate->panic(frame->accumulator()), Mode::PANIC; }
+TALOS_MM_ENGINE_EXECUTE(EXEC_NOOP, isolate, frame, unqualified) {
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
+}
 
-TALOS_MM_ENGINE_EXECUTE(EXEC_RAISE, isolate, , instruction) {
-    auto code = static_cast<Signal::Code>(instruction->get<0>().encode());
-    return isolate->service<Signal::Service>()->raise(code), Mode::NEXT;
+TALOS_MM_ENGINE_EXECUTE(EXEC_RETURN, , frame, ) { return frame->accumulator(); }
+TALOS_MM_ENGINE_EXECUTE(EXEC_CANCEL, isolate, frame, ) { return m_interrupt(isolate, frame); }
+TALOS_MM_ENGINE_EXECUTE(EXEC_PANIC, isolate, frame, ) { return isolate->panic(frame->accumulator()); }
+
+TALOS_MM_ENGINE_EXECUTE(EXEC_ABORT, isolate, , unqualified) {
+  auto *instruction = unqualified->cast<Glyph::EXEC_ABORT>();
+  isolate->thread()->shutdown(instruction->get<0>()); // bail
+}
+
+TALOS_MM_ENGINE_EXECUTE(EXEC_RAISE, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::EXEC_RAISE>();
+  auto code = static_cast<Signal::Symbolic>(instruction->get<0>().encode());
+  isolate->service<Signal::Service>()->raise(code);
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
 }

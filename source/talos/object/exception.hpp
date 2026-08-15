@@ -1,88 +1,88 @@
 #ifndef _TALOS_OBJECT_EXCEPTION_HPP
 #define _TALOS_OBJECT_EXCEPTION_HPP
 
-/// Talos Modules
-#include "talos/diagnostic/traits.hpp"
+/// Talos Includes
+#include "talos/diagnostic/inspect.hpp"
 #include "talos/iterable/list.hpp"
-#include "talos/string/dynamic.hpp"
+#include "talos/resource/trace.hpp"
+#include "talos/string/common.hpp"
 
 namespace Talos {
 
-    /// @brief Exception Attributes.
-    template <>
-    struct Object::Attributes<Object::Exception> {
-        //  PROPERTIES  //
+/// @brief Exception Attributes.
+template <> struct Object::Wrapper<Object::Exception> {
+  //  PROPERTIES  //
 
-        String::Dynamic name;     // Name of exception.
-        String::Dynamic message;  // Exception message.
+  String::Any name = {};    // Name of exception.
+  String::Any message = {}; // Exception message.
 
-        /// @brief Backtrace list.
-        std::vector<Resource::Trace> trace;
+  /// @brief Backtrace list.
+  std::vector<Resource::Trace> trace = {};
 
-        //  CONSTRUCTORS  //
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a defaulted exception.
-         * @param isolate                   Runtime isolate.
-         */
-        explicit Attributes(Runtime::Isolate* isolate);
+  /**
+   * @brief Constructs a defaulted exception.
+   * @param isolate                   Runtime isolate.
+   */
+  explicit Wrapper(Runtime::Isolate *isolate);
 
-        /**
-         * @brief Constructs an exception.
-         * @param isolate                   Runtime isolate.
-         * @param message                   Exception message.
-         */
-        explicit Attributes(Runtime::Isolate* isolate, String::Dynamic message);
-        explicit Attributes(Runtime::Isolate* isolate, const $::String::View& message);
+  /**
+   * @brief Constructs an exception.
+   * @param isolate                   Runtime isolate.
+   * @param message                   Exception message.
+   */
+  explicit Wrapper(Runtime::Isolate *isolate, String::Any message);
+  explicit Wrapper(Runtime::Isolate *isolate, const $::String::View &message);
 
-        /**
-         * @brief Constructs an exception.
-         * @param isolate                   Runtime isolate.
-         * @param name                      Name of exception.
-         * @param message                   Exception message.
-         */
-        explicit Attributes(Runtime::Isolate* isolate, String::Dynamic name, String::Dynamic message);
-        explicit Attributes(Runtime::Isolate* isolate, const $::String::View& name, const $::String::View& message);
-    };
+  /**
+   * @brief Constructs an exception.
+   * @param isolate                   Runtime isolate.
+   * @param name                      Name of exception.
+   * @param message                   Exception message.
+   */
+  explicit Wrapper(Runtime::Isolate *isolate, String::Any name, String::Any message);
+  explicit Wrapper(Runtime::Isolate *isolate, const $::String::View &name, const $::String::View &message);
+};
 
-    /// @brief Exception Interface.
-    struct Object::Exception : public Object::Abstract<Object::Exception> {
-        //  CONSTRUCTORS  //
+/// @brief Exception Interface.
+struct Object::Exception : public Object::Mixin<Object::Exception> {
+  //  CONSTRUCTORS  //
 
-        /// @brief Inherit the base constructor.
-        using Abstract::Abstract;
+  /// @brief Inherit the base constructor.
+  using Mixin::Mixin;
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        inline constexpr String::Dynamic& name() const noexcept { return m_attrs()->name; }
-        inline constexpr String::Dynamic& message() const noexcept { return m_attrs()->message; }
-        inline constexpr std::vector<Resource::Trace>& trace() const noexcept { return m_attrs()->trace; }
-        inline constexpr $::Stream::Output& format($::Stream::Output& os) const noexcept { return m_format(os); }
+  inline constexpr String::Any &name() const noexcept { return m_wrapper()->name; }
+  inline constexpr String::Any &message() const noexcept { return m_wrapper()->message; }
+  inline constexpr std::vector<Resource::Trace> &trace() const noexcept { return m_wrapper()->trace; }
+  inline constexpr std::ostream &format(std::ostream &os) const noexcept { return m_format(os); }
 
-       protected:
-        //  PRIVATE METHODS  //
+protected:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handles formatting exceptions.
-         * @param os                     Output stream.
-         */
-        $::Stream::Output& m_format($::Stream::Output& os) const noexcept;
+  /**
+   * @brief Handles formatting exceptions.
+   * @param os                     Output stream.
+   */
+  std::ostream &m_format(std::ostream &os) const noexcept;
 
-        /**
-         * @brief Handlers yielding exceptions safely.
-         * @param self                  Exception instance.
-         * @param yield                 Yield callback.
-         */
-        static void m_yield(const Exception& self, const Globals::Each& yield);
+  /**
+   * @brief Handlers yielding exceptions safely.
+   * @param self                  Exception instance.
+   * @param yield                 Yield callback.
+   */
+  static void m_yield(const Exception &self, Globals::Each &yield);
 
-        /**
-         * @brief Handles printing values.
-         * @param os                    Output stream.
-         * @param self                  Exception instance.
-         */
-        static void m_print($::Stream::Output& os, const Exception& self);
-    };
+  /**
+   * @brief Handles printing values.
+   * @param os                    Output stream.
+   * @param self                  Exception instance.
+   */
+  static void m_print(std::ostream &os, const Exception &self);
+};
 
-}  // namespace Talos
+} // namespace Talos
 
 #endif

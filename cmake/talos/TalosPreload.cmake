@@ -1,38 +1,27 @@
-# --  INCLUDE GUARDS  -- #
+# --  CONDITIONS  -- #
 
-include_guard(GLOBAL)
+# Stop early if user only wants to use "mono"
+if (MONO_OPTION_ONLY)
+    return()
+endif ()
 
-cmake_minimum_required(VERSION 3.28.3)
+# --  INCLUDES  -- #
 
-# --  MODULE PROPERTIES  -- #
+# Include all the "talos" base modules
+include("${CMAKE_CURRENT_LIST_DIR}/TalosMetadata.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/TalosMessage.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/TalosLibrary.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/TalosPackage.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/TalosSources.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/TalosVendors.cmake")
 
-# Define the primary target to be available
-set(TALOS_TARGET_SUPER "talos" CACHE INTERNAL "")
+# --  FEATURES  -- #
 
-# Define the initial directory paths
-set(TALOS_DIRECTORY_MODULES ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
-cmake_path(SET TALOS_DIRECTORY_ROOT "${TALOS_DIRECTORY_MODULES}/../.." NORMALIZE)
-string(REGEX REPLACE "${MONO_PATH_SEPARATOR}$" "" TALOS_DIRECTORY_ROOT ${TALOS_DIRECTORY_ROOT})
+# Ensure some features are enabled
+mono_sccache_setup()
+mono_feature_ninja()
 
-# And then define the additional directories for use
-set(TALOS_DIRECTORY_OUTPUT "${TALOS_DIRECTORY_ROOT}/dist" CACHE INTERNAL "")
-set(TALOS_DIRECTORY_BINARY "${TALOS_DIRECTORY_OUTPUT}/bin" CACHE INTERNAL "")
-set(TALOS_DIRECTORY_SOURCE "${TALOS_DIRECTORY_ROOT}/source" CACHE INTERNAL "")
-set(TALOS_DIRECTORY_SCRIPT "${TALOS_DIRECTORY_ROOT}/scripts" CACHE INTERNAL "")
-
-# --  MODULE DEFINITION  -- #
-
-# Pre-parse the incoming version value
-mono_version_read(TALOS_VERSION "${TALOS_DIRECTORY_ROOT}/configs/version.txt" BRANCH_TRIM "main")
-
-# Also parse the incoming commit details
-mono_version_commit(TALOS_VERSION_COMMIT)
-
-# --  MODULE INCLUDES  -- #
-
-# Include all the "talos" based modules
-include("${TALOS_DIRECTORY_MODULES}/TalosMetadata.cmake")
-include("${TALOS_DIRECTORY_MODULES}/TalosMessage.cmake")
-include("${TALOS_DIRECTORY_MODULES}/TalosPackage.cmake")
-include("${TALOS_DIRECTORY_MODULES}/TalosSources.cmake")
-include("${TALOS_DIRECTORY_MODULES}/TalosVendors.cmake")
+# Ensure all the "mono" libraries are enabled
+mono_library_warnings(${TALOS_OPTION_STRICT})
+mono_library_sanitize(${TALOS_OPTION_SANITIZE})
+mono_library_common(${TALOS_OPTION_CXXSTD})

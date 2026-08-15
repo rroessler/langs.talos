@@ -19,22 +19,19 @@ export async function Example({ href, lang, ...props }: Example) {
     // attempt resolving the incoming path to be used
     const example = await fs.promises.readFile(Assets.examples(href), 'utf-8');
 
-    // render the incoming code now as necessary
-    const rendered = <Code.Dynamic code={example.trim()} lang={lang} />;
-
     // resolve a suitable icon as necessary now
     const icon = lang === 'talos' ? <SwordIcon size="16" /> : undefined;
 
     // resolve a title as necessary now
-    const title = href.includes('/') ? href : `examples/${href}`;
+    const title: any = href.includes('/') ? href : `examples/${href}`;
 
-    // prepare the code-block to be shown now
-    return <Code.Block icon={icon} title={title} {...props} children={rendered} />;
+    // render the incoming code now as necessary
+    return <Code.Dynamic icon={icon} code={example.trim()} title={title} lang={lang ?? 'text'} {...props} />;
 }
 
 export namespace Example {
     //  TYPEDEFS  //
 
     /** Example Component Properties. */
-    export type Props = Code & { href?: string; lang?: string };
+    export type Props = Code.Block & { href?: string; lang?: string };
 }

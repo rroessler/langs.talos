@@ -1,9 +1,35 @@
+/// Node Modules
+import * as cp from 'node:child_process';
+
 /// Vendor Modules
 import * as fumadocs from 'fumadocs-mdx/next';
 
-// Next JS Configuration.
+/// JSON Modules
+import PKG from '~/package.json';
+
+//  ENVIRONMENT VARIABLES  //
+
+/** The latest release version. */
+const TALOS_VERSION = m_version();
+
+//  CONFIGURATION EXPORTS  //
+
+/** Next JS Configuration */
 export default fumadocs.createMDX()({
     output: 'export',
     reactStrictMode: true,
-    pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+    env: { TALOS_VERSION },
 });
+
+//  PRIVATE METHODS  //
+
+function m_version() {
+    // prepare the command to be used for getting current release version
+    const command = 'gh release view --repo rroessler/langs.talos --json tagName --jq .tagName';
+
+    try {
+        return cp.execSync(command, { stdio: 'ignore' }).toString().trim();
+    } catch {
+        return PKG.version;
+    }
+}

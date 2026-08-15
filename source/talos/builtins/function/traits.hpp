@@ -1,73 +1,54 @@
 #ifndef _TALOS_BUILTINS_FUNCTION_HPP
 #define _TALOS_BUILTINS_FUNCTION_HPP
 
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
-#include "talos/function/closure.hpp"
-#include "talos/function/native.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 namespace Talos::Builtins {
 
-    /// @brief Any Function Builtin Traits.
-    template <>
-    struct Traits<Function::Dynamic> : public Define<Function::Dynamic, "Function">,
-                                       public Features<Adapter::FIELDS, Adapter::GLOBALS, Adapter::TYPEDEFS> {
-        //  TYPEDEFS  //
+/// @brief Dynamic Function Builtin Traits.
+template <> struct Wrapper<Function::Any> : public Blueprint<Function::Any, "Function"> {
+  //  PUBLIC METHODS  //
 
-        /// @brief Helpers for constructing outputs.
-        struct Field;
-        struct Static;
+  /// @brief Gets the function formation for "bind" glue.
+  static const Function::Info *glue();
 
-       private:
-        //  PROPERTIES  //
+  /// @brief Gets the baseline function type-class.
+  static $::Shared::Pointer<Type::Prototype> typeclass();
 
-        /// @brief Available field descriptors.
-        static Member::Storage m_members;
+protected:
+  //  PRIVATE METHODS  //
 
-       public:
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-        /// @brief Gets the underlying "Function" typing.
-        static Type::Erased typing();
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   * @param prototype                 Prototype instance.
+   */
+  static Value::Any m_globals(Isolate *isolate, const Object::Class &prototype);
 
-        /// @brief Gets the glue function information.
-        static const Function::Info* binder();
+  /**
+   * @brief Handles looking up value fields.
+   * @param self                      Value instance.
+   * @param symbol                    Field symbol.
+   */
+  static Member::View m_attribute(const Function::Any &self, const Value::Symbol &symbol);
+};
 
-       protected:
-        //  PRIVATE METHODS  //
+/// @brief Native Builtin Traits.
+template <> struct Wrapper<Function::Native> : public Wrapper<Function::Any> {};
 
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
+/// @brief Jitted Builtin Traits.
+template <> struct Wrapper<Function::Jitted> : public Wrapper<Function::Any> {};
 
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
+/// @brief Closure Builtin Traits.
+template <> struct Wrapper<Function::Closure> : public Wrapper<Function::Any> {};
 
-        /**
-         * @brief Handles looking up value fields.
-         * @param self                      Self value.
-         * @param symbol                    Field symbol.
-         */
-        static Member::View m_attributes(const Function::Dynamic& self, Value::Symbol symbol);
-    };
-
-    /// @brief Native Builtin Traits.
-    template <>
-    struct Traits<Function::Native> : public Traits<Function::Dynamic> {};
-
-    /// @brief Jitted Builtin Traits.
-    template <>
-    struct Traits<Function::Jitted> : public Traits<Function::Dynamic> {};
-
-    /// @brief Closure Builtin Traits.
-    template <>
-    struct Traits<Function::Closure> : public Traits<Function::Dynamic> {};
-
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

@@ -3,6 +3,8 @@ import * as fs from 'node:fs';
 
 /// Website Modules
 import { Assets } from '@/website/assets';
+
+/// Package Modules
 import { Anchor } from '../anchor';
 
 /** Language Tour Components. */
@@ -23,7 +25,7 @@ export namespace Tour {
         const steps: Step[] = [];
 
         // attempt destructing all the necessary steps
-        for (const item of fs.readdirSync(Assets.tour())) {
+        for (const item of fs.readdirSync(Assets.docs('tour'))) {
             // trim the trailing details
             const leading = item.replaceAll(/\.mdx?$/g, '');
 
@@ -34,14 +36,11 @@ export namespace Tour {
             const index = Number.parseInt(base);
             if (Number.isNaN(index)) continue;
 
-            // construct the necessary href now as well
-            const href = `/docs/tour/${leading}`;
-
             // construct the title to be used
             const title = segments.map((part) => part[0].toUpperCase() + part.slice(1)).join(', ');
 
             // construct the resulting step now
-            steps.push({ title, index, href });
+            steps.push({ title, index, href: `/tour/${leading}` });
         }
 
         // prepare the list items now

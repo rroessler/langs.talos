@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "Boolean" Functionality.
-//! Description: Coordinates testing the builtin "Boolean".
-//!
+///
+/// @testing Builtin "Boolean" Functionality.
+/// @describe Coordinates testing the builtin "Boolean".
+///
 
 // Talos Modules
 import "talos:test" as Test;
@@ -37,8 +37,12 @@ Test.suite("Statics", fn {
         Assert.equals(Boolean.from(Symbol.from("abc")), True);
     });
 
-    Test.case("Boolean.from 'List'", fn { Assert.equals(Boolean.from([]), True); });
-    Test.case("Boolean.from 'Object'", fn { Assert.equals(Boolean.from({}), True); });
+    Test.case("Boolean.from 'List'", fn {
+        Assert.equals(Boolean.from([]), True);
+    });
+    Test.case("Boolean.from 'Object'", fn {
+        Assert.equals(Boolean.from({}), True);
+    });
 
     Test.case("Boolean.parse 'True'", fn {
         Assert.equals(Boolean.parse("true"), True);

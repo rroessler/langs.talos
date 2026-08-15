@@ -1,155 +1,171 @@
 #ifndef _TALOS_FORMAT_READER_HPP
 #define _TALOS_FORMAT_READER_HPP
 
-/// Talos Modules
-#include "talos/diagnostic/view.hpp"
+/// Talos Includes
 #include "talos/format/comments.hpp"
+#include "talos/format/options.hpp"
 #include "talos/format/storage.hpp"
 #include "talos/lexer/visitor.hpp"
 
 namespace Talos::Format {
 
-    /// @brief Format Reader Implementation.
-    class Reader : public Lexer::Visitor {
-        //  PROPERTIES  //
+/// @brief Format Node Reader.
+class Reader : public Lexer::Visitor {
+  //  PROPERTIES  //
 
-        /// @brief Format options available.
-        const Options* m_options;
+  /// @brief Available format options.
+  const Options *m_options;
 
-        /// @brief Format Node Storage.
-        $::Ptr::Unique<Storage> m_storage;
+  /// @brief Format pieces storage.
+  Storage m_storage = {};
 
-        /// @brief Currently encapsulated comment tokens.
-        $::Ptr::Unique<Comments> m_comments = $::New().unique<Comments>();
+  /// @brief Constructs a comments container.
+  Comments m_comments = {};
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a format reader.
-         * @param tokens                Tokens visitor.
-         * @param options               Format options.
-         */
-        explicit Reader(const Lexer::Buffer* tokens);
-        explicit Reader(const Lexer::Buffer* tokens, const Options* options);
+  /// @brief Do not allow default construction.
+  explicit Reader() = delete;
 
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Constructs a format reader.
+   * @param tokens                  Lexical tokens.
+   * @param options                 Format options.
+   */
+  explicit Reader(const Lexer::Buffer *tokens);
+  explicit Reader(const Lexer::Buffer *tokens, const Options *options);
 
-        /// @brief Gets the underlying node storage.
-        inline constexpr Storage* storage() const noexcept { return m_storage.get(); }
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets the underlying formatter options.
-        inline constexpr const Options* options() const noexcept { return m_options; }
+  /// @brief Gets the underlying pieces storage.
+  inline constexpr Storage *storage() noexcept { return &m_storage; }
+  inline constexpr const Storage *storage() const noexcept { return &m_storage; }
 
-        /// @brief Gets the underlying comments buffer.
-        inline constexpr const Comments* comments() const noexcept { return m_comments.get(); }
+  /// @brief Gets the underlying formatter options.
+  inline constexpr const Options *options() const noexcept { return m_options; }
 
-        /**
-         * @brief Flushes the currently queued comments.
-         * @param trim                      Force trimming.
-         */
-        inline constexpr Buffer flush(bool trim = false) {
-            return $::Ranges::To<Node*>(
-                std::views::transform(m_comments->flush(trim), [&](const $::String::View& comment) {
-                    return comment.empty() ? m_storage->empty() : m_storage->comment(comment);
-                }));
-        }
+  /// @brief Handles skipping leading whitespace.
+  inline constexpr bool skip() {
+    return m_until([](const Lexer::Token *token) { return !token->flags().test(Lexer::Flag::WHITESPACE); });
+  }
 
-        /// @brief Handles skipping leading whitespace.
-        inline constexpr void skip() {
-            m_until([](const Lexer::Token* token) { return !token->flags().test(Lexer::Flag::WHITESPACE); });
-        }
+  /// @brief Skips until the next token.
+  inline constexpr const Lexer::Token *advance() noexcept {
+    // stop handling if at the end-of-stream
+    if (eos()) return &s_invalid;
 
-        /// @brief Denotes if we have a trailing comment
-        inline constexpr Node* trailing() noexcept {
-            // get the previous and current token values now
-            const Lexer::Token *before = previous(), *after = current();
+    // check that we have a valid token
+    $_ASSERT(current()->kind() != Lexer::Kind::MISC_CMT);
 
-            // stop if we fail certain conditions
-            if (before->kind() == Lexer::Kind::MISC_CMT) return nullptr;
-            if (after->kind() != Lexer::Kind::MISC_CMT) return nullptr;
+    // and update our current token details now
+    return ++m_index, m_previous = &m_tokens.at(m_index - 1);
+  }
 
-            // since a valid trailing comment, we want to eat (even if empty)
-            auto comment = advance()->lexeme();
+  /// @brief Peeks the next non-whitespace token.
+  inline constexpr const Lexer::Token *peek() const noexcept {
+    // cache the original details now
+    auto offset = m_index;
 
-            // we trail with a line when empty, or a space when a comment exists
-            return comment.size() ? m_storage->comment(comment) : nullptr;
-        }
+    // attempt finding the next non-whitespace token
+    while (offset < m_tokens.size() && m_tokens.at(offset).kind() == Lexer::Kind::MISC_CMT) ++offset;
 
-        /**
-         * @brief Checks for an incoming token.
-         * @param kinds                 Token to expect.
-         */
-        template <std::same_as<Lexer::Kind>... Ks>
-        inline constexpr bool check(const Ks&... kinds) {
-            return m_until([kinds...](const Lexer::Token* token) { return ((kinds == token->kind()) || ...); });
-        }
+    // and return the resulting offset to be used
+    return offset >= m_tokens.size() ? &s_invalid : &m_tokens.at(offset);
+  }
 
-        /**
-         * @brief Checks for an incoming token.
-         * @param flags                 Flag to expect.
-         */
-        template <std::same_as<Lexer::Flag>... Fs>
-        inline constexpr bool check(const Fs&... flags) {
-            return m_until([flags...](const Lexer::Token* token) { return token->flags().test(flags...); });
-        }
+  /**
+   * @brief Flushes the currently queued comments.
+   * @param trim                      Force trimming.
+   */
+  inline constexpr Buffer flush(bool trim = false) {
+    return $::Ranges::To<Piece *>(std::views::transform(m_comments.flush(trim), [&](const $::String::View &comment) {
+      return comment.empty() ? m_storage.empty() : m_storage.comment(comment);
+    }));
+  }
 
-        /**
-         * @brief Checks for an incoming token.
-         * @param kinds                 Token to expect.
-         */
-        template <std::same_as<Lexer::Kind>... Ks>
-        inline constexpr bool match(const Ks&... kinds) {
-            return check(kinds...) ? advance(), true : false;
-        }
+  /// @brief Denotes if we have a trailing comment
+  inline constexpr Piece *trailing() noexcept {
+    // get the previous and current token values now
+    const Lexer::Token *before = previous(), *after = current();
 
-        /**
-         * @brief Checks for an incoming token.
-         * @param flags                 Flag to expect.
-         */
-        template <std::same_as<Lexer::Flag>... Fs>
-        inline constexpr bool match(const Fs&... flags) {
-            return check(flags...) ? advance(), true : false;
-        }
+    // stop if we fail certain conditions
+    if (before->kind() == Lexer::Kind::MISC_CMT) return nullptr;
+    if (after->kind() != Lexer::Kind::MISC_CMT) return nullptr;
 
-        /**
-         * @brief Handles reporting formatting errors.
-         * @param args                  Error arguments.
-         */
-        template <class... As>
-        inline constexpr std::nullptr_t report(As&&...) {
-            return nullptr;
-        }
+    // since a valid trailing comment, we want to eat (even if empty)
+    auto comment = (++m_index, (m_previous = after)->lexeme());
 
-       private:
-        //  PRIVATE METHODS  //
+    // we trail with a line when empty, or a space when a comment exists
+    return comment.size() ? m_storage.comment(comment) : nullptr;
+  }
 
-        /**
-         * @brief Attempts skipping to a desired token.
-         * @param condition             Condition to skip.
-         */
-        template <class C>
-        inline constexpr bool m_until(C condition) {
-            // get the original position now
-            auto index = m_tell();
+  /**
+   * @brief Checks for an incoming token.
+   * @param kinds                 Token to expect.
+   */
+  template <std::same_as<Lexer::Kind>... Ks> inline constexpr bool check(const Ks &...kinds) {
+    return m_until([kinds...](const Lexer::Token *token) { return ((kinds == token->kind()) || ...); });
+  }
 
-            // prepare the comments to
-            auto pending = Comments::View();
+  /**
+   * @brief Checks for an incoming token.
+   * @param flags                 Flag to expect.
+   */
+  template <std::same_as<Lexer::Flag>... Fs> inline constexpr bool check(const Fs &...flags) {
+    return m_until([flags...](const Lexer::Token *token) { return token->flags().test(flags...); });
+  }
 
-            // attempt iterating over the current token now
-            for (auto* token = current(); !condition(token); advance(), token = current()) {
-                // stop early if we did not receive a comment here
-                if (!token->flags().test(Lexer::Flag::WHITESPACE)) return m_rewind(index), false;
+  /**
+   * @brief Checks for an incoming token.
+   * @param kinds                 Token to expect.
+   */
+  template <std::same_as<Lexer::Kind>... Ks> inline constexpr bool match(const Ks &...kinds) {
+    return check(kinds...) ? advance(), true : false;
+  }
 
-                // otherwise push the comment onto the incoming ones (ignore terminators)
-                if (token->kind() == Lexer::Kind::MISC_CMT) pending.emplace_back(token->lexeme());
-            }
+  /**
+   * @brief Checks for an incoming token.
+   * @param flags                 Flag to expect.
+   */
+  template <std::same_as<Lexer::Flag>... Fs> inline constexpr bool match(const Fs &...flags) {
+    return check(flags...) ? advance(), true : false;
+  }
 
-            // validate all the pending comments to be appended
-            return m_comments->append(pending), true;
-        }
-    };
+  /**
+   * @brief Handles bailing when reading fails.
+   * @param args                    Bailout arguments.
+   */
+  template <class... As> inline constexpr std::nullptr_t bail(As &&...) { return nullptr; }
 
-}  // namespace Talos::Format
+private:
+  //  PRIVATE METHODS  //
+
+  /**
+   * @brief Attempts skipping to a desired token.
+   * @param condition             Condition to skip.
+   */
+  template <class C> inline constexpr bool m_until(C condition) {
+    // cache the original details now
+    auto offset = m_index;
+
+    // prepare the pending comments to be appended
+    auto pending = Comments::View();
+
+    // attempt iterating over the current token now
+    for (auto *token = current(); !condition(token); ++m_index, token = current()) {
+      // stop early if we did not receive a comment here
+      if (!token->flags().test(Lexer::Flag::WHITESPACE)) return m_rewind(offset), false;
+
+      // otherwise push the comment onto the incoming ones (ignore terminators)
+      if (token->kind() == Lexer::Kind::MISC_CMT) pending.emplace_back(token->lexeme());
+    }
+
+    // validate all the pending comments to be appended
+    return m_comments.append(pending), true;
+  }
+};
+
+} // namespace Talos::Format
 
 #endif

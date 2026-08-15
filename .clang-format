@@ -1,19 +1,21 @@
-AlignAfterOpenBracket: DontAlign
-AlignOperands: AlignAfterOperator
+BasedOnStyle: LLVM
+
+AlignAfterOpenBracket: BlockIndent
+AlignEscapedNewlines: LeftWithLastLine
+
 AllowShortBlocksOnASingleLine: Always
 AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: All
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: true
+AllowShortNamespacesOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
-BasedOnStyle: Google
+AllowShortCompoundRequirementOnASingleLine: true
+
+BinPackArguments: false
+BinPackParameters: false
+
 BreakConstructorInitializers: AfterColon
+
 ColumnLimit: 120
-Cpp11BracedListStyle: false
-EmptyLineBeforeAccessModifier: Always
-IndentPPDirectives: None
-IndentWidth: 4
-IncludeBlocks: Merge
-SortIncludes: CaseSensitive
-NamespaceIndentation: All
-RequiresClausePosition: SingleLine
-RequiresExpressionIndentation: OuterScope
-UseTab: Never

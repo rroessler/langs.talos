@@ -3,16 +3,22 @@
 
 //  PRIVATE METHODS  //
 
-TALOS_MM_ENGINE_EXECUTE(LOAD_FIELD, isolate, frame, instruction) {
-    auto target = frame->load(instruction->get<1>());  // prepare target
-    auto field = m_getter(isolate, frame, target, instruction->get<2>());
-    if ($_UNLIKELY(!field.traits().okay())) return Mode::PANIC;
-    return frame->store(instruction->get<0>(), field), Mode::NEXT;
+TALOS_MM_ENGINE_EXECUTE(LOAD_FIELD, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::LOAD_FIELD>();
+  auto target = frame->load(instruction->get<1>());
+  auto symbol = frame->constant<Value::Symbol>(instruction->get<2>());
+  auto field = getter(isolate, target, symbol);
+  if ($_UNLIKELY(!field.pointer().okay())) return field;
+  frame->store(instruction->get<0>(), field);
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
 }
 
-TALOS_MM_ENGINE_EXECUTE(STORE_FIELD, isolate, frame, instruction) {
-    auto value = frame->load(instruction->get<1>());
-    auto target = frame->load(instruction->get<0>());
-    auto field = m_setter(isolate, frame, target, value, instruction->get<2>());
-    return $_LIKELY(field.traits().okay()) ? Mode::NEXT : Mode::PANIC;
+TALOS_MM_ENGINE_EXECUTE(STORE_FIELD, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::STORE_FIELD>();
+  auto value = frame->load(instruction->get<1>());
+  auto target = frame->load(instruction->get<0>());
+  auto symbol = frame->constant<Value::Symbol>(instruction->get<2>());
+  auto field = setter(isolate, target, value, symbol);
+  if ($_UNLIKELY(!field.pointer().okay())) return field;
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
 }

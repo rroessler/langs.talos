@@ -9,10 +9,10 @@
 
 //  PUBLIC METHODS  //
 
-$::Filesystem::Path $::Executable::resolve() {
-    WCHAR file_path[MAX_PATH];  // prepare the buffer
-    GetModuleFileNameW(NULL, file_path, MAX_PATH);
-    return file_path;  // and return the result now
+$::FS::Path $::Executable::resolve() {
+  WCHAR file_path[MAX_PATH]; // prepare the buffer
+  ::GetModuleFileNameW(NULL, file_path, MAX_PATH);
+  return file_path; // and return the result now
 }
 
 #endif

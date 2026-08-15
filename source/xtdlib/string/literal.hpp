@@ -1,62 +1,68 @@
 #ifndef _XTDLIB_STRING_LITERAL_HPP
 #define _XTDLIB_STRING_LITERAL_HPP
 
-/// Library Modules
-#include "xtdlib/debug/printable.hpp"
+/// Library Includes
+#include "xtdlib/string/buffer.hpp"
+#include "xtdlib/string/view.hpp"
 
 namespace $::String {
 
-    /// @brief Template String Literal.
-    template <size_t N>
-    struct Literal : public Printable {
-        //  PROPERTIES  //
+/// @brief Template String Literal.
+template <size_t N> struct Literal {
+  //  PROPERTIES  //
 
-        /// @brief The underlying character buffer.
-        char buffer[N] = {};
+  /// @brief The underlying character buffer.
+  char storage[N] = {};
 
-        //  CONSTRUCTORS  //
+  //  CONSTRUCTORS  //
 
-        /// @brief Default literal constructor.
-        constexpr Literal() = default;
+  /// @brief Default literal constructor.
+  constexpr Literal() = default;
 
-        /**
-         * @brief Constructs a string literal.
-         * @param buffer                    Character buffer.
-         */
-        constexpr Literal(const char (&buffer)[N]) { std::copy_n(buffer, N, this->buffer); }
+  /**
+   * @brief Constructs a string literal.
+   * @param buffer                    Character buffer.
+   */
+  constexpr Literal(const char (&buffer)[N]) { std::copy_n(buffer, N, storage); }
 
-        //  PUBLIC METHODS  //
+  //  OPERATOR METHODS  //
 
-        inline constexpr size_t size() const noexcept { return N - 1; }
-        inline constexpr bool empty() const noexcept { return size() == 0; }
-        inline constexpr const char* data() const noexcept { return buffer; }
-        inline constexpr String::View view() const noexcept { return { data(), size() }; }
+  /// @brief Allow implicit casting directly to a view/buffer.
+  inline constexpr operator String::View() const noexcept { return view(); }
+  inline constexpr operator String::Buffer() const noexcept { return buffer(); }
 
-        /// @brief Allows joining literals.
-        template <size_t M>
-        inline constexpr auto join(const char (&suffix)[M]) const noexcept {
-            // prepare the result of joining items
-            auto result = Literal<N + M - 1>();
+  //  PUBLIC METHODS  //
 
-            // copy across this buffer and the one to join
-            std::copy_n(buffer, N - 1, result.buffer);
-            std::copy_n(suffix, M, result.buffer + N - 1);
+  inline constexpr size_t size() const noexcept { return N - 1; }
+  inline constexpr bool empty() const noexcept { return size() == 0; }
+  inline constexpr const char *data() const noexcept { return storage; }
+  inline constexpr String::View view() const noexcept { return {data(), size()}; }
+  inline constexpr String::Buffer buffer() const noexcept { return {data(), size()}; }
 
-            // return the resulting literal now
-            return result;
-        }
+  /// @brief Allows joining literals.
+  template <size_t M> inline constexpr auto join(const char (&suffix)[M]) const noexcept {
+    // prepare the result of joining items
+    auto result = Literal<N + M - 1>();
 
-       protected:
-        //  PRIVATE METHODS  //
+    // copy across this buffer and the one to join
+    std::copy_n(storage, N - 1, result.storage);
+    std::copy_n(suffix, M, result.storage + N - 1);
 
-        /**
-         * @brief Handles printing literals.
-         * @param os                        Output stream.
-         * @param self                      String literal.
-         */
-        static inline void m_print(::$::Stream::Output& os, const Literal& self) { os << self.view(); }
-    };
+    // return the resulting literal now
+    return result;
+  }
 
-}  // namespace $::String
+protected:
+  //  PRIVATE METHODS  //
+
+  /**
+   * @brief Handles printing literals.
+   * @param os                        Output stream.
+   * @param self                      String literal.
+   */
+  static inline void m_print(std::ostream &os, const Literal &self) { os << self.view(); }
+};
+
+} // namespace $::String
 
 #endif

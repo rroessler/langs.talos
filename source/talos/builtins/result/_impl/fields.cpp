@@ -1,70 +1,63 @@
-/// Talos Modules
-#include "talos/member/storage.hpp"
-
-/// Builtin Modules
+/// Builtin Includes
 #include "talos/builtins/_inline/assert.ipp"
-#include "talos/builtins/_inline/defines.ipp"
 
 //  TYPEDEFS  //
 
-#define TALOS_XX_FIELDS_DEFINE(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
-struct TALOS_BUILTIN_FIELDS(Monad::Result) {
+#define TALOS_XX_FIELDS_DEFINE(N, ...) $_FWD(Talos::Builtins::Field, static Value::Any N(Isolate *, const Args &))
 #include "talos/builtins/result/_defines/fields.def"
-};
-#undef TALOS_XX_FIELDS_DEFINE
 
 //  PROPERTIES  //
 
-#define TALOS_XX_FIELDS_DEFINE(N, ...) { #N, Field::N },
-TALOS_BUILTIN_STORAGE(Monad::Result) = Talos::Member::Storage(name(), {
+static auto s_members = Talos::Builtins::Storage<Talos::Monad::Result>({
+#define TALOS_XX_FIELDS_DEFINE(N, ...) {#N, Talos::Builtins::Field::N},
 #include "talos/builtins/result/_defines/fields.def"
-                                                                      });
-#undef TALOS_XX_FIELDS_DEFINE
+});
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_BUILTIN_FIELD(Monad::Result, is_okay, isolate, args) {
-    TALOS_MM_ASSERT_TYPEOF(isolate, Monad::Result, args.self());
-    return Value::Boolean(args.self<Monad::Result>().success());
+Talos::Value::Any Talos::Builtins::Field::is_okay(Isolate *isolate, const Args &args) {
+  TALOS_MM_ASSERT_TYPEOF(isolate, Monad::Result, args.self());
+  return Value::Boolean(args.self<Monad::Result>().success());
 }
 
-TALOS_MM_BUILTIN_FIELD(Monad::Result, is_error, isolate, args) {
-    TALOS_MM_ASSERT_TYPEOF(isolate, Monad::Result, args.self());
-    return Value::Boolean(args.self<Monad::Result>().failure());
+Talos::Value::Any Talos::Builtins::Field::is_error(Isolate *isolate, const Args &args) {
+  TALOS_MM_ASSERT_TYPEOF(isolate, Monad::Result, args.self());
+  return Value::Boolean(args.self<Monad::Result>().failure());
 }
 
-TALOS_MM_BUILTIN_FIELD(Monad::Result, unwrap_okay, isolate, args) {
-    // attempt parsing the incoming value
-    TALOS_MM_ASSERT_TYPEOF(isolate, Monad::Result, args.self());
+Talos::Value::Any Talos::Builtins::Field::unwrap_okay(Isolate *isolate, const Args &args) {
+  // attempt parsing the incoming value
+  TALOS_MM_ASSERT_TYPEOF(isolate, Monad::Result, args.self());
 
-    // get the baseline result value
-    auto result = args.self<Monad::Result>();
+  // get the baseline result value
+  auto result = args.self<Monad::Result>();
 
-    // succeed immediately if the result is okay
-    if (result.success()) return result.storage();
+  // succeed immediately if the result is okay
+  if (result.success()) return result.storage();
 
-    // otherwise throw an error as needed
-    if (args.empty()) return isolate->panic(6000701);
-    else return isolate->panic(6000700, args[1]);
+  // otherwise throw an error as needed
+  if (args.empty()) return isolate->panic(6000701);
+  else return isolate->panic(6000700, args[1]);
 }
 
-TALOS_MM_BUILTIN_FIELD(Monad::Result, unwrap_error, isolate, args) {
-    // attempt parsing the incoming value
-    TALOS_MM_ASSERT_TYPEOF(isolate, Monad::Result, args.self());
+Talos::Value::Any Talos::Builtins::Field::unwrap_error(Isolate *isolate, const Args &args) {
+  // attempt parsing the incoming value
+  TALOS_MM_ASSERT_TYPEOF(isolate, Monad::Result, args.self());
 
-    // get the baseline result value
-    auto result = args.self<Monad::Result>();
+  // get the baseline result value
+  auto result = args.self<Monad::Result>();
 
-    // succeed immediately if the result is an error
-    if (result.failure()) return result.storage();
+  // succeed immediately if the result is an error
+  if (result.failure()) return result.storage();
 
-    // otherwise throw an error as needed
-    if (args.empty()) return isolate->panic(6000702);
-    else return isolate->panic(6000700, args[1]);
+  // otherwise throw an error as needed
+  if (args.empty()) return isolate->panic(6000702);
+  else return isolate->panic(6000700, args[1]);
 }
 
 //  PRIVATE METHODS  //
 
-Talos::Member::View TALOS_BUILTIN_TRAITS(Monad::Result)::m_attributes(const Monad::Result&, Value::Symbol symbol) {
-    return m_members.retrieve(symbol);
+Talos::Member::View
+Talos::Builtins::Wrapper<Talos::Monad::Result>::m_attribute(const Monad::Result &, const Value::Symbol &symbol) {
+  return s_members.retrieve(symbol);
 }

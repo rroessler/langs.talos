@@ -10,5 +10,6 @@
 #include "talos/object/guard.hpp"
 #include "talos/object/header.hpp"
 #include "talos/object/instance.hpp"
+#include "talos/object/mixin.hpp"
 
 #endif

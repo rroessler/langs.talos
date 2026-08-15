@@ -1,6 +1,6 @@
-//!
-//! Crate: "codec"
-//! Description: Encoding/decoding utility functions.
-//!
+///
+/// @crate "codec"
+/// @describe Encoding/decoding utility functions.
+///
 
 Todo("Unimplemented Crate - 'talos:codec'");

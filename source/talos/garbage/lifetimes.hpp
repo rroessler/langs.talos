@@ -1,7 +1,7 @@
 #ifndef _TALOS_GARBAGE_LIFETIMES_HPP
 #define _TALOS_GARBAGE_LIFETIMES_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/forward/engine.hpp"
 #include "talos/forward/garbage.hpp"
 #include "talos/object/common.hpp"
@@ -17,72 +17,78 @@
 
 namespace Talos::Garbage {
 
-    /// @brief Handles Disposable Lifetimes.
-    class Lifetimes : public XI::Define<Lifetimes, XI::Unique> {
-        //  TYPEDEFS  //
+/// @brief Handles Disposable Lifetimes.
+class Lifetimes : public XI::Transient {
+  //  TYPEDEFS  //
 
-        /// @brief Available scoping of values.
-        using Scope = std::vector<Value::Any>;
+  /// @brief Available scoping of values.
+  using Scope = std::vector<Value::Any>;
 
-        /// @brief Available stacks to close.
-        using Stack = std::vector<Scope>;
+  /// @brief Available stacks to close.
+  using Stack = std::vector<Scope>;
 
-        //  PROPERTIES  //
+  //  PROPERTIES  //
 
-        /// @brief Prepare the mapping.
-        $::Map<const Engine::Frame*, Stack> m_stacks = {};
+  /// @brief Prepare the mapping.
+  $::Map::Base<const Engine::Frame *, Stack> m_stacks = {};
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs diposable lifetimes.
-        explicit Lifetimes() = default;
+  /// @brief Constructs diposable lifetimes.
+  explicit Lifetimes() = default;
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Attempts opening to a depth.
-         * @param isolate               Runtime isolate.
-         * @param depth                 Opening depth.
-         */
-        void open(Runtime::Isolate* isolate);
-        void open(Runtime::Isolate* isolate, size_t depth);
+  /**
+   * @brief Attempts opening to a depth.
+   * @param isolate               Runtime isolate.
+   * @param depth                 Opening depth.
+   */
+  void open(Runtime::Isolate *isolate);
+  void open(Runtime::Isolate *isolate, size_t depth);
 
-        /**
-         * @brief Closes to a required depth.
-         * @param isolate               Runtime isolate.
-         * @param depth                 Closing depth.
-         */
-        bool close(Runtime::Isolate* isolate);
-        bool close(Runtime::Isolate* isolate, size_t depth);
+  /**
+   * @brief Closes to a required depth.
+   * @param isolate               Runtime isolate.
+   * @param depth                 Closing depth.
+   */
+  bool close(Runtime::Isolate *isolate);
+  bool close(Runtime::Isolate *isolate, size_t depth);
 
-        /**
-         * @brief Value to defer for disposal.
-         * @param isolate               Runtime isolate.
-         * @param value                 Value to defer.
-         */
-        void defer(Runtime::Isolate* isolate, Value::Any value);
+  /**
+   * @brief Value to defer for disposal.
+   * @param isolate               Runtime isolate.
+   * @param value                 Value to defer.
+   */
+  void defer(Runtime::Isolate *isolate, const Value::Any &value);
 
-       private:
-        //  PRIVATE METHODS  //
+private:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handles disposing a set of values.
-         * @param isolate               Runtime isolate.
-         * @param values                Values to dispose.
-         */
-        bool m_dispose(Runtime::Isolate* isolate, Scope& values);
-        bool m_dispose(Runtime::Isolate* isolate, Value::Any value);
+  /**
+   * @brief Handles opening a suitable stack.
+   * @param isolate               Runtime isolate.
+   */
+  Stack &m_open(Runtime::Isolate *isolate);
 
-        /**
-         * @brief Checks if an original exception should be suppressed.
-         * @param isolate               Runtime isolate.
-         * @param exception             Exception value.
-         */
-        void m_suppress(Runtime::Isolate* isolate, Value::Any exception);
-        void m_suppress(Runtime::Isolate* isolate, Object::Exception exception);
-    };
+  /**
+   * @brief Handles disposing a set of values.
+   * @param isolate               Runtime isolate.
+   * @param values                Values to dispose.
+   */
+  bool m_dispose(Runtime::Isolate *isolate, Scope &values);
+  bool m_dispose(Runtime::Isolate *isolate, const Value::Any &value);
 
-}  // namespace Talos::Garbage
+  /**
+   * @brief Checks if an original exception should be suppressed.
+   * @param isolate               Runtime isolate.
+   * @param exception             Exception value.
+   */
+  void m_suppress(Runtime::Isolate *isolate, const Value::Any &exception);
+  void m_suppress(Runtime::Isolate *isolate, const Object::Exception &exception);
+};
+
+} // namespace Talos::Garbage
 
 #endif

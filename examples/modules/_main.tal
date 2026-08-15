@@ -1,7 +1,7 @@
-//!
-//! Example: "modules/_main.tal"
-//! Description: Barrel exports a variety of values.
-//!
+///
+/// @example "modules/_main.tal"
+/// @describe Barrel exports a variety of values.
+///
 
 // Firstly export the raw values.
 export "values.tal";

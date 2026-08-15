@@ -1,119 +1,127 @@
 #ifndef _TALOS_BYTECODE_BLOCK_HPP
 #define _TALOS_BYTECODE_BLOCK_HPP
 
-/// C++ Modules
-#include <list>
-
-/// Talos Modules
+/// Talos Includes
 #include "talos/bytecode/instruction.hpp"
-#include "talos/linker/records.hpp"
 
 namespace Talos::Bytecode {
 
-    /// @brief Instruction Mappings.
-    class Mapping {
-        //  PROPERTIES  //
+/// @brief Instruction Mappings.
+class Mapping {
+  //  PROPERTIES  //
 
-        /// @brief Handles instruction storage.
-        $::Map<const Instruction*, Linker::Position> m_positions = {};
+  /// @brief Handles instruction storage.
+  $::Map::Base<const Instruction *, XLSP::Position> m_positions = {};
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs an instruction cache.
-        constexpr Mapping() = default;
+  /// @brief Constructs an instruction cache.
+  constexpr Mapping() = default;
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Handles clearing the current positions available.
-        inline constexpr void clear() { m_positions.clear(); }
+  /// @brief Handles clearing the current positions available.
+  inline constexpr void clear() { m_positions.clear(); }
 
-        /**
-         * @brief Resolves a suitable position value.
-         * @param instruction               Instruction to retrieve.
-         */
-        inline constexpr const Linker::Position* get(const Instruction* instruction) const noexcept {
-            return m_positions.contains(instruction) ? &m_positions.at(instruction) : nullptr;
-        }
+  /**
+   * @brief Resolves a suitable position value.
+   * @param instruction               Instruction to retrieve.
+   */
+  inline constexpr const XLSP::Position *get(const Instruction *instruction) const noexcept {
+    return m_positions.contains(instruction) ? &m_positions.at(instruction) : nullptr;
+  }
 
-        /**
-         * @brief Handles emplacing an instruction.
-         * @param instruction               Instruction to emplace.
-         * @param position                  Associated position.
-         */
-        inline constexpr void set(const Instruction* instruction, const Linker::Position& position = {}) {
-            m_positions.emplace(instruction, position);
-        }
-    };
+  /**
+   * @brief Handles emplacing an instruction.
+   * @param instruction               Instruction to emplace.
+   * @param position                  Associated position.
+   */
+  inline constexpr void set(const Instruction *instruction, const XLSP::Position &position = {}) {
+    m_positions.emplace(instruction, position);
+  }
+};
 
-    /// @brief Basic Block Structure.
-    class Block : public $::Printable {
-        //  PROPERTIES  //
+/// @brief Basic Block Structure.
+class Block {
+  //  PROPERTIES  //
 
-        /// @brief Denotes if a block is reachable.
-        bool m_reachable = false;
+  /// @brief Denotes if a block is reachable.
+  bool m_reachable = false;
 
-        /// @brief Bound block labels.
-        $::Set<Label> m_labels = {};
+  /// @brief Bound block labels.
+  $::Map::Set<Label> m_labels = {};
 
-        $::Set<Block*> m_incoming = {};  // Incoming block references.
-        $::Set<Block*> m_outgoing = {};  // Outgoing block references.
+  /// @brief Incoming block references.
+  $::Map::Set<Block *> m_incoming = {};
 
-        /// @brief All available block instructions.
-        std::vector<$::Ptr::Unique<Instruction>> m_instructions = {};
+  /// @brief Outgoing block references.
+  $::Map::Set<Block *> m_outgoing = {};
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief All block instructions available.
+  std::vector<Boxed> m_instructions = {};
 
-        /// @brief Constructs an empty block instance.
-        constexpr Block() = default;
+public:
+  //  CONSTRUCTORS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Constructs an empty block instance.
+  constexpr Block() = default;
 
-        inline constexpr bool& reachable() noexcept { return m_reachable; }
-        inline constexpr bool reachable() const noexcept { return m_reachable; }
+  //  PUBLIC METHODS  //
 
-        inline constexpr bool empty() const noexcept { return m_instructions.empty(); }
-        inline constexpr size_t size() const noexcept { return m_instructions.size(); }
+  /// @brief Denotes if a block is actually reachable.
+  inline constexpr bool &reachable() noexcept { return m_reachable; }
+  inline constexpr bool reachable() const noexcept { return m_reachable; }
 
-        inline constexpr $::Set<Label>& labels() noexcept { return m_labels; }
-        inline constexpr const $::Set<Label>& labels() const noexcept { return m_labels; }
+  /// @brief Denotes if the block is empty.
+  inline constexpr bool empty() const noexcept { return m_instructions.empty(); }
 
-        inline constexpr auto& instructions() noexcept { return m_instructions; }
-        inline constexpr const auto& instructions() const noexcept { return m_instructions; }
+  /// @brief Gets the size of the block.
+  inline constexpr size_t size() const noexcept { return m_instructions.size(); }
 
-        inline constexpr const $::Set<Block*> incoming() const noexcept { return m_incoming; }
-        inline constexpr const $::Set<Block*> outgoing() const noexcept { return m_outgoing; }
+  /// @brief Gets a blocks available labels.
+  inline constexpr $::Map::Set<Label> &labels() noexcept { return m_labels; }
+  inline constexpr const $::Map::Set<Label> &labels() const noexcept { return m_labels; }
 
-        /**
-         * @brief Links a target block to this one.
-         * @param target                Target to link.
-         */
-        inline void link(Block* target) { m_outgoing.insert(target), target->m_incoming.insert(this); }
+  /// @brief Gets the available instructions.
+  inline constexpr auto &instructions() noexcept { return m_instructions; }
+  inline constexpr const auto &instructions() const noexcept { return m_instructions; }
 
-        /// @brief Unlinks all references to this block.
-        inline void unlink() {
-            for (auto* block : m_incoming) block->m_outgoing.erase(this);
-            for (auto* block : m_outgoing) block->m_incoming.erase(this);
-        }
+  /// @brief Gets the incoming block set.
+  inline constexpr const $::Map::Set<Block *> &incoming() const noexcept { return m_incoming; }
 
-        /**
-         * @brief Unlinks a target block to this one.
-         * @param target                Target to unlink.
-         */
-        inline void unlink(Block* target) { m_outgoing.erase(target), target->m_incoming.erase(this); }
+  /// @brief Gets the outgoing block set.
+  inline constexpr const $::Map::Set<Block *> &outgoing() const noexcept { return m_outgoing; }
 
-       protected:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Links a target block to this one.
+   * @param target                Target to link.
+   */
+  inline void link(Block *target) { m_outgoing.insert(target), target->m_incoming.insert(this); }
 
-        /**
-         * @brief Handles printing bytecode blocks.
-         * @param os                    Output stream.
-         * @param self                  Block instance.
-         */
-        static void m_print($::Stream::Output& os, const Block& self);
-    };
+  /// @brief Unlinks all references to this block.
+  inline void unlink() {
+    for (auto *block : m_incoming) block->m_outgoing.erase(this);
+    for (auto *block : m_outgoing) block->m_incoming.erase(this);
+  }
 
-}  // namespace Talos::Bytecode
+  /**
+   * @brief Unlinks a target block to this one.
+   * @param target                Target to unlink.
+   */
+  inline void unlink(Block *target) { m_outgoing.erase(target), target->m_incoming.erase(this); }
+
+protected:
+  //  PRIVATE METHODS  //
+
+  /**
+   * @brief Handles printing bytecode blocks.
+   * @param os                    Output stream.
+   * @param self                  Block instance.
+   */
+  static void m_print(std::ostream &os, const Block &self);
+};
+
+} // namespace Talos::Bytecode
 
 #endif

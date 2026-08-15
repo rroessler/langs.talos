@@ -1,12 +1,11 @@
-/// Talos Modules
-#include "talos/runtime/isolate.hpp"
-
-/// Builtin Modules
-#include "talos/builtins/_inline/builtins.ipp"
+/// Builtin Includes
+#include "talos/builtins/_inline/assert.ipp"
 
 //  PRIVATE METHODS  //
 
-Talos::Member::View TALOS_BUILTIN_TRAITS(Object::Class)::m_attributes(const Object::Class& self, Value::Symbol symbol) {
-    const auto& statics = self.statics();  // prepare the statics to resolve
-    return statics.contains(symbol) ? statics.at(symbol).get() : nullptr;
+Talos::Member::View
+Talos::Builtins::Wrapper<Talos::Object::Class>::m_attribute(const Object::Class &self, const Value::Symbol &symbol) {
+  const auto &statics = self.statics(); // prepare base
+  auto iter = statics.find(symbol), cend = statics.cend();
+  return iter == cend ? nullptr : iter->second.get();
 }

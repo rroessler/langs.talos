@@ -1,17 +1,16 @@
-/// Vendor Modules
-import React from 'react';
-
 /// Package Modules
 import { Icon } from '../icon';
 import { Anchor } from '../anchor';
+import { Fragment } from '../fragment';
 
+/** Portal Component. */
 export interface Portal extends Portal.Props {}
 export function Portal({ name, href, icon, description }: Portal) {
     // rebuild the header prefix now
-    const prefix = Icon.Dynamic(icon as any, { size: 20 });
+    const prefix = Icon.Dynamic(icon, { size: 20 });
 
     // prepare the header to be used now
-    const header = [<React.Fragment key="icon" children={prefix} />, <React.Fragment key="name" children={name} />];
+    const header = [<Fragment key="icon" children={prefix} />, <Fragment key="name" children={name} />];
 
     // and construct the resulting portal now
     return (

@@ -1,5 +1,4 @@
 /// Vendor Modules
-import React from 'react';
 import { DynamicIcon, IconName } from 'lucide-react/dynamic';
 import { Icon as Wrap, IconNode, LucideProps } from 'lucide-react';
 
@@ -23,8 +22,7 @@ export namespace Icon {
      * Constructs dynamic icons.
      * @param input                 Properties to bind.
      */
-    export function Dynamic(): React.ReactNode;
-    export function Dynamic(input: Name, props?: Omit<Props, 'name'>): React.ReactNode;
+    export function Dynamic(input?: Name, props?: Omit<Props, 'name'>): React.ReactNode;
     export function Dynamic(node: Node, props?: Omit<Props, 'name'>): React.ReactNode;
     export function Dynamic(props: Props): React.ReactNode;
     export function Dynamic(input?: Icon, props?: Omit<Props, 'name'>): React.ReactNode {

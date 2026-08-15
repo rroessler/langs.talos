@@ -1,27 +1,12 @@
 {
     "extends": "../../configs/tsconfig.base.json",
     "exclude": ["node_modules"],
-    "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "app/(home)/docs/page.mdx"],
+    "include": ["**/*.ts", "**/*.tsx", "**/*.mdx"],
     "compilerOptions": {
-        "allowJs": true,
-        "jsx": "react-jsx",
-
-        "incremental": true,
-        "isolatedModules": true,
-        "resolveJsonModule": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-
-        "target": "esnext",
-        "module": "esnext",
-        "moduleResolution": "bundler",
-        "plugins": [{ "name": "next" }],
-        "lib": ["dom", "dom.iterable", "esnext"],
-
         "paths": {
             "~/*": ["../../*"],
             "@/website/*": ["./library/*"],
-            "fumadocs-mdx:collections/*": ["./.source/*"]
+            "@/collections/*": ["./.source/*"]
         }
     }
 }

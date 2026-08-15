@@ -1,0 +1,66 @@
+name: Publish Release
+description: Workflow for publishing Talos releases to GitHub
+
+on:
+    workflow_call:
+        inputs:
+            suffix:
+                type: string
+                default: ''
+                required: false
+                description: Version Suffix
+            release:
+                type: string
+                required: true
+                description: Release Type
+
+jobs:
+    publish-version:
+        name: Parse Version
+        runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.version.outputs.version }}
+        steps:
+            - uses: actions/checkout@v6
+            - id: version # define a suitable output for the version value
+              run: echo "version=$(cat ${{ github.workspace }}/configs/version.txt | xargs)${{ inputs.suffix }}" >> "$GITHUB_OUTPUT"
+
+    publish-release:
+        runs-on: ubuntu-latest
+        needs: [publish-version]
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Generate Changelog
+              uses: elieahd/templater@v1
+              with:
+                  file: 'CHANGELOG.md'
+                  variables: 'version=${{ needs.publish-version.outputs.version }}'
+                  template: '.github/templates/release-${{ inputs.release }}.md'
+
+            - name: Download Artifacts
+              uses: actions/download-artifact@v8
+              with:
+                  path: dist
+                  pattern: talos-*
+                  merge-multiple: true
+
+            - name: Deduplicate Nightly
+              if: inputs.release == 'nightly'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  VERSION_TAG: ${{ needs.publish-version.outputs.version }}
+              run: |
+                  if gh release view "$VERSION_TAG" &>/dev/null; then
+                      gh release delete "$VERSION_TAG" --cleanup-tag --yes
+                  fi
+
+            - name: Generate Release
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh release create ${{ needs.publish-version.outputs.version }} "./dist/*" \
+                    --title "Talos ${{ needs.publish-version.outputs.version }}" \
+                    --notes-file "CHANGELOG.md" \
+                    --repo "${{ github.repository }}" \
+                    --latest=${{ inputs.release == 'stable' && 'true' || 'false' }}

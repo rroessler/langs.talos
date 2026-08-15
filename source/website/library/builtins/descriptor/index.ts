@@ -1,6 +1,3 @@
-/// Vendor Modules
-import * as React from 'react';
-
 /// Package Modules
 import { Property } from '../property';
 

@@ -1,47 +1,45 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
+/// Builtin Includes
+#include "talos/builtins/_inline/builtins.ipp"
 
-/// Builtin Inlines
-#include "talos/builtins/_inline/defines.ipp"
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Builtins, namespace TB = Type::Builder)
+/// Forward Definitions
+$_FWD(Talos::Builtins, using TN = Type::New)
 
 //  TYPEDEFS  //
 
-#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
-struct TALOS_BUILTIN_STATICS(Value::Boolean) {
+#define TALOS_XX_STATICS_DEFINE(N, ...) $_FWD(Talos::Builtins::Static, static Type::Entity N())
 #include "talos/builtins/boolean/_defines/statics.def"
-};
-#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
-Talos::Type::Erased TALOS_BUILTIN_TRAITS(Value::Boolean)::typing() { return prototype()->instantiate(); }
+Talos::Type::Entity Talos::Builtins::Static::from() { return TN::function(TN::boolean(), TN::any()); }
+Talos::Type::Entity Talos::Builtins::Static::parse() {
+  auto sensitivity = TN::optional(TN::boolean()); // prepare
+  return TN::function(TN::boolean(), TN::string(), sensitivity);
+}
 
-TALOS_MM_BUILTIN_STYPE(Value::Boolean, from) { return { TB::function(TB::boolean(), TB::arguments(TB::any())) }; }
-TALOS_MM_BUILTIN_STYPE(Value::Boolean, parse) {
-    Type::Entity source = TB::string(), sensitivity = TB::optional(TB::boolean());
-    return { TB::function(TB::boolean(), TB::arguments(source, sensitivity)) };
+$::Shared::Pointer<Talos::Type::Prototype> Talos::Builtins::Wrapper<Talos::Value::Boolean>::typeclass() {
+  return m_typeclass([](const auto &) {});
 }
 
 //  PRIVATE METHODS  //
 
-void TALOS_BUILTIN_TRAITS(Value::Boolean)::m_typedefs(Type::World* globals) {
-    // get the underlying prototype instance
-    auto proto = prototype();
-    auto& statics = proto->statics();
+void Talos::Builtins::Wrapper<Talos::Value::Boolean>::m_typedefs(Type::World *globals) {
+  // get the underlying prototype instance
+  auto prototype = typeclass();
+  auto &statics = prototype->statics();
 
-    // define the underlying statics for booleans
+  // define the underlying statics for booleans
 #define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
 #include "talos/builtins/boolean/_defines/statics.def"
-#undef TALOS_XX_STATICS_DEFINE
 
-    // prepare the baseline typing to be used
-    globals->types().declare(name(), typing());
-    globals->values().declare(name(), proto);
+  // prepare the baseline typing to be used
+  globals->values().declare(name(), prototype);
+  globals->types().declare(name(), TN::boolean());
 
-    // and generate the "True" and "False" typings as well
-    globals->values().declare("True", typing());
-    globals->values().declare("False", typing());
+  // and generate the "True" and "False" typings as well
+  globals->values().declare("True", TN::boolean());
+  globals->values().declare("False", TN::boolean());
 }

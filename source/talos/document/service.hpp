@@ -1,98 +1,104 @@
 #ifndef _TALOS_DOCUMENT_SERVICE_HPP
 #define _TALOS_DOCUMENT_SERVICE_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/document/buffer.hpp"
 #include "talos/document/publisher.hpp"
 #include "talos/value/symbol.hpp"
 
 namespace Talos::Document {
 
-    /// @brief Document Service.
-    class Service : public XI::Define<Service, XI::Shared> {
-        //  PROPERTIES  //
+/// @brief Document Service.
+class Service : public XI::Singleton {
+  //  TYPEDEFS  //
 
-        /// @brief Documents mutex value.
-        mutable $::Mutex::Auto m_mutex;
+  /// @brief Key Storage Typing.
+  using Key = Value::Symbol;
 
-        /// @brief Publisher instance.
-        $::Ptr::Unique<Publisher> m_publisher;
+  /// @brief Buffer Value Typing.
+  using Value = $::Shared::Pointer<Buffer>;
 
-        /// @brief Encapsulates document buffers.
-        $::Map<Value::Symbol, $::Ptr::Shared<Buffer>> m_buffers = {};
+  //  PROPERTIES  //
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Documents mutex value.
+  mutable $::Mutex::Auto m_mutex;
 
-        /// @brief Constructs a defaulted document service.
-        explicit Service() : m_publisher($::New().unique<Publisher>()) {}
+  /// @brief Publisher instance.
+  $::Unique::Pointer<Publisher> m_publisher;
 
-        /**
-         * @brief Constructs a document service.
-         * @param services                  Services container.
-         */
-        explicit Service(XI::Container* services) : m_publisher(*services) {}
+  /// @brief Encapsulates document buffers.
+  $::Map::Base<Key, Value> m_buffers = {};
 
-        //  PUBLIC METHODS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Removes all available buffers.
-        inline constexpr void clear() { m_buffers.clear(); }
+  /**
+   * @brief Constructs a document service.
+   * @param services                  Services container.
+   */
+  explicit Service();
+  explicit Service(XI::Container *services);
 
-        /// @brief Gets the publisher instance.
-        inline constexpr Publisher* publisher() const noexcept { return m_publisher.get(); }
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets a view of the underlying resources.
-        inline constexpr std::vector<$::URI::Buffer> opened() const noexcept {
-            // get the cached result of buffers
-            auto result = std::vector<$::URI::Buffer>();
+  /// @brief Removes all available buffers.
+  inline constexpr void clear() { m_buffers.clear(); }
 
-            // emplace all the resources available now
-            for (const auto& buffer : m_buffers | std::views::values) {
-                if (buffer->anonymous()) continue;  // ignore
-                result.emplace_back(buffer->resource().buffer());
-            }
+  /// @brief Gets the publisher instance.
+  inline constexpr Publisher *publisher() const noexcept { return m_publisher.get(); }
 
-            // return the resulting resources now
-            return result;
-        }
+  /// @brief Gets a view of the underlying resources.
+  inline constexpr std::vector<$::URI::Buffer> opened() const noexcept {
+    // get the cached result of buffers
+    auto result = std::vector<$::URI::Buffer>();
 
-        /**
-         * @brief Checks if a resource exists.
-         * @param resource                  Document resource.
-         */
-        inline constexpr bool contains(const $::URI::View& resource) const { return m_buffers.contains(resource); }
+    // emplace all the resources available now
+    for (const auto &buffer : m_buffers | std::views::values) {
+      if (buffer->anonymous()) continue; // ignore
+      result.emplace_back(buffer->resource().buffer());
+    }
 
-        /**
-         * @brief Handles resolving a document buffer.
-         * @param resource                  Document resource.
-         */
-        inline constexpr $::Ptr::Shared<Buffer> resolve(const $::URI::View& resource) const {
-            $_UNUSED $_AUTO = $::Lock::guard(m_mutex);  // prepare mutex
-            if (m_buffers.contains(resource)) return m_buffers.at(resource);
-            return $::New().shared<Buffer>(resource);  // non-cached buffer
-        }
+    // return the resulting resources now
+    return result;
+  }
 
-        /**
-         * @brief Handles updating a document buffer.
-         * @param resource                  Document resource.
-         * @param content                   Content to bind.
-         */
-        inline constexpr void update(const $::URI::View& resource, const $::String::Buffer& content) {
-            $_UNUSED $_AUTO = $::Lock::guard(m_mutex);  // lock mutex here
-            m_buffers[resource] = $::New().shared<Buffer>(content, resource);
-            m_publisher->refresh(resource);  // and force a publisher update
-        }
+  /**
+   * @brief Checks if a resource exists.
+   * @param resource                  Document resource.
+   */
+  inline constexpr bool contains(const $::URI::View &resource) const { return m_buffers.contains(resource); }
 
-        /**
-         * @brief Handles removing a resource.
-         * @param resource                  Document resource.
-         */
-        inline constexpr void remove(const $::URI::View& resource) {
-            $_UNUSED $_AUTO = $::Lock::guard(m_mutex);  // prepare
-            m_buffers.erase(resource), m_publisher->clear(resource);
-        }
-    };
+  /**
+   * @brief Handles resolving a document buffer.
+   * @param resource                  Document resource.
+   */
+  inline constexpr $::Shared::Pointer<Buffer> resolve(const $::URI::View &resource) const {
+    $_UNUSED $_AUTO = $::Lock::guard(m_mutex); // prepare mutex
+    if (m_buffers.contains(resource)) return m_buffers.at(resource);
+    return $::Shared::New<Buffer>(resource); // non-cached buffer
+  }
 
-}  // namespace Talos::Document
+  /**
+   * @brief Handles updating a document buffer.
+   * @param resource                  Document resource.
+   * @param content                   Content to bind.
+   */
+  inline constexpr void update(const $::URI::View &resource, const $::String::Buffer &content) {
+    $_UNUSED $_AUTO = $::Lock::guard(m_mutex); // lock mutex here
+    m_buffers[resource] = $::Shared::New<Buffer>(content, resource);
+    m_publisher->refresh(resource); // and force a publisher update
+  }
+
+  /**
+   * @brief Handles removing a resource.
+   * @param resource                  Document resource.
+   */
+  inline constexpr void remove(const $::URI::View &resource) {
+    $_UNUSED $_AUTO = $::Lock::guard(m_mutex); // prepare
+    m_buffers.erase(resource), m_publisher->clear(resource);
+  }
+};
+
+} // namespace Talos::Document
 
 #endif

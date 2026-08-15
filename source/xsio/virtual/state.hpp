@@ -1,33 +1,29 @@
 #ifndef _XSIO_VIRTUAL_STATE_HPP
 #define _XSIO_VIRTUAL_STATE_HPP
 
-/// XSIO Modules
+/// XSIO Includes
 #include "xsio/forward/virtual.hpp"
-
-//  X-MACROS  //
-
-#define XX_VIRTUAL_STATES(X) \
-    X(CLEANED)               \
-    X(WAITING)               \
-    X(ACQUIRE)               \
-    X(READY)                 \
-    X(NATIVE)                \
-    X(PAUSED)                \
-    X(RECYCLE)               \
-    X(WORKING)               \
-    X(SHUTDOWN)
-
-//  NAMESPACES  //
 
 namespace XSIO::Virtual {
 
-    /// @brief Available Virtual States.
-    $_XX_ENUM_CLASS(State, uint8_t, XX_VIRTUAL_STATES);
+/// @brief Available Virtual States.
+enum class State : uint8_t {
+  CLEANED, // Thread/Worker is clean and can be assigned.
 
-}  // namespace XSIO::Virtual
+  SLEEPING,  // Worker is currently sleeping.
+  ACQUIRING, // Worker is acquiring a processor.
 
-//  UNDEFINES  //
+  NATIVE,  // Thread/Worker is inside a native section.
+  STOPPED, // Worker is currently stopped from working.
 
-#undef XX_VIRTUAL_STATES
+  READY,   // Thread is ready for execution.
+  WAITING, // Thread is currently waiting.
+  RUNNING, // Thread/Worker is currently running.
+  EXITED,  // Thread has exited their current task.
+
+  SHUTDOWN, // Thread has requested a shutdown phase (must be last).
+};
+
+} // namespace XSIO::Virtual
 
 #endif

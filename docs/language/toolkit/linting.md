@@ -28,7 +28,7 @@ Enables hint-based diagnostics. These includes type-checking and linting diagnos
 
 ### `--config` (Unimplemented)
 
-Specifies the input configuration to be used for linting. This allows overriding the [crate manifest](/docs/language/development/configuration) associated with the given scripts. By default, any script that is linted will use it's upward parent crate manifest `lint` option.
+Specifies the input configuration to be used for linting. This allows overriding the [crate manifest](/language/development/configuration) associated with the given scripts. By default, any script that is linted will use it's upward parent crate manifest `lint` option.
 
 ## Configuration Options
 

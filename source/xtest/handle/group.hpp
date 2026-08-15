@@ -1,75 +1,69 @@
 #ifndef _XTEST_HANDLE_GROUP_HPP
 #define _XTEST_HANDLE_GROUP_HPP
 
-/// XT Modules
-#include "xtest/handle/abstract.hpp"
+/// Testing Includes
+#include "xtest/handle/mixin.hpp"
 
-namespace XT {
+namespace XT::Handle {
 
-    /// @brief Testing Group Container.
-    class Group : public Handle::Abstract<Group> {
-        //  PROPERTIES  //
+/// @brief Initializer list for groups.
+using Initializer = std::initializer_list<const Base *>;
 
-        /// @brief The setup handler.
-        Handle::Callback m_setup = nullptr;
+/// @brief Encapsulates a Grouped Tests.
+class Group : public Mixin<Group> {
+  //  PROPERTIES  //
 
-        /// @brief Bound Group Tests.
-        std::vector<const Handle*> m_tests = {};
+  /// @brief The setup handler.
+  Handle::Callback m_setup = nullptr;
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Bound Group Tests.
+  std::vector<const Base *> m_tests = {};
 
-        /**
-         * @brief Constructs a group.
-         * @param title             Group title.
-         * @param location          Source location.
-         */
-        explicit Group(const $::String::Buffer& title, const Location& location) : Abstract(title, location) {}
+public:
+  //  CONSTRUCTORS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Inherit the base mixin constructor.
+  using Mixin::Mixin;
 
-        /// @brief Gets all the associated group tests.
-        inline constexpr const std::vector<const Handle*>& tests() const noexcept { return m_tests; }
+  //  PUBLIC METHODS  //
 
-        /// @brief Returns the base test count.
-        inline size_t count() const final {
-            auto predicate = [](size_t acc, const Handle* handle) { return acc + handle->count(); };
-            return std::ranges::fold_left(m_tests, 0, predicate);  // reduce now as necessary
-        }
+  /// @brief Gets all the associated group tests.
+  inline constexpr const std::vector<const Base *> &tests() const noexcept { return m_tests; }
 
-        /**
-         * @brief Handles binding unit tests.
-         * @param list                      Initializer list.
-         */
-        inline constexpr Group* bind(const Handle* test) { return m_tests = { test }, this; }
-        inline constexpr Group* bind(const Handle::Initializer& list) { return m_tests = list, this; }
-        inline constexpr Group* bind(Handle::Callback&& setup) { return m_setup = std::move(setup), this; }
+  /**
+   * @brief Handles binding unit tests.
+   * @param list                      Initializer list.
+   */
+  inline constexpr Group *bind(const Base *test) { return m_tests = {test}, this; }
+  inline constexpr Group *bind(const Initializer &list) { return m_tests = list, this; }
+  inline constexpr Group *bind(Callback &&setup) { return m_setup = std::move(setup), this; }
 
-        /**
-         * @brief Handles emplacing unit tests.
-         * @param list                      Initializer list.
-         */
-        inline constexpr Group* emplace(const Handle* test) { return m_tests.emplace_back(test), this; }
-        inline constexpr Group* emplace(const Handle::Initializer& list) {
-            return $::Ranges::Append(m_tests, list), this;
-        }
+  /**
+   * @brief Handles emplacing unit tests.
+   * @param list                      Initializer list.
+   */
+  inline constexpr Group *emplace(const Base *test) { return m_tests.emplace_back(test), this; }
+  inline constexpr Group *emplace(const Initializer &list) { return $::Ranges::Append(m_tests, list), this; }
 
-        /**
-         * @brief Handles executing all group tests.
-         * @param runner                    Test runner.
-         */
-        void execute(Session::Runner* runner) const final;
+protected:
+  //  PRIVATE METHODS  //
 
-       private:
-        //  PRIVATE METHODS  //
+  /// @brief Gets the total count of the benchmark.
+  size_t m_count() const noexcept final;
 
-        /**
-         * @brief Handles initializing groups.
-         * @param runner                    Test runner.
-         */
-        bool m_initialize(Session::Runner* runner) const;
-    };
+  /**
+   * @brief Handles initializing groups.
+   * @param runner                    Test runner.
+   */
+  bool m_initialize(Session::Runner *runner) const;
 
-}  // namespace XT
+  /**
+   * @brief Handles running the callback.
+   * @param runner                Test runner.
+   */
+  void m_execute(Session::Runner *runner) const final;
+};
+
+} // namespace XT::Handle
 
 #endif

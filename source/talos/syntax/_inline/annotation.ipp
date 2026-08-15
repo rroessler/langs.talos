@@ -1,24 +1,30 @@
 #ifndef _TALOS_SYNTAX_ANNOTATION_IPP
 #define _TALOS_SYNTAX_ANNOTATION_IPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/parser/dispatch.hpp"
 
-/// Annotation Modules
+/// Parser Includes
+#include "talos/parser/_inline/macros.ipp"
+
+/// Annotation Includes
+#include "talos/syntax/annotation/constructor.hpp"
 #include "talos/syntax/annotation/interface.hpp"
+#include "talos/syntax/annotation/parameters.hpp"
 #include "talos/syntax/annotation/placeholder.hpp"
 #include "talos/syntax/annotation/qualifier.hpp"
 #include "talos/syntax/annotation/signature.hpp"
 
 //  MACROS  //
 
+/// @brief All available type-annotation nodes.
 #define TALOS_XX_ANNOTATION_NODES(X) \
-    X(Qualifier)                     \
-    X(Placeholder)                   \
-    X(Parameters)                    \
-    X(Constructor)                   \
-    X(Signature)                     \
-    X(Interface)
+  X(Qualifier)                       \
+  X(Placeholder)                     \
+  X(Parameters)                      \
+  X(Constructor)                     \
+  X(Signature)                       \
+  X(Interface)
 
 //  SPECIALIZATIONS  //
 

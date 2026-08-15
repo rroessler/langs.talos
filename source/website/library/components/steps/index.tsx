@@ -1,11 +1,10 @@
 /// Vendor Modules
-import * as React from 'react';
-import { Step, Steps } from '@fumadocs/base-ui/components/steps';
+import { Step as _Step, Steps as _Steps } from 'fumadocs-ui/components/steps';
 
-/// Vendor Exports
-export { Step, Steps } from '@fumadocs/base-ui/components/steps';
+//  PROPERTIES  //
 
-//  TYPEDEFS  //
-
+export const Step = _Step;
 export interface Step extends React.ComponentProps<typeof Step> {}
+
+export const Steps = _Steps;
 export interface Steps extends React.ComponentProps<typeof Steps> {}

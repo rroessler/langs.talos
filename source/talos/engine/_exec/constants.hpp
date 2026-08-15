@@ -1,34 +1,53 @@
-/// Talos Modules
-#include "talos/globals/service.hpp"
-
-/// Inline Modules
+/// Engine Modules
 #include "talos/engine/_inline/macros.ipp"
-#include "talos/value/_inline/value.ipp"
-
-//  PROPERTIES  //
-
-static constexpr auto g_void = Talos::Value::Void();
-static constexpr auto g_one = Talos::Number::Tagged(1);
-static constexpr auto g_zero = Talos::Number::Tagged(0);
-static constexpr auto g_true = Talos::Value::Boolean(true);
-static constexpr auto g_false = Talos::Value::Boolean(false);
 
 //  PRIVATE METHODS  //
 
-TALOS_MM_ENGINE_EXECUTE(LOAD_ZERO, , frame, ii) { return frame->store(ii->get<0>(), g_zero), Mode::NEXT; }
-TALOS_MM_ENGINE_EXECUTE(LOAD_ONE, , frame, ii) { return frame->store(ii->get<0>(), g_one), Mode::NEXT; }
-TALOS_MM_ENGINE_EXECUTE(LOAD_VOID, , frame, ii) { return frame->store(ii->get<0>(), g_void), Mode::NEXT; }
-TALOS_MM_ENGINE_EXECUTE(LOAD_TRUE, , frame, ii) { return frame->store(ii->get<0>(), g_true), Mode::NEXT; }
-TALOS_MM_ENGINE_EXECUTE(LOAD_FALSE, , frame, ii) { return frame->store(ii->get<0>(), g_false), Mode::NEXT; }
-
-TALOS_MM_ENGINE_EXECUTE(LOAD_SELF, , frame, ii) { return frame->store(ii->get<0>(), frame->self()), Mode::NEXT; }
-
-TALOS_MM_ENGINE_EXECUTE(LOAD_CONST, , frame, instruction) {
-    auto constant = frame->constant(instruction->get<1>());
-    return frame->store(instruction->get<0>(), constant), Mode::NEXT;
+TALOS_MM_ENGINE_EXECUTE(LOAD_ZERO, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::LOAD_ZERO>();
+  frame->store(instruction->get<0>(), Number::Zero);
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
 }
 
-TALOS_MM_ENGINE_EXECUTE(LOAD_GLOBAL, isolate, frame, instruction) {
-    auto symbol = frame->constant<Value::Symbol>(instruction->get<1>());
-    return frame->store(instruction->get<0>(), isolate->global(symbol)), Mode::NEXT;
+TALOS_MM_ENGINE_EXECUTE(LOAD_ONE, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::LOAD_ONE>();
+  frame->store(instruction->get<0>(), Number::One);
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
+}
+
+TALOS_MM_ENGINE_EXECUTE(LOAD_VOID, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::LOAD_VOID>();
+  frame->store(instruction->get<0>(), Value::Void());
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
+}
+
+TALOS_MM_ENGINE_EXECUTE(LOAD_TRUE, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::LOAD_TRUE>();
+  frame->store(instruction->get<0>(), Value::True);
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
+}
+
+TALOS_MM_ENGINE_EXECUTE(LOAD_FALSE, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::LOAD_FALSE>();
+  frame->store(instruction->get<0>(), Value::False);
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
+}
+
+TALOS_MM_ENGINE_EXECUTE(LOAD_SELF, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::LOAD_SELF>();
+  frame->store(instruction->get<0>(), frame->self());
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
+}
+
+TALOS_MM_ENGINE_EXECUTE(LOAD_CONST, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::LOAD_CONST>();
+  frame->store(instruction->get<0>(), frame->constant(instruction->get<1>()));
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
+}
+
+TALOS_MM_ENGINE_EXECUTE(LOAD_GLOBAL, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::LOAD_GLOBAL>();
+  auto symbol = frame->constant<Value::Symbol>(instruction->get<1>());
+  frame->store(instruction->get<0>(), isolate->global(symbol));
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
 }

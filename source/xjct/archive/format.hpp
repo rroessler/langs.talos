@@ -6,12 +6,12 @@
 
 namespace XJCT::Archive {
 
-    /// @brief Imbument format typing.
-    enum class Format : uint8_t { DARWIN, LINUX, WINDOWS, UNKNOWN };
+/// @brief Imbument format typing.
+enum class Format : uint8_t { DARWIN, LINUX, WINDOWS, UNKNOWN };
 
-    /// @brief Available platform extensions.
-    static inline constexpr $::String::View Extension = $_PLATFORM_WINDOWS ? ".exe" : "";
+/// @brief Available platform extensions.
+static inline constexpr $::String::View Extension = $_PLATFORM_WINDOWS ? ".exe" : "";
 
-}  // namespace XJCT::Archive
+} // namespace XJCT::Archive
 
 #endif

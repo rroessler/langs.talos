@@ -1,48 +1,40 @@
 #ifndef _TALOS_BUILTINS_OBJECT_HPP
 #define _TALOS_BUILTINS_OBJECT_HPP
 
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
-#include "talos/object/instance.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 namespace Talos::Builtins {
 
-    /// @brief Instance Builtin Traits.
-    template <>
-    struct Traits<Object::Instance> : public Define<Object::Instance, "Object">,
-                                      public Features<Adapter::FIELDS, Adapter::GLOBALS, Adapter::TYPEDEFS> {
-        //  PUBLIC METHODS  //
+/// @brief Instance Builtin Traits.
+template <> struct Wrapper<Object::Instance> : public Blueprint<Object::Instance, "Object"> {
+protected:
+  //  PRIVATE METHODS  //
 
-        /// @brief Gets the underlying "String" typing.
-        static Type::Erased typing();
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-       protected:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   * @param prototype                 Prototype instance.
+   */
+  static Value::Any m_globals(Isolate *isolate, const Object::Class &prototype);
 
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
+  /**
+   * @brief Handles looking up object fields.
+   * @param self                      Object instance.
+   * @param symbol                    Field symbol.
+   */
+  static Member::View m_attribute(const Object::Instance &self, const Value::Symbol &symbol);
+};
 
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
+/// @brief Object Builtin Traits.
+template <> struct Wrapper<Object::Any> : public Wrapper<Object::Instance> {};
 
-        /**
-         * @brief Handles looking up instance fields.
-         * @param self                      Object instance.
-         * @param symbol                    Field symbol.
-         */
-        static Member::View m_attributes(const Object::Instance& self, Value::Symbol symbol);
-    };
-
-    /// @brief Object Builtin Traits.
-    template <>
-    struct Traits<Object::Any> : public Traits<Object::Instance> {};
-
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

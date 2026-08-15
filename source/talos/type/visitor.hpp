@@ -1,40 +1,35 @@
 #ifndef _TALOS_TYPE_VISITOR_HPP
 #define _TALOS_TYPE_VISITOR_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/syntax/visitor.hpp"
 #include "talos/type/analyzer.hpp"
-#include "talos/type/builder.hpp"
-#include "talos/type/deduction.hpp"
+
+/// Forward Declarations
+$_FWD(Talos::Type, using Visitor = Syntax::Visitor<Deduction, Analyzer *>)
 
 //  MACROS  //
 
-#define TALOS_MM_CHECK_NODE(T, N, A, ...)                                            \
-    template <>                                                                      \
-    Talos::Type::Deduction Talos::Type::Visitor::Acceptor::accept<Talos::Syntax::T>( \
-        const Syntax::T* N, Type::Analyzer* A)
+/// @brief Allows checking of nodes.
+#define TALOS_MM_CHECK_NODE(T, N, A, ...)                                          \
+  template <>                                                                      \
+  Talos::Type::Deduction Talos::Type::Visitor::Acceptor::accept<Talos::Syntax::T>( \
+      const Syntax::T *N, Type::Analyzer *A                                        \
+  )
 
 //  NAMESPACES  //
 
-namespace Talos::Type {
-
-    /// @brief Syntax Type Visitor.
-    using Visitor = Syntax::Visitor<Deduction, Analyzer*>;
-
-}  // namespace Talos::Type
-
 namespace Talos::Syntax {
 
-    /// @brief Visitor Specialization.
-    template <>
-    struct Visitor<Type::Deduction, Type::Analyzer*>::Acceptor {
-        //  PUBLIC METHODS  //
+/// @brief Visitor Specialization.
+template <> struct Visitor<Type::Deduction, Type::Analyzer *>::Acceptor {
+  //  PUBLIC METHODS  //
 
-        template <std::derived_from<Node> T>
-        static Type::Deduction accept(const T* node, Type::Analyzer* analyzer);
-    };
+  /// @brief Allows visiting syntax nodes for analysis.
+  template <std::derived_from<Node> T> static Type::Deduction accept(const T *node, Type::Analyzer *analyzer);
+};
 
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 //  SPECIALIZATIONS  //
 

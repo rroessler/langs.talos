@@ -1,14 +1,17 @@
-/// Library Modules
-#include "xtdlib/terminal/core.hpp"
+/// Platform Modules
 #include "xtdlib/system/platform.hpp"
 
 #if $_PLATFORM_WINDOWS
 
-/// Windows Modules
+/// Platform Modules
 #include "xtdlib/portable/windows.hpp"
+#include "xtdlib/terminal/core.hpp"
 
 //  PUBLIC METHODS  //
 
-bool $::Terminal::is(int32_t fh) { return ::_isatty(fh); }
+void $::Terminal::utf8() {
+  ::SetConsoleOutputCP(CP_UTF8);
+  ::setvbuf(stdout, nullptr, _IOFBF, 1000);
+}
 
 #endif

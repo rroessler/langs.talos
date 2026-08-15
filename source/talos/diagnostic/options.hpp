@@ -6,28 +6,31 @@
 
 namespace Talos::Diagnostic {
 
-    /// @brief Diagnostic Options.
-    struct Options {
-        //  PROPERTIES  //
+/// @brief Diagnostic Options.
+struct Options {
+  //  PROPERTIES  //
 
-        /// @brief Diagnostics limit.
-        size_t limit = SIZE_MAX;
+  /// @brief Diagnostics limit.
+  size_t limit = SIZE_MAX;
 
-        /// @brief Minimum allowable severities.
-        Severity severity = Severity::WARN;
+  /// @brief Current backtraces limit.
+  size_t backtraces = 10;
 
-        /// @brief Available override severities.
-        $::Map<Code, Severity> overrides = {};
+  /// @brief Minimum allowable severities.
+  Severity severity = Severity::WARN;
 
-        /// @brief The defaulted encoding for diagnostic ranges.
-        XLSP::Encoding::Type encoding = XLSP::Encoding::Type::UTF8;
+  /// @brief Available override severities.
+  $::Map::Base<Code, Severity> overrides = {};
 
-        //  CONSTRUCTORS  //
+  /// @brief The defaulted encoding for diagnostic ranges.
+  XLSP::Encoding::Type encoding = XLSP::Encoding::Type::UTF8;
 
-        /// @brief Default constructor.
-        constexpr Options() = default;
-    };
+  //  CONSTRUCTORS  //
 
-}  // namespace Talos::Diagnostic
+  /// @brief Default constructor.
+  constexpr Options() = default;
+};
+
+} // namespace Talos::Diagnostic
 
 #endif

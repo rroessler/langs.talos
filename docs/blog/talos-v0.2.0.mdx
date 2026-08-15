@@ -1,0 +1,60 @@
+---
+draft: true
+date: 1970-01-01
+author: Reuben Roessler
+title: Talos v0.2.0
+---
+
+## Runtime Updates
+
+Todo...
+
+## Match Statements
+
+Todo...
+
+## Faster Functions
+
+Todo...
+
+## Upcoming Work
+
+Todo..
+
+---
+
+## Bug Fixes
+
+<h4>Package / talos</h4>
+
+- Fixed: Updated the current CI infrastructure to now be independent of a release script.
+- Fixed: CMake infrastructure had some minor modifications made to improve compile-times.
+- Fixed: All crates for Talos have been reworked to now feature documentation friendly comments.
+
+<h4>Package / website</h4>
+
+- Moved: All content for the website can now be found in the `/docs` folder of the monorepo.
+- Fixed: Headings for the `builtins` and `crates` sections are now constructed dynamically.
+
+<h4>Package / vscode</h4>
+
+- Added: Allow users to install Talos when the executable cannot be found.
+- Fixed: Restarting the language server now does not error if it had not already been started.
+
+<h4>Toolkit / talos run</h4>
+
+- Fixed: The equality operator `==` was ill-formed for `String` values. Now these compare values correctly.
+- Added: Implemented constant load propagation to further optimize bytecode. This effectively speeds up variable loads.
+- Moved: Changed typing of `Function.bind` to be a static field for `Function` instead of an instance field.
+- Fixed: Improved the internal AST design to use lexical tokens to describe ranges/bounds for source code.
+- Moved: The bytecode interpreter now uses tail-calls instead of direct-threading with `goto*` statements.
+- Added: Fully completed a baseline JIT compiler. This is now exposed via the
+- Added: Implemented the `match` statement as described in this blog-post. For now it is just a basic implementation.
+
+<h4>Crate / talos:jit</h4>
+
+- Moved: The JIT compilation library was removed in lieu of the `#[Internal.Optimize]` attribute.
+
+<h4>Crate / talos:lint</h4>
+
+- Added: Prepare the stub-definitions for the `talos:lint` crate. This will be for eventual linting plugins.

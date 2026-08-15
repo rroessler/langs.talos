@@ -64,5 +64,3 @@ function(__mono_vendor_declare _target _repo _tag)
             OVERRIDE_FIND_PACKAGE)
     endif ()
 endfunction()
-
-# --  MODULE DEFINITION  -- #

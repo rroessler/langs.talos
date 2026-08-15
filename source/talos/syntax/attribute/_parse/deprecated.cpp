@@ -1,18 +1,18 @@
-/// Syntax Modules
+/// Syntax Includes
 #include "talos/syntax/_inline/declaration.ipp"
 
 //  PRIVATE METHODS  //
 
 TALOS_MM_PARSE_DECL(Deprecated, parser) {
-    // prepare the incoming snapshot
-    auto snapshot = parser->snapshot();
+  // prepare the incoming snapshot
+  auto snapshot = parser->snapshot();
 
-    // get the original token location to be used
-    auto *token = m_assert(parser->advance(), "Deprecated");
+  // get the original token location to be used
+  auto *token = m_assert(parser->advance(), "Deprecated");
 
-    // stop early if necessary to do so
-    if (!parser->match(Lexer::Kind::LTRL_STR)) return parser->allocate<Syntax::Deprecated>(token->location());
+  // stop early if necessary to do so
+  if (!parser->match(Lexer::Kind::LTRL_STR)) return parser->allocate<Syntax::Deprecated>(Syntax::Bounds(token));
 
-    // otherwise we can safely construct with a message found
-    return parser->allocate<Syntax::Deprecated>(parser->previous()->lexeme(), snapshot.enclose(token));
+  // otherwise we can safely construct with a message found
+  return parser->allocate<Syntax::Deprecated>(snapshot.enclose(token), parser->previous()->lexeme());
 }

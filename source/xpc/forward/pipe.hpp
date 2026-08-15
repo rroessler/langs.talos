@@ -1,7 +1,7 @@
 #ifndef _XPC_FORWARD_PIPE_HPP
 #define _XPC_FORWARD_PIPE_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations

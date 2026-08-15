@@ -1,50 +1,51 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/object/exception.hpp"
+#include "talos/globals/roots.hpp"
 #include "talos/runtime/isolate.hpp"
 
 //  CONSTRUCTORS  //
 
-Talos::Object::Attributes<Talos::Object::Exception>::Attributes(Runtime::Isolate* isolate) :
-    Attributes(isolate, String::Dynamic()) {}
+Talos::Object::Wrapper<Talos::Object::Exception>::Wrapper(Runtime::Isolate *isolate) :
+    Wrapper(isolate, String::Any()) {}
 
-Talos::Object::Attributes<Talos::Object::Exception>::Attributes(
-    Runtime::Isolate* isolate, const $::String::View& message) :
-    Attributes(isolate, String::Dynamic(isolate, message)) {}
+Talos::Object::Wrapper<Talos::Object::Exception>::Wrapper(Runtime::Isolate *isolate, const $::String::View &message) :
+    Wrapper(isolate, String::Any(isolate, message)) {}
 
-Talos::Object::Attributes<Talos::Object::Exception>::Attributes(Runtime::Isolate* isolate, String::Dynamic message) :
-    Attributes(isolate, String::Dynamic(isolate, "Runtime"), message) {}
+Talos::Object::Wrapper<Talos::Object::Exception>::Wrapper(Runtime::Isolate *isolate, String::Any message) :
+    Wrapper(isolate, String::Any(isolate, "Runtime"), message) {}
 
-Talos::Object::Attributes<Talos::Object::Exception>::Attributes(
-    Runtime::Isolate* isolate, const $::String::View& name, const $::String::View& message) :
-    Attributes(isolate, String::Dynamic(isolate, name), String::Dynamic(isolate, message)) {}
+Talos::Object::Wrapper<Talos::Object::Exception>::Wrapper(
+    Runtime::Isolate *isolate, const $::String::View &name, const $::String::View &message
+) : Wrapper(isolate, String::Any(isolate, name), String::Any(isolate, message)) {}
 
-Talos::Object::Attributes<Talos::Object::Exception>::Attributes(
-    Runtime::Isolate* isolate, String::Dynamic arg_name, String::Dynamic arg_message) {
-    // prepare the local scoping
-    auto local_scope = isolate->scope();
+Talos::Object::Wrapper<Talos::Object::Exception>::Wrapper(
+    Runtime::Isolate *isolate, String::Any arg_name, String::Any arg_message
+) {
+  // prepare the local scoping
+  auto local_scope = isolate->scope();
 
-    // prepare the locals to be used
-    auto local_name = local_scope(arg_name);
-    auto local_message = local_scope(arg_message);
+  // prepare the locals to be used
+  auto local_name = local_scope(arg_name);
+  auto local_message = local_scope(arg_message);
 
-    // set the values to be used now
-    name = *local_name, message = *local_message, trace = isolate->backtrace();
+  // set the values to be used now
+  name = *local_name, message = *local_message, trace = isolate->backtrace();
 }
 
 //  PRIVATE METHODS  //
 
-$::Stream::Output& Talos::Object::Exception::m_format($::Stream::Output& os) const noexcept {
-    os << $::Dye::red("{0}.{1}", type_name(), name()).bold() << ": " << message();
-    for (const auto& trace : trace()) os << $::Dye::dim("\n --> {0}", trace);
-    return os;  // and return the initial output-stream for more printing now
+std::ostream &Talos::Object::Exception::m_format(std::ostream &os) const noexcept {
+  os << $::Dye::red("{0}.{1}", brand(), name()).bold() << ": " << message();
+  for (const auto &trace : trace()) os << $::Dye::dim("\n --> {0}", trace);
+  return os; // and return the initial output-stream for more printing now
 }
 
-void Talos::Object::Exception::m_yield(const Exception& self, const Globals::Each& yield) {
-    auto* attributes = self.m_attrs();
-    yield(attributes->name);
-    yield(attributes->message);
+void Talos::Object::Exception::m_yield(const Exception &self, Globals::Each &yield) {
+  auto *attributes = self.m_wrapper();
+  yield(attributes->name);
+  yield(attributes->message);
 }
 
-void Talos::Object::Exception::m_print($::Stream::Output& os, const Exception& self) {
-    os << $::Dye::cyan("<{0}.{1}: stack({2})>", self.type_name(), self.name(), self.trace().size());
+void Talos::Object::Exception::m_print(std::ostream &os, const Exception &self) {
+  os << $::Dye::cyan("<{0}.{1}: stack({2})>", self.brand(), self.name(), self.trace().size());
 }

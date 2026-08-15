@@ -1,41 +1,42 @@
 #ifndef _TALOS_LITERAL_TEXT_HPP
 #define _TALOS_LITERAL_TEXT_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/syntax/node.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Text Literal Node.
-    class Text : public Abstract<Text, Expression> {
-        //  PROPERTIES  //
+/// @brief Text Literal Node.
+class Text : public Mixin<Text, Expression> {
+  //  PROPERTIES  //
 
-        /// @brief Associated text value.
-        $::String::View m_buffer;
+  /// @brief Associated text value.
+  $::String::View m_view = {};
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a tokenized text-node.
-         * @param token                 Token to bind.
-         */
-        explicit Text(const Lexer::Token* token) : Abstract(token), m_buffer(token->lexeme()) {}
+  /**
+   * @brief Constructs a tokenized text-node.
+   * @param token                 Token to bind.
+   */
+  explicit Text(const Lexer::Token *token) : Text(token->lexeme()) {}
 
-        /**
-         * @brief Constructs an explicit text-node.
-         * @param buffer                Text buffer to bind.
-         * @param location              Optional location.
-         */
-        explicit Text(const $::String::View& buffer = "", const Bounds& location = {}) :
-            Abstract(location), m_buffer(buffer) {}
+  /**
+   * @brief Constructs an explicit text-node.
+   * @param buffer                Text buffer to bind.
+   */
+  explicit Text(const $::String::View &view = "") : m_view(view) {}
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets the associated value.
-        inline constexpr $::String::View buffer() const noexcept { return m_buffer; }
-    };
+  /// @brief Gets the associated value view.
+  inline constexpr $::String::View view() const noexcept { return m_view; }
 
-}  // namespace Talos::Syntax
+  /// @brief Gets the associated value buffer.
+  inline constexpr $::String::Buffer buffer() const noexcept { return $::String::Buffer(m_view); }
+};
+
+} // namespace Talos::Syntax
 
 #endif

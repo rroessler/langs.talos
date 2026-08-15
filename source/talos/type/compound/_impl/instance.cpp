@@ -1,74 +1,47 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
+/// Builtins Includes
+#include "talos/builtins/_inline/builtins.ipp"
 
-/// Value Modules
-#include "talos/value/_inline/value.ipp"
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
 
 //  PUBLIC METHODS  //
 
-$::Ternary Talos::Type::Instance::truthiness() const noexcept {
-    auto type = lattice();  // prepare type
-    auto truthy = type.test(Fact::IS_TRUTHY);
-    auto falsey = type.test(Fact::IS_FALSEY);
-    if (truthy == falsey) return $::Unknown();
-    else return $::Ternary(truthy);  // known
-}
-
-Talos::Type::Lattice Talos::Type::Instance::lattice() const noexcept {
-    // ensure always correct for anonymous instances
-    if (m_prototype == nullptr) return Fact::OBJ_ANY;
-
-    // otherwise check against the incoming prototype
-    switch (m_prototype->m_base()) {
-        case Shape::Lookup<Value::Symbol>(): return Fact::SYM_ANY;
-        case Shape::Lookup<Value::Boolean>(): return Fact::BIT_ANY;
-        case Shape::Lookup<Number::Tagged>(): return Fact::NUM_ANY;
-        case Shape::Lookup<String::Dynamic>(): return Fact::STR_ANY;
-        default: return Fact::OBJ_ANY;  // could be any object value
-    }
-}
-
-Talos::Type::Entity Talos::Type::Instance::lookup(const $::String::View& field) const {
-    return m_prototype ? m_prototype->m_lookup(field) : Entity(Builder::any());
+Talos::Type::Entity Talos::Type::Instance::lookup(const $::String::View &field) const {
+  return m_prototype ? m_prototype->m_lookup(field) : Entity(New::any());
 }
 
 Talos::Type::Erased Talos::Type::Instance::apply(Operator::Kind kind) const { return apply(kind, nullptr); }
-Talos::Type::Erased Talos::Type::Instance::apply(Operator::Kind kind, const Erased& right) const {
-    // ignore if there is no valid protocol at all
-    if (m_prototype == nullptr) return Builder::any();
-
-    // prepare the incoming parameters to be used
-    auto& operators = m_prototype->m_operators;
-    auto* protocol = m_prototype->m_protocol.get();
-
-    auto result = operators == nullptr ? Builder::unset() : operators(protocol, kind, right);
-    return result->is<Unset>() ? right ? Abstract::apply(kind, right) : Abstract::apply(kind) : result;
+Talos::Type::Erased Talos::Type::Instance::apply(Operator::Kind kind, const Erased &right) const {
+  if (m_prototype == nullptr) return New::any();
+  return m_prototype->m_structure->apply(kind, right);
 }
 
 //  PRIVATE METHODS  //
 
-Talos::Type::Erased Talos::Type::Instance::m_infer(const Constraints& constraints) const {
-    if (m_prototype == nullptr) return m_clone();  // simple clone of the value
-    return m_prototype->infer(constraints)->as<Prototype>()->instantiate();
+Talos::Type::Erased Talos::Type::Instance::m_infer(Constraints *constraints) const {
+  if (m_prototype == nullptr) return $::Shared::New<Instance>(*this);
+  return m_prototype->infer(constraints)->as<Prototype>()->instantiate();
 }
 
-bool Talos::Type::Instance::m_unify(const Erased& candidate, const Constraints& constraints) const {
-    // attempt resolving a suitable prototype
-    auto other = Builder::resolve<Prototype>(candidate, false);
+bool Talos::Type::Instance::m_unify(const Erased &candidate, Constraints *constraints) const {
+  // attempt resolving a suitable prototype
+  auto other = New::cast<Prototype>(candidate, false);
 
-    if (other == nullptr) return false;       // failed to find a parent class
-    if (m_prototype == nullptr) return true;  // pass all generic objects now
+  if (other == nullptr) return false;      // failed to find a parent class
+  if (m_prototype == nullptr) return true; // pass all generic objects now
 
-    // otherwise we check against the incoming class
-    return m_prototype->unify(other, constraints);
+  // otherwise we check against the incoming class
+  return m_prototype->unify(other, constraints);
 }
 
-void Talos::Type::Instance::m_print($::Stream::Output& os) const {
-    // do a regular print if there is no prototype available
-    if (!m_prototype) return void(os << Value::Proxy<Object::Instance>::name());
+void Talos::Type::Instance::m_print(std::ostream &os, const Instance &self) {
+  // do a regular print if there is no prototype available
+  if (!self.m_prototype) return void(os << Builtins::Inspect<Object::Instance>::name());
 
-    // otherwise we want to print the base-class name
-    os << m_prototype->name();
-    if (m_prototype->constraints().empty()) return;
-    os << '[' << $::Convert::join(m_prototype->constraints()) << ']';
+  // otherwise we want to print the base-class name
+  os << self.m_prototype->name();
+  if (self.m_prototype->constraints().empty()) return;
+
+  // and bind the incoming constraints now as necessary
+  os << fmt::format("[{0}]", fmt::join($::Ranges::Deref(self.m_prototype->constraints()), ", "));
 }

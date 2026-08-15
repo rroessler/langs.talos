@@ -1,63 +1,48 @@
 #ifndef _TALOS_SIGNAL_SERVICE_HPP
 #define _TALOS_SIGNAL_SERVICE_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/async/service.hpp"
 #include "talos/forward/signal.hpp"
-#include "talos/runtime/executor.hpp"
 
 namespace Talos::Signal {
 
-    /// @brief Signal Codes Typing.
-    using Code = XSIO::Signal::Symbolic;
+/// @brief Signal Handling Service.
+class Service : public XI::Singleton, public XI::Immediate {
+  //  PROPERTIES  //
 
-    /// @brief Signal Handling Service.
-    class Service : public XI::Define<Service, XI::Shared, XI::Immediate> {
-        //  PROPERTIES  //
+  /// @brief Associated asynchronous runtime.
+  Async::Service *m_async = nullptr;
 
-        /// @brief Associated asynchronous runtime.
-        Async::Service* m_async = nullptr;
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Prepare the runtime handler.
-        Value::Any m_handler = Value::Void();
+  /**
+   * @brief Constructs a signal service.
+   * @param services                  Services container.
+   */
+  explicit Service();
+  explicit Service(XI::Container *services);
 
-       public:
-        //  CONSTRUCTORS  //
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Constructs a signal service.
-         * @param services                  Services container.
-         */
-        explicit Service(XI::Container* services);
+  /**
+   * @brief Handles raising signals.
+   * @param code                      Signal code/name.
+   */
+  inline constexpr void raise(Symbolic code) { m_async->signals()->raise(code); }
+  inline constexpr void raise(const $::String::View &name) { m_async->signals()->raise(name); }
 
-        //  PUBLIC METHODS  //
+private:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handles raising signals.
-         * @param code                      Signal code/name.
-         */
-        inline constexpr void raise(Code code) { m_async->signals()->raise(code); }
-        inline constexpr void raise(const $::String::View& name) { m_async->signals()->raise(name); }
+  /**
+   * @brief Handles delegating incoming signals.
+   * @param code                      Signal code.
+   */
+  void m_dispatch(const Code &code);
+};
 
-        /// @brief Handles ignoring user signal handling.
-        inline constexpr void ignore() { subscribe(Value::Void()); }
-
-        /**
-         * @brief Handles subscribing a user signal handler.
-         * @param handler                   Signal callback.
-         */
-        inline constexpr void subscribe(Value::Any handler) { m_handler = handler; }
-
-       private:
-        //  PRIVATE METHODS  //
-
-        /**
-         * @brief Handles delegating incoming signals.
-         * @param code                      Signal code.
-         */
-        void m_dispatch(const XSIO::Signal::Code& code);
-    };
-
-}  // namespace Talos::Signal
+} // namespace Talos::Signal
 
 #endif

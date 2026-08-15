@@ -1,4 +1,13 @@
+/// Builtins Includes
+#include "talos/builtins/_inline/defines.ipp"
+
 //  MACROS  //
+
+TALOS_XX_STATICS_HEADER()
+TALOS_XX_STATICS_DEFINE(bind)
+TALOS_XX_STATICS_TYPEDEF("fn [F: Function](callback: F, receiver: Any) -> F")
+TALOS_XX_STATICS_DESCRIBE("Binds a `Function` with the given context receiver.")
+TALOS_XX_STATICS_FOOTER()
 
 TALOS_XX_STATICS_HEADER()
 TALOS_XX_STATICS_DEFINE(call)
@@ -15,5 +24,10 @@ TALOS_XX_STATICS_FOOTER()
 TALOS_XX_STATICS_HEADER()
 TALOS_XX_STATICS_DEFINE(vlimit)
 TALOS_XX_STATICS_TYPEDEF("fn -> Number")
-TALOS_XX_STATICS_DESCRIBE("Gets the fixed variadic arguments adicity.")
+TALOS_XX_STATICS_DESCRIBE("Gets the maximum fixed variadic arguments adicity.")
 TALOS_XX_STATICS_FOOTER()
+
+//  UNDEFINES  //
+
+/// Builtins Includes
+#include "talos/builtins/_inline/undefs.ipp"

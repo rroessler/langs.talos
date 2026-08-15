@@ -2,114 +2,128 @@
 #define _TALOS_VALUE_ANY_HPP
 
 /// Talos Includes
-#include "talos/operator/kind.hpp"
-#include "talos/value/proxy.hpp"
+#include "talos/forward/handle.hpp"
+#include "talos/member/descriptor.hpp"
+#include "talos/operator/attribute.hpp"
+#include "talos/value/inspect.hpp"
 
 namespace Talos::Value {
 
-    /// @brief Base Runtime Value.
-    class Any : public $::Printable {
-        //  TYPEDEFS  //
+/// @brief Base Runtime Value.
+class Any {
+  //  TYPEDEFS  //
 
-        /// @brief Allow locals internal access.
-        template <std::derived_from<Any> T>
-        friend class Handle::Local;
+  /// @brief Allow object guards internal access.
+  friend class Object::Guard;
 
-       protected:
-        //  PROPERTIES  //
+  /// @brief Allow locals internal access.
+  template <std::derived_from<Any> T> friend class Handle::Local;
 
-        /// @brief The underlying pointer instance.
-        Pointer::Underlying m_pointer = Pointer::Traits();
+protected:
+  //  PROPERTIES  //
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief The underlying tagged pointer.
+  Pointer::Tagged m_pointer = Pointer::Tagged();
 
-        /// @brief Constructs a defaulted value.
-        explicit constexpr Any() = default;
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Allow explicit construction of values.
-         * @param pointer               Pointer to assign.
-         */
-        explicit constexpr Any(const Pointer::Traits& traits) : m_pointer(traits) {}
+  /// @brief Constructs a defaulted value.
+  constexpr Any() = default;
 
-        //  OPERATOR METHODS  //
+  /**
+   * @brief Constructs a value.
+   * @param tagged          Tagger pointer.
+   */
+  constexpr Any(const Pointer::Tagged &tagged) : m_pointer(tagged) {}
 
-        inline constexpr bool operator==(const Any& other) const noexcept { return m_pointer == other.m_pointer; }
-        inline constexpr bool operator!=(const Any& other) const noexcept { return m_pointer != other.m_pointer; }
+  //  OPERATOR METHODS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Allows checking for direct equality of values.
+  inline constexpr bool operator==(const Any &other) const noexcept { return m_equals(other); }
+  inline constexpr bool operator!=(const Any &other) const noexcept { return !m_equals(other); }
 
-        /// @brief Gets the associated truthiness of the value
-        bool truthiness() const noexcept;
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets a values underlying shape.
-        Shape::Underlying shape() const noexcept;
+  /// @brief Gets the truthiness of the value.
+  inline constexpr bool truthiness() const noexcept { return m_truthiness(); }
 
-        /// @brief Gets the underlying type-name of a value.
-        $::String::View type_name() const noexcept;
+  /// @brief Gets the shape of the value.
+  inline constexpr Shape::Underlying shape() const noexcept { return m_shape(); }
 
-        /// @brief Gets the underlying tagged pointer.
-        inline constexpr Pointer::Traits traits() const noexcept { return m_pointer; }
-        inline constexpr Pointer::Underlying pointer() const noexcept { return m_pointer; }
+  /// @brief Gets the name of the value type.
+  inline constexpr $::String::View brand() const noexcept { return m_brand(); }
 
-        /// @brief Handles validating value types.
-        template <std::derived_from<Any> T>
-        inline constexpr bool is() const noexcept {
-            return Proxy<T>::is(traits());
-        }
+  /// @brief Gets the underlying tagged pointer value.
+  inline constexpr const Pointer::Tagged &pointer() const noexcept { return m_pointer; }
 
-        /// @brief Casts value to the desired typing.
-        template <std::derived_from<Any> T>
-        inline constexpr T as() const noexcept {
-            $_UNUSED static constexpr auto to = $::RTTI::Name::of<T>();  // prepare the compiled name
-            return $_ASSERT(is<T>(), "Failed cast from '{0}' to '{1}'", type_name(), to), m_as<T>();
-        }
+  /// @brief Checks if the value is a particular typing.
+  template <std::derived_from<Any> T> inline constexpr bool is() const noexcept { return Inspect<T>::is(m_pointer); }
 
-        /**
-         * @brief Handles looking up a member attribute.
-         * @param symbol            Field symbol.
-         */
-        Member::View attribute(const Symbol& symbol) const noexcept;
+  /// @brief Casts values to a desired one (safe in debug-mode).
+  template <std::derived_from<Any> T> inline constexpr T as() const noexcept {
+    $_UNUSED static constexpr auto s_to = $::RTTI::Name<T>(); // prepare the cast name
+    return $_ASSERT(is<T>(), "Failed cast from '{0}' to '{1}'", brand(), s_to), *m_as<T>();
+  }
 
-        /**
-         * @brief Handles looking up an operator attribute.
-         * @param symbol            Field symbol.
-         */
-        Member::View attribute(Operator::Kind kind) const noexcept;
+  /**
+   * @brief Handles resolving attributes.
+   * @param field                   Field to resolve.
+   */
+  inline constexpr Member::View attribute(const Symbol &symbol) const noexcept { return m_attribute(symbol); }
+  inline constexpr Member::View attribute(Operator::Kind kind) const noexcept { return m_attribute(kind); }
 
-       protected:
-        //  PRIVATE METHODS  //
+protected:
+  //  PRIVATE METHODS  //
 
-        /// @brief Handles coordinating an unsafe cast.
-        template <std::derived_from<Any> T>
-        $_INLINE_PERF constexpr T m_as() const noexcept {
-            if constexpr (std::same_as<T, Value::Any>) return *this;
-            else return *reinterpret_cast<const T*>(this);  // cast
-        }
+  /// @brief Allows casting values to derived types.
+  template <std::derived_from<Any> T> $_INLINE_PERF constexpr const T *m_as() const noexcept {
+    if constexpr (std::same_as<T, Value::Any>) return this;
+    else return static_cast<const T *>(this); // cast derived
+  }
 
-        /// @brief Fallback validation check.
-        static inline bool m_is(const Pointer::Traits&) { return true; }
+  /// @brief Gets the truthiness of the value.
+  bool m_truthiness() const noexcept;
 
-        /**
-         * @brief Handles printing values.
-         * @param os                        Output stream.
-         * @param self                      Value to print.
-         */
-        static void m_print($::Stream::Output& os, const Any& self);
-        static void m_stringify($::Stream::Output& os, const Any& self);
-    };
+  /// @brief Gets the underlying shape of the value.
+  Shape::Underlying m_shape() const noexcept;
 
-    //  PUBLIC METHODS  //
+  /// @brief Gets the type-name of the value.
+  $::String::View m_brand() const noexcept;
 
-    /// @brief Allows unsafely casting to other values.
-    template <std::derived_from<Any> T, class V>
-    inline constexpr T Cast(const V& value) noexcept {
-        if constexpr (std::same_as<T, V>) return value;  // same type
-        else if constexpr (std::same_as<T, Value::Any>) return value;
-        else return *reinterpret_cast<const T*>(&value);  // cast now
-    }
+  /**
+   * @brief Handles resolving attributes.
+   * @param field                   Field to resolve.
+   */
+  Member::View m_attribute(const Symbol &symbol) const noexcept;
+  Member::View m_attribute(Operator::Kind kind) const noexcept;
 
-}  // namespace Talos::Value
+  /**
+   * @brief Checks if two values are equal.
+   * @param other                   Other value to check.
+   */
+  bool m_equals(const Value::Any &other) const noexcept;
+
+  /// @brief Fallback validation check (all values succeed base-case).
+  static bool m_is(const Pointer::Tagged &);
+
+  /**
+   * @brief Handles printing values.
+   * @param os              Output stream.
+   * @param self            Value to print.
+   */
+  static void m_print(std::ostream &os, const Any &self);
+};
+
+//  PUBLIC METHODS  //
+
+/// @brief Allows unsafely casting to other values.
+template <std::derived_from<Any> T = Value::Any, class V> inline constexpr T Cast(const V &value) noexcept {
+  if constexpr (std::same_as<T, V>) return value; // same type
+  else if constexpr (std::derived_from<V, Any>) return value.template as<T>();
+  else return *reinterpret_cast<const T *>(&value); // reinterpret via pointer
+}
+
+} // namespace Talos::Value
 
 #endif

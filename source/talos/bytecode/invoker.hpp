@@ -13,114 +13,113 @@
 
 namespace Talos::Bytecode {
 
-    /// @brief Available Call-Site Conventions
-    enum class Convention : uint8_t { VOID, INLINE, FIELD };
+/// @brief Available Call-Site Conventions
+enum class Convention : uint8_t { VOID, INLINE, FIELD };
 
-    /// @brief Handles Call Invocations.
-    class Invoker {
-        //  TYPEDEFS  //
+/// @brief Handles Call Invocations.
+class Invoker {
+  //  TYPEDEFS  //
 
-        /// @brief Potential Classification Typing.
-        using Classification = std::pair<Convention, const Syntax::Expression*>;
+  /// @brief Internal arguments typing.
+  using Args = std::vector<Syntax::Expression *>;
 
-        //  PROPERTIES  //
+  /// @brief Potential Classification Typing.
+  using Details = std::pair<Convention, const Syntax::Expression *>;
 
-        /// @brief The convention to be used.
-        Convention m_convention = Convention::VOID;
+  //  PROPERTIES  //
 
-        /// @brief The associated callee to be used.
-        const Syntax::Expression* m_callee = nullptr;
+  /// @brief Denotes if asynchronous.
+  bool m_async = false;
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief The convention to be used.
+  Convention m_convention = Convention::VOID;
 
-        /// @brief Constructs a suitable call-invocation.
-        explicit Invoker() = default;
+  /// @brief The associated callee to be used.
+  const Syntax::Expression *m_callee = nullptr;
 
-        /**
-         * @brief Constructs a expression based invocation.
-         * @param callee            Callee to classify.
-         */
-        explicit Invoker(const Syntax::Expression* callee) : Invoker(m_classify(callee)) {}
-        explicit Invoker(const Classification& classification) :
-            m_convention(classification.first), m_callee(classification.second) {}
+public:
+  //  CONSTRUCTORS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Constructs a suitable call-invocation.
+  explicit Invoker() = default;
 
-        inline constexpr Convention convention() const noexcept { return m_convention; }
-        inline constexpr const Syntax::Expression* callee() const noexcept { return m_callee; }
+  /**
+   * @brief Constructs a expression based invocation.
+   * @param callee            Callee to classify.
+   * @param async             Whether asynchronous.
+   */
+  explicit Invoker(const Syntax::Expression *callee, bool async = false) : Invoker(m_classify(callee), async) {}
+  explicit Invoker(const Details &classification, bool async = false) :
+      m_async(async), m_convention(classification.first), m_callee(classification.second) {}
 
-        /// @brief Denotes if the invocation is inlinable.
-        inline constexpr bool inlined(bool async = false) const noexcept {
-            return m_convention == Convention::INLINE && !async;
-        }
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Handles running the invocation.
-         * @param compiler          Bytecode compiler.
-         * @param destination       Destination register.
-         * @param arguments         Call arguments.
-         */
-        void invoke(Compiler* compiler, Destination destination,
-            const std::vector<Syntax::Expression*>& arguments = {}) const noexcept;
+  /// @brief Gets the baseline calling convention.
+  inline constexpr Convention convention() const noexcept { return m_convention; }
 
-        /**
-         * @brief Handles running the asynchronous invocation.
-         * @param compiler          Bytecode compiler.
-         * @param destination       Destination register.
-         * @param arguments         Call arguments.
-         */
-        void spawn(Compiler* compiler, Destination destination,
-            const std::vector<Syntax::Expression*>& arguments = {}) const noexcept;
+  /// @brief Resolves to the callee value.
+  inline constexpr const Syntax::Expression *callee() const noexcept { return m_callee; }
 
-       private:
-        //  PRIVATE METHODS  //
+  /// @brief Denotes if the invocation is inlinable.
+  inline constexpr bool inlined(bool async = false) const noexcept {
+    return m_convention == Convention::INLINE && !async;
+  }
 
-        /**
-         * @brief Handles preparing an invocation.
-         * @param compiler          Bytecode compiler.
-         * @param destination       Destination register.
-         * @param arguments         Call arguments.
-         * @param async             Asynchronous flag.
-         */
-        Register::List m_prepare(Compiler* compiler, Destination& destination,
-            const std::vector<Syntax::Expression*>& arguments = {}, bool async = false) const noexcept;
+  /**
+   * @brief Handles compiling the invocation.
+   * @param compiler          Bytecode compiler.
+   * @param destination       Destination register.
+   * @param args              Call arguments.
+   */
+  void compile(Compiler *compiler, Register::Slot destination, const Args &args = {}) const;
 
-        /**
-         * @brief Handles emitting synchronous invocation.
-         * @param compiler          Byecode compiler.
-         * @param destination       Destination register.
-         * @param span              Optional arguments span.
-         */
-        void m_invoke(Compiler* compiler, Destination destination) const noexcept;
-        void m_invoke(Compiler* compiler, Destination destination, const Register::Span& span) const noexcept;
+private:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handles emitting asynchronous invocations.
-         * @param compiler          Byecode compiler.
-         * @param destination       Destination register.
-         * @param span              Optional arguments span.
-         */
-        void m_spawn(Compiler* compiler, Destination destination) const noexcept;
-        void m_spawn(Compiler* compiler, Destination destination, const Register::Span& span) const noexcept;
+  /**
+   * @brief Handles preparing an invocation.
+   * @param compiler          Bytecode compiler.
+   * @param destination       Destination register.
+   * @param arguments         Call arguments.
+   * @param async             Asynchronous flag.
+   */
+  Register::List m_prepare(Compiler *compiler, Register::Slot &destination, const Args &args = {}) const;
 
-        /**
-         * @brief Handles classifying the invocation.
-         * @param callee            Callee to classify.
-         */
-        static inline constexpr Classification m_classify(const Syntax::Expression* callee) {
-            switch (callee->traits()->tag()) {
-                case $::RTTI::Hash<Syntax::Caret>(): return { Convention::INLINE, callee };
-                case $::RTTI::Hash<Syntax::Accessor>(): return { Convention::FIELD, callee };
-                case $::RTTI::Hash<Syntax::Group>(): return m_classify(callee->as<Syntax::Group>()->value());
-                case $::RTTI::Hash<Syntax::Typed>(): return m_classify(callee->as<Syntax::Typed>()->value());
+  /**
+   * @brief Handles emitting synchronous invocation.
+   * @param compiler          Byecode compiler.
+   * @param destination       Destination register.
+   * @param span              Optional arguments span.
+   */
+  void m_invoke(Compiler *compiler, const Register::Slot &destination) const noexcept;
+  void m_invoke(Compiler *compiler, const Register::Slot &destination, const Register::Span &span) const noexcept;
 
-                // stop for normal conventions to be found
-                default: return { Convention::VOID, callee };
-            }
-        }
-    };
+  /**
+   * @brief Handles emitting asynchronous invocations.
+   * @param compiler          Byecode compiler.
+   * @param destination       Destination register.
+   * @param span              Optional arguments span.
+   */
+  void m_spawn(Compiler *compiler, const Register::Slot &destination) const noexcept;
+  void m_spawn(Compiler *compiler, const Register::Slot &destination, const Register::Span &span) const noexcept;
 
-}  // namespace Talos::Bytecode
+  /**
+   * @brief Handles classifying the invocation.
+   * @param callee            Callee to classify.
+   */
+  static inline constexpr Details m_classify(const Syntax::Expression *callee) {
+    switch (callee->trivia()->hash()) {
+    case $::RTTI::Hash<Syntax::Caret>(): return {Convention::INLINE, callee};
+    case $::RTTI::Hash<Syntax::Accessor>(): return {Convention::FIELD, callee};
+    case $::RTTI::Hash<Syntax::Group>(): return m_classify(callee->as<Syntax::Group>()->value());
+    case $::RTTI::Hash<Syntax::Typed>(): return m_classify(callee->as<Syntax::Typed>()->value());
+
+    // stop for normal conventions to be found
+    default: return {Convention::VOID, callee};
+    }
+  }
+};
+
+} // namespace Talos::Bytecode
 
 #endif

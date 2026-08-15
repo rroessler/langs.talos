@@ -1,321 +1,319 @@
 #ifndef _TALOS_BYTECODE_COMPILER_HPP
 #define _TALOS_BYTECODE_COMPILER_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/bytecode/assembler.hpp"
-#include "talos/bytecode/binder.hpp"
 #include "talos/bytecode/loop.hpp"
 #include "talos/bytecode/optimizer.hpp"
-#include "talos/bytecode/request.hpp"
 #include "talos/bytecode/trace.hpp"
-#include "talos/diagnostic/traits.hpp"
+#include "talos/diagnostic/inspect.hpp"
 #include "talos/function/info.hpp"
 #include "talos/shape/service.hpp"
-#include "talos/variable/captures.hpp"
 
-/// Syntax Modules
-#include "talos/syntax/declaration/class.hpp"
+/// Syntax Includes
+#include "talos/syntax/declaration/preamble.hpp"
 #include "talos/syntax/literal/identifier.hpp"
 
 namespace Talos::Bytecode {
 
-    /// @brief Variable Declaration Typing.
-    using Declaration = std::pair<Register, bool>;
+/// @brief Declaration Alias.
+using Declaration = std::pair<Register::Slot, bool>;
 
-    /// @brief Current disposable stack.
-    class Disposable {
-        //  PROPERTIES  //
+/// @brief Bytecode Compiler.
+class Compiler : public XI::Transient {
+  //  TYPEDEFS  //
 
-        /// @brief The disposable depth.
-        size_t m_depth = 0;
+  /// @brief Allow disposables internal inspection.
+  friend class Disposable;
 
-        /// @brief Bound compiler instance.
-        Compiler* m_compiler = nullptr;
+  //  PROPERTIES  //
 
-        /// @brief The parent disposable.
-        const Disposable* m_ancestor = nullptr;
+  /// @brief Current compilation request.
+  Request *m_request = nullptr;
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Underlying services container.
+  XI::Container *m_services = nullptr;
 
-        /// @brief Constructs an empty disposable.
-        explicit Disposable() = default;
+  /// @brief The current stack-traces.
+  std::stack<XLSP::Position> m_traces = {};
 
-        /// @brief Constructs a disposable stack.
-        explicit Disposable(Compiler* compiler);
-        explicit Disposable(Compiler* compiler, const Disposable* ancestor);
+  /// @brief The current bytecode arena.
+  $::Unique::Pointer<Image::Arena> m_arena = nullptr;
 
-        /// @brief Handles closing a disposable.
-        ~Disposable();
+  /// @brief Current disposable instance.
+  const Disposable *m_disposable = nullptr;
 
-        //  PUBLIC METHODS  //
+  /// @brief Associated variable captures.
+  const Variable::Captures *m_captures = nullptr;
 
-        /// @brief Gets the underlying depth of the disposable stack.
-        inline constexpr size_t depth() const noexcept { return m_depth; }
+  /// @brief The bytecode assembler service.
+  $::Unique::Pointer<Assembler> m_assembler = nullptr;
 
-        /// @brief Denotes if there is no disposable instance.
-        inline constexpr bool unset() const noexcept { return m_compiler == nullptr; }
-    };
+  /// @brief The bytecode optimizer service.
+  $::Unique::Pointer<Optimizer> m_optimizer = nullptr;
 
-    /// @brief Bytecode Compiler.
-    class Compiler : public XI::Define<Compiler, XI::Unique> {
-        //  TYPEDEFS  //
+  /// @brief Current compilation pipeline.
+  $::Unique::Pointer<Queue> m_queue = $::Unique::New<Queue>();
 
-        /// @brief Allow disposables internal inspection.
-        friend class Disposable;
+  /// @brief The binder for blocks/jumps labels.
+  $::Unique::Pointer<Binder> m_labels = $::Unique::New<Binder>(&m_request);
 
-        //  PROPERTIES  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Current compilation request.
-        Request* m_request = nullptr;
+  /// @brief Constructs a bytecode compiler.
+  explicit Compiler();
 
-        /// @brief Underlying services container.
-        XI::Container* m_services = nullptr;
+  /**
+   * @brief Constructs a bytecode compiler.
+   * @param services                  Services container.
+   */
+  explicit Compiler(XI::Container *services);
 
-        /// @brief The current stack-traces.
-        Trace::Stack m_traces = {};
+  //  PUBLIC METHODS  //
 
-        /// @brief The current bytecode arena.
-        $::Ptr::Unique<Linker::Arena> m_arena = nullptr;
+  /// @brief Gets the available labels.
+  inline constexpr Binder *labels() const noexcept { return m_labels.get(); }
 
-        /// @brief Current disposable instance.
-        const Disposable* m_disposable = nullptr;
+  /// @brief Gets the compilation queue.
+  inline constexpr const Queue *queue() const noexcept { return m_queue.get(); }
 
-        /// @brief Associated variable captures.
-        const Variable::Captures* m_captures = nullptr;
+  /// @brief Gets the shapes service.
+  inline constexpr Shape::Service *shapes() const noexcept { return *m_services; }
 
-        /// @brief The bytecode assembler service.
-        $::Ptr::Unique<Assembler> m_assembler = nullptr;
+  /// @brief Gets the current arena resource.
+  inline constexpr $::URI::View resource() const noexcept { return m_arena->resource; }
 
-        /// @brief The bytecode optimizer service.
-        $::Ptr::Unique<Optimizer> m_optimizer = nullptr;
+  /// @brief Gets the current compilation routine.
+  inline constexpr Routine *routine() const noexcept { return m_request->routine(); }
 
-        /// @brief Current compilation pipeline.
-        $::Ptr::Unique<Queue> m_queue = $::New().unique<Queue>();
+  /// @brief Gets the internal allocator for registers.
+  inline constexpr Allocator *registers() const noexcept { return m_request->registers(); }
 
-        /// @brief The binder for blocks/jumps labels.
-        $::Ptr::Unique<Binder> m_labels = $::New().unique<Binder>(&m_request);
+  /// @brief Gets the captures for variables.
+  inline constexpr const Variable::Captures *captures() const noexcept { return m_captures; }
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Gets the variable scoping.
+  inline constexpr Variable::Scope *variables() const noexcept { return m_request->variables(); }
 
-        /// @brief Constructs a bytecode compiler.
-        explicit Compiler();
+  /// @brief Constructs a scoped loop.
+  inline constexpr Loop loop() { return Loop(this); }
 
-        /**
-         * @brief Constructs a bytecode compiler.
-         * @param services                  Services container.
-         */
-        explicit Compiler(XI::Container* services);
+  /// @brief Constructs a variable scoping.
+  inline constexpr auto scope() { return m_request->scope(); }
 
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Check if a block has disposable elements.
+   * @param block                     Block to resolve.
+   */
+  Disposable disposable(const Syntax::Block *block);
 
-        inline constexpr bool bundled() const noexcept { return m_bundled(); }
-        inline constexpr Binder* labels() const noexcept { return m_labels.get(); }
-        inline constexpr const Queue* queue() const noexcept { return m_queue.get(); }
-        inline constexpr Shape::Service* shapes() const noexcept { return *m_services; }
-        inline constexpr $::URI::View resource() const noexcept { return m_arena->resource; }
-        inline constexpr Routine* routine() const noexcept { return m_request->routine(); }
-        inline constexpr const Variable::Captures* captures() const noexcept { return m_captures; }
-        inline constexpr Allocator* registers() const noexcept { return m_request->registers(); }
-        inline constexpr Variable::Context* variables() const noexcept { return m_request->variables(); }
+  /**
+   * @brief Handles tracing positions.
+   * @param position              Position to trace.
+   */
+  inline constexpr Trace trace(const XLSP::Position &position) { return Trace(&m_traces, position); }
 
-        /// @brief Constructs a scoped loop.
-        inline constexpr Loop loop() { return Loop(this); }
+  /**
+   * @brief Handles tracing nodes.
+   * @param node                  Node to trace.
+   */
+  inline constexpr Trace trace(const Syntax::Node *node) {
+    return node->is<Syntax::Lambda>() ? Trace() : trace(node->trivia()->range().start);
+  }
 
-        /// @brief Constructs a variable scoping.
-        inline constexpr auto scope() { return m_request->scope(); }
+  /**
+   * @brief Constructs a constant value.
+   * @param value                     Value to make constant.
+   */
+  Index constant(const Value::Any &value);
 
-        /**
-         * @brief Check if a block has disposable elements.
-         * @param block                     Block to resolve.
-         */
-        Disposable disposable(const Syntax::Block* block);
+  /**
+   * @brief Constructs a string intern.
+   * @param buffer                    Buffer to intern.
+   */
+  Index string(const $::String::View &buffer);
 
-        /**
-         * @brief Handles tracing positions.
-         * @param position              Position to trace.
-         */
-        inline constexpr Trace trace(const Linker::Position& position) { return Trace(&m_traces, position); }
+  /**
+   * @brief Constructs a string/symbol intern.
+   * @param buffer                    Buffer to intern.
+   */
+  Index symbol(const $::String::View &buffer);
 
-        /**
-         * @brief Handles tracing nodes.
-         * @param node                  Node to trace.
-         */
-        inline constexpr Trace trace(const Syntax::Node* node) {
-            return node->is<Syntax::Lambda>() ? Trace() : trace(node->traits()->range().start);
-        }
+  /**
+   * @brief Handles enqueuing functions for compilation.
+   * @param function                  Function to compile.
+   */
+  Index enqueue(const Syntax::Lambda *function) const;
+  Index enqueue(const Syntax::Class *prototype) const;
 
-        /**
-         * @brief Constructs a constant value.
-         * @param value                     Value to make constant.
-         */
-        Index constant(Value::Any value);
+  /**
+   * @brief Constructs an import path intern.
+   * @param sink                      Destination register.
+   * @param buffer                    Buffer to intern.
+   */
+  void import(const Register::Slot &sink, const $::String::View &buffer);
 
-        /**
-         * @brief Constructs a string intern.
-         * @param buffer                    Buffer to intern.
-         */
-        Index string(const $::String::View& buffer);
+  /**
+   * @brief Handles loading/storing variables.
+   * @param name                      Name of variable.
+   * @param extent                    Variable extent.
+   */
+  void load(const $::String::View &name, Variable::Extent extent, const Register::Slot &sink);
+  void store(const $::String::View &name, Variable::Extent extent, const Register::Slot &value);
 
-        /**
-         * @brief Constructs a string/symbol intern.
-         * @param buffer                    Buffer to intern.
-         */
-        Index symbol(const $::String::View& buffer);
+  /**
+   * @brief Handles lowering the incoming node.
+   * @param node                      Node to lower.
+   * @param destination               Destination to use.
+   */
+  void lower(const Syntax::Node *node, const Register::Slot &destination = {});
 
-        /**
-         * @brief Handles enqueuing functions for compilation.
-         * @param function                  Function to compile.
-         */
-        Index enqueue(const Syntax::Lambda* function) const;
-        Index enqueue(const Syntax::Class* prototype) const;
+  /**
+   * @brief Handles emitting preamble information.
+   * @param preamble                  Preamble node.
+   * @param value                     Source of preamble.
+   */
+  void preamble(const Syntax::Preamble *preamble, const Register::Slot &value);
 
-        /**
-         * @brief Constructs an import path intern.
-         * @param sink                      Destination register.
-         * @param buffer                    Buffer to intern.
-         */
-        void import(Destination sink, const $::String::View& buffer);
+  /**
+   * @brief Handles exposing variables to modules.
+   * @param declaration               Declaration node.
+   * @param value                     Source of variable.
+   * @param constant                  Optional constant.
+   */
+  void expose(const Syntax::Declaration *declaration, const Register::Slot &value);
+  void expose(const Syntax::Declaration *declaration, const Register::Slot &value, const Value::Any &constant);
 
-        /**
-         * @brief Handles loading/storing variables.
-         * @param name                      Name of variable.
-         * @param extent                    Variable extent.
-         */
-        void load(const $::String::View& name, Variable::Extent extent, Destination sink);
-        void store(const $::String::View& name, Variable::Extent extent, Register value);
+  /**
+   * @brief Handles compiling syntax trees.
+   * @param syntax                    Syntax to compile.
+   */
+  $::Unique::Pointer<Image::Arena> process(const Syntax::Tree *syntax);
 
-        /**
-         * @brief Handles lowering the incoming node.
-         * @param node                      Node to lower.
-         * @param destination               Destination to use.
-         */
-        void lower(const Syntax::Node* node, Destination destination = {});
+  /**
+   * @brief Handles compiling match guards.
+   * @param guard                     Guard to check.
+   * @param value                     Value to check.
+   */
+  Label match(const std::vector<Syntax::Expression *> &guards, const Register::Slot &value);
 
-        /**
-         * @brief Handles emitting preamble information.
-         * @param preamble                  Preamble node.
-         * @param value                     Source of preamble.
-         */
-        void preamble(const Syntax::Preamble* preamble, Register value);
-        void expose(const Syntax::Declaration* declaration, Register value);
+  /**
+   * @brief Handles declaring a variable.
+   * @param variable                  Variable to declare.
+   */
+  Declaration declare(const Syntax::Identifier *variable);
+  Declaration declare(const Syntax::Declaration *variable);
 
-        /**
-         * @brief Handles compiling syntax trees.
-         * @param syntax                    Syntax to compile.
-         * @param captures                  Variable captures.
-         */
-        $::Ptr::Unique<Linker::Arena> process(const Syntax::Tree* syntax, const Variable::Captures* captures);
+  /**
+   * @brief Handles declaring a variable.
+   * @param name                      Name of variable.
+   * @param node                      Associated node.
+   */
+  Declaration declare(const $::String::View &name, const Syntax::Node *node);
 
-        /**
-         * @brief Handles declaring a variable.
-         * @param variable                  Variable to declare.
-         */
-        inline Declaration declare(const Syntax::Identifier* variable) { return declare(variable->name(), variable); }
-        inline Declaration declare(const Syntax::Declaration* variable) { return declare(variable->name(), variable); }
+  /**
+   * @brief Handles returning with a value.
+   * @param value                     Value to panic.
+   */
+  inline void returns(const Syntax::Expression *value) { lower(value, Register::Accumulator), m_returns(); }
 
-        /**
-         * @brief Handles declaring a variable.
-         * @param name                      Name of variable.
-         * @param node                      Associated node.
-         */
-        inline Declaration declare(const $::String::View& name, const Syntax::Node* node) {
-            auto leaked = m_captures->resolve(node) == Variable::Extent::LEAKED;
-            auto vreg = leaked ? Register(routine()->shared->leaked++) : registers()->allocate();
-            return variables()->declare(name, vreg, leaked), Declaration(vreg, leaked);
-        }
+  /**
+   * @brief Handles panicking with a value.
+   * @param value                     Value to panic.
+   */
+  inline void panic(const Syntax::Expression *value) { lower(value, Register::Accumulator), m_panic(); }
 
-        /**
-         * @brief Handles returning with a value.
-         * @param value                     Value to panic.
-         */
-        inline void returns(const Syntax::Expression* value) { lower(value, Accumulator()), m_returns(); }
+  /**
+   * @brief Handles emitting panics.
+   * @param code                      Diagnostic code.
+   * @param args                      Format arguments.
+   */
+  template <class... As> inline void panic(Diagnostic::Code code, As &&...args) {
+    panic(Diagnostic::Inspect::format(code, std::forward<As>(args)...));
+  }
 
-        /**
-         * @brief Handles panicking with a value.
-         * @param value                     Value to panic.
-         */
-        inline void panic(const Syntax::Expression* value) { lower(value, Accumulator()), m_panic(); }
+  /**
+   * @brief Handles emitting panics.
+   * @param code                      Diagnostic code.
+   * @param args                      Format arguments.
+   */
+  template <class... As> inline void panic(const $::String::View &message, As &&...args) {
+    auto formatted = fmt::format(fmt::runtime(message), std::forward<As>(args)...);
+    emit<Glyph::STRING_MAKE>(Register::Accumulator, string(formatted)), m_panic();
+  }
 
-        /**
-         * @brief Handles emitting panics.
-         * @param code                      Diagnostic code.
-         * @param args                      Format arguments.
-         */
-        template <class... As>
-        inline void panic(Diagnostic::Code code, As&&... args) {
-            panic(Diagnostic::Traits::format(code, std::forward<As>(args)...));
-        }
+  /**
+   * @brief Emits an instruction to the current block.
+   * @param operands                  Operands to emit.
+   */
+  template <Glyph::Encoded G, class... As> inline constexpr void emit(As &&...operands) {
+    m_emit($::Unique::New<Qualified<G>>(std::forward<As>(operands)...));
+  }
 
-        /**
-         * @brief Handles emitting panics.
-         * @param code                      Diagnostic code.
-         * @param args                      Format arguments.
-         */
-        template <class... As>
-        inline void panic(const $::String::View& message, As&&... args) {
-            auto formatted = fmt::format(fmt::runtime(message), std::forward<As>(args)...);
-            emit<Syllable::STRING_MAKE>(Accumulator(), string(formatted)), m_panic();
-        }
+  /**
+   * @brief Handles plugging instructions.
+   * @param destination           Destination register.
+   * @param operands              Instruction operands.
+   */
+  template <Glyph::Encoded G, class... As>
+  inline constexpr void plug(const Register::Slot &destination, As &&...operands) {
+    if (!destination.nowhere()) emit<G>(destination, std::forward<As>(operands)...);
+  }
 
-        /**
-         * @brief Emits an instruction to the current block.
-         * @param operands                  Operands to emit.
-         */
-        template <Syllable S, class... As>
-        inline constexpr void emit(As&&... operands) {
-            m_emit(Qualified<S>(std::forward<As>(operands)...).encode());
-        }
+private:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handles plugging instructions.
-         * @param destination           Destination register.
-         * @param operands              Instruction operands.
-         */
-        template <Syllable S, class... As>
-        inline constexpr void plug(const Destination& destination, As&&... operands) {
-            if (!destination.nowhere()) emit<S>(destination, std::forward<As>(operands)...);
-        }
+  /// @brief Denotes if the runtime is being bundled.
+  bool m_bundled() const noexcept;
 
-       private:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles emitting an instruction.
+   * @param instruction               Instruction to emit.
+   */
+  void m_emit(Boxed &&instruction);
 
-        /// @brief Denotes if the runtime is being bundled.
-        bool m_bundled() const noexcept;
+  /**
+   * @brief Handles compiling a function request.
+   * @param request                   Bytecode request.
+   */
+  void m_function(Request *request);
 
-        /**
-         * @brief Handles emitting an instruction.
-         * @param instruction               Instruction to emit.
-         */
-        void m_emit(const Instruction& instruction);
+  /**
+   * @brief Handles compiling a class extension.
+   * @param super                     Callable expression.
+   */
+  void m_inherits(const Syntax::Call *super);
 
-        /**
-         * @brief Handles compiling a function request.
-         * @param request                   Bytecode request.
-         */
-        void m_function(Request* request);
+  /**
+   * @brief Handles compiling match guards.
+   * @param guard                     Guard to check.
+   * @param success                   Success label.
+   * @param value                     Value to check.
+   */
+  void m_match(const Syntax::Expression *guard, const Label &success, const Register::Slot &value);
 
-        /**
-         * @brief Handles compiling a class extension.
-         * @param super                     Callable expression.
-         */
-        void m_inherits(const Syntax::Call* super);
+  /**
+   * @brief Handles propagating constant loads.
+   * @param name                      Name of variable.
+   * @param sink                      Sink to output to.
+   */
+  bool m_propagate(const $::String::View &name, const Register::Slot &sink);
 
-        /**
-         * @brief Handles compiling a function parameter.
-         * @param parameter                 Parameter to compile.
-         * @param spread                    Expected spread parameter.
-         */
-        bool m_parameter(const Syntax::Variable* parameter, const Syntax::Variable* spread = nullptr);
+  /**
+   * @brief Handles compiling a function parameter.
+   * @param parameter                 Parameter to compile.
+   * @param spread                    Expected spread parameter.
+   */
+  bool m_parameter(const Syntax::Variable *parameter, const Syntax::Variable *spread = nullptr);
 
-        /// @brief Handles internal returning from the accumulator.
-        inline void m_returns() { emit<Syllable::EXEC_RETURN>(), emit<Syllable::JUMP_TO>(m_labels->returns()); }
+  /// @brief Handles internal returning from the accumulator.
+  inline void m_returns() { emit<Glyph::EXEC_RETURN>(), emit<Glyph::JUMP_TO>(m_labels->returns()); }
 
-        /// @brief Handles internal panicking from the accumulator.
-        inline void m_panic() { emit<Syllable::EXEC_PANIC>(), emit<Syllable::JUMP_TO>(m_labels->returns()); }
-    };
+  /// @brief Handles internal panicking from the accumulator.
+  inline void m_panic() { emit<Glyph::EXEC_PANIC>(), emit<Glyph::JUMP_TO>(m_labels->returns()); }
+};
 
-}  // namespace Talos::Bytecode
+} // namespace Talos::Bytecode
 
 #endif

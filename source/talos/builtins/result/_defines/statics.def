@@ -1,3 +1,6 @@
+/// Builtins Includes
+#include "talos/builtins/_inline/defines.ipp"
+
 //  MACROS  //
 
 TALOS_XX_STATICS_HEADER()
@@ -17,3 +20,8 @@ TALOS_XX_STATICS_DEFINE(error)
 TALOS_XX_STATICS_TYPEDEF("fn [T = Any, E = Any](error: E) => Result[T, E]")
 TALOS_XX_STATICS_DESCRIBE("Creates a `Result` with an error.")
 TALOS_XX_STATICS_FOOTER()
+
+//  UNDEFINES  //
+
+/// Builtins Includes
+#include "talos/builtins/_inline/undefs.ipp"

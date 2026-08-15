@@ -6,21 +6,21 @@
 
 namespace Talos::Crate::Constants {
 
-    //  PROPERTIES  //
+//  PROPERTIES  //
 
-    /// @brief Explicit crate filename.
-    static inline constexpr $::String::View filename() { return "_crate.jsonc"; }
+/// @brief Explicit crate filename.
+static inline constexpr $::String::View filename() { return "_crate.jsonc"; }
 
-    //  PUBLIC METHODS  //
+//  PUBLIC METHODS  //
 
-    /// @brief Gets the builtin crates directory.
-    static inline constexpr $::Filesystem::Path internal() {
-        return $::Path::canonical("../crates", $::Executable::resolve());
-    }
+/// @brief Gets the builtin crates directory.
+static inline constexpr $::FS::Path internal() { return $::Path::canonical("../crates", $::Executable::resolve()); }
+static inline constexpr $::FS::Path internal(const $::String::View &name) { return internal() / name / filename(); }
 
-    /// @brief Gets the vendors crates directory.
-    static inline constexpr $::Filesystem::Path external() { $_ABORT("Unimplemented!"); }
+/// @brief Gets the vendors crates directory.
+static inline constexpr $::FS::Path external() { $_ABORT("Unimplemented!"); }
+static inline constexpr $::FS::Path external(const $::String::View &name) { return external() / name / filename(); }
 
-}  // namespace Talos::Crate::Constants
+} // namespace Talos::Crate::Constants
 
 #endif

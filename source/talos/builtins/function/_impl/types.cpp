@@ -1,67 +1,64 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
+/// Builtin Includes
+#include "talos/builtins/_inline/builtins.ipp"
 
-/// Builtin Inlines
-#include "talos/builtins/_inline/defines.ipp"
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Builtins, namespace TB = Type::Builder)
+/// Forward Definitions
+$_FWD(Talos::Builtins, using TN = Type::New)
 
 //  TYPEDEFS  //
 
-#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N();
-struct TALOS_BUILTIN_FIELDS(Function::Dynamic) {
+#define TALOS_XX_FIELDS_DEFINE(N, ...) $_FWD(Talos::Builtins::Field, static Type::Entity N())
 #include "talos/builtins/function/_defines/fields.def"
-};
-#undef TALOS_XX_FIELDS_DEFINE
 
-#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
-struct TALOS_BUILTIN_STATICS(Function::Dynamic) {
+#define TALOS_XX_STATICS_DEFINE(N, ...) $_FWD(Talos::Builtins::Static, static Type::Entity N())
 #include "talos/builtins/function/_defines/statics.def"
-};
-#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
-Talos::Type::Erased TALOS_BUILTIN_TRAITS(Function::Dynamic)::typing() { return TB::variadic(); }
-
-TALOS_MM_BUILTIN_FTYPE(Function::Dynamic, arity) { return { TB::function(TB::number()) }; }
-TALOS_MM_BUILTIN_FTYPE(Function::Dynamic, adicity) { return { TB::function(TB::number()) }; }
-
-TALOS_MM_BUILTIN_FTYPE(Function::Dynamic, receiver) { return { TB::function(TB::any()) }; }
-TALOS_MM_BUILTIN_FTYPE(Function::Dynamic, bind) { return { TB::function(TB::variadic(), TB::arguments(TB::any())) }; }
-
-TALOS_MM_BUILTIN_STYPE(Function::Dynamic, vlimit) { return { TB::function(TB::number()) }; }
-
-TALOS_MM_BUILTIN_STYPE(Function::Dynamic, call) {
-    auto F = TB::constraint("F", TB::variadic());
-    auto signature = TB::invocation(F, false);
-    return { TB::generic(signature, TB::parameters(F)) };
+$::Shared::Pointer<Talos::Type::Prototype> Talos::Builtins::Wrapper<Talos::Function::Any>::typeclass() {
+  return m_typeclass([](const auto &) {});
 }
 
-TALOS_MM_BUILTIN_STYPE(Function::Dynamic, apply) {
-    auto passthrough = TB::optional(TB::list(TB::any()));
-    auto arguments = TB::arguments(TB::variadic(), passthrough);
-    return { TB::function(TB::any(), arguments) };
+Talos::Type::Entity Talos::Builtins::Field::arity() { return TN::function(TN::number()); }
+Talos::Type::Entity Talos::Builtins::Field::adicity() { return TN::function(TN::number()); }
+Talos::Type::Entity Talos::Builtins::Field::receiver() { return TN::function(TN::any()); }
+
+Talos::Type::Entity Talos::Builtins::Static::vlimit() { return TN::function(TN::number()); }
+
+Talos::Type::Entity Talos::Builtins::Static::bind() {
+  auto F = TN::constraint("F", TN::variadic());
+  return TN::generic(TN::function(F, F, TN::any()), F);
+}
+
+Talos::Type::Entity Talos::Builtins::Static::call() {
+  auto F = TN::constraint("F", TN::variadic());
+  return TN::generic(TN::invocation(F, false), F);
+}
+
+Talos::Type::Entity Talos::Builtins::Static::apply() {
+  auto passthrough = TN::optional(TN::list(TN::any()));
+  return TN::function(TN::any(), TN::variadic(), passthrough);
 }
 
 //  PRIVATE METHODS  //
 
-void TALOS_BUILTIN_TRAITS(Function::Dynamic)::m_typedefs(Type::World* globals) {
-    // prepare the prototype to be constructed
-    auto proto = prototype();
-    auto& fields = proto->fields();
-    auto& statics = proto->statics();
+void Talos::Builtins::Wrapper<Talos::Function::Any>::m_typedefs(Type::World *globals) {
+  // prepare the baseline details
+  auto prototype = typeclass();
+  auto &fields = prototype->fields();
+  auto &statics = prototype->statics();
 
+// define the fields for symbols
 #define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N());
 #include "talos/builtins/function/_defines/fields.def"
-#undef TALOS_XX_FIELDS_DEFINE
 
+// define the statics for symbols
 #define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
 #include "talos/builtins/function/_defines/statics.def"
-#undef TALOS_XX_STATICS_DEFINE
 
-    // and assign the resulting entity to be used
-    globals->types().declare(name(), typing());
-    globals->values().declare(name(), proto);
+  // define the baseline types
+  globals->values().declare(name(), prototype);
+  globals->types().declare(name(), TN::variadic());
 }

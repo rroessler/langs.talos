@@ -1,53 +1,43 @@
 #ifndef _TALOS_TERNARY_EXPRESSION_HPP
 #define _TALOS_TERNARY_EXPRESSION_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/syntax/node.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Ternary Expression Node.
-    class Ternary : public Abstract<Ternary, Expression> {
-        //  PROPERTIES  //
+/// @brief Ternary Expression Node.
+class Ternary : public Mixin<Ternary, Expression> {
+  //  PROPERTIES  //
 
-        /// @brief Conditional node.
-        Expression* m_condition;
+  /// @brief Conditional node.
+  Expression *m_condition;
 
-        /// @brief Assignment value.
-        Expression* m_consequence;
+  /// @brief Assignment value.
+  Expression *m_consequence;
 
-        /// @brief Identifier name.
-        Expression* m_alternative;
+  /// @brief Identifier name.
+  Expression *m_alternative;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a ternary node.
-         * @param condition                 Condition value.
-         * @param consequence               Truthy result.
-         * @param alternative               Falsey result.
-         */
-        explicit Ternary(Expression* condition, Expression* consequence, Expression* alternative) :
-            Ternary(condition, consequence, alternative, condition->traits()->location()) {}
+  /**
+   * @brief Constructs a ternary node.
+   * @param condition                 Condition value.
+   * @param consequence               Truthy result.
+   * @param alternative               Falsey result.
+   */
+  explicit Ternary(Expression *condition, Expression *consequence, Expression *alternative)
+      : m_condition(condition), m_consequence(consequence), m_alternative(alternative) {}
 
-        /**
-         * @brief Constructs a ternary node.
-         * @param condition                 Condition value.
-         * @param consequence               Truthy result.
-         * @param alternative               Falsey result.
-         */
-        explicit Ternary(
-            Expression* condition, Expression* consequence, Expression* alternative, const Bounds& location) :
-            Abstract(location), m_condition(condition), m_consequence(consequence), m_alternative(alternative) {}
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  inline constexpr const Expression *condition() const noexcept { return m_condition; }
+  inline constexpr const Expression *consequence() const noexcept { return m_consequence; }
+  inline constexpr const Expression *alternative() const noexcept { return m_alternative; }
+};
 
-        inline constexpr Expression* condition() const noexcept { return m_condition; }
-        inline constexpr Expression* consequence() const noexcept { return m_consequence; }
-        inline constexpr Expression* alternative() const noexcept { return m_alternative; }
-    };
-
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

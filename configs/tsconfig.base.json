@@ -1,7 +1,10 @@
 {
+    "$schema": "https://www.schemastore.org/tsconfig",
+
     "compilerOptions": {
-        "noEmit": true,
+        "strict": true,
         "alwaysStrict": true,
+
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
 
@@ -10,17 +13,26 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
 
-        "target": "ESNext",
-        "module": "preserve",
+        "target": "esnext",
+        "module": "esnext",
 
+        "noEmit": true,
+        "allowJs": true,
+        "jsx": "react-jsx",
+        "incremental": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
         "moduleResolution": "bundler",
         "skipDefaultLibCheck": true,
-        "resolveJsonModule": false,
+        "resolveJsonModule": true,
+
+        "types": ["node"],
+        "plugins": [{ "name": "next" }],
+        "lib": ["dom", "dom.iterable", "esnext"],
 
         "sourceMap": false,
         "removeComments": true,
+        "isolatedModules": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true
     }

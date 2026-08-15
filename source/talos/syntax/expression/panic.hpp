@@ -1,34 +1,33 @@
 #ifndef _TALOS_EXPRESSION_PANIC_HPP
 #define _TALOS_EXPRESSION_PANIC_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/syntax/node.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Panic Expression.
-    class Panic : public Abstract<Panic, Expression> {
-        //  PROPERTIES  //
+/// @brief Panic Expression.
+class Panic : public Mixin<Panic, Expression> {
+  //  PROPERTIES  //
 
-        /// @brief Associated statement value.
-        Expression* m_value;
+  /// @brief Associated statement value.
+  Expression *m_value;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a "panic" expression.
-         * @param value                     Failure value.
-         * @param location                  Resource location.
-         */
-        explicit Panic(Expression* value, const Bounds& location = {}) : Abstract(location), m_value(value) {}
+  /**
+   * @brief Constructs a "panic" expression.
+   * @param value                     Failure value.
+   */
+  explicit Panic(Expression *value) : m_value(value) {}
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Encpasulated panic value.
-        inline constexpr Expression* value() const noexcept { return m_value; }
-    };
+  /// @brief Encpasulated panic value.
+  inline constexpr const Expression *value() const noexcept { return m_value; }
+};
 
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

@@ -1,184 +1,154 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/runtime/isolate.hpp"
 #include "talos/async/future.hpp"
-#include "talos/builtins/proxy.hpp"
-#include "talos/engine/dispatch.hpp"
-#include "talos/engine/frame.hpp"
+#include "talos/engine/invoke.hpp"
+#include "talos/function/frame.hpp"
 #include "talos/garbage/service.hpp"
+#include "talos/globals/roots.hpp"
 #include "talos/globals/service.hpp"
-#include "talos/heap/service.hpp"
-#include "talos/machine/frame.hpp"
-#include "talos/module/service.hpp"
+#include "talos/import/service.hpp"
 #include "talos/resource/frame.hpp"
 #include "talos/runtime/container.hpp"
-#include "talos/runtime/service.hpp"
 
-/// Metadata Modules
-#include "talos/engine/metadata.hpp"
-
-/// Builtin Modules
-#include "talos/builtins/_inline/builtins.ipp"
+/// Builtins Includes
+#include "talos/builtins/function/traits.hpp"
 
 //  CONSTRUCTORS  //
 
 Talos::Runtime::Isolate::Isolate() : Isolate($::Global::get<Container>()) {}
-Talos::Runtime::Isolate::Isolate(XI::Container* services) : Isolate(services, Value::Void()) {}
-Talos::Runtime::Isolate::Isolate(XI::Container* services, const Value::Any& data) :
-    m_services(services), m_data(data), m_allocator(this) {}
+Talos::Runtime::Isolate::Isolate(XI::Container *services) : Isolate(services, {}) {}
+Talos::Runtime::Isolate::Isolate(XI::Container *services, const Value::Any &data) :
+    m_services(services), m_data(data) {}
 
 //  PUBLIC METHODS  //
 
-Talos::Value::Any Talos::Runtime::Isolate::interrupt() {
-    if (m_frame) m_frame->interrupted() = true;
-    return Value::Failure();  // declare failed
+void Talos::Runtime::Isolate::roots(Globals::Each &yield) {
+  // yield the baseline details
+  yield(m_data), yield(m_exception);
+
+  // and then yield all the handles
+  for (auto *handle = m_handles.head(); handle; handle = handle->next()) yield(handle->value());
+
+  // finally start going through the frame roots now
+  for (auto *frame : m_frames | std::views::reverse) frame->roots(yield);
 }
 
-Talos::Garbage::Lifetimes* Talos::Runtime::Isolate::lifetimes() const noexcept {
-    return m_services->get<Garbage::Service>()->lifetimes();
+Talos::Value::Any Talos::Runtime::Isolate::global(const Value::Symbol &symbol) {
+  return m_services->get<Globals::Service>()->get(this, symbol);
 }
 
-void Talos::Runtime::Isolate::roots(const Globals::Each& yield) {
-    // yield the baseline details
-    yield(m_data), yield(m_exception);
+const Talos::String::Intern *Talos::Runtime::Isolate::intern(const Value::Symbol &symbol) {
+  // get the top-most frame value
+  auto *head = frame();
 
-    // and then yield all the handles
-    for (auto* handle = m_handles.head(); handle; handle = handle->next()) yield(handle->value());
+  // ensure the underlying frame is valid
+  if (head == nullptr) return nullptr;
 
-    // finally start going through the frame roots now
-    for (auto* frame = m_frame; frame; frame = frame->parent()) {
-        // ensure we have a valid frame to be used
-        if (!frame->is<Function::Frame>()) continue;
+  // attempt finding the arena reference
+  const auto *arena = head->arena();
+  if (arena == nullptr) return nullptr;
 
-        // get the underlying closure frame now
-        auto* closure = frame->as<Function::Frame>();
-
-        // yield context environment and locals
-        yield(closure->context().environment());
-        yield(closure->span(0, closure->info()->locals()));
-    }
+  auto predicate = [symbol](const String::Intern &intern) { return intern.symbol() == symbol; };
+  auto iter = std::ranges::find_if(arena->strings, predicate); // attempt finding now ...
+  return iter == arena->strings.cend() ? nullptr : &*iter;     // ... resolve as necessary
 }
 
-std::vector<Talos::Resource::Trace> Talos::Runtime::Isolate::backtrace() {
-    // get the initial frame value to be used
-    auto* frame = m_frame;
-
-    // prepare the resulting stack to be used
-    auto stack = std::vector<Resource::Trace>();
-
-    // if no frame exists, then construct an empty trace
-    if (frame == nullptr) return stack;
-
-    // determine the current frame size to be used
-    auto size = std::min(m_frame->depth() + 1, options()->limits.backtraces);
-
-    // attempt appending each of our available frames
-    for (size_t ii = (stack.reserve(size), 0); frame != nullptr && ii < size; frame = frame->parent(), ++ii) {
-        stack.emplace_back(frame->backtrace());
-    }
-
-    // and return the resulting backtrace as a list
-    return stack;
+Talos::Value::Any Talos::Runtime::Isolate::invoke(const Value::Any &target, const Function::Args &args) {
+  return Engine::Invoke::dynamic(this, target, args);
 }
 
-Talos::Engine::Exports* Talos::Runtime::Isolate::exports(const $::String::View& script) {
-    return exports(script, $::System::cwd());
+Talos::Async::Result Talos::Runtime::Isolate::spawn(const Value::Any &target, const Resource::Trace &trace) {
+  return spawn(target, {}, trace);
 }
 
-Talos::Engine::Exports* Talos::Runtime::Isolate::exports(
-    const $::String::View& script, const $::Filesystem::Path& hint) {
-    auto resource = resolve(script, hint);  // resolve the resource
-    return resource.has_value() ? exports(resource.value()) : nullptr;
+Talos::Async::Result
+Talos::Runtime::Isolate::spawn(const Value::Any &target, Function::Args &&args, const Resource::Trace &trace) {
+  // prepare the incoming frame to be used for the execution of the target
+  auto frame = trace.anonymous() ? nullptr : $::Unique::New<Resource::Frame>(this, trace);
+
+  // ensure we have a valid target to be awaited on
+  if (target.is<Async::Future>()) return target.as<Async::Future>().await(thread());
+  else if (!target.is<Function::Any>()) return std::unexpected(panic(6000201, target.brand()));
+  else return create<Async::Future>(target.as<Function::Any>(), args).await(thread());
 }
 
-Talos::Engine::Exports* Talos::Runtime::Isolate::exports(const $::URI::View& resource) {
-    auto* module = service<Import::Service>()->fetch(resource);
-    if (module == nullptr) return panic(8000102, resource.relative()), nullptr;
-    return module->metadata<Module::Phase::EXPORTED>();  // can validly return
+Talos::Function::Any Talos::Runtime::Isolate::bind(const Function::Any &callback, const Value::Any &receiver) {
+  // prepare the passthrough callback to be used
+  auto *info = Builtins::Inspect<Function::Any>::glue();
+
+  // construct a passthrough context
+  auto context = Function::Environ(this, 2);
+
+  // bind the contextual details
+  context.store(0, receiver);
+  context.store(1, callback);
+
+  // and construct the resulting passthrough handler
+  return create<Function::Closure>(info, receiver, context);
 }
 
-Talos::Value::Any Talos::Runtime::Isolate::global(Value::Symbol symbol) {
-    return m_services->get<Globals::Service>()->get(this, symbol);
+Talos::Resource::Result Talos::Runtime::Isolate::resolve(const $::String::View &script, const $::FS::Path &hint) const {
+  return service<Import::Service>()->resolve(script, hint);
 }
 
-const Talos::String::Intern* Talos::Runtime::Isolate::intern(Value::Symbol symbol) {
-    // ensure the underlying frame is valid
-    if (m_frame == nullptr) return nullptr;
-
-    // attempt finding the arena reference
-    const auto* arena = m_frame->arena();
-    if (arena == nullptr) return nullptr;
-
-    auto predicate = [symbol](const String::Intern& intern) { return intern.symbol() == symbol; };
-    auto iter = std::ranges::find_if(arena->strings, predicate);  // attempt finding now ...
-    return iter == arena->strings.cend() ? nullptr : &*iter;      // ... resolve as necessary
+Talos::Value::Any Talos::Runtime::Isolate::import(const $::URI::Buffer &resource, const Resource::Trace &trace) {
+  auto *result = service<Import::Service>()->import(this, resource, trace);
+  return result ? result->await(this) : Value::Failure(); // pre-validate
 }
 
-Talos::Async::Result Talos::Runtime::Isolate::spawn(Value::Any target) { return spawn(target, {}, {}); }
-Talos::Async::Result Talos::Runtime::Isolate::spawn(Value::Any target, const Resource::Trace& trace) {
-    return spawn(target, {}, trace);
+Talos::Value::Any Talos::Runtime::Isolate::import(const $::String::View &script, const Resource::Trace &trace) {
+  return import(script, $::System::cwd(), trace);
 }
 
-Talos::Async::Result Talos::Runtime::Isolate::spawn(Value::Any target, Function::Arguments&& args) {
-    return spawn(target, std::move(args), {});
+Talos::Value::Any
+Talos::Runtime::Isolate::import(const $::String::View &script, const $::FS::Path &hint, const Resource::Trace &trace) {
+  auto resource = resolve(script, hint);
+  if (resource) return import(*resource, trace);
+  else return panic(8000000, resource.error());
 }
 
-Talos::Async::Result Talos::Runtime::Isolate::spawn(
-    Value::Any target, Function::Arguments&& args, const Resource::Trace& trace) {
-    // prepare the incoming frame to be used for the execution of the target
-    auto frame = trace.anonymous() ? nullptr : $::New().unique<Resource::Frame>(this, trace);
-
-    // ensure we have a valid target to be awaited on
-    if (target.is<Async::Future>()) return target.as<Async::Future>().await(thread());
-    else if (!target.is<Function::Dynamic>()) return panic(6000201, target.type_name());
-    return create<Async::Future>(target.as<Function::Dynamic>(), args).await(thread());
+Talos::Engine::Exports *Talos::Runtime::Isolate::exports(const $::String::View &script, const $::FS::Path &hint) {
+  auto resource = resolve(script, hint); // resolve the resource
+  return resource.has_value() ? exports(resource.value()) : nullptr;
 }
 
-Talos::Value::Any Talos::Runtime::Isolate::invoke(Value::Any target) { return invoke(target, {}); }
-Talos::Value::Any Talos::Runtime::Isolate::invoke(Value::Any target, const Function::Arguments& args) {
-    return Engine::Call::any(this, target, args);
+Talos::Engine::Exports *Talos::Runtime::Isolate::exports(const $::URI::Buffer &resource) {
+  auto *module = service<Import::Service>()->fetch(resource); // fetch module
+  if (module == nullptr) return panic(8000102, resource.relative()), nullptr;
+  return module->metadata<Module::Phase::EXPORTED>(); // can validly return
 }
 
-Talos::Function::Dynamic Talos::Runtime::Isolate::bind(const Function::Dynamic& callback, Value::Any receiver) {
-    // prepare the incoming passthrough callback information
-    auto* info = Builtins::Proxy<Function::Dynamic>::binder();
+//  PRIVATE METHODS  //
 
-    // construct a passthrough context
-    auto context = Function::Context(this, 2);
+std::vector<Talos::Resource::Trace> Talos::Runtime::Isolate::m_backtrace() {
+  // prepare the resulting stack to be used
+  auto stack = std::vector<Resource::Trace>();
 
-    // bind the contextual details
-    context.store(0, receiver);
-    context.store(1, callback);
+  // if no frames exists, then construct an empty trace
+  if (m_frames.empty()) return stack;
 
-    // and construct the resulting passthrough handler
-    return create<Function::Closure>(info, receiver, context);
+  // determine the current frame size to be used
+  auto limit = std::min(m_frames.size(), options()->diagnostics.backtraces);
+
+  // attempt appending each of our available frames to the stack
+  for (const auto &[ii, frame] : $::Ranges::Each(std::views::reverse(m_frames))) {
+    if (ii > limit) break; // reached limit
+    stack.emplace_back(frame->backtrace());
+  }
+
+  // and return the resulting backtrace as a list
+  return stack;
 }
 
-Talos::Resource::Result Talos::Runtime::Isolate::resolve(const $::String::View& script) const {
-    return resolve(script, $::System::cwd());
+Talos::Garbage::Lifetimes *Talos::Runtime::Isolate::m_lifetimes() const noexcept {
+  return m_services->get<Garbage::Service>()->lifetimes();
 }
 
-Talos::Resource::Result Talos::Runtime::Isolate::resolve(
-    const $::String::View& script, const $::Filesystem::Path& hint) const {
-    return service<Import::Service>()->resolve(script, hint);
+Talos::Handle::Scope Talos::Runtime::Isolate::m_scope(Engine::Exports *exports) noexcept {
+  return exports->open(this), scope();
 }
 
-Talos::Value::Any Talos::Runtime::Isolate::import(const $::String::View& script, const Resource::Trace& trace) {
-    return import(script, $::System::cwd(), trace);
-}
-
-Talos::Value::Any Talos::Runtime::Isolate::import(const $::String::View& script, const $::Filesystem::Path& hint) {
-    return import(script, hint, {});
-}
-
-Talos::Value::Any Talos::Runtime::Isolate::import(
-    const $::String::View& script, const $::Filesystem::Path& hint, const Resource::Trace& trace) {
-    auto resource = resolve(script, hint);
-    if (resource) return import(*resource, trace);
-    return panic(8000000, resource.error());
-}
-
-Talos::Value::Any Talos::Runtime::Isolate::import(const $::URI::View& resource) { return import(resource, {}); }
-Talos::Value::Any Talos::Runtime::Isolate::import(const $::URI::View& resource, const Resource::Trace& trace) {
-    auto* result = service<Import::Service>()->import(this, resource, trace);
-    return result ? result->await(this) : Value::Failure();  // failed here
+Talos::Value::Any Talos::Runtime::Isolate::m_panic(const Object::Exception &exception) noexcept {
+  if (m_exception != exception) m_exception = exception;
+  return Value::Failure(); // force a failure here
 }

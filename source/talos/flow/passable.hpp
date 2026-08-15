@@ -1,19 +1,25 @@
 #ifndef _TALOS_FLOW_PASSABLE_HPP
 #define _TALOS_FLOW_PASSABLE_HPP
 
-/// Type Modules
+/// Type Includes
 #include "talos/flow/control.hpp"
 
 namespace Talos::Flow {
 
-    /// @brief Passable Control Flow.
-    struct Passable : public Abstract<Passable> {
-        //  CONSTRUCTORS  //
+/// @brief Passable Control Flow.
+struct Passable : public Mixin<Passable> {
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs a passable flow state.
-        explicit constexpr Passable() : Abstract<Passable>(-1) {}
-    };
+  /// @brief Constructs a passable flow state.
+  explicit constexpr Passable() : Mixin(-1) {}
 
-}  // namespace Talos::Flow
+protected:
+  //  PRIVATE METHODS  //
+
+  /// @brief Passable flows have no decernable effect.
+  inline constexpr Effect m_effect() const noexcept final { return Effect::NONE; }
+};
+
+} // namespace Talos::Flow
 
 #endif

@@ -12,7 +12,7 @@ talos test [options...]
 
 Runs unit-tests using Talos' builtin test runner. When requested, any files that fulfill the `--pattern` are evaluated and the coinciding `talos:test` cases will be queued and executed.
 
-For more information in regard to setting up tests, check out the [`talos:test`](/docs/crates/test) crate.
+For more information in regard to setting up tests, check out the [`talos:test`](/crates/test) crate.
 
 ## Common Options
 
@@ -66,4 +66,4 @@ Selects a test reporter to be used. Currently defaulted to the pretty `text` rep
 
 ## Runtime Options
 
-Most declared [runtime options](/docs/language/toolkit/runtime) can be used when running tests.
+Most declared [runtime options](/language/toolkit/runtime) can be used when running tests.

@@ -2,8 +2,8 @@
 
 @import 'tailwindcss';
 
-@import '@fumadocs/base-ui/css/solar.css';
-@import '@fumadocs/base-ui/css/preset.css';
+@import 'fumadocs-ui/css/solar.css';
+@import 'fumadocs-ui/css/preset.css';
 
 /*----------  Theme Styles  ----------*/
 
@@ -25,7 +25,7 @@
 
 /*----------  Shiki Styles  ----------*/
 
-.shiki .highlighted-word {
+.shiki .highlighted-deprecated {
     background-color: unset !important;
     border: unset !important;
     padding: unset !important;

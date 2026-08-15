@@ -1,71 +1,70 @@
 #ifndef _TALOS_OBJECT_INSTANCE_HPP
 #define _TALOS_OBJECT_INSTANCE_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/object/class.hpp"
 
 namespace Talos {
 
-    /// @brief Instance Attributes.
-    template <>
-    struct Object::Attributes<Object::Instance> {
-        //  PROPERTIES  //
+/// @brief Instance Attributes.
+template <> struct Object::Wrapper<Object::Instance> {
+  //  PROPERTIES  //
 
-        /// @brief Bound prototype instance.
-        Class prototype;
+  /// @brief Bound prototype instance.
+  Class prototype;
 
-        /// @brief Bound instance fields.
-        Fields fields = {};
+  /// @brief Bound instance fields.
+  Fields fields = {};
 
-        //  CONSTRUCTORS  //
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a defaulted object instance.
-         * @param isolate               Runtime isolate.
-         */
-        explicit Attributes(Runtime::Isolate* isolate);
+  /**
+   * @brief Constructs a defaulted object instance.
+   * @param isolate               Runtime isolate.
+   */
+  explicit Wrapper(Runtime::Isolate *isolate);
 
-        /**
-         * @brief Constructs a class instance.
-         * @param isolate               Runtime isolate.
-         * @param inherits              Class to inherit.
-         */
-        explicit Attributes(const Class& inherits) : prototype(inherits) {}
-    };
+  /**
+   * @brief Constructs a class instance.
+   * @param isolate               Runtime isolate.
+   * @param inherits              Class to inherit.
+   */
+  explicit Wrapper(const Class &inherits) : prototype(inherits) {}
+};
 
-    /// @brief Instance Interface.
-    struct Object::Instance : public Object::Abstract<Object::Instance> {
-        //  CONSTRUCTORS  //
+/// @brief Instance Interface.
+struct Object::Instance : public Object::Mixin<Object::Instance> {
+  //  CONSTRUCTORS  //
 
-        /// @brief Inherit the base constructor.
-        using Abstract::Abstract;
+  /// @brief Inherit the base constructor.
+  using Mixin::Mixin;
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        inline constexpr Fields& fields() const noexcept { return m_attrs()->fields; }
-        inline constexpr Class& prototype() const noexcept { return m_attrs()->prototype; }
-        inline constexpr const String::Dynamic& name() const noexcept { return prototype().name(); }
+  inline constexpr Fields &fields() const noexcept { return m_wrapper()->fields; }
+  inline constexpr Class &prototype() const noexcept { return m_wrapper()->prototype; }
+  inline constexpr const String::Any &name() const noexcept { return prototype().name(); }
 
-       protected:
-        //  PRIVATE METHODS  //
+protected:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handlers yielding instances safely.
-         * @param self                          Value instance.
-         * @param yield                         Yield callback.
-         */
-        static void m_yield(const Instance& self, const Globals::Each& yield);
+  /**
+   * @brief Handlers yielding instances safely.
+   * @param self                          Value instance.
+   * @param yield                         Yield callback.
+   */
+  static void m_yield(const Instance &self, Globals::Each &yield);
 
-        /**
-         * @brief Handles printing values.
-         * @param os                    Output stream.
-         * @param self                  Object instance.
-         */
-        static inline void m_print($::Stream::Output& os, const Instance& self) {
-            os << $::Dye::cyan("<{0}: 0x{1:08X}>", self.name(), self.m_pointer);
-        }
-    };
+  /**
+   * @brief Handles printing values.
+   * @param os                    Output stream.
+   * @param self                  Object instance.
+   */
+  static inline void m_print(std::ostream &os, const Instance &self) {
+    os << $::Dye::cyan("<{0}: 0x{1:08X}>", self.name(), self.m_pointer.value());
+  }
+};
 
-}  // namespace Talos
+} // namespace Talos
 
 #endif

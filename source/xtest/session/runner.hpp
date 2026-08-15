@@ -1,81 +1,55 @@
 #ifndef _XTEST_SESSION_RUNNER_HPP
 #define _XTEST_SESSION_RUNNER_HPP
 
-/// XT Modules
+/// Testing Includes
 #include "xtest/assert/that.hpp"
-#include "xtest/reporter/interface.hpp"
+#include "xtest/reporter/abstract.hpp"
 #include "xtest/session/options.hpp"
-#include "xtest/session/service.hpp"
-#include "xtest/session/statistics.hpp"
+#include "xtest/trivia/statistics.hpp"
 
 namespace XT::Session {
 
-    /// @brief Transient Session Context.
-    class Runner : public XI::Define<Runner, XI::Unique> {
-        //  PROPERTIES  //
+/// @brief Session Runner.
+class Runner {
+  //  PROPERTIES  //
 
-        /// @brief Current runner depth.
-        size_t m_depth = 0;
+  /// @brief The bound options to use.
+  const Options *m_options = nullptr;
 
-        /// @brief Underlying session options.
-        Options* m_options = nullptr;
+  /// @brief The assertion interface.
+  $::Unique::Pointer<Assert::That> m_asserts = nullptr;
 
-        /// @brief Bound session container.
-        XI::Container* m_services = nullptr;
+  /// @brief The reporter to output to.
+  $::Unique::Pointer<Reporter::Abstract> m_reporter = nullptr;
 
-        /// @brief Reporter service.
-        $::Ptr::Unique<Reporter::Interface> m_reporter = nullptr;
+  /// @brief The statistics for this session runner.
+  $::Unique::Pointer<Trivia::Statistics> m_statistics = nullptr;
 
-        /// @brief Statistics service.
-        $::Ptr::Unique<Statistics> m_statistics = $::New().unique<Statistics>();
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Assertion service.
-        $::Ptr::Unique<Assert::That> m_asserts = $::New().unique<Assert::That>(this);
+  /**
+   * @brief Handles constructing a session runner.
+   * @param options             Options to inherit.
+   */
+  explicit Runner();
+  explicit Runner(const Options *options);
 
-       public:
-        //  CONSTRUCTORS  //
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Constructs an anonymous runner.
-         * @param options               Session options.
-         */
-        explicit Runner(Options* options = $::Global::get<Options>());
+  /// @brief Gets the associated options.
+  inline constexpr const Options *options() const noexcept { return m_options; }
 
-        /**
-         * @brief Constructs a service-runner.
-         * @param services              Session services.
-         */
-        explicit Runner(XI::Container* services);
+  /// @brief Gets the assertion inteface.
+  inline constexpr Assert::That *asserts() const noexcept { return m_asserts.get(); }
 
-        //  PUBLIC METHODS  //
+  /// @brief Gets the associated reporter.
+  inline constexpr Reporter::Abstract *reporter() const noexcept { return m_reporter.get(); }
 
-        inline constexpr size_t& depth() noexcept { return m_depth; }
-        inline constexpr size_t depth() const noexcept { return m_depth; }
+  /// @brief Gets the associated statistics.
+  inline constexpr Trivia::Statistics *statistics() const noexcept { return m_statistics.get(); }
+};
 
-        inline constexpr Options* options() const noexcept { return m_options; }
-        inline constexpr Assert::That* asserts() const noexcept { return m_asserts.get(); }
-        inline constexpr Statistics* statistics() const noexcept { return m_statistics.get(); }
-        inline constexpr Reporter::Interface* reporter() const noexcept { return m_reporter.get(); }
-
-        /// @brief Gets a service from the runner.
-        template <std::derived_from<XI::Shared> T>
-        inline constexpr T* service() const noexcept {
-            return $_ASSERT(m_services->exists<T>()), m_services->get<T>();
-        }
-
-        /// @brief Gets a unique service from the runner.
-        template <std::derived_from<XI::Unique> T>
-        inline constexpr $::Ptr::Unique<T> service() const noexcept {
-            return m_services->get<T>();
-        }
-
-        /// @brief Handles getting the underlying services container.
-        template <std::derived_from<XI::Container> T>
-        inline constexpr XI::Container* service() const noexcept {
-            return m_services;  // get the base container now
-        }
-    };
-
-}  // namespace XT::Session
+} // namespace XT::Session
 
 #endif

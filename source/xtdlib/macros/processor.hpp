@@ -3,8 +3,8 @@
 
 //  MACROS  //
 
-#define $_PP_IGNORE(E) ((void)(E))
-#define $_PP_NOOP() $_PP_IGNORE(0)
+#define $_PP_IGN(E) ((void)(E))
+#define $_PP_NOOP() $_PP_IGN(0)
 
 #define $_PP_COMMA ,
 #define $_PP_VOPT_ARGS(A, B, C, ...) C
@@ -17,8 +17,8 @@
 #endif
 
 #define $_PP_SCOPE(...)
-#define $_PP_BLOCK(...) \
-    do __VA_ARGS__ while (false)
+#define $_PP_BLOCK(...)        \
+  do __VA_ARGS__ while (false)
 
 #define $_PP_STRINGIFY_IMPL(X) #X
 #define $_PP_STRINGIFY(X) $_PP_STRINGIFY_IMPL(X)

@@ -3,7 +3,7 @@
 # Attempts reading a version from a given file.
 function(mono_version_read _prefix _file)
     # parse the incoming arguments to be used
-    cmake_parse_arguments(_ARGS "BRANCH" "" "BRANCH_TRIM" ${ARGN})
+    cmake_parse_arguments(_ARGS "BRANCH;COMMIT" "" "BRANCH_TRIM" ${ARGN})
 
     # ensure the file-path is valid as well
     cmake_path(SET _file ${_file} NORMALIZE)
@@ -13,24 +13,30 @@ function(mono_version_read _prefix _file)
     string(STRIP ${_version} _version)
 
     # update some items if necessary
-    if(DEFINED _ARGS_BRANCH_TRIM)
+    if (DEFINED _ARGS_BRANCH_TRIM)
         set(_ARGS_BRANCH ON)
-    endif()
+    endif ()
 
     # attempt pulling the incoming branch value
-    if(_ARGS_BRANCH)
+    if (_ARGS_BRANCH)
         cmake_path(GET _file PARENT_PATH _cwd)
         __mono_version_branch(_branch ${_cwd})
 
-        if(NOT "${_branch}" STREQUAL "")
-            if((NOT DEFINED _ARGS_TRIM_BRANCH) OR NOT "${_branch}" IN_LIST _ARGS_TRIM_BRANCH)
+        if (NOT "${_branch}" STREQUAL "")
+            if ((NOT DEFINED _ARGS_TRIM_BRANCH) OR NOT "${_branch}" IN_LIST _ARGS_TRIM_BRANCH)
                 string(APPEND _version "-${_branch}")
-            endif()
-        endif()
-    endif()
+            endif ()
+        endif ()
+    endif ()
 
     # finally attempt parsing the result now
     mono_version_parse(${_prefix} ${_version})
+
+    # attempt getting the version-commit if required
+    if (_ARGS_COMMIT)
+        mono_version_commit("${_prefix}_COMMIT") # resolve commit
+        set("${_prefix}_COMMIT" ${${_prefix}_COMMIT} PARENT_SCOPE)
+    endif ()
 
     # set some of the outputs required
     set("${_prefix}_FILE" ${_file} PARENT_SCOPE)

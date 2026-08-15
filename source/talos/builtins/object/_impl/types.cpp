@@ -1,19 +1,14 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
+/// Builtin Includes
+#include "talos/builtins/_inline/builtins.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Builtins, namespace TB = Type::Builder)
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
 
-//  PUBLIC METHODS  //
-
-Talos::Type::Erased TALOS_BUILTIN_TRAITS(Object::Instance)::typing() { return TB::object(); }
+/// Forward Definitions
+$_FWD(Talos::Builtins, using TN = Type::New)
 
 //  PRIVATE METHODS  //
 
-void TALOS_BUILTIN_TRAITS(Object::Instance)::m_typedefs(Type::World* globals) {
-    // prepare the baseline object types
-    globals->types().declare(name(), typing());
-    globals->values().declare(name(), prototype());
-
-    /// TODO: also expose a record typing to be used
+void Talos::Builtins::Wrapper<Talos::Object::Instance>::m_typedefs(Type::World *globals) {
+  globals->types().declare(name(), TN::object());
 }

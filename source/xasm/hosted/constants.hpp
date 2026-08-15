@@ -6,11 +6,11 @@
 
 namespace XASM::Constants {
 
-    //  PROPERTIES  //
+//  PROPERTIES  //
 
-    /// @brief The maximum allowed registers count.
-    static constexpr auto REGISTERS = asmjit::Operand::kVirtIdCount;
+/// @brief The maximum allowed registers count.
+static constexpr auto VREGS_MAX = asmjit::Operand::kVirtIdCount;
 
-}  // namespace XASM::Constants
+} // namespace XASM::Constants
 
 #endif

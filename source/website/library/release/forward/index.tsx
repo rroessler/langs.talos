@@ -2,12 +2,12 @@
 import { Details, Registry } from '../registry';
 
 /// Markdown Modules
-import Content from './content.mdx';
+import Snippet from './_snippet.mdx';
 
 /** Preview Component. */
 export interface Forward extends Forward.Props {}
 export function Forward({ page }: Forward) {
-    return Registry.validate(page) ? <Content /> : null;
+    return Registry.validate(page) ? <Snippet /> : null;
 }
 
 export namespace Forward {

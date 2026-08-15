@@ -1,47 +1,28 @@
 /// Talos Modules
 #include "talos/bytecode/visitor.hpp"
-
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
+#include "talos/value/fold.hpp"
 
 //  PUBLIC METHODS  //
 
 TALOS_MM_LOWER_NODE(Unary, node, compiler, destination) {
-    // allow access to the traits for operators
-    namespace Traits = ::Talos::Operator::Traits;
+  // attempt resolving an immediate value if possible
+  if (auto immediate = Value::Fold(node); immediate.pointer().okay()) {
+    auto constant = compiler->constant(immediate); // pre-build now
+    return compiler->emit<Glyph::LOAD_CONST>(destination, constant);
+  }
 
-    // emit the operand to begin with onto the sink
-    compiler->lower(node->operand(), Accumulator());
+  // emit the operand to begin with onto the sink
+  compiler->lower(node->operand(), Register::Accumulator);
 
-    // trace the incoming binary node now
-    $_UNUSED $_AUTO = compiler->trace(node);
+  // trace the incoming binary node now
+  $_UNUSED $_AUTO = compiler->trace(node);
 
-    // attempt emitting based on the incoming opcodes
-    switch (node->opcode()) {
-#define TALOS_XX_TOKEN_UNARY(N, ...) \
-    case Operator::Kind::N: compiler->plug<Syllable::UNOP_##N>(destination, Accumulator()); break;
-        TALOS_XX_TOKEN_UNARY(NEG)
+  // attempt emitting based on the incoming opcodes
+  switch (node->opcode()) {
+#define TALOS_XX_TOKEN_UNARY(N, ...)                                                                  \
+  case Operator::Kind::N: compiler->plug<Glyph::UNOP_##N>(destination, Register::Accumulator); break;
+    TALOS_XX_TOKEN_UNARY(NEG)
 #include "talos/lexer/_defines/tokens.def"
-        default: $_ABORT("Unknown unary operator '{0}'", Traits::name(node->opcode()));
-    }
-}
-
-//  PRIVATE METHODS  //
-
-Talos::Value::Any Talos::Syntax::Unary::m_fold() const noexcept {
-    // get the underlying value to be handled
-    auto value = m_operand->fold();
-
-    // stop if the value is a failure here
-    if (!value.traits().okay()) return value;
-
-    // handle based on the incoming opcodes now
-    switch (m_opcode) {
-        case Operator::Kind::NOT: return Value::Boolean(value.truthiness());  // should be valid to ascertain now
-        case Operator::Kind::NEG: return value.is<Number::Tagged>() ? -value.as<Number::Tagged>() : Value::Failure();
-        case Operator::Kind::INV: return value.is<Number::Tagged>() ? ~value.as<Number::Tagged>() : Value::Failure();
-
-        // stop for invalid opcodes now
-        default: return Value::Failure();
-    }
+  default: $_ABORT("Unknown unary operator '{0}'", Operator::Inspect::name(node->opcode()));
+  }
 }

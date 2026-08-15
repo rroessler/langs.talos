@@ -1,44 +1,41 @@
 #ifndef _TALOS_BUILTINS_ENUM_HPP
 #define _TALOS_BUILTINS_ENUM_HPP
-
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 namespace Talos::Builtins {
 
-    /// @brief Tagged Enumeration Builtin Traits.
-    template <>
-    struct Traits<Object::Enum> : public Define<Object::Enum, "Enum">,
-                                  public Features<Adapter::FIELDS, Adapter::GLOBALS, Adapter::TYPEDEFS> {
-        //  TYPEDEFS  //
+/// @brief Tagged Enumeration Builtin Traits.
+template <> struct Wrapper<Object::Enum> : public Blueprint<Object::Enum, "Enum"> {
+  //  PUBLIC METHODS  //
 
-        /// @brief Helper for constructing outputs.
-        struct Field;
-        struct Static;
+  /// @brief Gets the baseline list type-class.
+  static $::Shared::Pointer<Type::Prototype> typeclass();
 
-       protected:
-        //  PRIVATE METHODS  //
+protected:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   * @param prototype                 Prototype instance.
+   */
+  static Value::Any m_globals(Isolate *isolate, const Object::Class &prototype);
 
-        /**
-         * @brief Handles looking up value fields.
-         * @param self                      Self value.
-         * @param symbol                    Field symbol.
-         */
-        static Member::View m_attributes(const Object::Enum& self, Value::Symbol symbol);
-    };
+  /**
+   * @brief Handles looking up enumeration fields.
+   * @param self                      Enum object.
+   * @param symbol                    Field symbol.
+   */
+  static Member::View m_attribute(const Object::Enum &self, const Value::Symbol &symbol);
+};
 
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

@@ -1,11 +1,12 @@
-/// XT Modules
+/// Testing Includes
 #include "xtest/session/runner.hpp"
 #include "xtest/reporter/facade.hpp"
 
 //  CONSTRUCTORS  //
 
-XT::Session::Runner::Runner(XI::Container* services) : Runner(*services) { m_services = services; }
-XT::Session::Runner::Runner(Options* options) : m_options(options) {
-    $_ASSERT(m_options, "Session::Runner requires valid options");  // prepare
-    m_reporter = $::New().unique<Reporter::Facade>(m_options->reporter, this);
+XT::Session::Runner::Runner() : Runner($::Global::get<Options>()) {}
+XT::Session::Runner::Runner(const Options *options) : m_options(options) {
+  m_asserts = $::Unique::New<Assert::That>(this);
+  m_reporter = $::Unique::New<Reporter::Facade>(this);
+  m_statistics = $::Unique::New<Trivia::Statistics>();
 }

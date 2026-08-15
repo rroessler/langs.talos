@@ -1,39 +1,32 @@
 #ifndef _TALOS_BUILTINS_DEBUG_HPP
 #define _TALOS_BUILTINS_DEBUG_HPP
 
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 /// Forward Declarations
-TALOS_BUILTIN_CUSTOM(Debug)
+$_FWD(Talos::Builtins::Custom, struct Debug)
 
 namespace Talos::Builtins {
 
-    /// @brief Void Builtin Traits.
-    template <>
-    struct Traits<Custom::Debug> : public Define<Custom::Debug, "Debug">,
-                                   public Features<Adapter::GLOBALS, Adapter::TYPEDEFS> {
-        //  TYPEDEFS  //
+/// @brief Custom Debug Builtin Traits.
+template <> struct Wrapper<Custom::Debug> : public Define<Custom::Debug, "Debug", Adapter::GLOBALS, Adapter::TYPEDEFS> {
+protected:
+  //  PRIVATE METHODS  //
 
-        /// @brief Helper for constructing outputs.
-        struct Field;
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-       protected:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   */
+  static Value::Any m_globals(Isolate *isolate);
+};
 
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
-
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
-    };
-
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

@@ -1,6 +1,6 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/machine/service.hpp"
-#include "talos/machine/builder.hpp"
+#include "talos/function/common.hpp"
 #include "talos/machine/visitor.hpp"
 #include "talos/runtime/container.hpp"
 #include "talos/runtime/isolate.hpp"
@@ -8,78 +8,79 @@
 //  CONSTRUCTORS  //
 
 Talos::Machine::Service::Service() : Service($::Global::get<Runtime::Container>()) {}
-Talos::Machine::Service::Service(XI::Container* services) : m_services(services) {}
+Talos::Machine::Service::Service(XI::Container *services) : m_services(services) {}
 
 //  PUBLIC METHODS  //
 
-bool Talos::Machine::Service::verify(Function::Closure closure) const noexcept { return verify(closure.info()); }
-bool Talos::Machine::Service::verify(const Function::Info* info) const noexcept {
-    auto jitless = m_services->get<Runtime::Options>()->flags.jitless;
-    return !jitless && info->locals() <= XASM::Constants::REGISTERS;
+bool Talos::Machine::Service::verify(const Function::Info *info) const noexcept {
+  auto jitless = m_services->get<Runtime::Options>()->flags.jitless;
+  return !jitless && info->locals() <= XASM::Constants::VREGS_MAX;
 }
 
-Talos::Function::Dynamic Talos::Machine::Service::compile(Runtime::Isolate* isolate, Function::Closure closure) {
-    return verify(closure) ? compile(isolate, closure.info(), closure.context()) : closure;
-}
+Talos::Function::Any Talos::Machine::Service::upgrade(Runtime::Isolate *isolate, const Function::Closure &closure) {
+  // attempt verifying the instance now
+  auto *info = closure.info();
+  if (!verify(info)) return closure;
 
-Talos::Function::Dynamic Talos::Machine::Service::compile(Runtime::Isolate* isolate, const Function::Info* info) {
-    return compile(isolate, info, Value::Void());
-}
+  // get all the necessary services required
+  bool logging = m_services->get<Runtime::Options>()->dump.assembly;
 
-Talos::Function::Dynamic Talos::Machine::Service::compile(
-    Runtime::Isolate* isolate, const Function::Info* info, Value::Any context) {
-    // for now we can only compile one item at a time
-    $_UNUSED $_AUTO = $::Lock::guard(m_mutex);
+  // prepare a compilation scope to be used
+  auto compiler = m_context.scope<Callback>(logging);
 
-    // get all the necessary services required
-    Runtime::Options* options = *m_services;
+  // construct a new callee information to be used now
+  auto *callee = m_callees.emplace($::Unique::New<Info>(info)).first->get();
 
-    // prepare a compilation scope to be used
-    auto compiler = m_context.scope<Callback>(options->dump.machine);
+  // attempt compilation now as necessary
+  m_compile(callee, compiler.get());
+  callee->callback() = compiler->finish();
+  callee->bytes() = m_context.arena()->code_size();
 
-    // construct a new callee information to be used now
-    auto* callee = m_callees.emplace($::New().unique<Info>(info)).first->get();
+  // show logging results if necessary
+  if ($_UNLIKELY(logging)) m_dump(info);
 
-    $_PP_SCOPE() {
-        // initialize the scoping to be used now
-        auto builder = m_services->get<Builder>(callee, &compiler);
+  // prepare the receiver and context to be used
+  auto receiver = closure.receiver();
+  auto &context = closure.context();
 
-        // get the underlying bytecode to be converted
-        auto bytecode = info->buffer();
-        auto labels = bytecode.size();
-        auto offset = bytecode.address();
-
-        // prepare the width to be used now
-        auto width = sizeof(Bytecode::Instruction);
-
-        // reserve the total labels now to be used
-        for (size_t ii = 0; ii < (labels / width); ++ii) builder->labels.emplace_back(compiler->new_label());
-
-        // iterate over the bytecode to be transformed
-        for (size_t ii = 0; ii < labels; ii += width) {
-            auto* instruction = std::bit_cast<Bytecode::Instruction*>(offset + ii);
-            builder->emitter.header("{0}", *instruction);  // show the bytecode here
-            compiler->bind(builder->emitter.label(ii));    // bind the current label
-            Visitor::accept(builder.get(), instruction);   // and attempt compiling
-        }
-    }
-
-    // finish off the resulting instance
-    callee->callback() = compiler->finish();
-
-    // show logging results if necessary
-    if ($_UNLIKELY(options->dump.machine)) m_dump(info);
-
-    // and construct the resulting native function
-    return isolate->create<Function::Jitted>(callee, context);
+  // and construct the resulting native function to be used
+  return isolate->create<Function::Jitted>(callee, receiver, context);
 }
 
 //  PRIVATE METHODS  //
 
-void Talos::Machine::Service::m_dump(const Function::Info* info) const noexcept {
-    // show the baseline dump details now
-    $::IO::println("\n===== Assembly Dump '{0}' =====\n", $::Path::relative(info->resource().body()).string());
+void Talos::Machine::Service::m_dump(const Function::Info *info) const noexcept {
+  // get the current details of the function
+  auto bytes = m_context.arena()->code_size();
+  auto relative = info->resource().relative();
 
-    // and attempt showing the necessary output now
-    if (auto content = m_context.content(); content.size()) $::IO::println(content);
+  // show the baseline dump details now
+  $::Debug::println("\n===== Assembly Dump / {0}B '{1}' =====\n", bytes, relative.string());
+
+  // and attempt showing the necessary output now
+  if (auto content = m_context.content(); content.size()) $::Debug::println(content);
+}
+
+void Talos::Machine::Service::m_compile(Info *callee, Compiler *compiler) const noexcept {
+  // get the underlying bytecode to be converted
+  auto bytecode = callee->bytecode();
+
+  // prepare some details about the bytecode
+  auto offset = bytecode.address();
+  auto labels = bytecode.size() / Bytecode::Width;
+
+  // prepare the scoped builder process now
+  auto builder = m_services->get<Builder>(callee, compiler);
+
+  // reserve the total labels now to be used
+  for (size_t ii = 0; ii < labels; ++ii) builder->labels.emplace_back(compiler->new_label());
+
+  // prepare the base instruction instance to be iterated over
+  const auto *instruction = std::bit_cast<const Bytecode::Instruction *>(offset);
+
+  // iterate over the bytecode to be transformed
+  for (size_t ii = 0; ii < labels; ++ii, ++instruction) {
+    builder->emitter->header(instruction, ii);
+    Visitor::accept(builder.get(), instruction);
+  }
 }

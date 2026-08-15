@@ -1,26 +1,31 @@
 #ifndef _TALOS_SYNTAX_COMPARATOR_HPP
 #define _TALOS_SYNTAX_COMPARATOR_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/syntax/node.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Ranges Heap Comparator.
-    struct Comparator {
-        //  CONSTRUCTORS  //
+/// @brief Ranges Heap Comparator.
+struct Comparator {
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs a comparator function.
-        explicit Comparator() = default;
+  /// @brief Constructs a comparator function.
+  explicit Comparator() = default;
 
-        //  OPERATOR METHODS  //
+  //  OPERATOR METHODS  //
 
-        /// @brief Compares two nodes for their range position.
-        constexpr bool operator()(const Syntax::Node* left, const Syntax::Node* right) const {
-            return left->traits()->range() > right->traits()->range();
-        }
-    };
+  /// @brief Compares two nodes for their range position.
+  inline constexpr bool operator()(const Syntax::Node *left, const Syntax::Node *right) const {
+    return left->trivia()->range() < right->trivia()->range();
+  }
 
-}  // namespace Talos::Syntax
+  //  PUBLIC METHODS  //
+
+  /// @brief Checks for nodes that have a valid range.
+  inline constexpr bool validate(const Syntax::Node *node) const { return node->trivia()->range() != XLSP::Range(); }
+};
+
+} // namespace Talos::Syntax
 
 #endif

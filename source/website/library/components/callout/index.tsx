@@ -1,15 +1,14 @@
-/// Vendor Modules
-import clsx from 'clsx';
-import React from 'react';
+/// Website Modules
+import { cn } from '@/website/utilities';
 
 /** Callout Component. */
 export interface Callout extends Callout.Props {}
 export function Callout({ children, type, title, className, style, ...props }: Callout) {
     // prepare the incoming class-name to be used
-    className = clsx('flex gap-2 my-2 p-3 ps-1 text-sm text-fd-card-foreground', className);
+    className = cn('flex gap-2 my-2 p-3 ps-1 text-sm text-fd-card-foreground', className);
 
-    // update the current styling as well
-    style = { '--callout-color': `var(--color-fd-${type ?? 'info'}, var(--color-fd-muted))`, ...style } as object;
+    // update the current styling as well (need to force the use of our desired callout values through `any`)
+    style = { '--callout-color': `var(--color-fd-${type ?? 'info'}, var(--color-fd-muted))`, ...style } as any;
 
     // construct the container of the callout now
     return (

@@ -1,7 +1,7 @@
 #ifndef _TALOS_MONAD_INLINE_IPP
 #define _TALOS_MONAD_INLINE_IPP
 
-/// Object Modules
+/// Monad Includes
 #include "talos/monad/result.hpp"
 
 #endif

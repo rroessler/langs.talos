@@ -6,17 +6,17 @@
 
 namespace Talos::Server {
 
-    /// @brief Underlying server options.
-    struct Options : public XLSP::Server::Options {
-        //  CONSTRUCTORS  //
+/// @brief Underlying server options.
+struct Options : public XLSP::Server::Options {
+  //  CONSTRUCTORS  //
 
-        /// @brief Ensures underlying options are set properly.
-        constexpr Options() {
-            server.title = TALOS_MM_TITLE;
-            server.version = TALOS_MM_VERSION;
-        }
-    };
+  /// @brief Ensures underlying options are set properly.
+  constexpr Options() {
+    server.title = TALOS_MM_TITLE;
+    server.version = TALOS_MM_VERSION;
+  }
+};
 
-}  // namespace Talos::Server
+} // namespace Talos::Server
 
 #endif

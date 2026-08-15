@@ -1,12 +1,9 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/relint/visitor.hpp"
-
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
 
 //  PUBLIC METHODS  //
 
 TALOS_MM_LINT_NODE(Call, node, analyzer) {
-    analyzer->verify(node->callee(), node);
-    analyzer->verify(node->arguments(), node);
+  analyzer->verify(node->callee(), node);
+  analyzer->verify(node->arguments(), node);
 }

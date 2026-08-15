@@ -1,11 +1,10 @@
 {/* Vendor Modules */}
 
-import { Tabs, Tab } from '@fumadocs/base-ui/components/tabs';
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 
 {/* Website Modules */}
 
-import { Product } from '@/website/product';
-import { Footer, Hero, Install, Version } from '@/website/components';
+import { Hero, Footer, Install } from '@/website/components';
 
 <Hero className="mb-10" />
 
@@ -52,19 +51,18 @@ Test.suite("Addition", fn {
 
 <Tabs items={['Execute', 'Lint', 'Format', 'Test', 'Deploy']}>
     <Tab value="Execute">
-        Whether it be simple scripts, tasks or entire projects, Talos can [execute](/docs/language/toolkit/runtime) it
-        all.
+        Whether it be simple scripts, tasks or entire projects, Talos can [execute](/language/toolkit/runtime) it all.
     </Tab>
     <Tab value="Lint">
-        A builtin [linter](/docs/language/toolkit/linting) to help maintain code consistency and avoid bugs.
+        A builtin [linter](/language/toolkit/linting) to help maintain code consistency and avoid bugs.
     </Tab>
-    <Tab value="Format">[Formatting](/docs/language/toolkit/formatter) support that prettifies Talos files.</Tab>
+    <Tab value="Format">[Formatting](/language/toolkit/formatter) support that prettifies Talos files.</Tab>
     <Tab value="Test">
-        Talos provides a [test-runner](/docs/language/toolkit/testing) and assertion libraries to ensure code accuracy
-        during development.
+        Talos provides a [test-runner](/language/toolkit/testing) and assertion libraries to ensure code accuracy during
+        development.
     </Tab>
     <Tab value="Deploy">
-        Seamlessly create [standalone native executables](/docs/language/toolkit/bundler) from your Talos program.
+        Seamlessly create [standalone native executables](/language/toolkit/bundler) from your Talos program.
     </Tab>
 </Tabs>
 

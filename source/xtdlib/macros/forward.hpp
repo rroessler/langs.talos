@@ -3,10 +3,8 @@
 
 //  MACROS  //
 
-/// @brief Allows constructing a forward declaration macro.
-#define $_FWD(N, ...) \
-    namespace N {     \
-        __VA_ARGS__;  \
-    }
+/// @brief Forward declares namespaced types/values.
+#define $_FWD(N, ...)          \
+  namespace N { __VA_ARGS__; }
 
 #endif

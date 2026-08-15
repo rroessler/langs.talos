@@ -127,7 +127,7 @@ Functions can also be called with different conventions, through named "executio
 let future = double::async(5);
 ```
 
-For more information, see the [concurrency](/docs/language/advanced/concurrency) and [execution policy](/docs/language/advanced/policies) segments.
+For more information, see the [concurrency](/language/advanced/concurrency) and [execution policy](/language/advanced/policies) segments.
 
 ## First-Class Citizens
 

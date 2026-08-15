@@ -1,57 +1,42 @@
 #ifndef _TALOS_BUILTINS_SYMBOL_HPP
 #define _TALOS_BUILTINS_SYMBOL_HPP
 
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
-#include "talos/value/symbol.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 namespace Talos::Builtins {
 
-    /// @brief Tagged Symbol Builtin Traits.
-    template <>
-    struct Traits<Value::Symbol> : public Define<Value::Symbol, "Symbol">,
-                                   public Features<Adapter::FIELDS, Adapter::GLOBALS, Adapter::TYPEDEFS> {
-        //  TYPEDEFS  //
+/// @brief Tagged Symbol Builtin Traits.
+template <> struct Wrapper<Value::Symbol> : public Blueprint<Value::Symbol, "Symbol"> {
+  //  PUBLIC METHODS  //
 
-        /// @brief Helpers for constructing outputs.
-        struct Field;
-        struct Static;
+  /// @brief Gets the baseline symbol type-class.
+  static $::Shared::Pointer<Type::Prototype> typeclass();
 
-       private:
-        //  PROPERTIES  //
+protected:
+  //  PRIVATE METHODS  //
 
-        /// @brief Available field descriptors.
-        static Member::Storage m_members;
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-       public:
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   * @param prototype                 Prototype instance.
+   */
+  static Value::Any m_globals(Isolate *isolate, const Object::Class &prototype);
 
-        /// @brief Gets the underlying "Symbol" typing.
-        static Type::Erased typing();
+  /**
+   * @brief Handles looking up value fields.
+   * @param self                      Value instance.
+   * @param symbol                    Field symbol.
+   */
+  static Member::View m_attribute(const Value::Symbol &self, const Value::Symbol &symbol);
+};
 
-       protected:
-        //  PRIVATE METHODS  //
-
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
-
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
-
-        /**
-         * @brief Handles looking up value fields.
-         * @param self                      Self value.
-         * @param symbol                    Field symbol.
-         */
-        static Member::View m_attributes(const Value::Symbol& self, Value::Symbol symbol);
-    };
-
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

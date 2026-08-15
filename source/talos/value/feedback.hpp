@@ -4,33 +4,19 @@
 /// Talos Includes
 #include "talos/forward/value.hpp"
 
-//  X-MACROS  //
-
-/// @brief Internal Void Feedback.
-#define XX_VALUES_FEEDBACK(X) \
-    /**  NON-ERRORS  */       \
-                              \
-    X(ALL_OKAY)               \
-    X(ITERATOR_SENTINEL)      \
-                              \
-    /**  EXCEPTIONS  */       \
-                              \
-    X(EXCEPTION_THROWN)       \
-    X(ASYNC_TIMEOUT)          \
-    X(FIELD_MISSING)          \
-    X(FIELD_IMMUTABLE)
-
-//  NAMESPACES  //
-
 namespace Talos::Value {
 
-    /// @brief Associated Feedback Values.
-    $_XX_ENUM_CLASS(Feedback, uint8_t, XX_VALUES_FEEDBACK);
+/// @brief Associated Feedback Values.
+enum class Feedback : uint8_t {
+  ALL_OKAY = 0b0000,
+  ITER_SENTINEL = 0b0001,
 
-}  // namespace Talos::Value
+  ERROR_THROWN = 0b1000,
+  ASYNC_TIMEOUT = 0b1001,
+  FIELD_MISSING = 0b1010,
+  FIELD_IMMUTABLE = 0b1011,
+};
 
-//  UNDEFINES  //
-
-#undef XX_VALUES_FEEDBACK
+} // namespace Talos::Value
 
 #endif

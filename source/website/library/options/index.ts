@@ -1,7 +1,7 @@
 /// Vendor Modules
-import { BaseLayoutProps } from '@fumadocs/base-ui/layouts/shared';
+import { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 
-/// Library Modules
+/// Website Modules
 import { Product } from '@/website/product';
 
 /** Core Layout Properties. */

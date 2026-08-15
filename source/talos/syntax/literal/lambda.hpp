@@ -1,51 +1,41 @@
 #ifndef _TALOS_LITERAL_LAMBDA_HPP
 #define _TALOS_LITERAL_LAMBDA_HPP
 
-/// Syntax Modules
+/// Syntax Includes
 #include "talos/syntax/annotation/signature.hpp"
-#include "talos/syntax/statement/block.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Lambda Literal Node.
-    class Lambda : public Abstract<Lambda, Expression> {
-        //  PROPERTIES  //
+/// @brief Lambda Literal Node.
+class Lambda : public Mixin<Lambda, Expression> {
+  //  PROPERTIES  //
 
-        /// @brief The function body.
-        Node* m_body;
+  /// @brief The function body.
+  Node *m_body;
 
-        /// @brief Associated function signature.
-        Signature* m_signature;
+  /// @brief Associated function signature.
+  Signature *m_signature;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a lambda expression.
-         * @param signature                 Lambda signature.
-         * @param body                      Function body.
-         */
-        explicit Lambda(Signature* signature, Node* body) : Lambda(signature, body, signature->traits()->location()) {}
+  /**
+   * @brief Constructs a lambda expression.
+   * @param signature                 Lambda signature.
+   * @param body                      Function body.
+   */
+  explicit Lambda(Signature *signature, Node *body) : m_body(body), m_signature(signature) {}
 
-        /**
-         * @brief Constructs a lambda expression.
-         * @param signature                 Lambda signature.
-         * @param body                      Function body.
-         * @param location                  Resource location.
-         */
-        explicit Lambda(Signature* signature, Node* body, const Bounds& location) :
-            Abstract(location), m_body(body), m_signature(signature) {}
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  inline constexpr const Node *body() const noexcept { return m_body; }
+  inline constexpr const Signature *signature() const noexcept { return m_signature; }
+  inline constexpr const Parameters::List &parameters() const noexcept { return m_signature->parameters(); }
 
-        inline constexpr Node* body() const noexcept { return m_body; }
-        inline constexpr Signature* signature() const noexcept { return m_signature; }
-        inline constexpr const Parameters::List& parameters() const noexcept { return m_signature->parameters(); }
+  inline constexpr size_t arity() const noexcept { return m_signature->arity(); }
+  inline constexpr size_t adicity() const noexcept { return m_signature->adicity(); }
+};
 
-        inline constexpr size_t arity() const noexcept { return m_signature->arity(); }
-        inline constexpr size_t adicity() const noexcept { return m_signature->adicity(); }
-    };
-
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

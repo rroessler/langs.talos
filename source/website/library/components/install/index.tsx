@@ -1,88 +1,109 @@
 /// Vendor Modules
-import React from 'react';
 import Link from 'next/link';
 import { Eye } from 'lucide-react';
-import { buttonVariants } from '@fumadocs/base-ui/components/ui/button';
+import { buttonVariants } from 'fumadocs-ui/components/ui/button';
+import { Tab, Tabs, TabsList, TabsTrigger } from 'fumadocs-ui/components/tabs';
 
 /// Website Modules
-import { Product } from '@/website/product';
+import { cn } from '@/website/utilities';
 
 /// Package Modules
 import { Code } from '../code';
-import { Version } from '../version';
+import { Fragment } from '../fragment';
 
 /** Install Component Factory. */
 export interface Install extends Install.Props {}
-export function Install({ sleek = true, ...props }: Install) {
-    // prepare the version text to be used now
-    const version = !sleek && (
-        <h2 key="version" {...props}>
-            Install {Product.shortName} <Version />
-        </h2>
-    );
-
+export function Install({}: Install) {
     // prepare the scripts to be shown now as well
     const scripts: Install.Script[] = [
         {
+            lang: 'bash',
             href: '/install.sh',
             title: 'Linux / Darwin',
-            language: 'bash',
             content: 'curl -fsSL https://talos.rroessler.io/install.sh | bash',
         },
         {
-            title: 'Windows',
+            lang: 'powershell',
             href: '/install.ps1',
-            language: 'powershell',
+            title: 'Windows',
             content: 'powershell -c "irm https://talos.rroessler.io/install.ps1 | iex"',
         },
     ];
 
+    // prepare the available tabs and triggers
+    const initial = scripts[0].lang;
+    const tabs = scripts.map((props, ii) => <Install.Script key={ii} {...props} />);
+    const triggers = scripts.map((props, ii) => <Install.Trigger key={ii} {...props} />);
+
+    // push the custom triggers for viewing the current script
+    triggers.push(...scripts.map((props, ii) => <Install.Viewer key={ii + scripts.length} {...props} />));
+
+    // prepare the resulting children to be shown now
+    const children = [
+        <TabsList key="list" children={triggers} />,
+        tabs.map((tab, ii) => <Fragment key={ii} children={tab} />),
+    ];
+
     // prepare the resulting tabs now
-    const tabs = (
-        <Code.Tabs key="tabs" defaultValue={scripts[0].title}>
-            <Code.List>
-                {scripts.map((script) => (
-                    <Code.Trigger key={script.title} value={script.title} children={script.title} />
-                ))}
-            </Code.List>
-
-            {scripts.map((props) => (
-                <Code.Tab key={props.title} value={props.title} children={<Install.Script {...props} />} />
-            ))}
-        </Code.Tabs>
-    );
-
-    // prepare the output children now
-    return <React.Fragment children={[version, tabs]} />;
+    return <Tabs defaultValue={initial} children={children} />;
 }
 
 export namespace Install {
     //  TYPEDEFS  //
 
     /** Install Component Properties. */
-    export type Props = Omit<React.HTMLAttributes<HTMLElement>, 'children'> & { sleek?: boolean };
+    export type Props = Omit<React.HTMLAttributes<HTMLElement>, 'children'>;
 
     /** Baseline script details. */
     export interface Script {
+        lang: string;
         href: string;
         title: string;
         content: string;
-        language: string;
     }
+
+    //  PROPERTIES  //
+
+    /** Prepare the peers class-names. */
+    const m_peers: Record<string, string> = {
+        bash: 'peer/bash',
+        powershell: 'peer/powershell',
+    };
+
+    /** Prepare the variants class-names. */
+    const m_variants: Record<string, string> = {
+        bash: 'peer-data-[state=inactive]/bash:hidden',
+        powershell: 'peer-data-[state=inactive]/powershell:hidden',
+    };
 
     //  PUBLIC METHODS  //
 
-    /** Shows the install actions. */
-    export function Actions({ href }: Pick<Script, 'href'>) {
-        const className = 'hover:text-fd-accent-foreground data-checked:text-fd-accent-foreground';
-        const variant = buttonVariants({ className, size: 'icon-xs' }); // prepare variant
-        return <Link href={href} target="_blank" type="button" className={variant} children={<Eye />} />;
+    /** Allows viewing scripts. */
+    export function Viewer({ href, lang }: Script) {
+        // prepare the baseline classes and variant details
+        const className = `text-fd-muted-foreground hover:text-fd-accent-color ms-auto`;
+        const variant = buttonVariants({ className: cn(className, m_variants[lang]), size: 'icon-xs' });
+
+        // we then need to define our link so it does not download automatically
+        return (
+            <Link
+                href={href}
+                target="_blank"
+                type="button"
+                rel="noopener noreferrer"
+                className={variant}
+                children={<Eye />}
+            />
+        );
+    }
+
+    /** Available Script Triggers. */
+    export function Trigger({ title, lang }: Script) {
+        return <TabsTrigger value={lang} className={m_peers[lang]} children={title} />;
     }
 
     /** Shows the install script. */
-    export function Script({ href, content, language }: Script) {
-        const actions = <Actions href={href} />;
-        const dynamic = <Code.Dynamic lang={language} code={content} />;
-        return <Code.Block children={dynamic} actions={actions} />;
+    export function Script({ content, lang }: Script) {
+        return <Tab value={lang} children={<Code.Dynamic lang={lang} code={content} />} />;
     }
 }

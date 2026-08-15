@@ -1,6 +1,6 @@
-//!
-//! Crate: "rng"
-//! Description: Utilities for generating random numbers.
-//!
+///
+/// @crate "rng"
+/// @describe Utilities for generating random numbers.
+///
 
 Todo("Unimplemented Crate - 'talos:rng'");

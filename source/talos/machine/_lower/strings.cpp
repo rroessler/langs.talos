@@ -1,22 +1,29 @@
-/// Talos Modules
-#include "talos/engine/dispatch.hpp"
-#include "talos/string/dynamic.hpp"
-
-/// Inline Modules
+/// Machine Includes
 #include "talos/machine/_inline/macros.ipp"
 
-//  PRIVATE METHODS  //
+//  EMITTER METHODS  //
 
 TALOS_MM_MACHINE_EMIT(STRING_MAKE, builder, instruction) {
-    __ee__ string(instruction->get<0>(), instruction->get<1>());
+  // get the intern value to be emitted
+  auto index = instruction->get<1>();
+  auto *arena = builder->info->arena();
+  auto *intern = &arena->strings[index];
+
+  // prepare the register to be loaded into
+  auto dx = __ee__ slot(instruction->get<0>());
+
+  // check if the intern bytes are small enough else-wise glue
+  auto small = intern->bytes() < String::Limits::SMALL;
+  if (small) __ee__ load(dx, String::Small(intern->view()));
+  else __ee__ call(Glue::string, dx, builder->isolate, Immediate(intern));
 }
 
 TALOS_MM_MACHINE_EMIT(STRING_CONCAT, builder, instruction) {
-    // prepare the incoming registers now
-    auto dx = __ee__ resolve(instruction->get<0>());
-    auto ax = __ee__ resolve(instruction->get<1>());
-    auto bx = __ee__ resolve(instruction->get<2>());
+  // prepare the required registers for concatenation
+  auto dx = __ee__ slot(instruction->get<0>());
+  auto ax = __ee__ slot(instruction->get<1>());
+  auto bx = __ee__ slot(instruction->get<2>());
 
-    // emit the invocation for concatenation strings
-    __ee__ invoke(Engine::Dispatch::concat, dx, builder->isolate, ax, bx);
+  // invoke the required glue-method
+  __ee__ call(Glue::concat, dx, builder->isolate, ax, bx);
 }

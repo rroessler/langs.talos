@@ -1,7 +1,7 @@
-//!
-//! Example: "benchmarks/factorial.bench.tal"
-//! Description: Traces different "factorial" benchmarks.
-//!
+///
+/// @example "benchmarks/factorial.bench.tal"
+/// @describe Traces different "factorial" benchmarks.
+///
 
 // Talos Modules
 import "talos:test" as Test;

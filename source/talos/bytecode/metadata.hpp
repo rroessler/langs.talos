@@ -3,32 +3,31 @@
 
 /// Talos Modules
 #include "talos/function/info.hpp"
-#include "talos/linker/arena.hpp"
 #include "talos/module/metadata.hpp"
 #include "talos/runtime/isolate.hpp"
 
 namespace Talos::Module {
 
-    /// @brief Constructs a set of bytecode metadata.
-    template <>
-    class Metadata::Attributes<Phase::COMPILED> : public Metadata {
-        //  PROPERTIES  //
+/// @brief Constructs a set of bytecode metadata.
+template <> class Metadata::Wrapper<Phase::COMPILED> : public Metadata {
+  //  PROPERTIES  //
 
-        /// @brief Associated output arena.
-        $::Ptr::Unique<Linker::Arena> m_arena = $::New().unique<Linker::Arena>();
+  /// @brief Associated output arena.
+  $::Unique::Pointer<Image::Arena> m_arena = $::Unique::New<Image::Arena>();
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs a set of exports.
-        explicit Attributes() = default;
+  /// @brief Constructs a set of compilation exports.
+  explicit Wrapper() = default;
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        inline constexpr $::Ptr::Unique<Linker::Arena>& arena() noexcept { return m_arena; }
-        inline constexpr const Linker::Arena* arena() const noexcept { return m_arena.get(); }
-    };
+  /// @brief Image compilation outputs.
+  inline constexpr $::Unique::Pointer<Image::Arena> &arena() noexcept { return m_arena; }
+  inline constexpr const Image::Arena *arena() const noexcept { return m_arena.get(); }
+};
 
-}  // namespace Talos::Module
+} // namespace Talos::Module
 
 #endif

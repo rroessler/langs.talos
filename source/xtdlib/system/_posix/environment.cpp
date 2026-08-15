@@ -1,4 +1,4 @@
-/// Platform Modules
+/// Platform Includes
 #include "xtdlib/system/platform.hpp"
 
 #if $_PLATFORM_POSIX
@@ -11,7 +11,7 @@
 #include "xtdlib/system/environment.hpp"
 
 /// Forward Declarations
-$_FWD($::Environment, size_t separator(const String::View &pair))
+$_FWD($::Environ, size_t separator(const String::View &pair))
 
 //  MACROS  //
 
@@ -29,47 +29,47 @@ extern char **environ;
 
 //  PUBLIC METHODS  //
 
-std::optional<$::String::Buffer> $::Environment::get(const String::Buffer &key) {
-    auto *result = ::getenv(key.c_str());  // get value
-    return result ? std::optional(result) : std::nullopt;
+std::optional<$::String::Buffer> $::Environ::get(const String::Buffer &key) {
+  auto *result = ::getenv(key.c_str()); // attempt finding
+  return result ? std::optional(result) : std::nullopt;
 }
 
-bool $::Environment::del(const String::Buffer &key) { return ::unsetenv(key.c_str()) == 0; }
-bool $::Environment::set(const String::Buffer &key, const String::Buffer &value) {
-    return ::setenv(key.c_str(), value.c_str(), true) == 0;
+bool $::Environ::del(const String::Buffer &key) { return ::unsetenv(key.c_str()) == 0; }
+bool $::Environ::set(const String::Buffer &key, const String::Buffer &value) {
+  return ::setenv(key.c_str(), value.c_str(), true) == 0;
 }
 
-size_t $::Environment::separator(const String::View &pair) {
-    // prepare the underlying separator value
-    static constexpr auto value = '=';
+size_t $::Environ::separator(const String::View &pair) {
+  // prepare the underlying separator value
+  static constexpr auto value = '=';
 
-    // attempt an initial find
-    if (auto equals = pair.find(value)) return equals;
+  // attempt an initial find
+  if (auto equals = pair.find(value)) return equals;
 
-    // otherwise search one-place further
-    auto equals = pair.find(value, 1);
-    return equals == String::View::npos ? 0 : equals;
+  // otherwise search one-place further
+  auto equals = pair.find(value, 1);
+  return equals == String::View::npos ? 0 : equals;
 }
 
-$::Dict<$::String::Buffer> $::Environment::view() {
-    // prepare the output now
-    auto output = Dict<String::Buffer>();
+$::Map::Dict<$::String::Buffer> $::Environ::view() {
+  // prepare the output now
+  auto output = Map::Dict<String::Buffer>();
 
-    // attempt iterating over the environment now
-    for (auto *ii = environ; *ii != nullptr; ++ii) {
-        // prepare the pair and equals location
-        auto pair = String::Buffer(*ii);
-        auto equals = separator(pair);
+  // attempt iterating over the environment now
+  for (auto *ii = environ; *ii != nullptr; ++ii) {
+    // prepare the pair and equals location
+    auto pair = String::Buffer(*ii);
+    auto equals = separator(pair);
 
-        // resolve the middle value to be used
-        auto middle = equals == String::View::npos ? pair.size() : equals;
+    // resolve the middle value to be used
+    auto middle = equals == String::View::npos ? pair.size() : equals;
 
-        // and push our key/value to the dictionary
-        output.emplace(pair.substr(0, middle), pair.substr(equals + 1));
-    }
+    // and push our key/value to the dictionary
+    output.emplace(pair.substr(0, middle), pair.substr(equals + 1));
+  }
 
-    // return the resulting output now
-    return output;
+  // return the resulting output now
+  return output;
 }
 
 #endif

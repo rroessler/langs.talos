@@ -1,156 +1,155 @@
 #ifndef _TALOS_TYPE_CALLABLE_HPP
 #define _TALOS_TYPE_CALLABLE_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/type/entity.hpp"
 
-/// Type Modules
+/// Type Includes
 #include "talos/type/utility/intrinsics.hpp"
 
 namespace Talos::Type {
 
-    /// @brief Callable Function Typing.
-    class Callable : public Abstract<Callable> {
-        //  TYPEDEFS  //
+/// @brief Callable Function Typing.
+class Callable : public Mixin<Callable> {
+  //  TYPEDEFS  //
 
-        /// @brief Allow prototypes internal access.
-        friend class Prototype;
+  /// @brief Allow prototypes internal access.
+  friend class Prototype;
 
-        //  PROPERTIES  //
+  //  PROPERTIES  //
 
-        /// @brief Attach parameter values.
-        std::vector<Entity> m_parameters = {};
+  /// @brief Attach parameter values.
+  std::vector<Entity> m_parameters = {};
 
-        /// @brief Expected return typing.
-        Erased m_returns = $::New().shared<None>();
+  /// @brief Expected return typing.
+  Erased m_returns = New::none();
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs a defaulted callable instance.
-        explicit Callable() = default;
+  /**
+   * @brief Constructs a function hint.
+   * @param returns               Return typing.
+   */
+  explicit Callable(const Erased &returns = New::any()) : m_returns(returns) {}
 
-        /**
-         * @brief Constructs a function hint.
-         * @param returns               Return typing.
-         */
-        explicit Callable(const Erased& returns) : m_returns(returns) {}
+  /**
+   * @brief Constructs a function hint.
+   * @param returns               Return typing.
+   * @param parameters            Parameter types.
+   */
+  explicit Callable(const Erased &returns, const std::vector<Entity> &parameters) :
+      m_parameters(parameters), m_returns(returns) {}
 
-        /**
-         * @brief Constructs a function hint.
-         * @param returns               Return typing.
-         * @param parameters            Parameter types.
-         */
-        explicit Callable(const Erased& returns, const std::vector<Entity>& parameters) :
-            m_parameters(parameters), m_returns(returns) {}
+  /**
+   * @brief Constructs a function hint.
+   * @param returns               Return typing.
+   * @param parameters            Parameter types.
+   */
+  explicit Callable(const Erased &returns, const std::vector<Erased> &parameters) : m_returns(returns) {
+    static constexpr auto predicate = [](const Erased &type) { return Entity(type); };
+    m_parameters = $::Ranges::To(parameters | std::views::transform(predicate));
+  }
 
-        /**
-         * @brief Constructs a function hint.
-         * @param returns               Return typing.
-         * @param parameters            Parameter types.
-         */
-        explicit Callable(const Erased& returns, const std::vector<Erased>& parameters) : m_returns(returns) {
-            static constexpr auto predicate = [](const Erased& type) { return Entity(type); };
-            m_parameters = $::Ranges::To(parameters | std::views::transform(predicate));
-        }
+  //  PROPERTIES  //
 
-        //  PROPERTIES  //
+  /// @brief Denotes if the instance is packed.
+  virtual inline constexpr bool packed() const noexcept { return false; }
 
-        /// @brief Denotes if the instance is packed.
-        virtual inline constexpr bool packed() const noexcept { return false; }
+  /// @brief Gets the bound parameters.
+  inline constexpr std::vector<Entity> &parameters() noexcept { return m_parameters; }
+  inline constexpr const std::vector<Entity> &parameters() const noexcept { return m_parameters; }
 
-        inline constexpr std::vector<Entity>& parameters() noexcept { return m_parameters; }
-        inline constexpr const std::vector<Entity>& parameters() const noexcept { return m_parameters; }
+  /// @brief Gets the return typing.
+  inline constexpr Erased &returns() noexcept { return m_returns; }
+  inline constexpr const Erased &returns() const noexcept { return m_returns; }
 
-        inline constexpr Erased& returns() noexcept { return m_returns; }
-        inline constexpr const Erased& returns() const noexcept { return m_returns; }
+  /// @brief Gets the truthiness of a callable.
+  inline constexpr $::Unit::Ternary truthiness() const noexcept final { return true; }
 
-        inline constexpr Lattice lattice() const noexcept final { return Fact::FUN_ANY; }
-        inline constexpr $::Ternary truthiness() const noexcept final { return true; }
+  /// @brief Callables always validate to function instances.
+  inline constexpr Shape::Underlying shape() const noexcept final { return Shape::Lookup<Function::Any>(); }
 
-        /// @brief Gets the minimum parameters available.
-        inline constexpr size_t arity() const noexcept {
-            for (const auto& [ii, entity] : $::Each(m_parameters)) {
-                if (packed() && &entity == &m_parameters.back()) break;
-                if (entity.optional()) return ii;  // check optionality
-            }
+  /// @brief Gets the minimum parameters available.
+  inline constexpr size_t arity() const noexcept {
+    for (const auto &[ii, entity] : $::Ranges::Each(m_parameters)) {
+      if (packed() && &entity == &m_parameters.back()) break;
+      if (entity.optional()) return ii; // check optionality
+    }
 
-            // return the resulting distance to be used now
-            return m_parameters.size() - packed();
-        }
+    // return the resulting distance to be used now
+    return m_parameters.size() - packed();
+  }
 
-        /// @brief Gets the maximum parameters available.
-        inline constexpr size_t adicity() const noexcept { return packed() ? SIZE_MAX : m_parameters.size(); }
+  /// @brief Gets the maximum parameters available.
+  inline constexpr size_t adicity() const noexcept { return packed() ? SIZE_MAX : m_parameters.size(); }
 
-        /**
-         * @brief Handles looking up callable fields.
-         * @param field                 Field to lookup.
-         */
-        Entity lookup(const $::String::View& field) const final;
+  /**
+   * @brief Handles looking up callable fields.
+   * @param field                 Field to lookup.
+   */
+  inline constexpr Entity lookup(const $::String::View &field) const final { return m_lookup(field); }
 
-       protected:
-        //  PRIVATE METHODS  //
+protected:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handles validating "Function" shapes.
-         * @param shape                     Shape to validate.
-         */
-        inline constexpr bool m_extends(Shape::Underlying shape) const noexcept final {
-            return shape == Shape::Lookup<Function::Dynamic>();
-        }
+  /**
+   * @brief Handles looking up callable fields.
+   * @param field                 Field to lookup.
+   */
+  Entity m_lookup(const $::String::View &field) const;
 
-        /**
-         * @brief Handles inferring a function.
-         * @param constraints               Generic constraints.
-         */
-        Erased m_infer(const Constraints& constraints) const final;
+  /**
+   * @brief Handles inferring a function.
+   * @param constraints               Generic constraints.
+   */
+  Erased m_infer(Constraints *constraints) const final;
 
-        /**
-         * @brief Handles running a unification pass.
-         * @param candidate                 Candidate to unify.
-         * @param constraints               Generic constraints.
-         */
-        bool m_unify(const Erased& candidate, const Constraints& constraints) const final;
+  /**
+   * @brief Handles running a unification pass.
+   * @param candidate                 Candidate to unify.
+   * @param constraints               Generic constraints.
+   */
+  bool m_unify(const Erased &candidate, Constraints *constraints) const final;
 
-        /**
-         * @brief Handles printing the type.
-         * @param os                        Output stream.
-         */
-        void m_print($::Stream::Output& os) const final;
-    };
+  /**
+   * @brief Handles printing the type.
+   * @param os                        Output stream.
+   * @param self                      Callable instance.
+   */
+  static void m_print(std::ostream &os, const Callable &self);
+};
 
-    /// @brief Variadic Function Typing.
-    struct Variadic : public Abstract<Variadic, Callable> {
-        //  CONSTRUCTORS  //
+/// @brief Variadic Function Typing.
+struct Variadic : public Callable {
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs a defaulted variadic function.
-        explicit Variadic() : Variadic($::New().shared<Any>()) {}
-        explicit Variadic(const Erased& returns) : Variadic(returns, std::vector<Erased>({ $::New().shared<Any>() })) {}
+  /**
+   * @brief Constructs a defaulted variadic function.
+   * @param returns                   Return typing.
+   */
+  explicit Variadic(const Erased &returns = New::any()) : Variadic(returns, std::vector({New::any()})) {}
 
-        /**
-         * @brief Constructs a variadic function.
-         * @param returns                   Return typing.
-         * @param parameters                Parameters to bind.
-         */
-        template <class... As>
-        explicit Variadic(const Erased& returns, const std::vector<Erased>& parameters) :
-            Abstract(returns, parameters) {}
+  /**
+   * @brief Constructs a variadic function.
+   * @param returns                   Return typing.
+   * @param parameters                Parameters to bind.
+   */
+  explicit Variadic(const Erased &returns, const std::vector<Erased> &parameters) : Callable(returns, parameters) {}
 
-        /**
-         * @brief Constructs a variadic function.
-         * @param returns                   Return typing.
-         * @param parameters                Parameters to bind.
-         */
-        template <class... As>
-        explicit Variadic(const Erased& returns, const std::vector<Entity>& parameters) :
-            Abstract(returns, parameters) {}
+  /**
+   * @brief Constructs a variadic function.
+   * @param returns                   Return typing.
+   * @param parameters                Parameters to bind.
+   */
+  explicit Variadic(const Erased &returns, const std::vector<Entity> &parameters) : Callable(returns, parameters) {}
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Denotes if the instance is packed.
-        inline constexpr bool packed() const noexcept final { return true; }
-    };
+  /// @brief Denotes if the instance is packed.
+  inline constexpr bool packed() const noexcept final { return true; }
+};
 
-}  // namespace Talos::Type
+} // namespace Talos::Type
 
 #endif

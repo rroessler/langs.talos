@@ -1,3 +1,6 @@
+/// Builtins Includes
+#include "talos/builtins/_inline/defines.ipp"
+
 //  MACROS  //
 
 TALOS_XX_STATICS_HEADER()
@@ -23,3 +26,8 @@ TALOS_XX_STATICS_DEFINE(filled)
 TALOS_XX_STATICS_TYPEDEF("fn [V](size: Number, value: V) -> List[V]")
 TALOS_XX_STATICS_DESCRIBE("Creates a `List` filled to a size with a given value.")
 TALOS_XX_STATICS_FOOTER()
+
+//  UNDEFINES  //
+
+/// Builtins Includes
+#include "talos/builtins/_inline/undefs.ipp"

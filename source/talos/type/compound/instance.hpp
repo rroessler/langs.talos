@@ -1,88 +1,91 @@
 #ifndef _TALOS_TYPE_INSTANCE_HPP
 #define _TALOS_TYPE_INSTANCE_HPP
 
-/// Talos Modules
-#include "talos/object/instance.hpp"
-
-/// Type Modules
+/// Type Includes
 #include "talos/type/compound/prototype.hpp"
 
 namespace Talos::Type {
 
-    /// @brief Instance Typing.
-    class Instance : public Abstract<Instance> {
-        //  PROPERTIES  //
+/// @brief Instance Typing.
+class Instance : public Mixin<Instance> {
+  //  PROPERTIES  //
 
-        /// @brief Associated class typing.
-        $::Ptr::Shared<Prototype> m_prototype = nullptr;
+  /// @brief Associated class typing.
+  $::Shared::Pointer<Prototype> m_prototype = nullptr;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Constructs a dynamic object instance.
-        explicit Instance() = default;
+  /// @brief Constructs a dynamic object instance.
+  explicit Instance() = default;
 
-        /**
-         * @brief Constructs an instance-type.
-         * @param prototype             Class prototype.
-         */
-        explicit Instance(const $::Ptr::Shared<Prototype>& prototype) : m_prototype(prototype) {}
+  /**
+   * @brief Constructs an instance-type.
+   * @param prototype             Class prototype.
+   */
+  explicit Instance(const $::Shared::Pointer<Prototype> &prototype) : m_prototype(prototype) {}
 
-        //  PROPERTIES  //
+  //  PROPERTIES  //
 
-        /// @brief Gets the underlying prototype.
-        inline constexpr const $::Ptr::Shared<Prototype>& prototype() const noexcept { return m_prototype; }
+  /// @brief Gets the underlying prototype.
+  inline constexpr const $::Shared::Pointer<Prototype> &prototype() const noexcept { return m_prototype; }
 
-        /// @brief Gets the associated type-lattice.
-        Lattice lattice() const noexcept final;
+  /// @brief Gets the associated shape for this instance.
+  inline constexpr Shape::Underlying shape() const noexcept final {
+    return m_prototype ? m_prototype->m_shape : Shape::Lookup<Object::Instance>();
+  }
 
-        /// @brief Gets the associated truthiness.
-        $::Ternary truthiness() const noexcept final;
+  /// @brief Gets the associated truthiness.
+  inline constexpr $::Unit::Ternary truthiness() const noexcept final {
+    // ignore if there is no underlying truthiness
+    if (m_prototype == nullptr) return true;
 
-        /**
-         * @brief Handles looking up fields.
-         * @param field                 Field to lookup.
-         */
-        Entity lookup(const $::String::View& field) const final;
+    // cast based on the incoming details
+    switch (m_prototype->m_base()) {
+    case Shape::Lookup<String::Any>(): $_FALLTHROUGH;
+    case Shape::Lookup<Number::Tagged>(): $_FALLTHROUGH;
+    case Shape::Lookup<Value::Boolean>(): return $::Unit::Unknown();
+    default: return true; // all other object types will be truthy
+    }
+  }
 
-        /**
-         * @brief Handles transforming the type.
-         * @param kind                  Operator kind.
-         */
-        Erased apply(Operator::Kind kind) const final;
-        Erased apply(Operator::Kind kind, const Erased& right) const final;
+  /**
+   * @brief Handles looking up fields.
+   * @param field                 Field to lookup.
+   */
+  Entity lookup(const $::String::View &field) const final;
 
-       protected:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles transforming the type.
+   * @param kind                  Operator kind.
+   */
+  Erased apply(Operator::Kind kind) const final;
+  Erased apply(Operator::Kind kind, const Erased &right) const final;
 
-        /**
-         * @brief Handles validating "Object" shapes.
-         * @param shape                     Shape to validate.
-         */
-        inline constexpr bool m_extends(Shape::Underlying shape) const noexcept final {
-            return m_prototype ? m_prototype->m_derived(shape) : shape == Shape::Lookup<Object::Instance>();
-        }
+protected:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handles inferring class types.
-         * @param constraints               Generic constraints.
-         */
-        Erased m_infer(const Constraints& constraints) const final;
+  /**
+   * @brief Handles inferring class types.
+   * @param constraints               Generic constraints.
+   */
+  Erased m_infer(Constraints *constraints) const final;
 
-        /**
-         * @brief Handles running a unification pass.
-         * @param candidate                 Candidate to unify.
-         * @param constraints               Generic parameter constraints.
-         */
-        bool m_unify(const Erased& candidate, const Constraints& constraints) const final;
+  /**
+   * @brief Handles running a unification pass.
+   * @param candidate                 Candidate to unify.
+   * @param constraints               Generic parameter constraints.
+   */
+  bool m_unify(const Erased &candidate, Constraints *constraints) const final;
 
-        /**
-         * @brief Handles printing the type.
-         * @param os                        Output stream.
-         */
-        void m_print($::Stream::Output& os) const final;
-    };
+  /**
+   * @brief Handles printing the type.
+   * @param os                        Output stream.
+   * @param self                      Instance value.
+   */
+  static void m_print(std::ostream &os, const Instance &self);
+};
 
-}  // namespace Talos::Type
+} // namespace Talos::Type
 
 #endif

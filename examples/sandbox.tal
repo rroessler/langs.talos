@@ -1,6 +1,6 @@
-//!
-//! Example: "sandbox.tal"
-//! Description: Dynamic programs for sandboxed development.
-//!
+///
+/// @example "sandbox.tal"
+/// @describe Dynamic programs for sandboxed development.
+///
 
 Debug.println("Hello, 🦄");

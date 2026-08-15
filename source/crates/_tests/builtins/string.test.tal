@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "String" Functionality.
-//! Description: Coordinates testing the builtin "String".
-//!
+///
+/// @testing Builtin "String" Functionality.
+/// @describe Coordinates testing the builtin "String".
+///
 
 // Talos Modules
 import "talos:test" as Test;

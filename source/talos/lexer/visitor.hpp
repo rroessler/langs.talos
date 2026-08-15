@@ -6,75 +6,67 @@
 
 namespace Talos::Lexer {
 
-    /// @brief Token Visitor.
-    class Visitor {
-        //  PROPERTIES  //
+/// @brief Token Buffer Visitor.
+class Visitor {
+  //  TYPEDEFS  //
 
-        /// @brief Current token index.
-        size_t m_index = 0;
+  /// @brief The underlying iterator typing.
+  using Iterator = std::vector<Token>::const_iterator;
 
-        /// @brief Underlying token buffer.
-        const Buffer* m_tokens;
+protected:
+  //  PROPERTIES  //
 
-        /// @brief Baseline invalid token.
-        static inline const Token m_invalid = {};
+  /// @brief A current token index.
+  size_t m_index = 0;
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Underlying token buffer.
+  const std::vector<Token> &m_tokens;
 
-        /**
-         * @brief Constructs a token-visitor.
-         * @param tokens                Buffer to encapsulate.
-         */
-        explicit Visitor(const Buffer* tokens) : m_tokens(tokens) {}
+  /// @brief A previous token reference.
+  const Token *m_previous = &s_invalid;
 
-        //  PUBLIC METHODS  //
+  /// @brief Baseline invalid token.
+  static inline const Token s_invalid = {};
 
-        /// @brief Resets the parser-stream.
-        inline void reset() { m_rewind(0); }
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Denotes if at the EOS value.
-        inline constexpr bool eos() const noexcept { return m_index >= m_tokens->size(); }
+  /// @brief Do not allow default construction.
+  explicit Visitor() = delete;
 
-        /// @brief Gets the previous token view.
-        inline constexpr const Token* previous() const { return peek(-1); }
+  /**
+   * @brief Constructs a token-visitor.
+   * @param tokens                Buffer to encapsulate.
+   */
+  explicit Visitor(const Buffer *tokens) : m_tokens(tokens->buffer()) { reset(); }
 
-        /// @brief Gets the current token view.
-        inline constexpr const Token* current() const { return peek(0); }
+  //  PUBLIC METHODS  //
 
-        /// @brief Advances the stream by one-place forwards.
-        inline const Token* advance() { return eos() ? &m_invalid : (++m_index, previous()); }
+  /// @brief Resets the parser-stream.
+  inline constexpr void reset() { m_previous = &s_invalid, m_rewind(0); }
 
-        /**
-         * @brief Peeks a token at an offset from the current index.
-         * @param offset                    Offset to peek.
-         */
-        inline constexpr const Token* peek(int32_t offset = 0) const noexcept {
-            if (offset == INT32_MAX) return m_incoming();  // gets next non-whitespace
-            else if (m_index + offset >= m_tokens->size()) return &m_invalid;
-            else return &m_tokens->buffer().at(m_index + offset);
-        }
+  /// @brief Denotes if at the EOS value.
+  inline constexpr bool eos() const noexcept { return m_index >= m_tokens.size(); }
 
-       protected:
-        //  PRIVATE METHODS  //
+  /// @brief Gets the previous token view.
+  inline constexpr const Token *previous() const { return m_previous; }
 
-        /// @brief Gets the current index position.
-        inline constexpr size_t m_tell() const noexcept { return m_index; }
+  /// @brief Gets the current token view.
+  inline constexpr const Token *current() const { return eos() ? &s_invalid : m_current(); }
 
-        /**
-         * @brief Handles rewinding the visitor position.
-         * @param index                     Index to rewind.
-         */
-        inline constexpr void m_rewind(size_t index) { $_ASSERT(index <= m_tokens->size()), m_index = index; }
+protected:
+  //  PRIVATE METHODS  //
 
-        /// @brief Gets the next non-whitespace token.
-        inline constexpr const Token* m_incoming() const noexcept {
-            size_t index = m_index;  // prepare the index to be used now whilst we can
-            while (index < m_tokens->size() && m_tokens->buffer().at(index).kind() == Kind::MISC_CMT) ++index;
-            return index > INT32_MAX ? &m_invalid : peek(index - m_index);  // and ensure that the result is valid
-        }
-    };
+  /// @brief Gets the current-most token on the buffer.
+  inline constexpr const Lexer::Token *m_current() const noexcept { return &m_tokens.at(m_index); }
 
-}  // namespace Talos::Lexer
+  /**
+   * @brief Handles rewinding the visitor position.
+   * @param index                     Index to rewind.
+   */
+  inline constexpr void m_rewind(size_t index) { $_ASSERT(index <= m_tokens.size()), m_index = index; }
+};
+
+} // namespace Talos::Lexer
 
 #endif

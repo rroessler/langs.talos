@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "Symbol" Functionality.
-//! Description: Coordinates testing the builtin "Symbol".
-//!
+///
+/// @testing Builtin "Symbol" Functionality.
+/// @describe Coordinates testing the builtin "Symbol".
+///
 
 // Talos Modules
 import "talos:test" as Test;

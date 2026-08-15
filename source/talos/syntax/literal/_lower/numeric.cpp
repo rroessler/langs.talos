@@ -1,23 +1,21 @@
 /// Talos Modules
 #include "talos/bytecode/visitor.hpp"
-
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
+#include "talos/number/tagged.hpp"
 
 //  PUBLIC METHODS  //
 
 TALOS_MM_LOWER_NODE(Numeric, node, compiler, destination) {
-    // ignore if there is no sink to output to
-    if (destination.nowhere()) return;
+  // ignore if there is no sink to output to
+  if (destination.nowhere()) return;
 
-    // prepare the value to be used now
-    auto value = node->value();
+  // prepare the value to be used now
+  auto value = node->value();
 
-    // handle consistent values now
-    if (value == 0) return compiler->emit<Syllable::LOAD_ZERO>(destination);
-    else if (value == 1) return compiler->emit<Syllable::LOAD_ONE>(destination);
+  // handle consistent values now
+  if (value == 0) return compiler->emit<Glyph::LOAD_ZERO>(destination);
+  else if (value == 1) return compiler->emit<Glyph::LOAD_ONE>(destination);
 
-    // prepare the constant to be used now
-    auto constant = compiler->constant(Number::Tagged(value));
-    compiler->emit<Syllable::LOAD_CONST>(destination, constant);
+  // prepare the constant to be used now
+  auto constant = compiler->constant(Number::Tagged(value));
+  compiler->emit<Glyph::LOAD_CONST>(destination, constant);
 }

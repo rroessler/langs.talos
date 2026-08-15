@@ -1,42 +1,47 @@
-/// Talos Modules
-#include "talos/type/visitor.hpp"
+/// Talos Includes
+#include "talos/variable/visitor.hpp"
 
-/// Syntax Modules
-#include "talos/syntax/_inline/declaration.ipp"
+/// Talos Includes
+#include "talos/type/_inline/type.ipp"
 
 //  PUBLIC METHODS  //
 
+TALOS_MM_CAPTURE_NODE(Alias, node, analyzer) {
+  analyzer->visit(node->generics());
+  analyzer->visit(node->hint());
+}
+
 TALOS_MM_CHECK_NODE(Alias, node, analyzer) {
-    // prepare a transform for resolving our target now
-    auto transform = Type::Builder::transform();
+  // prepare a lazy transform for our typing (for recursion)
+  auto transform = Type::New::lazy();
 
-    // prepare the details about the alias now
-    auto name = node->name();
-    auto location = node->traits()->location();
+  // prepare the details about the alias now
+  auto name = node->name();
+  auto bounds = node->trivia()->bounds();
 
-    // sanity check the incoming node now
-    analyzer->sanity(node);
+  // sanity check the incoming node now
+  analyzer->sanity(node);
 
-    // pre-declare the entity as necessary
-    auto* entity = analyzer->world()->types().declare(name, transform, location);
-    if (entity == nullptr) return analyzer->report(node, 4000402, name);
+  // pre-declare the entity as necessary
+  auto *entity = analyzer->world()->types().declare(name, transform, bounds);
+  if (entity == nullptr) return analyzer->report(node, 4000402, name);
 
-    // prepare a current scoping to be used now
-    $_UNUSED $_AUTO = analyzer->scope();
+  // prepare a current scoping to be used now
+  $_UNUSED $_AUTO = analyzer->scope();
 
-    // get the current generics to be used now
-    auto constraints = analyzer->check(node->generics());
+  // get the current generics to be used now
+  auto constraints = analyzer->check(node->generics());
 
-    auto hint = analyzer->check(node->hint()).type;  // resolve the typing
-    if (hint->is<Type::Protocol>()) hint->as<Type::Protocol>()->name() = name;
+  auto hint = analyzer->check(node->hint()).type; // resolve the typing now
+  if (hint->is<Type::Structure>()) hint->as<Type::Structure>()->name() = name;
 
-    // update the entity to contain this hint now
-    transform->target() = Type::Builder::generic(hint, constraints);
+  // update the entity to contain this hint now
+  transform->target() = Type::New::generic(hint, constraints);
 
-    // otherwise update the exported flag if necessary
-    auto exported = node->modifiers().test(Variable::Flag::EXPORT);
-    if (exported) entity->modifiers().set(Variable::Flag::EXPORT);
+  // otherwise update the exported flag if necessary
+  auto exported = node->modifiers().test(Variable::Flag::EXPORT);
+  if (exported) entity->modifiers().set(Variable::Flag::EXPORT);
 
-    // return a passable result now
-    return analyzer->passable(transform);
+  // return a passable result now
+  return analyzer->passable(transform);
 }

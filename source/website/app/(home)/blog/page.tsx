@@ -7,11 +7,12 @@ import { Portal } from '@/website/components';
 export const metadata = { title: 'Blog', description: '' };
 
 /** Constructs the indexed blog page. */
-export default function Blog() {
+export default async function Blog() {
     // get a view of all the available pages
-    const pages = Source.blog
-        .getPages()
-        .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+    const pages = Source.blog.getPages();
+
+    // and sort the pages inplace with their associated dates
+    pages.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 
     // prepare all the incoming links now
     const links = pages.map((page) => (

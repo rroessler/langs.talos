@@ -1,7 +1,7 @@
 #ifndef _XPC_FORWARD_SHELL_HPP
 #define _XPC_FORWARD_SHELL_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <xtdlib/xtdlib.hpp>
 
 /// Forward Declarations

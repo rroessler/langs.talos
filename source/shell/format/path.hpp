@@ -1,17 +1,17 @@
 #ifndef _SHELL_FORMAT_PATH_HPP
 #define _SHELL_FORMAT_PATH_HPP
 
-/// Vendor Modules
-#include <talos/talos.hpp>
+/// Vendor Includes
+#include <xtdlib/xtdlib.hpp>
 
-namespace Shell::Format::Path {
+namespace Shell::Format {
 
-    /**
-     * @brief Handles resolving format paths.
-     * @param target                Target to resolve.
-     */
-    std::vector<$::URI::Buffer> resolve(const $::String::View& target);
+/**
+ * @brief Handles resolving format paths.
+ * @param target                Target to resolve.
+ */
+std::vector<$::URI::Buffer> Path(const $::String::View &target);
 
-}  // namespace Shell::Format::Path
+} // namespace Shell::Format
 
 #endif

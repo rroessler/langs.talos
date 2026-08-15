@@ -1,34 +1,34 @@
+/// Declare Client
 'use client';
 
 /// CSS Modules
-import './styles/hero.css';
+import './style.css';
 
 /// Vendor Modules
-import clsx from 'clsx';
-import React from 'react';
 import dynamic from 'next/dynamic';
-import { GrainGradientProps } from '@paper-design/shaders-react';
+import { useEffect, useState } from 'react';
+import type { GrainGradientProps } from '@paper-design/shaders-react';
 
-/// Library Modules
+/// Website Modules
+import { cn } from '@/website/utilities';
 import { Product } from '@/website/product';
 
 /// Package Modules
 import { Button } from '../button';
-import { Version } from '../version';
 
 /** Constructs a hero-component. */
 export interface Hero extends Hero.Props {}
 export function Hero({ className, ...props }: Hero) {
     // prepare some state to be used here
-    const [showShaders, setShowShaders] = React.useState(false);
+    const [showShaders, setShowShaders] = useState(false);
 
     // allow enabling the shaders after a small amount of time
-    React.useEffect(() => void setTimeout(() => setShowShaders(true), 100), []);
+    useEffect(() => void setTimeout(() => setShowShaders(true), 100), []);
 
     // prepare the className to be used
     const height = 'h-[200px] sm:h-[310px]';
     const grid = 'grid grid-cols-8 justify-center items-center';
-    className = clsx(className, height, grid, 'relative border rounded-2xl overflow-hidden bg-origin-border');
+    className = cn(className, height, grid, 'relative border rounded-2xl overflow-hidden bg-origin-border');
 
     // prepare the dithering options to be used
     const grain: GrainGradientProps = {
@@ -39,8 +39,8 @@ export function Hero({ className, ...props }: Hero) {
 
     // prepare the hero actions available now
     const actions = [
-        <Button key="welcome" href="/docs/language" title={'Learn'} icon="book-text" />,
-        <Button key="github" variant="secondary" href={Product.github} title={'GitHub'} icon="github" />,
+        <Button key="welcome" href="/language" title={'Learn'} icon="book-text" />,
+        <Button key="github" variant="secondary" href={Product.github} title={'GitHub'} icon="git-branch" />,
     ];
 
     // and construct the home-page hero poster
@@ -48,7 +48,7 @@ export function Hero({ className, ...props }: Hero) {
         <div {...props} className={className}>
             <div className="flex flex-col col-span-8 sm:col-span-5 px-6 py-8 z-10 sm:h-full">
                 <h1 className="text-4xl sm:text-5xl mb-1! sm:mb-2 font-mono italic">{Product.shortName}</h1>
-                <h2 className="text-2xl block sm:hidden font-mono my-0!">{<Version branch />}</h2>
+                <h2 className="text-2xl block sm:hidden font-mono my-0!">{Product.version}</h2>
                 <h2 className="text-3xl hidden sm:block">{Product.description}</h2>
             </div>
 

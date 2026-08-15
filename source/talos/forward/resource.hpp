@@ -1,8 +1,7 @@
 #ifndef _TALOS_FORWARD_RESOURCE_HPP
 #define _TALOS_FORWARD_RESOURCE_HPP
 
-/// Vendor Modules
-#include <xinv/xinv.hpp>
+/// Vendor Includes
 #include <xlsp/xlsp.hpp>
 
 /// Forward Declarations

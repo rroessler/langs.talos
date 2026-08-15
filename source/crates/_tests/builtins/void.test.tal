@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "Void" Functionality.
-//! Description: Coordinates testing the "Void" builtin.
-//!
+///
+/// @testing Builtin "Void" Functionality.
+/// @describe Coordinates testing the "Void" builtin.
+///
 
 // Talos Modules
 import "talos:test" as Test;

@@ -1,7 +1,7 @@
-//!
-//! Example: "benchmarks/fibonacci.bench.tal"
-//! Description: Traces different "fibonacci" benchmarks.
-//!
+///
+/// @example "benchmarks/fibonacci.bench.tal"
+/// @describe Traces different "fibonacci" benchmarks.
+///
 
 // Talos Modules
 import "talos:test" as Test;

@@ -1,7 +1,7 @@
 #ifndef _XTDLIB_MACROS_ATTRIBUTES_HPP
 #define _XTDLIB_MACROS_ATTRIBUTES_HPP
 
-/// Library Modules
+/// Library Includes
 #include "xtdlib/macros/processor.hpp"
 
 //  MACROS  //
@@ -23,7 +23,7 @@
 #define $_ENABLE_MTRACE 0
 #endif
 
-#ifndef NDEBUG
+#if !$_PP_NDEBUG
 #define $_INLINE_PERF
 #define $_INLINE_ALWAYS
 #else
@@ -38,10 +38,12 @@
 #endif
 
 #define $_ALIGNAS(N) alignas(N)
+#define $_ALIGNAS_CACHE() $_ALIGNAS(std::hardware_destructive_interference_size)
 #define $_INLINE_FORCE inline $_INLINE_ALWAYS
 
 #if defined(__clang__)
 #define $_MUSTTAIL [[clang::musttail]]
+#define $_WILLTAIL [[clang::preserve_none]]
 #else
 #define $_MUSTTAIL
 #endif

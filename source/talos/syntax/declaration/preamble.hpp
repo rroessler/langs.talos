@@ -1,85 +1,77 @@
 #ifndef _TALOS_DECLARATION_PREAMBLE_HPP
 #define _TALOS_DECLARATION_PREAMBLE_HPP
 
-/// Talos Modules
+/// Talos Includes
+#include "talos/variable/captures.hpp"
 #include "talos/variable/modifiers.hpp"
 
-/// Syntax Modules
+/// Syntax Includes
 #include "talos/syntax/declaration/attribute.hpp"
 #include "talos/syntax/declaration/decorator.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Declaration Node Abstractions.
-    class $_ABSTRACT Declaration : public Passthrough<Declaration> {
-        //  PROPERTIES  //
+/// @brief Alias Node Modifiers.
+using Modifiers = ::Talos::Variable::Modifiers;
 
-        /// @brief The preamble target.
-        $::String::View m_name;
+/// @brief Declaration Node Abstractions.
+class $_ABSTRACT Declaration : public Mixin<Declaration> {
+  //  PROPERTIES  //
 
-        /// @brief Bound declaration modifiers.
-        Variable::Modifiers m_modifiers = {};
+  /// @brief The preamble target.
+  $::String::View m_name;
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Bound declaration modifiers.
+  Modifiers m_modifiers = {};
 
-        /**
-         * @brief Constructs a target.
-         * @param tag                   Tag to passthrough.
-         * @param name                  Target identifier.
-         * @param location              Resource location.
-         */
-        explicit Declaration($::RTTI::Tag tag, const $::String::View& name, const Bounds& location = {}) :
-            Passthrough<Declaration>(tag, location), m_name(name) {}
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a target.
-         * @param tag                   Tag to passthrough.
-         * @param target                Target identifier.
-         */
-        explicit Declaration($::RTTI::Tag tag, const Lexer::Token* target) :
-            Declaration(tag, target, target->location()) {}
+  /**
+   * @brief Constructs a target.
+   * @param tag                   Tag to passthrough.
+   * @param name                  Target identifier.
+   */
+  explicit Declaration(const $::String::View &name) : m_name(name) {}
 
-        /**
-         * @brief Constructs a target.
-         * @param tag                   Tag to passthrough.
-         * @param target                Target identifier.
-         * @param location              Resource location.
-         */
-        explicit Declaration($::RTTI::Tag tag, const Lexer::Token* target, const Bounds& location) :
-            Declaration(tag, target->lexeme(), location) {}
+  /**
+   * @brief Constructs a target.
+   * @param target                Target identifier.
+   */
+  explicit Declaration(const Lexer::Token *target) : Declaration(target->lexeme()) {}
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets the associated declaration target.
-        inline constexpr $::String::View name() const noexcept { return m_name; }
+  /// @brief Gets the associated declaration target.
+  inline constexpr $::String::View name() const noexcept { return m_name; }
 
-        inline constexpr Variable::Modifiers& modifiers() noexcept { return m_modifiers; }
-        inline constexpr const Variable::Modifiers& modifiers() const noexcept { return m_modifiers; }
-    };
+  /// @brief Gets the available modifiers for a declaration.
+  inline constexpr Modifiers &modifiers() noexcept { return m_modifiers; }
+  inline constexpr const Modifiers &modifiers() const noexcept { return m_modifiers; }
+};
 
-    /// @brief Encapsulates Declaration Preamble.
-    class $_ABSTRACT Preamble : public Passthrough<Preamble, Declaration> {
-        //  PROPERTIES  //
+/// @brief Encapsulates Declaration Preamble.
+class $_ABSTRACT Preamble : public Mixin<Preamble, Declaration> {
+  //  PROPERTIES  //
 
-        std::vector<Decorator*> m_decorators = {};  // Runtime decorators.
-        std::vector<Attribute*> m_attributes = {};  // Compile-time attributes.
+  std::vector<Decorator *> m_decorators = {}; // Runtime decorators.
+  std::vector<Attribute *> m_attributes = {}; // Compile-time attributes.
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Inherit the base constructor.
-        using Passthrough<Preamble, Declaration>::Passthrough;
+  /// @brief Inherit the base constructor.
+  using Mixin<Preamble, Declaration>::Mixin;
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        inline constexpr std::vector<Decorator*>& decorators() noexcept { return m_decorators; }
-        inline constexpr const std::vector<Decorator*>& decorators() const noexcept { return m_decorators; }
+  inline constexpr std::vector<Decorator *> &decorators() noexcept { return m_decorators; }
+  inline constexpr const std::vector<Decorator *> &decorators() const noexcept { return m_decorators; }
 
-        inline constexpr std::vector<Attribute*>& attributes() noexcept { return m_attributes; }
-        inline constexpr const std::vector<Attribute*>& attributes() const noexcept { return m_attributes; }
-    };
+  inline constexpr std::vector<Attribute *> &attributes() noexcept { return m_attributes; }
+  inline constexpr const std::vector<Attribute *> &attributes() const noexcept { return m_attributes; }
+};
 
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

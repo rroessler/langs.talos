@@ -8,7 +8,7 @@ Talos provides support for a selection of compile-time attributes. These allow a
 
 ## Deprecations
 
-Variable declarations can now be noted as ~~deprecated~~ and any usage of these variables will be hinted as such (see the [linting command](/docs/language/toolkit/linting/) for restricting deprecation usage).
+Variable declarations can now be noted as ~~deprecated~~ and any usage of these variables will be hinted as such (see the [linting command](/language/toolkit/linting/) for restricting deprecation usage).
 
 ```talos
 // Annotating a variable as being deprecated.
@@ -16,14 +16,14 @@ Variable declarations can now be noted as ~~deprecated~~ and any usage of these 
 let value = ...;
 
 // In a code-editor with a compatible Talos language-server, any usage of `value` will now be noted as deprecated.
-Debug.println(value); // [!code word:value]
+Debug.println(value); // [!code deprecated:value]
 ```
 
 ## Operator Hooks
 
 Although limited, some operators can be added/altered to provide custom functionality. The operators that currently allow being defined include:
 
-- `dispose` &nbsp;&mdash;&nbsp; Utilized by [explicit resource management](/docs/language/advanced/resources).
+- `dispose` &nbsp;&mdash;&nbsp; Utilized by [explicit resource management](/language/advanced/resources).
 - `iterator` &nbsp;&mdash;&nbsp; Allows defining [custom object iterators](#).
 
 ## Additional Support

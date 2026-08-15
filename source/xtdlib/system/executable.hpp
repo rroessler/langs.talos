@@ -1,20 +1,20 @@
 #ifndef _XTDLIB_SYSTEM_EXECUTABLE_HPP
 #define _XTDLIB_SYSTEM_EXECUTABLE_HPP
 
-/// Library Modules
+/// Library Includes
 #include "xtdlib/filesystem/path.hpp"
 
 namespace $::Executable {
 
-    /// @brief Resolves the full executable path.
-    Filesystem::Path resolve();
+/// @brief Resolves the full executable path.
+FS::Path resolve();
 
-    /// @brief Gets the executable file-name.
-    static inline Filesystem::Path filename() { return Path::filename(resolve()); }
+/// @brief Gets the executable file-name.
+FS::Path filename();
 
-    /// @brief Gets the executable directory name.
-    static inline Filesystem::Path dirname() { return Path::dirname(resolve()); }
+/// @brief Gets the executable directory name.
+FS::Path dirname();
 
-}  // namespace $::Executable
+} // namespace $::Executable
 
 #endif

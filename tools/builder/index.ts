@@ -1,61 +1,66 @@
 /// Node Modules
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 
 /// Vendor Modules
+import * as types from 'type-fest';
 import * as esbuild from 'esbuild';
 
-//  PROPERTIES  //
+/// Tool Modules
+import { Assets } from '~/tools/assets/index';
 
-const g_root = path.resolve(__dirname, '..', '..');
-const g_output = path.resolve(g_root, 'dist', 'vscode');
-const g_package = path.join(g_output, 'package.json');
-const g_schemas = path.join(g_output, 'schemas');
-const g_license = path.join(g_output, 'LICENSE');
-const g_readme = path.join(g_output, 'README.md');
-const g_config = path.join(g_output, 'language-configuration.json');
-const g_development = process.argv.includes('--development');
-const g_options: esbuild.BuildOptions = {
-    bundle: true,
-    minify: !g_development,
-    treeShaking: !g_development,
+/// JSON Modules
+import MONOREPO from '~/package.json';
+import EXTENSION from '~/configs/extension.json';
 
-    platform: 'node',
-    external: ['vscode'],
-    entryPoints: ['source/vscode/bootstrap.ts'],
-    outfile: path.join(g_output, 'extension.js'),
+//  TOOL RUNNER  //
 
-    assetNames: '[name]',
-    loader: { '.json': 'file' },
-};
+/// Run the core builder instance.
+(async () => m_build())();
 
 //  PRIVATE METHODS  //
 
-/** Handles patching the output "package.json" value. */
-const m_patch = async () => {
-    // prepare the package and extension objects to be used
-    const pkg = JSON.parse(await fs.promises.readFile(g_package, 'utf-8'));
-    const extension = JSON.parse(await fs.promises.readFile('configs/extension.json', 'utf-8'));
+/** Gets the available options. */
+function m_options(): esbuild.BuildOptions {
+    // check if running in development mode
+    const development = process.argv.includes('--development');
 
-    // and append in all the details for running the project
-    Object.assign(pkg, { main: './extension.js' }, extension);
+    return {
+        bundle: true,
+        minify: !development,
+        treeShaking: !development,
+
+        platform: 'node',
+        external: ['vscode'],
+        assetNames: '[name]',
+        entryPoints: ['library/bootstrap.ts'],
+        outfile: Assets.vscode('extension.js'),
+    };
+}
+
+/** Handles patching the output "package.json" value. */
+async function m_patch() {
+    // prepare the directories and details to be use
+
+    // prepare the baseline extension "package.json"
+    const inject = { main: 'extension.js', version: MONOREPO.version };
+    const pkg = Object.assign({}, inject, EXTENSION) as unknown as types.PackageJson;
 
     // delete some items that are not necessary to be kept
     (delete pkg.scripts, delete pkg.dependencies, delete pkg.devDependencies, delete pkg.$schema);
 
     // finally update the package file being used
-    await fs.promises.writeFile(g_package, JSON.stringify(pkg, undefined, 4));
+    await fs.promises.writeFile(Assets.vscode('package.json'), JSON.stringify(pkg, undefined, 4));
 
     // also copy across the language configuration file and schemas
-    await fs.promises.copyFile(path.resolve(g_root, 'LICENSE'), g_license);
-    await fs.promises.copyFile(path.resolve(g_root, 'configs', 'language.json'), g_config);
-    await fs.promises.copyFile(path.resolve(g_root, 'docs', 'internal', 'extension.md'), g_readme);
-    await fs.promises.cp(path.resolve(g_root, 'schemas'), g_schemas, { recursive: true, force: true });
-};
+    await fs.promises.copyFile(Assets.root('LICENSE'), Assets.vscode('LICENSE'));
+    await fs.promises.copyFile(Assets.configs('language.json'), Assets.vscode('language-configuration.json'));
+    await fs.promises.copyFile(Assets.root('docs', 'internal', 'extension.md'), Assets.vscode('README.md'));
+    await fs.promises.cp(Assets.root('schemas'), Assets.vscode('schemas'), { recursive: true, force: true });
+}
 
 /** Handles building the project. */
-const m_build = async () => {
-    const result = await esbuild.build(g_options); // construct the suitable result and printer
+async function m_build() {
+    const result = await esbuild.build(m_options()); // construct the suitable result and printer
     const printer = (messages: string[]) => messages.forEach((message) => console.log(message));
 
     // display any error or warnsing that occured
@@ -73,8 +78,4 @@ const m_build = async () => {
 
     // and exit as necessary now
     process.exit(+failed);
-};
-
-//  TOOL RUNNER  //
-
-(async () => m_build())();
+}

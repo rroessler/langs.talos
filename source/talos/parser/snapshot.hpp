@@ -1,128 +1,85 @@
 #ifndef _TALOS_PARSER_SNAPSHOT_HPP
 #define _TALOS_PARSER_SNAPSHOT_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/forward/parser.hpp"
 #include "talos/lexer/visitor.hpp"
-#include "talos/syntax/tree.hpp"
+#include "talos/syntax/node.hpp"
 
 namespace Talos::Parser {
 
-    /// @brief Parser Location Snapshot.
-    class Snapshot {
-        //  PROPERTIES  //
+/// @brief Parser Bounds Snapshot.
+class Snapshot {
+  //  PROPERTIES  //
 
-        /// @brief Snapshot offset value.
-        XLSP::Range m_offset = {};
+  /// @brief The current baseline range.
+  XLSP::Range m_base = {};
 
-        /// @brief Tokens cache.
-        const Lexer::Visitor* m_tokens;
+  /// @brief The left-most set of bounds.
+  const Lexer::Token *m_left = nullptr;
 
-        /// @brief Initial token value.
-        const Lexer::Token* m_initial;
+  /// @brief Current tokens cache.
+  const Lexer::Visitor *m_tokens = nullptr;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a snapshot.
-         * @param tokens                Tokens visitor.
-         * @param offset                Offset to inherit.
-         */
-        explicit constexpr Snapshot(const Lexer::Visitor* tokens, const XLSP::Range& offset = {}) :
-            Snapshot(tokens, tokens->current(), offset) {}
+  /// @brief Constructs an empty snapshot.
+  constexpr Snapshot() = default;
 
-        /**
-         * @brief Constructs a snapshot.
-         * @param tokens                Tokens visitor.
-         * @param initial               Initial token.
-         * @param offset                Offset to inherit.
-         */
-        explicit constexpr Snapshot(
-            const Lexer::Visitor* tokens, const Lexer::Token* initial, const XLSP::Range& offset = {}) :
-            m_offset(offset), m_tokens(tokens), m_initial(initial) {}
+  /**
+   * @brief Constructs a snapshot instance.
+   * @param tokens                  Tokens visitor.
+   */
+  constexpr Snapshot(const Lexer::Visitor *tokens) : Snapshot(tokens, tokens->current()) {}
 
-        //  OPERATOR METHODS  //
+  /**
+   * @brief Constructs a snapshot instance.
+   * @param tokens                  Tokens visitor.
+   * @param base                    Baseline range.
+   */
+  constexpr Snapshot(const Lexer::Visitor *tokens, const Lexer::Token *base)
+      : m_base(base->range()), m_left(base), m_tokens(tokens) {}
 
-        /// @brief Converts this instance to a location.
-        inline constexpr operator Syntax::Bounds() const noexcept { return location(); }
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Constructs the inner set of bounds.
+  inline constexpr Syntax::Bounds bounds() const noexcept {
+    if ($_UNLIKELY(m_tokens == nullptr)) return Syntax::Bounds();
+    else return Syntax::Bounds(m_left, m_base, m_outer());
+  }
 
-        /// @brief Gets the encapsulated resource value.
-        inline constexpr $::URI::View resource() const noexcept { return m_initial->location().resource(); }
+  /**
+   * @brief Encloses an outside token.
+   * @param base                    Token to enclose.
+   */
+  inline constexpr Syntax::Bounds enclose(const Lexer::Token *base) const noexcept {
+    if ($_UNLIKELY(m_tokens == nullptr)) return Syntax::Bounds();
+    else return Syntax::Bounds(m_left, base->range(), m_outer());
+  }
 
-        /// @brief Gets the current snapshot bounds to be used.
-        inline constexpr Syntax::Bounds location() const noexcept { return m_resolve(m_range()); }
+  /**
+   * @brief Resolves a suitable offset to use.
+   * @param base                    Baseline offset.
+   */
+  inline constexpr Snapshot &offset(const Lexer::Token *base) noexcept { return m_base = base->range(), *this; }
+  inline constexpr Snapshot &offset(const Syntax::Node *base) noexcept { return offset(base->trivia()->bounds()); }
+  inline constexpr Snapshot &offset(const Syntax::Bounds &base) noexcept {
+    if (base.m_base == XLSP::Range()) return *this;
+    if (base.m_left < m_left) m_left = base.m_left;
+    return m_base = base.outer(), *this; // update
+  }
 
-        /**
-         * @brief Constructs an offset snapshot.
-         * @param
-         */
-        inline constexpr Snapshot offset(const XLSP::Range& offset) const noexcept {
-            return Snapshot(m_tokens, offset);
-        }
+private:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Encloses a token range within a snapshot.
-         * @param inner                 Inner token range.
-         */
-        inline constexpr Syntax::Bounds enclose(const Lexer::Token* inner) const noexcept {
-            return enclose(inner->range());
-        }
+  /// @brief Handles resolving the outer-most token.
+  inline constexpr const Lexer::Token *m_outer() const noexcept { return m_outer(m_tokens->previous()); }
+  inline constexpr const Lexer::Token *m_outer(const Lexer::Token *right) const noexcept {
+    return m_left > right ? m_left : right;
+  }
+};
 
-        /**
-         * @brief Encloses a node range within a snapshot.
-         * @param inner                 Inner node range.
-         */
-        inline constexpr Syntax::Bounds enclose(const Syntax::Node* inner) const noexcept {
-            return enclose(inner->traits()->range());
-        }
-
-        /**
-         * @brief Encloses a smaller range within a snapshot.
-         * @param inner                 Inner range value.
-         */
-        inline constexpr Syntax::Bounds enclose(const XLSP::Range& inner) const noexcept { return m_resolve(inner); }
-
-       private:
-        //  PRIVATE METHODS  //
-
-        /**
-         * @brief Resolves final snapshot values.
-         * @param inner                 Inner range value.
-         * @param outer                 Outer range value.
-         */
-        inline constexpr Syntax::Bounds m_resolve(const XLSP::Range& inner, XLSP::Range outer = {}) const noexcept {
-            // resolve the outer range when necessary
-            if (outer == XLSP::Range()) outer = m_range();
-            if (m_offset != XLSP::Range()) m_shift(outer);
-
-            // finally construct the resulting bounds necessary
-            return Syntax::Bounds(resource(), inner, outer);
-        }
-
-        /**
-         * @brief Handles shifting a range.
-         * @param range                 Range to shift.
-         */
-        inline constexpr void m_shift(XLSP::Range& range) const noexcept {
-            if (m_offset.end > range.end) range.end = m_offset.end;
-            if (m_offset.start < range.start) range.start = m_offset.start;
-        }
-
-        /**
-         * @brief Gets the current range value.
-         * @param initial                   Initial token.
-         */
-        inline constexpr XLSP::Range m_range() const noexcept {
-            $_ASSERT(m_initial != m_tokens->current());
-            auto* ending = m_tokens->previous();  // ending
-            if (m_initial == ending) return m_initial->range();
-            return { m_initial->range().start, ending->range().end };
-        }
-    };
-
-}  // namespace Talos::Parser
+} // namespace Talos::Parser
 
 #endif

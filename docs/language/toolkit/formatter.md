@@ -24,7 +24,7 @@ Overwrites all input targets with their formatted results. By default, the forma
 
 ### `--config` (Unimplemented)
 
-Specifies the input configuration to be used for formatting. This allows overriding the [crate manifest](/docs/language/development/configuration) associated with the given scripts. By default, any script that is formatted will use it's upward parent crate manifest `format` option.
+Specifies the input configuration to be used for formatting. This allows overriding the [crate manifest](/language/development/configuration) associated with the given scripts. By default, any script that is formatted will use it's upward parent crate manifest `format` option.
 
 ## Configuration Options
 

@@ -1,12 +1,13 @@
 #ifndef _XINV_HPP
 #define _XINV_HPP
 
-/// Core Modules
-#include "xinv/core/container.hpp"
-#include "xinv/core/service.hpp"
-#include "xinv/core/shared.hpp"
-#include "xinv/core/traits.hpp"
-#include "xinv/core/unique.hpp"
-#include "xinv/core/utilities.hpp"
+/// Service Includes
+#include "xinv/service/abstract.hpp"
+#include "xinv/service/singleton.hpp"
+#include "xinv/service/transient.hpp"
+
+/// Utility Includes
+#include "xinv/utilities/container.hpp"
+#include "xinv/utilities/inspect.hpp"
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef _XTDLIB_PORTABLE_WINDOWS_HPP
 #define _XTDLIB_PORTABLE_WINDOWS_HPP
 
-/// Library Modules
+/// Library Includes
 #include "xtdlib/system/platform.hpp"
 
 #if $_PLATFORM_WINDOWS
@@ -55,8 +55,78 @@
 /// Platform Modules
 #include <windows.h>
 
-/// Library Modules
-#include "xtdlib/portable/_defines/windows.def"
+//  UNDEFINES  //
+
+// Defined in the GDI interface.
+#ifdef ERROR
+#undef ERROR
+#endif
+
+// Defined in winnt.h
+#ifdef VOID
+#undef VOID
+#endif
+
+// Defined in winnt.h
+#ifdef DELETE
+#undef DELETE
+#endif
+
+// Defined in minwindef.h
+#ifdef IN
+#undef IN
+#endif
+
+// Defined in minwindef.h
+#ifdef CALLBACK
+#undef CALLBACK
+#endif
+
+// Defined in minwindef.h
+#ifdef TRUE
+#undef TRUE
+#endif
+
+// Defined in minwindef.h
+#ifdef FALSE
+#undef FALSE
+#endif
+
+// Defined in minwindef.h
+#ifdef OPTIONAL
+#undef OPTIONAL
+#endif
+
+// Defined in winerror.h
+#ifdef NO_ERROR
+#undef NO_ERROR
+#endif
+
+// Defined in minwindef.h
+#ifdef OUT
+#undef OUT
+#endif
+
+// Defined in minwindef.h
+#ifdef STRICT
+#undef STRICT
+#endif
+
+// Defined in Winbase.h
+#ifdef Yield
+#undef Yield
+#endif
+
+// Defined in Winbase.h
+#ifdef IGNORE
+#undef IGNORE
+#endif
+
+// Defined in nb30.h
+#ifdef REGISTERED
+#undef REGISTERED
+#endif
 
 #endif
+
 #endif

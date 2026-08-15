@@ -1,13 +1,10 @@
-/// Talos Modules
-#include "talos/object/enum.hpp"
-
-/// Builtin Modules
+/// Builtin Includes
 #include "talos/builtins/_inline/assert.ipp"
-#include "talos/builtins/_inline/defines.ipp"
 
 //  PRIVATE METHODS  //
 
-Talos::Member::View TALOS_BUILTIN_TRAITS(Object::Enum)::m_attributes(const Object::Enum& self, Value::Symbol symbol) {
-    auto* variant = self.resolve(symbol);  // resolve
-    return variant ? variant->value.get() : nullptr;
+Talos::Member::View
+Talos::Builtins::Wrapper<Talos::Object::Enum>::m_attribute(const Object::Enum &self, const Value::Symbol &symbol) {
+  auto *variant = self.resolve(symbol); // find
+  return variant ? variant->value.get() : nullptr;
 }

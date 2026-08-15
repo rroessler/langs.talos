@@ -1,7 +1,7 @@
 # --  MODULE PROPERTIES  -- #
 
 set_property(GLOBAL PROPERTY __MONO_BOOST_TARGET "boost")
-set_property(GLOBAL PROPERTY __MONO_BOOST_VERSION "1.88.0")
+set_property(GLOBAL PROPERTY __MONO_BOOST_VERSION "1.91.0-1")
 
 # --  PUBLIC METHODS  -- #
 
@@ -11,23 +11,23 @@ function(mono_boost_declare)
     cmake_parse_arguments(_ARGS "" "NAMED;VERSION" "COMPONENTS" ${ARGN})
 
     # update the underlying name now
-    if(DEFINED _ARGS_NAMED)
+    if (DEFINED _ARGS_NAMED)
         set_property(GLOBAL PROPERTY __MONO_BOOST_TARGET ${_ARGS_NAMED})
-    else()
+    else ()
         get_property(_ARGS_NAMED GLOBAL PROPERTY __MONO_BOOST_TARGET)
-    endif()
+    endif ()
 
     # update the underlying version now
-    if(DEFINED _ARGS_VERSION)
+    if (DEFINED _ARGS_VERSION)
         set_property(GLOBAL PROPERTY __MONO_BOOST_VERSION ${_ARGS_VERSION})
-    else()
+    else ()
         get_property(_ARGS_VERSION GLOBAL PROPERTY __MONO_BOOST_VERSION)
-    endif()
+    endif ()
 
     # stop handling if the target is available
-    if(TARGET _ARGS_NAMED)
+    if (TARGET _ARGS_NAMED)
         return()
-    endif()
+    endif ()
 
     # set some global boost-properties now
     set(BOOST_USE_STATIC_LIBS ${_ARGS_STATIC} PARENT_SCOPE)
@@ -40,11 +40,11 @@ function(mono_boost_require)
     # get the underlying boost target now
     get_property(_target GLOBAL PROPERTY __MONO_BOOST_TARGET)
 
-    if(NOT TARGET ${_target})
-        get_property(_version GLOBAL PROPERTY __MONO_BOOST_VERSION)
+    if (NOT TARGET ${_target})
         FetchContent_MakeAvailable(${_target}) # ensure before-hand
-        find_package(${_target} ${_version} EXACT REQUIRED QUIET)
-    endif()
+        find_package(${_target} REQUIRED QUIET) # ignore versioning
+        mono_message_status("Found Vendor 'boost'") # show found
+    endif ()
 endfunction()
 
 macro(mono_boost_static _state)

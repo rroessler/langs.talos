@@ -1,46 +1,35 @@
-/// Talos Modules
-#include "talos/member/factory.hpp"
-
-/// Builtin Modules
+/// Builtin Includes
 #include "talos/builtins/_inline/assert.ipp"
-#include "talos/builtins/_inline/defines.ipp"
 
 //  TYPEDEFS  //
 
-#define TALOS_XX_STATICS_DEFINE(N, ...) static Value::Any N(Runtime::Isolate*, const Function::Arguments&);
-struct TALOS_BUILTIN_STATICS(Value::Symbol) {
+#define TALOS_XX_STATICS_DEFINE(N, ...) $_FWD(Talos::Builtins::Static, static Value::Any N(Isolate *, const Args &))
 #include "talos/builtins/symbol/_defines/statics.def"
-};
-#undef TALOS_XX_STATICS_DEFINE
 
 //  PUBLIC METHODS  //
 
-TALOS_MM_BUILTIN_STATIC(Value::Symbol, from, isolate, args) {
-    // ensure the correct number of arguments given
-    TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);
+Talos::Value::Any Talos::Builtins::Static::from(Isolate *isolate, const Args &args) {
+  // ensure the correct number of arguments given
+  TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);
 
-    // get the value to question and validate as needed
-    auto value = args.at(0);
+  // get the value to question and validate as needed
+  auto value = args.at(0);
 
-    // cast depending on the type of the value
-    if (value.is<String::Dynamic>()) return value.as<String::Dynamic>().symbol();
+  // cast depending on the type of the value
+  if (value.is<String::Any>()) return value.as<String::Any>().symbol();
 
-    // otherwise cast using the pointer directly
-    return Value::Symbol(value.traits());
+  /// TODO: define a better hasher for other values
+  return Value::Symbol();
 }
 
 //  PRIVATE METHODS  //
 
-Talos::Value::Any TALOS_BUILTIN_TRAITS(Value::Symbol)::m_globals(Runtime::Isolate* isolate) {
-    // construct the base object instance
-    auto self = isolate->create<Object::Class>(name(), shape());
-
-// assign the necessary fields now
-#define TALOS_XX_STATICS_DEFINE(N, ...) \
-    self.statics().emplace(#N, Member::Factory::native(isolate, Static::N, name(), #N));
+Talos::Value::Any
+Talos::Builtins::Wrapper<Talos::Value::Symbol>::m_globals(Isolate *isolate, const Object::Class &self) {
+#define TALOS_XX_STATICS_DEFINE(N, ...)                                                \
+  self.statics().emplace(#N, Member::Factory::native(isolate, Static::N, name(), #N));
 #include "talos/builtins/symbol/_defines/statics.def"
-#undef TALOS_XX_STATICS_DEFINE
 
-    // and return the resulting instance
-    return self;
+  // and return the resulting instance
+  return self;
 }

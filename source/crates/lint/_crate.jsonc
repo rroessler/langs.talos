@@ -1,0 +1,6 @@
+{
+    "version": "0.2.0",
+    "name": "@talos/lint",
+    "main": "library/_main.tal",
+    "describe": "Bindings for defining Linter plugins"
+}

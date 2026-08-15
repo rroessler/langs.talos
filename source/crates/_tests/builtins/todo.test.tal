@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "Todo" Functionality.
-//! Description: Coordinates testing the builtin "Todo".
-//!
+///
+/// @testing Builtin "Todo" Functionality.
+/// @describe Coordinates testing the builtin "Todo".
+///
 
 // Talos Modules
 import "talos:test" as Test;

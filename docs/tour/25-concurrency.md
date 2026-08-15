@@ -38,4 +38,4 @@ acceptor::async(-1)
     .then(Debug.println);
 ```
 
-See the [concurrency documentation](/docs/language/advanced/concurrency.md) for a more in-depth look.
+See the [concurrency documentation](/language/advanced/concurrency.md) for a more in-depth look.

@@ -2,104 +2,70 @@
 #define _TALOS_MACHINE_BUILDER_HPP
 
 /// Talos Modules
-#include "talos/function/dynamic.hpp"
+#include "talos/machine/allocator.hpp"
 #include "talos/machine/emitter.hpp"
+#include "talos/machine/facts.hpp"
+#include "talos/machine/logger.hpp"
 
 namespace Talos::Machine {
 
-    /// @brief Simple Register Allocator.
-    class Allocator {
-        //  PROPERTIES  //
+/// @brief Scoped Machine-Code Builder.
+struct Builder : public XI::Transient {
+  //  PROPERTIES  //
 
-        /// @brief Underlying compiler instance.
-        Compiler* m_compiler = nullptr;
+  Register::Host envp = {};     // Context register.
+  Register::Host argv = {};     // Arguments registers.
+  Register::Host params = {};   // Parameters registers.
+  Register::Host isolate = {};  // Isolate register.
+  Register::Host frame = {};    // Call-frame register.
+  Register::Host feedback = {}; // Feedback register.
+  Register::Host result = {};   // Accumulator register.
 
-        /// @brief Currently allocated registers.
-        $::Map<Engine::Register::Encoded, Register> m_registers = {};
+  Label panic = {};     // Enables panic handling.
+  Label interrupt = {}; // Enables interrupt handling.
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Optimization facts.
+  Facts facts = {};
 
-        /// @brief Do not allow default construction.
-        explicit Allocator() = default;
+  /// @brief The available labels.
+  std::vector<Label> labels = {};
 
-        /// @brief Constructs a contiguous register allocator.
-        explicit Allocator(Compiler* compiler) : m_compiler(compiler) {}
+  /// @brief Incoming function information.
+  Info *info = nullptr;
 
-        //  PUBLIC METHODS  //
+  /// @brief The underlying scoped compiler.
+  Compiler *compiler = nullptr;
 
-        /**
-         * @brief Denotes if a register has been bound.
-         * @param vreg              Bytecode register.
-         */
-        inline constexpr bool bound(const Engine::Register& vreg) const noexcept { return m_registers.contains(vreg); }
+  /// @brief Handles logging headers and comments.
+  $::Unique::Pointer<Logger> logger = $::Unique::New<Logger>(compiler);
 
-        /**
-         * @brief Resolves an already bound register.
-         * @param vreg              Bytecode register.
-         */
-        inline constexpr Register resolve(const Engine::Register& vreg) const noexcept { return m_registers.at(vreg); }
+  /// @brief Handles emitting complex instrutions.
+  $::Unique::Pointer<Emitter> emitter = $::Unique::New<Emitter>(this);
 
-        /**
-         * @brief Handles allocating a register.
-         * @param vreg              Bytecode register.
-         */
-        inline constexpr Register allocate(const Engine::Register& vreg) {
-            return allocate(vreg, fmt::format("{0}", vreg));
-        }
+  /// @brief Handles emitting register allocations.
+  $::Unique::Pointer<Allocator> registers = $::Unique::New<Allocator>(compiler);
 
-        /**
-         * @brief Handles allocating a register.
-         * @param vreg              Bytecode register.
-         * @param name              Name of register.
-         */
-        inline constexpr Register allocate(const Engine::Register& vreg, const $::String::View& name) {
-            if (m_registers.contains(vreg)) return m_registers.at(vreg);  // get cached value
-            return m_registers.emplace(vreg, m_compiler->new_gp64(name.data())).first->second;
-        }
-    };
+  //  CONSTRUCTORS  //
 
-    /// @brief Scoped Machine-Code Builder.
-    struct Builder : public XI::Define<Builder, XI::Unique> {
-        //  PROPERTIES  //
+  /// @brief Do not allow default construction.
+  constexpr Builder() = delete;
 
-        Register isolate = {};  // Isolate register.
-        Register stack = {};    // Stack register.
-        Register frame = {};    // Frame register.
-        Register argv = {};     // Arguments register.
-        Register envp = {};     // Context register.
-        Register result = {};   // Accumulator register.
+  /// @brief Constructs a defaulted builder.
+  constexpr Builder(Info *info, Compiler *compiler) : facts(info), info(info), compiler(compiler) { m_prolog(); }
 
-        Label panic = {};      // Enables panic handling.
-        Label interrupt = {};  // Enables interrupt handling.
+  /// @brief Handles closing off the builder.
+  constexpr ~Builder() { m_epilog(); }
 
-        /// @brief Incoming function information.
-        Info* info = nullptr;
+private:
+  //  PRIVATE METHODS  //
 
-        /// @brief The underlying scoped compiler.
-        Compiler* compiler = nullptr;
+  /// @brief Construct the builders prolog.
+  void m_prolog();
 
-        /// @brief Handles emitting complex instrutions.
-        Emitter emitter = Emitter();
+  /// @brief Constructs the builders epilog.
+  void m_epilog();
+};
 
-        /// @brief Handles emitting register allocations.
-        Allocator registers = Allocator();
-
-        /// @brief The available labels.
-        std::vector<Label> labels = {};
-
-        //  CONSTRUCTORS  //
-
-        /// @brief Do not allow default construction.
-        explicit Builder() = delete;
-
-        /// @brief Constructs a defaulted builder.
-        explicit Builder(Info* info, Compiler* compiler);
-
-        /// @brief Handles closing off the builder.
-        ~Builder();
-    };
-
-}  // namespace Talos::Machine
+} // namespace Talos::Machine
 
 #endif

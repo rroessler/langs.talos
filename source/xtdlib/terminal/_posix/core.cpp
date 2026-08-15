@@ -1,14 +1,13 @@
-/// Library Modules
-#include "xtdlib/terminal/core.hpp"
+/// Platform Modules
 #include "xtdlib/system/platform.hpp"
 
 #if $_PLATFORM_POSIX
 
-/// Unix Modules
-#include <unistd.h>
+/// Platform Modules
+#include "xtdlib/terminal/core.hpp"
 
 //  PUBLIC METHODS  //
 
-bool $::Terminal::is(int32_t fh) { return ::isatty(fh); }
+void $::Terminal::utf8() { /** do nothing here */ }
 
 #endif

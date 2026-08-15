@@ -1,116 +1,100 @@
 #ifndef _TALOS_TYPE_TRANSFORM_HPP
 #define _TALOS_TYPE_TRANSFORM_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/type/entity.hpp"
+#include "talos/type/registry.hpp"
 
 namespace Talos::Type {
 
-    /// @brief Transformation Resolver Functor.
-    using Resolver = $::Functor::Shared<Erased(const Erased&, const Constraints&)>;
+/// @brief Lazy Type Evaluation.
+class Transform : public Mixin<Transform> {
+  //  PROPERTIES  //
 
-    /// @brief Lazy Type Evaluation.
-    class Transform : public Abstract<Transform> {
-        //  PROPERTIES  //
+  /// @brief The baseline target.
+  Erased m_target = New::any();
 
-        /// @brief The baseline target.
-        Erased m_target = $::New().shared<Any>();
+  /// @brief Bound resolvers available.
+  Resolver m_resolver = [](const Erased &target, Constraints *) { return target; };
 
-        /// @brief Bound resolvers available.
-        Resolver m_resolver = [](const Erased& target, const Constraints&) { return target; };
+public:
+  //  PUBLIC METHODS  //
 
-       public:
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Constructs a lazy-transform.
+   * @param target                Target to transform.
+   */
+  explicit Transform(const Erased &target = New::any()) : m_target(target) {}
 
-        /// @brief Constructs a no-op transformation.
-        explicit Transform() = default;
+  /**
+   * @brief Constructs a transformation.
+   * @param target                Target to transform.
+   * @param resolver              Resolver to inherit.
+   */
+  explicit Transform(const Erased &target, Resolver &&resolver) : m_target(target), m_resolver(std::move(resolver)) {}
 
-        /**
-         * @brief Constructs a transformation.
-         * @param target                Target to transform.
-         * @param resolver              Resolver to inherit.
-         */
-        explicit Transform(const Erased& target, Resolver resolver) : m_target(target), m_resolver(resolver) {}
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Allow getting the attached target.
+  inline constexpr Erased &target() noexcept { return m_target; }
+  inline constexpr const Erased &target() const noexcept { return m_target; }
 
-        /// @brief Gets the associated type-lattice of the target.
-        inline constexpr Lattice lattice() const noexcept final { return reduce()->lattice(); }
+  /// @brief Gets the associated truthiness of the target.
+  inline constexpr $::Unit::Ternary truthiness() const noexcept final { return reduce()->truthiness(); }
 
-        /// @brief Gets the associated truthiness of the target.
-        inline constexpr $::Ternary truthiness() const noexcept final { return reduce()->truthiness(); }
+  /// @brief Gets the shape of a generic.
+  inline constexpr Shape::Underlying shape() const noexcept final { return reduce()->shape(); }
 
-        /// @brief Allow getting the attached target.
-        inline constexpr Erased& target() noexcept { return m_target; }
-        inline constexpr const Erased& target() const noexcept { return m_target; }
+  /**
+   * @brief Handles reducing a target against constraints.
+   * @param constraints           Constraints to resolve.
+   */
+  inline constexpr Erased reduce(Constraints *constraints = nullptr) const { return m_resolver(m_target, constraints); }
 
-        /**
-         * @brief Handles reducing a target against constraints.
-         * @param constraints           Constraints to resolve.
-         */
-        inline constexpr Erased reduce(const Constraints& constraints = nullptr) const {
-            return m_resolver(m_target, constraints);
-        }
+  /**
+   * @brief Handles looking up fields.
+   * @param field                     Field to lookup.
+   */
+  inline Entity lookup(const $::String::View &field) const final { return reduce()->lookup(field); }
 
-        /**
-         * @brief Handles looking up fields.
-         * @param field                     Field to lookup.
-         */
-        inline Entity lookup(const $::String::View& field) const final { return reduce()->lookup(field); }
+  /**
+   * @brief Handles transforming the type.
+   * @param kind                      Operator kind.
+   */
+  inline Erased apply(Operator::Kind kind) const final { return reduce()->apply(kind); }
 
-        /**
-         * @brief Handles transforming the type.
-         * @param kind                      Operator kind.
-         */
-        inline Erased apply(Operator::Kind kind) const final { return reduce()->apply(kind); }
+  /**
+   * @brief Handles transforming the type.
+   * @param kind                      Operator kind.
+   * @param right                     RHS value to use.
+   */
+  inline Erased apply(Operator::Kind kind, const Erased &right) const final { return reduce()->apply(kind, right); }
 
-        /**
-         * @brief Handles transforming the type.
-         * @param kind                      Operator kind.
-         * @param right                     RHS value to use.
-         */
-        inline Erased apply(Operator::Kind kind, const Erased& right) const final {
-            return reduce()->apply(kind, right);
-        }
+protected:
+  //  PRIVATE METHODS  //
 
-       protected:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles instantiating a transform.
+   * @param constraints               Generic constraints.
+   */
+  inline Erased m_infer(Constraints *constraints) const final { return reduce(constraints)->m_infer(constraints); }
 
-        /**
-         * @brief Handles validating transform shapes.
-         * @param shape                     Shape to validate.
-         */
-        inline constexpr bool m_extends(Shape::Underlying shape) const noexcept final {
-            return reduce()->m_extends(shape);
-        }
+  /**
+   * @brief Handles running a unification pass.
+   * @param candidate                 Candidate to unify.
+   * @param constraints               Generic constraints.
+   */
+  inline bool m_unify(const Erased &candidate, Constraints *constraints) const final {
+    return reduce(constraints)->m_unify(candidate, constraints);
+  }
 
-        /**
-         * @brief Handles instantiating a transform.
-         * @param constraints               Generic constraints.
-         */
-        inline Erased m_infer(const Constraints& constraints) const final {
-            return reduce(constraints)->m_infer(constraints);
-        }
+  /**
+   * @brief Handles printing the type.
+   * @param os                        Output stream.
+   */
+  static inline void m_print(std::ostream &os, const Transform &self) { os << *self.reduce(); }
+};
 
-        /**
-         * @brief Handles running a unification pass.
-         * @param candidate                 Candidate to unify.
-         * @param constraints               Generic constraints.
-         */
-        inline bool m_unify(const Erased& candidate, const Constraints& constraints) const final {
-            return reduce(constraints)->m_unify(candidate, constraints);
-        }
-
-        /// @brief Handles cloning to the inherited class implementation.
-        inline Erased m_clone() const noexcept final { return $::New().shared<Transform>(*Tagged::m_as<Transform>()); }
-
-        /**
-         * @brief Handles printing the type.
-         * @param os                        Output stream.
-         */
-        inline void m_print($::Stream::Output& os) const final { os << *reduce(); }
-    };
-
-}  // namespace Talos::Type
+} // namespace Talos::Type
 
 #endif

@@ -1,7 +1,7 @@
-//!
-//! Crate: "uuid"
-//! Description: Helpers for generating and validating UUIDs.
-//!
+///
+/// @crate "uuid"
+/// @describe Helpers for generating and validating UUIDs.
+///
 
 // Dynamic Modules
 import "dylib:uuid" as uuid;
@@ -11,27 +11,27 @@ import "talos:_detail" as Detail;
 
 // - HELPERS - //
 
-//! Brief: Internal helper to reduce bytecode output.
+//! @brief Internal helper to reduce bytecode output.
 let m_cast = Detail.Unsafe.cast;
 
 // - PUBLIC METHODS - //
 
-//! Brief: Generates a time-based UUID (using Version 1, defined by RFC 9562).
+//! @brief Generates a time-based UUID (using Version 1, defined by RFC 9562).
 export let V1 = m_cast[fn -> String](uuid.V1);
 
-//! Brief: Generates an MD5 UUID (using Version 3, defined by RFC 9562).
+//! @brief Generates an MD5 UUID (using Version 3, defined by RFC 9562).
 export let V3 = m_cast[fn -> String](uuid.V3);
 
-//! Brief: Generates a random UUID (using Version 4, defined by RFC 9562).
+//! @brief Generates a random UUID (using Version 4, defined by RFC 9562).
 export let V4 = m_cast[fn (seed?: String, name?: String) -> String](uuid.V4);
 
-//! Brief: Generates a SHA1 UUID (using Version 5, defined by RFC 9562).
+//! @brief Generates a SHA1 UUID (using Version 5, defined by RFC 9562).
 export let V5 = m_cast[fn (seed?: String, name?: String) -> String](uuid.V5);
 
-//! Brief: Generates a reordered time-based UUID (using Version 6, defined by RFC 9562).
+//! @brief Generates a reordered time-based UUID (using Version 6, defined by RFC 9562).
 export let V6 = m_cast[fn -> String](uuid.V6);
 
-//! Brief: Generates a unix time-based UUID (using Version 7, defined by RFC 9562).
+//! @brief Generates a unix time-based UUID (using Version 7, defined by RFC 9562).
 export let V7 = m_cast[fn -> String](uuid.V7);
 
 // - NAMESPACES - //

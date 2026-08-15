@@ -1,13 +1,13 @@
 {
     "extends": "./configs/tsconfig.base.json",
-    "include": ["configs", "docs", "tools", "source"],
+    "include": ["configs", "docs", "source/vscode", "source/talos/builtins/index.mdx", "tools"],
     "exclude": ["dist", "node_modules", "source/website"],
+
     "compilerOptions": {
-        "jsx": "react-jsx",
-        "outDir": "dist",
         "paths": {
             "~/*": ["./*"],
-            "@/talos/*": ["./source/vscode/*"],
+            "@/tools/*": ["./tools/*"],
+            "@/vscode/*": ["./source/vscode/library/*"],
             "@/website/*": ["./source/website/library/*"]
         }
     }

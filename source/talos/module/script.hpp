@@ -2,43 +2,39 @@
 #define _TALOS_MODULE_SCRIPT_HPP
 
 /// Talos Includes
-#include "talos/module/loader.hpp"
+#include "talos/module/abstract.hpp"
 
 namespace Talos::Module {
 
-    /// @brief Script Module Implementation.
-    struct Script : public Abstract<Script> {
-        //  CONSTRUCTORS  //
+/// @brief Script Module Implementation.
+struct Script : public Mixin<Script> {
+  //  CONSTRUCTORS  //
 
-        /// @brief Inherit the base constructor.
-        using Abstract<Script>::Abstract;
-    };
+  /// @brief Inherit the base constructor.
+  using Mixin::Mixin;
 
-}  // namespace Talos::Module
+protected:
+  //  PRIVATE METHODS  //
 
-namespace Talos::Import {
+  /**
+   * @brief Handles parsing a module.
+   * @param services                  Service container.
+   */
+  void m_parse(XI::Container *services) final;
 
-    /// @brief Handles loading script modules.
-    template <>
-    struct Loader::Proxy<Module::Script> : public Loader::Abstract<Resource::Scheme::SCRIPT> {
-        //  CONSTRUCTORS  //
+  /**
+   * @brief Handles analyzing a module.
+   * @param services                  Service container.
+   */
+  void m_analyze(XI::Container *services) final;
 
-        /// @brief Inherit the base constructor.
-        using Abstract::Abstract;
+  /**
+   * @brief Handles compiling a module.
+   * @param services                  Service container.
+   */
+  void m_compile(XI::Container *services) final;
+};
 
-        //  PUBLIC METHODS  //
-
-        /**
-         * @brief Handles fetching a module.
-         * @param resource                  Resource to fetch.
-         * @param services                  Services container.
-         */
-        inline $::Ptr::Unique<Module::Interface> fetch(
-            const $::URI::View& resource, XI::Container* services) const final {
-            return services->get<Module::Script>(resource);
-        }
-    };
-
-}  // namespace Talos::Import
+} // namespace Talos::Module
 
 #endif

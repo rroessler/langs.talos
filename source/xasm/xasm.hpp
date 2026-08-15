@@ -5,7 +5,6 @@
 #include "xasm/compiler/scope.hpp"
 
 /// Hosted Modules
-#include "xasm/hosted/condition.hpp"
 #include "xasm/hosted/constants.hpp"
 
 /// Function Modules

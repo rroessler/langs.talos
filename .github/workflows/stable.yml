@@ -1,0 +1,14 @@
+name: Release Stable
+description: Workflow for publishing Talos stable releases
+on: [workflow_dispatch]
+
+jobs:
+    stable-staging:
+        name: Stage Stable Branch
+        with: { release: stable }
+        uses: ./.github/workflows/staging.yml
+
+    stable-release:
+        needs: [stable-staging]
+        with: { release: stable }
+        uses: rroessler/langs.talos/.github/workflows/release.yml@stable

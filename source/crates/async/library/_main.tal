@@ -1,6 +1,6 @@
-//!
-//! Crate: "async"
-//! Description: Asynchronous utility functions.
-//!
+///
+/// @crate "async"
+/// @describe Asynchronous utility functions.
+///
 
 Todo("Unimplemented Crate - 'talos:async'");

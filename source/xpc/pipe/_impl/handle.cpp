@@ -1,4 +1,4 @@
-/// XPC Modules
+/// XPC Includes
 #include "xpc/pipe/handle.hpp"
 
 //  PUBLIC METHODS  //

@@ -7,92 +7,55 @@
 
 namespace XASM::Compiler {
 
-    /// @brief Unviversal Compiler Wrapper.
-    template <class T>
-    class Typed : public asmjit::ujit::UniCompiler {
-        //  TYPDEFS  //
+/// @brief Unviversal Compiler Wrapper.
+template <class T> class Typed : public asmjit::ujit::UniCompiler {
+  //  TYPDEFS  //
 
-        /// @brief Allow scopes internal access.
-        template <class>
-        friend class Scope;
+  /// @brief Allow scopes internal access.
+  template <class> friend class Scope;
 
-        //  PROPERTIES  //
+  //  PROPERTIES  //
 
-        /// @brief The underlying arena.
-        Arena* m_arena = nullptr;
+  /// @brief The underlying arena.
+  Arena *m_arena = nullptr;
 
-        /// @brief The bound runtime target.
-        Runtime::Target* m_target = nullptr;
+  /// @brief The bound runtime target.
+  Runtime::Target *m_target = nullptr;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a universal compiler.
-         * @param target            Target runtime.
-         * @param arena             Arena code holder.
-         * @param backend           Backend compiler.
-         */
-        explicit Typed(Runtime::Target* target, Arena* arena, Backend* backend) :
-            UniCompiler(backend, target->_cpu_features, target->_cpu_hints), m_arena(arena), m_target(target) {}
+  /**
+   * @brief Constructs a universal compiler.
+   * @param target            Target runtime.
+   * @param arena             Arena code holder.
+   * @param backend           Backend compiler.
+   */
+  explicit Typed(Runtime::Target *target, Arena *arena, Backend *backend) :
+      UniCompiler(backend, target->_cpu_features, target->_cpu_hints), m_arena(arena), m_target(target) {}
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Handles safely finalizing functions.
-        T finish() {
-            // prepare the output functor
-            T functor = {};
+  /// @brief Handles safely finalizing functions.
+  T finish() {
+    // prepare the output functor
+    T functor = {};
 
-            // attempt finalizing the incoming callback
-            $_EXPECT(end_func() == asmjit::Error::kOk);
-            $_EXPECT(finalize() == asmjit::Error::kOk);
-            $_EXPECT(m_target->add(&functor, m_arena) == asmjit::Error::kOk);
+#define MM_EXPECT(...)                                                                                                \
+  if (auto errc = __VA_ARGS__; errc != asmjit::Error::kOk) $_ABORT("{0}", asmjit::DebugUtils::error_as_string(errc));
 
-            // and finally declare as a success
-            return m_arena->reset(), functor;
-        }
-    };
+    // attempt finalizing the incoming callback
+    MM_EXPECT(end_func());
+    MM_EXPECT(finalize());
+    MM_EXPECT(m_target->add(&functor, m_arena));
 
-    /// @brief Compilation Scoping.
-    template <class T>
-    class Scope {
-        //  PROPERTIES  //
+#undef MM_EXPECT
 
-        /// @brief The compiler interface.
-        $::Ptr::Unique<Typed<T>> m_compiler = nullptr;
+    // and finally declare as a success
+    return functor;
+  }
+};
 
-       public:
-        //  CONSTRUCTORS  //
-
-        /**
-         * @brief Constructs a scoped compiler.
-         * @param target                Runtime target.
-         * @param arena                 Code holder.
-         * @param backend               Backend compiler.
-         * @param logger                Logger to bind.
-         */
-        explicit Scope(Runtime::Target* target, Arena* arena, Backend* backend, Runtime::Logger* logger = nullptr) :
-            m_compiler($::New().unique<Typed<T>>(target, arena, backend)) {
-            arena->reset();  // reset code buffer
-            arena->init(target->environment());
-            arena->attach(backend);  // bind cc
-
-            // update the incoming logger as necessary now
-            if (logger) logger->clear(), arena->set_logger(logger);
-        }
-
-        /// @brief Ensure the arena is cleared on completion.
-        ~Scope() { m_compiler->m_arena->reset(); }
-
-        //  OPERATOR METHODS  //
-
-        /// @brief Gets the underlying universal compiler.
-        inline constexpr Typed<T>* operator&() const noexcept { return m_compiler.get(); }
-
-        /// @brief Gets the underlying universal compiler.
-        inline constexpr Typed<T>* operator->() const noexcept { return m_compiler.get(); }
-    };
-
-}  // namespace XASM::Compiler
+} // namespace XASM::Compiler
 
 #endif

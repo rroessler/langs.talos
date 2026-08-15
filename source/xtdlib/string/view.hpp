@@ -1,14 +1,11 @@
 #ifndef _XTDLIB_STRING_VIEW_HPP
 #define _XTDLIB_STRING_VIEW_HPP
 
-/// C++ Includes
-#include <string_view>
+/// Library Includes
+#include "xtdlib/macros/forward.hpp"
+#include "xtdlib/portable/stdlib.hpp"
 
-namespace $::String {
-
-    /// @brief String-View Reference.
-    using View = std::string_view;
-
-}  // namespace $::String
+/// Forward Definitions
+$_FWD($::String, using View = std::string_view)
 
 #endif

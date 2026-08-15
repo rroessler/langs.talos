@@ -1,7 +1,8 @@
 /// Vendor Modules
-import clsx from 'clsx';
-import React from 'react';
-import Link, { LinkProps } from 'next/link';
+import Link, { type LinkProps } from 'next/link';
+
+/// Website Modules
+import { cn } from '@/website/utilities';
 
 /** Anchor Component. */
 export interface Anchor extends Anchor.Props {}
@@ -10,7 +11,7 @@ export function Anchor({ href = '#', sleek, className, component, ...props }: An
     const target = external && !href.includes('#') ? '_blank' : undefined;
 
     const base = !sleek && 'text-brand decoration-brand-200 decoration-1 hover:underline hover:text-brand-200';
-    className = clsx(className, 'no-underline', base); // prepare the class-name details to be used now
+    className = cn(className, 'no-underline', base); // prepare the class-name details to be used now
 
     // use the component if given at all
     if (typeof component === 'function') return component({ href, className, target, ...props });
@@ -44,6 +45,6 @@ export namespace Anchor {
     export function Footnote({ index, ...props }: Footnote) {
         const id = `note-${index}`;
         const href = `#mark-${index}`;
-        return <Anchor id={id} href={href} children={`⚔️${index}`} {...props} />;
+        return <Anchor id={id} href={href} children={`⚔️&nbsp;${index}`} {...props} />;
     }
 }

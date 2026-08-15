@@ -1,15 +1,16 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/engine/frame.hpp"
 #include "talos/runtime/isolate.hpp"
 
 //  CONSTRUCTORS  //
 
-Talos::Engine::Frame::Frame(Runtime::Isolate* isolate) :
-    m_interrupt(false), m_parent(isolate->m_frame), m_isolate(isolate) {
-    m_depth = m_parent ? m_parent->m_depth + 1 : 0, m_isolate->m_frame = this;
+Talos::Engine::Frame::Frame(Isolate *isolate) : m_encoded(reinterpret_cast<uintptr_t>(isolate)) {
+  isolate->m_frames.push_back(this);
 }
 
 Talos::Engine::Frame::~Frame() {
-    if (m_isolate->thread()->task() == nullptr) return;  // forced exit
-    $_ASSERT(m_isolate->m_frame == this), m_isolate->m_frame = m_parent;
+  auto *isolate = m_isolate(); // decode the isolate
+  if (isolate->thread()->task() == nullptr) return;
+  $_ASSERT(isolate->m_frames.back() == this);
+  isolate->m_frames.pop_back(); // remove frame
 }

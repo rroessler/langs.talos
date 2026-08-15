@@ -1,89 +1,113 @@
-/// Talos Modules
-#include "talos/engine/frame.hpp"
-#include "talos/runtime/isolate.hpp"
-#include "talos/string/small.hpp"
-#include "talos/value/boolean.hpp"
-
-/// Inline Modules
+/// Machine Includes
 #include "talos/machine/_inline/macros.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Machine::Template, void interrupted(Builder*))
-$_FWD(Talos::Machine::Dispatch, uint64_t interrupted(Runtime::Isolate*))
+//  EMITTTER METHODS  //
 
-//  PUBLIC METHODS  //
-
-uint64_t Talos::Machine::Dispatch::interrupted(Runtime::Isolate* isolate) {
-    auto* frame = isolate->frame();  // get frame
-    return $_ASSERT(frame), frame->interrupted();
-}
-
-void Talos::Machine::Template::interrupted(Builder* builder) {
-    // prepare a boolean result register
-    auto dx = __cc__ new_gp64("@dx");
-
-    // attempt calling the interrupted state getter
-    __ee__ invoke(Dispatch::interrupted, dx, builder->isolate);
-
-    // if the flag has been set, then we force a panic to occur
-    __ee__ interrupt(dx);
-}
-
-//  PRIVATE METHODS  //
+TALOS_MM_MACHINE_EMIT(JUMP_TPL, , ) { $::System::unreachable(); }
 
 TALOS_MM_MACHINE_EMIT(JUMP_TO, builder, instruction) {
-    // attempt resolving the incoming label
-    auto lv = instruction->get<0>();
-
-    // pre-check if the interrupt flag is set at all
-    __tm__ interrupted(builder);
-
-    // jump to the incoming label as needed
-    __cc__ j(__ee__ label(lv));
+  __ee__ irq(Engine::Interrupt::BAILOUT); // jtest
+  __cc__ j(__ee__ label(instruction->get<0>()));
 }
 
 TALOS_MM_MACHINE_EMIT(JUMP_FILLED, builder, instruction) {
-    // attempt resolving the incoming label
-    auto label = __ee__ label(instruction->get<0>());
+  // prepare some details for the incoming jump
+  auto tx = __cc__ new_gp64();
+  auto hole = __ee__ imm(Constants::Void);
+  auto label = __ee__ label(instruction->get<0>());
 
-    // resolve the necessary incoming register
-    auto tv = instruction->get<1>();
-    auto tx = __cc__ new_gp64("@tx");
+  // test for incoming interupts before jump
+  __ee__ irq(Engine::Interrupt::BAILOUT);
 
-    // prepare the incoming test value now
-    auto empty = __iv__(Value::Void());
-
-    // pre-check if the interrupt flag has been set at all
-    __tm__ interrupted(builder);
-
-    // attempt testing against the filled condition now
-    __ee__ move(tx, tv), __cc__ j(label, asmjit::ujit::cmp_ne(tx, empty));
+  // we want to test our value against a "Void" value
+  __ee__ move(tx, instruction->get<1>());
+  __cc__ j(label, asmjit::ujit::cmp_ne(tx, hole));
 }
 
 TALOS_MM_MACHINE_EMIT(JUMP_TRUTHY, builder, instruction) {
-    // resolve the necessary incoming register
-    auto tv = instruction->get<1>();
+  // get the label required for jumping
+  auto label = __ee__ label(instruction->get<0>());
 
-    // attempt resolving the incoming label
-    auto label = __ee__ label(instruction->get<0>());
-
-    // pre-check if the interrupt flag has been set at all
-    __tm__ interrupted(builder);
-
-    // jump when the incoming value is truthy at all
-    __ee__ truthy(label, tv);
+  // test our interrupt mode then execute our jump
+  __ee__ irq(Engine::Interrupt::BAILOUT);
+  __ee__ jmpt(label, instruction->get<1>());
 }
 
 TALOS_MM_MACHINE_EMIT(JUMP_FALSEY, builder, instruction) {
-    // resolve the necessary incoming register
-    auto tv = instruction->get<1>();
+  // get the label required for jumping
+  auto label = __ee__ label(instruction->get<0>());
 
-    // attempt resolving the incoming label
-    auto label = __ee__ label(instruction->get<0>());
+  // test our interrupt mode then execute our jump
+  __ee__ irq(Engine::Interrupt::BAILOUT);
+  __ee__ jmpf(label, instruction->get<1>());
+}
 
-    // pre-check if the interrupt flag has been set at all
-    __tm__ interrupted(builder);
+TALOS_MM_MACHINE_EMIT(MATCH_VOID, builder, instruction) {
+  // get the label required for jumping
+  auto label = __ee__ label(instruction->get<0>());
 
-    // jump when the incoming value is falsey
-    __ee__ falsey(label, tv);
+  // test our interrupt mode before emitting the jump
+  __ee__ irq(Engine::Interrupt::BAILOUT);
+  __ee__ jmpc(label, instruction->get<1>(), Constants::Void);
+}
+
+TALOS_MM_MACHINE_EMIT(MATCH_TRUE, builder, instruction) {
+  // get the label required for jumping
+  auto label = __ee__ label(instruction->get<0>());
+
+  // test our interrupt mode before emitting the jump
+  __ee__ irq(Engine::Interrupt::BAILOUT);
+  __ee__ jmpc(label, instruction->get<1>(), Value::True);
+}
+
+TALOS_MM_MACHINE_EMIT(MATCH_FALSE, builder, instruction) {
+  // get the label required for jumping
+  auto label = __ee__ label(instruction->get<0>());
+
+  // test our interrupt mode before emitting the jump
+  __ee__ irq(Engine::Interrupt::BAILOUT);
+  __ee__ jmpc(label, instruction->get<1>(), Value::False);
+}
+
+TALOS_MM_MACHINE_EMIT(MATCH_CONST, builder, instruction) {
+  // get the label required for jumping
+  auto label = __ee__ label(instruction->get<0>());
+
+  // test our interrupt mode before emitting the jump
+  __ee__ irq(Engine::Interrupt::BAILOUT);
+  __ee__ jmpc(label, instruction->get<1>(), instruction->get<2>());
+}
+
+TALOS_MM_MACHINE_EMIT(MATCH_TEXT, builder, instruction) {
+  // get the intern value to be emitted
+  auto index = instruction->get<2>();
+  auto *arena = builder->info->arena();
+  auto *intern = &arena->strings[index];
+
+  // get the label required for jumping
+  auto label = __ee__ label(instruction->get<0>());
+
+  // prepare all our registers to be used
+  auto dx = __cc__ new_gp64();
+  auto tx = __ee__ slot(instruction->get<1>());
+
+  // test our interrupt mode before emitting the jump
+  __ee__ irq(Engine::Interrupt::BAILOUT);
+  __ee__ call(Glue::compare, dx, tx, Immediate(intern));
+  __cc__ j(label, asmjit::ujit::test_nz(dx));
+}
+
+TALOS_MM_MACHINE_EMIT(MATCH_GUARD, builder, instruction) {
+  // get the label required for jumping
+  auto label = __ee__ label(instruction->get<0>());
+
+  // prepare all our registers to be used
+  auto dx = __cc__ new_gp64();
+  auto tx = __ee__ slot(instruction->get<1>());
+  auto gx = __ee__ slot(instruction->get<2>());
+
+  // test our interrupt mode before emitting the jump
+  __ee__ irq(Engine::Interrupt::BAILOUT);
+  __ee__ call(Glue::matches, dx, tx, gx);
+  __cc__ j(label, asmjit::ujit::test_nz(dx));
 }

@@ -1,7 +1,7 @@
-//!
-//! Testing: Builtin "Future" Functionality.
-//! Description: Coordinates testing the builtin "Future".
-//!
+///
+/// @testing Builtin "Future" Functionality.
+/// @describe Coordinates testing the builtin "Future".
+///
 
 // Talos Modules
 import "talos:test" as Test;
@@ -53,7 +53,7 @@ Test.suite("Methods", fn {
 
     // test the expected await results now
     Test.case("Future.await 'success'", fn => Assert.equals(success.await(), message));
-    Test.case("Future.await 'failure'", fn => Assert.panics(failure.await.bind(failure)));
+    Test.case("Future.await 'failure'", fn => Assert.panics(Function.bind(failure.await, failure)));
 
     // test the expected state values now
     Test.case("Future.state 'REJECTED'", fn => Assert.equals(failure.state(), 1));

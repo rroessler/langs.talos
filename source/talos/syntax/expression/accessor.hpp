@@ -1,44 +1,34 @@
 #ifndef _TALOS_EXPRESSION_ACCESSOR_HPP
 #define _TALOS_EXPRESSION_ACCESSOR_HPP
 
-/// Syntax Modules
+/// Syntax Includes
 #include "talos/syntax/literal/identifier.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Generic Accessor Expression.
-    class Accessor : public Abstract<Accessor, Expression> {
-        //  PROPERTIES  //
+/// @brief Generic Accessor Expression.
+class Accessor : public Mixin<Accessor, Expression> {
+  //  PROPERTIES  //
 
-        Identifier* m_field;   // Field token.
-        Expression* m_parent;  // Parent expression.
+  Identifier *m_field;  // Field identifier.
+  Expression *m_parent; // Parent expression.
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a property accessor.
-         * @param field                     Field expression.
-         * @param parent                    Parent expression.
-         */
-        explicit Accessor(Identifier* field, Expression* parent) :
-            Accessor(field, parent, field->traits()->location()) {}
+  /**
+   * @brief Constructs a property accessor.
+   * @param field                     Field expression.
+   * @param parent                    Parent expression.
+   */
+  explicit Accessor(Identifier *field, Expression *parent) : m_field(field), m_parent(parent) {}
 
-        /**
-         * @brief Constructs a property accessor.
-         * @param field                     Field expression.
-         * @param parent                    Parent expression.
-         * @param location                  Resource location.
-         */
-        explicit Accessor(Identifier* field, Expression* parent, const Bounds& location) :
-            Abstract(location), m_field(field), m_parent(parent) {}
+  //  PUBLIC METHODS  //
 
-        //  PUBLIC METHODS  //
+  inline constexpr const Identifier *field() const noexcept { return m_field; }
+  inline constexpr const Expression *parent() const noexcept { return m_parent; }
+};
 
-        inline constexpr Identifier* field() const noexcept { return m_field; }
-        inline constexpr Expression* parent() const noexcept { return m_parent; }
-    };
-
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

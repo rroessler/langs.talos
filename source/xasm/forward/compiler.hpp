@@ -1,7 +1,7 @@
 #ifndef _XASM_FORWARD_COMPILER_HPP
 #define _XASM_FORWARD_COMPILER_HPP
 
-/// Vendor Modules
+/// Vendor Includes
 #include <asmjit/ujit.h>
 #include <xtdlib/xtdlib.hpp>
 

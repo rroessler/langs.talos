@@ -1,28 +1,33 @@
-/// Talos Modules
-#include "talos/type/visitor.hpp"
+/// Talos Includes
+#include "talos/variable/visitor.hpp"
 
-/// Syntax Modules
-#include "talos/syntax/_inline/expression.ipp"
+/// Talos Includes
+#include "talos/type/_inline/type.ipp"
 
 //  PUBLIC METHODS  //
 
+TALOS_MM_CAPTURE_NODE(Binary, node, analyzer) {
+  analyzer->visit(node->left());
+  analyzer->visit(node->right());
+}
+
 TALOS_MM_CHECK_NODE(Binary, node, analyzer) {
-    // trace from the unary node
-    $_UNUSED $_AUTO = analyzer->trace(node);
+  // trace from the unary node
+  $_UNUSED $_AUTO = analyzer->trace(node);
 
-    // prepare the sides that are available
-    auto left = analyzer->check(node->left()).type;
-    auto right = analyzer->check(node->right()).type;
+  // prepare the sides that are available
+  auto left = analyzer->check(node->left()).type;
+  auto right = analyzer->check(node->right()).type;
 
-    // prepare the base deduction to be used
-    auto deduction = analyzer->passable(Type::Builder::fail());
+  // prepare the base deduction to be used
+  auto deduction = analyzer->passable(Type::New::fail());
 
-    // if either operand is invalid, then fail immediately
-    if (left->is<Type::Failure>() || right->is<Type::Failure>()) return deduction;
+  // if either operand is invalid, then fail immediately
+  if (left->is<Type::Poison>() || right->is<Type::Poison>()) return deduction;
 
-    // otherwise attempt running the transformation now
-    deduction.type = left->apply(node->opcode(), right);
+  // otherwise attempt running the transformation now
+  deduction.type = left->apply(node->opcode(), right);
 
-    if (!deduction.type->is<Type::Unset>()) return deduction;
-    return analyzer->report(3000801, node->symbol(), *left, *right);
+  if (!deduction.type->is<Type::Unset>()) return deduction;
+  return analyzer->report(3000801, node->symbol(), *left, *right);
 }

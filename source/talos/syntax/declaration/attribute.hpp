@@ -1,36 +1,34 @@
 #ifndef _TALOS_DECLARATION_ATTRIBUTE_HPP
 #define _TALOS_DECLARATION_ATTRIBUTE_HPP
 
-/// Talos Modules
-#include "talos/reflect/category.hpp"
+/// Talos Include
+#include "talos/reflect/inspect.hpp"
 #include "talos/syntax/node.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Compile Time Attribute Node.
-    class $_ABSTRACT Attribute : public Passthrough<Attribute> {
-        //  PROPERTIES  //
+/// @brief Compile Time Attribute Node.
+class $_ABSTRACT Attribute : public Mixin<Attribute> {
+  //  PROPERTIES  //
 
-        /// @brief Associated compile-time category.
-        Reflect::Category m_category;
+  /// @brief Associated compile-time category.
+  Reflect::Category m_category;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a compile-time attribute.
-         * @param tag                       Node runtime tag.
-         * @param category                  Reflection category.
-         * @param location                  Resource location.
-         */
-        explicit Attribute($::RTTI::Tag tag, Reflect::Category category, const Bounds& location = {}) :
-            Passthrough<Attribute>(tag, location), m_category(category) {}
+  /**
+   * @brief Constructs a compile-time attribute.
+   * @param category                  Reflection category.
+   */
+  explicit Attribute(Reflect::Category category) : m_category(category) {}
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        inline constexpr Reflect::Category category() const noexcept { return m_category; }
-    };
+  /// @brief Assigned reflection category.
+  inline constexpr Reflect::Category category() const noexcept { return m_category; }
+};
 
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

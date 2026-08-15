@@ -1,91 +1,100 @@
 #ifndef _TALOS_RELINT_SERVICE_HPP
 #define _TALOS_RELINT_SERVICE_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/crate/registry.hpp"
+#include "talos/forward/value.hpp"
 #include "talos/relint/hooks.hpp"
 
 namespace Talos::Relint {
 
-    /// @brief The linter service contains all available rules.
-    class Service : public XI::Define<Service, XI::Shared> {
-        //  PROPERTIES  //
+/// @brief The linter service contains all available rules.
+class Service : public XI::Singleton {
+  //  PROPERTIES  //
 
-        /// @brief The default options available.
-        const Options* m_options = nullptr;
+  /// @brief Available services container.
+  XI::Container *m_services = nullptr;
 
-        /// @brief All available subscribed rules.
-        $::Record<$::Ptr::Unique<Rule>> m_rules = {};
+  /// @brief The default options available.
+  const Options *m_options = nullptr;
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief All available subscribed rules.
+  $::Map::Record<$::Unique::Pointer<Rule>> m_rules = {};
 
-        /// @brief Default constructor.
-        explicit Service();
-        explicit Service(XI::Container* services);
+public:
+  //  CONSTRUCTORS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Default constructor.
+  explicit Service();
+  explicit Service(XI::Container *services);
 
-        /**
-         * @brief Handles subscribing rules.
-         * @param rule                      Rule to subscribe.
-         */
-        inline constexpr bool subscribe($::Ptr::Unique<Rule>&& rule) {
-            return m_rules.emplace(rule->documentation.identifier, std::move(rule)).second;
-        }
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Handles subscribing rules.
-         * @param identifier                Rule identifier.
-         * @param rule                      Rule to subscribe.
-         */
-        inline constexpr bool subscribe(const $::String::Buffer& identifier, $::Ptr::Unique<Rule>&& rule) {
-            return rule->documentation.identifier = identifier, subscribe(std::move(rule));
-        }
+  /**
+   * @brief Handles subscribing rules.
+   * @param rule                      Rule to subscribe.
+   */
+  inline constexpr bool subscribe($::Unique::Pointer<Rule> &&rule) {
+    return m_rules.emplace(rule->documentation.identifier, std::move(rule)).second;
+  }
 
-        /**
-         * @brief Handles resolving delegate hooks.
-         * @param args                      Crate scanning arguments.
-         */
-        template <class... As>
-        inline constexpr $::Ptr::Unique<Hooks> hooks(As&&... args) {
-            return m_hooks(Crate::Registry::scan(std::forward<As>(args)...)->lint());
-        }
+  /**
+   * @brief Handles subscribing rules.
+   * @param identifier                Rule identifier.
+   * @param rule                      Rule to subscribe.
+   */
+  inline constexpr bool subscribe(const $::String::Buffer &identifier, $::Unique::Pointer<Rule> &&rule) {
+    return rule->documentation.identifier = identifier, subscribe(std::move(rule));
+  }
 
-       private:
-        //  PRIVATE METHODS  //
+  /**
+   * @brief Handles resolving delegate hooks.
+   * @param args                      Crate scanning arguments.
+   */
+  template <class... As> inline constexpr $::Unique::Pointer<Hooks> hooks(As &&...args) {
+    return m_hooks(Crate::Registry::scan(std::forward<As>(args)...)->lint());
+  }
 
-        /**
-         * @brief Handles merging options with global ones.
-         * @param options                   Options to merge with globals.
-         */
-        void m_merge(Options& options) const noexcept;
+private:
+  //  PRIVATE METHODS  //
 
-        /**
-         * @brief Handles emplacing plugins.
-         * @param options                   Options to update with plugins.
-         */
-        void m_plugins(Options& options) const noexcept;
+  /**
+   * @brief Handles emplacing plugins.
+   * @param options                   Options to update with plugins.
+   */
+  void m_plugins(Options &options) noexcept;
 
-        /**
-         * @brief Handles setting all the recommended options.
-         * @param options                   Options to set recommendations.
-         */
-        void m_recommends(Options& options) const noexcept;
+  /**
+   * @brief Handles merging options with global ones.
+   * @param options                   Options to merge with globals.
+   */
+  void m_merge(Options &options) const noexcept;
 
-        /**
-         * @brief Handles merging, plugins and setting recommended settings.
-         * @param options                   Options to merge.
-         */
-        Options& m_resolve(Options& options) const noexcept;
+  /**
+   * @brief Handles setting all the recommended options.
+   * @param options                   Options to set recommendations.
+   */
+  void m_recommends(Options &options) const noexcept;
 
-        /**
-         * @brief Constructs hooks from the incoming options.
-         * @param options                   Options to use.
-         */
-        $::Ptr::Unique<Hooks> m_hooks(Options options);
-    };
+  /**
+   * @brief Handles merging, plugins and setting recommended settings.
+   * @param options                   Options to merge.
+   */
+  Options &m_resolve(Options &options) noexcept;
 
-}  // namespace Talos::Relint
+  /**
+   * @brief Handles subscribing plugins.
+   * @param module                    Module to subscribe.
+   */
+  void m_subscribe(const Value::Any &module, Options &options) noexcept;
+
+  /**
+   * @brief Constructs hooks from the incoming options.
+   * @param options                   Options to use.
+   */
+  $::Unique::Pointer<Hooks> m_hooks(Options options) noexcept;
+};
+
+} // namespace Talos::Relint
 
 #endif

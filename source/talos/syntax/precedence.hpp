@@ -1,46 +1,43 @@
 #ifndef _TALOS_SYNTAX_PRECEDENCE_HPP
 #define _TALOS_SYNTAX_PRECEDENCE_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/forward/syntax.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Operator/Types Precedences.
-    enum class Precedence : uint8_t {
-        NONE = 0,
+/// @brief Operator/Types Precedence Ranks.
+enum class Precedence : uint8_t {
+  NONE = 0,
 
-        COMMA,  // ,
+  COMMA, // ,
 
-        ASSIGN,            // =
-        TERNARY = ASSIGN,  // a ? b : c
+  ASSIGN,           // =
+  TERNARY = ASSIGN, // a ? b : c
 
-        COAL,        // ??
-        LOR = COAL,  // ||
+  COAL,       // ??
+  LOR = COAL, // ||
 
-        LAND,  // &&
-        BOR,   // |
-        XOR,   // ^
-        BAND,  // &
+  LAND, // &&
+  BOR,  // |
+  XOR,  // ^
+  BAND, // &
 
-        EQUALITY,    // ==, !=
-        COMPARISON,  // < > <= >=
+  EQUAL,   // ==, !=
+  COMPARE, // < > <= >=
 
-        SHIFT,     // << >>
-        TERM,      // + -
-        FACTOR,    // * / %
-        EXPONENT,  // **
+  SHIFT,    // << >>
+  TERM,     // + -
+  FACTOR,   // * / %
+  EXPONENT, // **
 
-        UNARY,           // ! - ++ -- ~
-        TYPEOF = UNARY,  // typeof
+  UNARY, // ! - ++ -- ~
 
-        CAST,          // as
-        INFER = CAST,  // is
+  INFER, // as is
+  CALL,  // . ?. :: ()
+  TMPL,  // []
+};
 
-        CALL,  // . ?. () []
-        TMPL,  // ::
-    };
-
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

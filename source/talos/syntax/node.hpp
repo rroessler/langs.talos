@@ -1,171 +1,74 @@
 #ifndef _TALOS_SYNTAX_NODE_HPP
 #define _TALOS_SYNTAX_NODE_HPP
 
-/// Talos Modules
-#include "talos/lexer/token.hpp"
-#include "talos/syntax/bounds.hpp"
-#include "talos/type/lattice.hpp"
-#include "talos/value/void.hpp"
-
-//  X-MACROS  //
-
-#define XX_SYNTAX_BASES(X) \
-    X(Annotation)          \
-    X(Expression)          \
-    X(Statement)
-
-//  NAMESPACES  //
+/// Talos Includes
+#include "talos/syntax/trivia.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Explicit Syntax Traits.
-    class Traits {
-        //  PROPERTIES  //
+/// @brief Node Extension Mixin.
+template <class T, class B = Node> using Mixin = $::RTTI::Mixin<T, B>;
 
-        /// @brief Bounds resource location.
-        Bounds m_location = {};
+/// @brief Node Abstraction.
+class $_ABSTRACT Node : public $::RTTI::Dynamic {
+  //  TYPEDEFS  //
 
-        /// @brief Resultant type from analysis.
-        Type::Erased m_type = nullptr;
+  /// @brief Allow the trivia handler internal access.
+  friend class Trivia;
 
-        /// @brief Underlying node tag.
-        $::RTTI::Tag m_tag = $::RTTI::Hash();
+  /// @brief Allow the syntax storage internal access.
+  friend class Storage;
 
-       public:
-        //  CONSTRUCTORS  //
+  //  PROPERTIES  //
 
-        /// @brief Allow default construction.
-        explicit Traits() = default;
+  /// @brief Internal syntax metadata proxy.
+  $::Unique::Pointer<Trivia> m_trivia = $::Unique::New<Trivia>();
 
-        /**
-         * @brief Constructs node metadata.
-         * @param tag                   Optional tag.
-         * @param location              Resource location.
-         */
-        explicit Traits($::RTTI::Tag tag, const Bounds& location = {}) : m_location(location), m_tag(tag) {}
+public:
+  //  CONSTRUCTORS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Default constructor for nodes.
+  constexpr Node() = default;
 
-        /// @brief Gets the underlying metadata tag.
-        inline constexpr $::RTTI::Tag tag() const noexcept { return m_tag; }
+  /**
+   * @brief Helper for constructing trivia nodes.
+   * @param keyid                 Key identifier to bind.
+   */
+  template <std::derived_from<Node> T> constexpr Node(const T *keyid) : m_trivia($::Unique::New<Trivia>(keyid)) {}
 
-        /// @brief Denotes if a node was synthetically created.
-        inline constexpr bool synthetic() const noexcept { return m_location.anonymous(); }
+  /// @brief Virtual abstract destructor.
+  virtual ~Node() = default;
 
-        /// @brief Gets the nodes resource.
-        inline constexpr $::URI::View resource() const noexcept { return m_location.resource(); }
+  //  PUBLIC METHODS  //
 
-        /// @brief Gets the underlying bounds location.
-        inline constexpr const Bounds& location() const noexcept { return m_location; }
+  /// @brief Gets the underlying node trivia.
+  inline constexpr Trivia *trivia() const noexcept { return m_trivia.get(); }
 
-        /// @brief Gets the underlying range and bounds.
-        inline constexpr const XLSP::Range& range() const noexcept { return m_location.range(); }
-        inline constexpr const XLSP::Range& bounds() const noexcept { return m_location.bounds(); }
+  /// @brief Downcasts nodes to derived types.
+  template <std::derived_from<Node> T> inline constexpr T *as() noexcept { return $::RTTI::Cast<T>(this); }
+  template <std::derived_from<Node> T> inline constexpr const T *as() const noexcept { return $::RTTI::Cast<T>(this); }
+};
 
-        /// @brief Gets the underlying node typing resolved.
-        inline constexpr Type::Erased& type() noexcept { return m_type; }
-        inline constexpr const Type::Erased& type() const noexcept { return m_type; }
+/// @brief Baseline Expression Node.
+struct Expression : public Mixin<Expression> {
+  using Mixin<Expression, Node>::Mixin;
+};
 
-        /// @brief Resolves a compile-time type-lattice.
-        inline constexpr Type::Lattice lattice() const noexcept { return Type::Lattice(m_type); }
-    };
+/// @brief Baseline Statement Node.
+struct Statement : public Mixin<Statement> {
+  using Mixin<Statement, Node>::Mixin;
+};
 
-    /// @brief AST Node Abstraction.
-    class $_ABSTRACT Node : public $::RTTI::Dynamic {
-        //  PROPERTIES  //
+/// @brief Baseline Annotation Node.
+struct Annotation : public Mixin<Annotation> {
+  using Mixin<Annotation, Node>::Mixin;
+};
 
-        /// @brief Internal metadata.
-        $::Ptr::Unique<Traits> m_traits;
+/// @brief Fallback Expression Node.
+struct Fallback : public Mixin<Fallback, Expression> {
+  explicit Fallback() = default;
+};
 
-       public:
-        //  CONSTRUCTORS  //
-
-        /**
-         * @brief Constructs a node instance.
-         * @param tag                   Optional tag.
-         * @param location              Resource location.
-         */
-        explicit Node($::RTTI::Tag tag, const Lexer::Token* token) : Node(tag, token->location()) {}
-        explicit Node($::RTTI::Tag tag, const Bounds& location = {}) :
-            m_traits($::New().unique<Traits>(tag, location)) {}
-
-        /// @brief Virtual abstract destructor.
-        virtual ~Node() = default;
-
-        //  PUBLIC METHODS  //
-
-        /// @brief Allow folding values into themselves.
-        inline constexpr Value::Any fold() const noexcept { return m_fold(); }
-
-        /// @brief Gets the underlying metadata.
-        inline constexpr Traits* traits() const noexcept { return m_traits.get(); }
-
-        /// @brief Allows casting to derived values.
-        template <std::derived_from<Node> T>
-        inline constexpr T* as() noexcept {
-            return $::RTTI::Assert<T>(this), static_cast<T*>(this);
-        }
-
-        /// @brief Allows casting to derived values.
-        template <std::derived_from<Node> T>
-        inline constexpr const T* as() const noexcept {
-            return $::RTTI::Assert<T>(this), static_cast<const T*>(this);
-        }
-
-       protected:
-        //  PRIVATE METHODS  //
-
-        /// @brief Allows folding values into themselves.
-        virtual inline Value::Any m_fold() const noexcept { return Value::Failure(); }
-    };
-
-#define X(N, ...) struct N;
-    XX_SYNTAX_BASES(X)
-#undef X
-
-#define X(N, ...) || std::same_as<T, N>
-    template <class T>
-    concept Base = std::derived_from<T, Node> XX_SYNTAX_BASES(X);
-#undef X
-
-    /// @brief Prepare an internal passthrough template.
-    template <class T, Base B = Node>
-    using Passthrough = $::RTTI::Extends<T, B>;
-
-    /// @brief Allows extension of nodes.
-    template <class T, Base B = Node>
-    struct $_ABSTRACT Abstract : public $::RTTI::Extends<T, B> {
-        //  CONSTRUCTORS  //
-
-        /**
-         * @brief Handles forwarding construction.
-         * @param args                  Arguments to forward.
-         */
-        template <class... As>
-        explicit Abstract(As&&... args) : $::RTTI::Extends<T, B>($::RTTI::Hash<T>(), std::forward<As>(args)...) {}
-    };
-
-#define X(N, ...)                                                                             \
-    struct $_ABSTRACT N : public Passthrough<N> {                                             \
-        /**  CONSTRUCTORS  */                                                                 \
-                                                                                              \
-        using Passthrough<N>::Passthrough;                                                    \
-                                                                                              \
-       protected:                                                                             \
-        /**  PRIVATE METHODS  */                                                              \
-                                                                                              \
-        $_INLINE_PERF virtual constexpr bool m_is($::RTTI::Tag tag) const noexcept override { \
-            return tag == $::RTTI::Hash<N>();                                                 \
-        }                                                                                     \
-    };
-
-    XX_SYNTAX_BASES(X)
-#undef X
-
-}  // namespace Talos::Syntax
-
-//  UNDEFINES  //
-
-#undef XX_SYNTAX_BASES
+} // namespace Talos::Syntax
 
 #endif

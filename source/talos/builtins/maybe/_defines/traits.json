@@ -1,4 +1,0 @@
-{
-    "name": "Maybe",
-    "describe": "A polymorphic type that represents the encapsulation of an optional value."
-}

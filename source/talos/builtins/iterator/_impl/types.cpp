@@ -1,135 +1,129 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
-
-/// Builtin Modules
+/// Builtin Includes
+#include "talos/builtins/_inline/apply.ipp"
 #include "talos/builtins/_inline/builtins.ipp"
-#include "talos/builtins/_inline/defines.ipp"
+
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
 
 /// Forward Declarations
-$_FWD(Talos::Builtins, namespace TB = Type::Builder)
-$_FWD(Talos::Builtins, using Self = Type::Protocol)
+$_FWD(Talos::Builtins::Constraint, static const $::Shared::Pointer<Type::Parameter> &T())
+$_FWD(Talos::Builtins::Static, static const $::Shared::Pointer<Type::Generic> &generator())
+
+/// Forward Definitions
+$_FWD(Talos::Builtins, using TN = Type::New)
+$_FWD(Talos::Builtins, using Self = Type::Structure)
 
 //  TYPEDEFS  //
 
-#define TALOS_XX_FIELDS_DEFINE(N, ...) static Type::Entity N(const Self*);
-struct TALOS_BUILTIN_FIELDS(Iterable::Iterator) {
+#define TALOS_XX_FIELDS_DEFINE(N, ...) $_FWD(Talos::Builtins::Field, static Type::Entity N(const Self *))
 #include "talos/builtins/iterator/_defines/fields.def"
-};
-#undef TALOS_XX_FIELDS_DEFINE
 
-#define TALOS_XX_STATICS_DEFINE(N, ...) static Type::Entity N();
-struct TALOS_BUILTIN_STATICS(Iterable::Iterator) {
+#define TALOS_XX_STATICS_DEFINE(N, ...) $_FWD(Talos::Builtins::Static, static Type::Entity N())
 #include "talos/builtins/iterator/_defines/statics.def"
-};
-#undef TALOS_XX_STATICS_DEFINE
-
-struct TALOS_MM_BUILTIN_ODECL(Iterable::Iterator, unary, binary);
-
-//  PROPERTIES  //
-
-/// @brief The core prototype constraint.
-static auto g_T = Talos::Builtins::TB::constraint("T", Talos::Builtins::TB::any(), Talos::Builtins::TB::any());
-
-/// @brief Available generator name.
-static constexpr auto g_generator = "Generator";
 
 //  PUBLIC METHODS  //
 
-Talos::Type::Erased TALOS_BUILTIN_TRAITS(Iterable::Iterator)::typing() {
-    return TB::generic(prototype()->instantiate(), std::vector({ g_T }));
+const $::Shared::Pointer<Talos::Type::Parameter> &Talos::Builtins::Constraint::T() {
+  static auto s_T = TN::constraint("T", TN::any(), TN::any());
+  return s_T; // define the necessary type-parameter now
 }
 
-$::Ptr::Shared<Talos::Type::Generic> TALOS_BUILTIN_TRAITS(Iterable::Iterator)::generator() {
-    // prepare the baseline typing to output
-    static $::Ptr::Shared<Type::Generic> s_generator = nullptr;
-
-    // stop early if already constructed here
-    if (s_generator != nullptr) return s_generator;
-
-    // prepare the context parameter to be used
-    auto V = TB::constraint("V", TB::any(), TB::any());
-
-    // prepare the yield handler to be used
-    auto yield = TB::optional(TB::function(TB::none(), TB::arguments(V)));
-
-    // prepare the arguments and signature to be used
-    auto arguments = TB::arguments(TB::number(), yield);
-    auto signature = TB::function(TB::boolean(), arguments);
-
-    // return the resulting context typing now
-    return s_generator = $::New().shared<Type::Generic>(signature, TB::parameters(V));
+$::Shared::Pointer<Talos::Type::Generic> Talos::Builtins::Wrapper<Talos::Iterable::Iterator>::generic() {
+  return TN::generic(typeclass()->instantiate(), Constraint::T());
 }
 
-TALOS_MM_BUILTIN_FTYPE(Iterable::Iterator, done, const Self*) { return { TB::function(TB::boolean()) }; }
-TALOS_MM_BUILTIN_FTYPE(Iterable::Iterator, next, const Self*) { return { TB::function(TB::boolean()) }; }
-TALOS_MM_BUILTIN_FTYPE(Iterable::Iterator, index, const Self*) { return { TB::function(TB::number()) }; }
-
-TALOS_MM_BUILTIN_STYPE(Iterable::Iterator, empty) {
-    auto T = TB::constraint("T", TB::any(), TB::any());
-    auto signature = TB::function(TB::iterator(T));
-    return { TB::generic(signature, TB::parameters(T)) };
+$::Shared::Pointer<Talos::Type::Prototype> Talos::Builtins::Wrapper<Talos::Iterable::Iterator>::typeclass() {
+  return m_typeclass([](const $::Shared::Pointer<Type::Prototype> &prototype) {
+    // bind the required constraints (Iterator [T = Any])
+    prototype->constraints() = {Constraint::T()};
+  });
 }
 
-TALOS_MM_BUILTIN_STYPE(Iterable::Iterator, from) {
-    // prepare the constraints to be used
-    auto T = TB::constraint("T");
+Talos::Type::Entity Talos::Builtins::Field::done(const Self *) { return TN::function(TN::boolean()); }
+Talos::Type::Entity Talos::Builtins::Field::next(const Self *) { return TN::function(TN::boolean()); }
+Talos::Type::Entity Talos::Builtins::Field::index(const Self *) { return TN::function(TN::number()); }
 
-    // construct the signature that resolves a suitable iterable
-    auto signature = TB::function(TB::iterable(T), TB::arguments(T));
-
-    // allow binding the generics required for this instance
-    return { TB::generic(signature, TB::parameters(T)) };
+Talos::Type::Entity Talos::Builtins::Static::empty() {
+  auto T = TN::constraint("T", TN::any(), TN::any());
+  return TN::generic(TN::function(TN::iterator(T)), T);
 }
 
-TALOS_MM_BUILTIN_STYPE(Iterable::Iterator, dynamic) {
-    // prepare the constraints to be used
-    auto T = TB::constraint("T", TB::any(), TB::any());
+Talos::Type::Entity Talos::Builtins::Static::from() {
+  // prepare the constraints to be used
+  auto T = TN::constraint("T");
 
-    // prepare the signature to be used for the generator
-    auto arguments = TB::arguments(generator()->instantiate({ T }));
-    auto signature = TB::function(TB::iterator(T), arguments);
-
-    // allow binding the generics required for this instance
-    return { TB::generic(signature, TB::parameters(T)) };
+  // construct the signature that resolves a suitable iterable
+  return TN::generic(TN::function(TN::iterable(T), T), T);
 }
 
-TALOS_MM_BUILTIN_OTYPE(Iterable::Iterator, unary, const Self* self, Operator::Kind kind) {
-    switch (kind) {
-        case Operator::Kind::ITER: return self->constraints().at(0);
-        default: return TB::unset();  // resolve accordingly
-    }
+const $::Shared::Pointer<Talos::Type::Generic> &Talos::Builtins::Static::generator() {
+  // prepare the baseline typing to output
+  static auto s_generator = $::Shared::Pointer<Type::Generic>();
+
+  // stop early if already constructed here
+  if (s_generator != nullptr) return s_generator;
+
+  // prepare the context parameter to be used
+  auto V = TN::constraint("V", TN::any(), TN::any());
+
+  // prepare the yield handler to be used
+  auto yield = TN::optional(TN::function(TN::none(), V));
+
+  // prepare the arguments and signature to be used
+  auto signature = TN::function(TN::boolean(), TN::number(), yield);
+
+  // return the resulting context typing now
+  return s_generator = TN::generic(signature, V);
 }
 
-TALOS_MM_BUILTIN_OTYPE(Iterable::Iterator, binary, const Self*, Operator::Kind, const Type::Erased&) {
-    return TB::unset();
+Talos::Type::Entity Talos::Builtins::Static::dynamic() {
+  // prepare the constraints to be used
+  auto T = TN::constraint("T", TN::any(), TN::any());
+
+  // prepare the signature to be used for the generator
+  auto yield = generator()->instantiate({T});
+  auto signature = TN::function(TN::iterator(T), yield);
+
+  // allow binding the generics required for this instance
+  return TN::generic(signature, T);
+}
+
+template <>
+Talos::Type::Erased
+Talos::Builtins::Apply<Talos::Iterable::Iterator>::unary(const Type::Structure *self, Operator::Kind kind) {
+  switch (kind) {
+  case Operator::Kind::ITER: return self->constraints(0);
+  default: return TN::unset(); // resolve accordingly
+  }
+}
+
+template <>
+Talos::Type::Erased Talos::Builtins::Apply<Talos::Iterable::Iterator>::binary(
+    const Type::Structure *, Operator::Kind, const Type::Erased &
+) {
+  return TN::unset();
 }
 
 //  PRIVATE METHODS  //
 
-void TALOS_BUILTIN_TRAITS(Iterable::Iterator)::m_typedefs(Type::World* globals) {
-    // prepare the underlying prototype to be used
-    auto proto = prototype();
-    auto& fields = proto->fields();
-    auto& statics = proto->statics();
+void Talos::Builtins::Wrapper<Talos::Iterable::Iterator>::m_typedefs(Type::World *globals) {
+  // prepare the baseline details
+  auto prototype = typeclass();
+  auto &fields = prototype->fields();
+  auto &statics = prototype->statics();
 
-    // prepare the parameter typings now
-    proto->constraints() = { g_T };
+  // bind the decision tree for operators
+  prototype->operators() = Apply<Iterable::Iterator>::decide;
 
-    // bind the decision handler for operators
-    proto->operators() = Apply::decide;
-
+// define the fields for symbols
 #define TALOS_XX_FIELDS_DEFINE(N, ...) fields.emplace(#N, Field::N);
 #include "talos/builtins/iterator/_defines/fields.def"
-#undef TALOS_XX_FIELDS_DEFINE
 
+// define the statics for symbols
 #define TALOS_XX_STATICS_DEFINE(N, ...) statics.emplace(#N, Static::N());
 #include "talos/builtins/iterator/_defines/statics.def"
-#undef TALOS_XX_STATICS_DEFINE
 
-    // bind the necessary properties now for use
-    globals->types().declare(name(), typing());
-    globals->values().declare(name(), proto);
-
-    // bind the context to it's own generator typing
-    globals->types().declare(g_generator, generator());
+  // define the baseline types
+  globals->values().declare(name(), prototype);
+  globals->types().declare(name(), generic());
 }

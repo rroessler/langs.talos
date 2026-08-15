@@ -1,116 +1,120 @@
 #ifndef _TALOS_GLOBALS_SERVICE_HPP
 #define _TALOS_GLOBALS_SERVICE_HPP
 
-/// Talos Modules
-#include "talos/builtins/proxy.hpp"
+/// Talos Includes
+#include "talos/forward/type.hpp"
+#include "talos/function/callback.hpp"
 #include "talos/globals/roots.hpp"
 #include "talos/object/class.hpp"
 #include "talos/value/symbol.hpp"
 
-//  MACROS  //
-
-#define TALOS_MM_GLOBALS_NATIVE(I, N, C, ...)                                     \
-    I->service<::Talos::Globals::Service>()->internal<::Talos::Function::Native>( \
-        I, N, [](::Talos::Runtime::Isolate* isolate) { return isolate->create<::Talos::Function::Native>(C, N); })
-
-//  NAMESPACES  //
-
 namespace Talos::Globals {
 
-    /// @brief Builtin Global Values.
-    class Service : public XI::Define<Service, XI::Shared> {
-        //  PROPERTIES  //
+/// @brief Builtin Global Values.
+class Service : public XI::Singleton {
+  //  PROPERTIES  //
 
-        /// @brief Ensure values can only be accessed one-at-a-time.
-        mutable $::Mutex::Shared m_mutex;
+  /// @brief Ensure values can only be accessed one-at-a-time.
+  mutable $::Mutex::Shared m_mutex;
 
-        /// @brief Currently instantiated values (eg: runtime-values).
-        $::Map<Value::Symbol, Value::Any> m_values = {};
+  /// @brief Available global types world.
+  $::Unique::Pointer<Type::World> m_types;
 
-        /// @brief Available internal values (eg: native-functions).
-        $::Map<Value::Symbol, Value::Any> m_internal = {};
+  /// @brief Currently instantiated values (eg: runtime-values).
+  $::Map::Base<Value::Symbol, Value::Any> m_values = {};
 
-        /// @brief Preloaded factories for use.
-        $::Map<Value::Symbol, Factory> m_factories = {};
+  /// @brief Available internal values (eg: native-functions).
+  $::Map::Base<Value::Symbol, Value::Any> m_internal = {};
 
-        /// @brief Explicitly available global roots.
-        $::Ptr::Unique<Roots> m_roots = $::New().unique<Roots>();
+  /// @brief Preloaded factories for use.
+  $::Map::Base<Value::Symbol, Factory> m_factories = {};
 
-       public:
-        //  CONSTRUCTORS  //
+  /// @brief Explicitly available global roots.
+  $::Unique::Pointer<Roots> m_roots = $::Unique::New<Roots>();
 
-        /// @brief Constructs a set of global values.
-        explicit Service();
+public:
+  //  CONSTRUCTORS  //
 
-        //  PUBLIC METHODS  //
+  /// @brief Constructs a set of global values.
+  explicit Service();
 
-        /// @brief Gets all the available runtime roots.
-        inline constexpr Roots* roots() const noexcept { return m_roots.get(); }
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Denotes if a symbol exists.
-         * @param symbol                Symbol to query.
-         */
-        inline constexpr bool has(Value::Symbol symbol) const noexcept {
-            return m_values.contains(symbol) || m_factories.contains(symbol);
-        }
+  /// @brief Gets all the available runtime roots.
+  inline constexpr Roots *roots() const noexcept { return m_roots.get(); }
 
-        /**
-         * @brief Explicitly casts a global to a type.
-         * @tparam T                        Type to cast.
-         * @param thread                    Thread isolate.
-         * @param symbol                    Global symbol.
-         */
-        template <std::derived_from<Value::Any> T>
-        inline constexpr T get(Runtime::Isolate* isolate, Value::Symbol symbol) {
-            return get(isolate, symbol).as<T>();
-        }
+  /// @brief Gets the available global types.
+  inline constexpr Type::World *types() const noexcept { return m_types.get(); }
 
-        /**
-         * @brief Allow getting cached persitent globals.
-         * @param isolate               Thread isolate.
-         * @param symbol                Global symbol.
-         * @param factory               Factory to use.
-         */
-        template <std::derived_from<Value::Any> T>
-        inline constexpr T internal(Runtime::Isolate* isolate, Value::Symbol symbol, Factory&& factory) {
-            return internal(isolate, symbol, std::move(factory)).as<T>();
-        }
+  /**
+   * @brief Denotes if a symbol exists.
+   * @param symbol                Symbol to query.
+   */
+  inline constexpr bool has(const Value::Symbol &symbol) const noexcept {
+    return m_values.contains(symbol) || m_factories.contains(symbol);
+  }
 
-        /**
-         * @brief Attempts getting a global prototype.
-         * @tparam T                    Type of prototype.
-         * @param isolate               Thread isolate.
-         */
-        template <std::derived_from<Value::Any> T>
-        inline constexpr Object::Class prototype(Runtime::Isolate* isolate) {
-            return get<Object::Class>(isolate, Builtins::Proxy<T>::name());
-        }
+  /**
+   * @brief Explicitly casts a global to a type.
+   * @param thread                Runtime Isolate.
+   * @param symbol                Global symbol.
+   */
+  template <std::derived_from<Value::Any> T>
+  inline constexpr T get(Runtime::Isolate *isolate, const Value::Symbol &symbol) {
+    return get(isolate, symbol).as<T>();
+  }
 
-        /**
-         * @brief Allow getting cached persitent globals.
-         * @param isolate               Thread isolate.
-         * @param symbol                Global symbol.
-         * @param factory               Factory to use.
-         */
-        inline constexpr Value::Any internal(Runtime::Isolate* isolate, Value::Symbol symbol, Factory&& factory) {
-            if (m_internal.contains(symbol)) return m_internal.at(symbol);
-            $_UNUSED $_AUTO = $::Lock::guard(m_mutex);  // ensure thread-safe
-            return m_internal.emplace(symbol, factory(isolate)).first->second;
-        }
+  /**
+   * @brief Attempts getting a global prototype.
+   * @param isolate               Runtime Isolate.
+   */
+  template <std::derived_from<Value::Any> T> inline constexpr Object::Class prototype(Runtime::Isolate *isolate) {
+    return get<Object::Class>(isolate, Builtins::Inspect<T>::name());
+  }
 
-        /**
-         * @brief Ensures that we can set a global variable.
-         * @param isolate               Thread isolate.
-         * @param symbol                Global symbol.
-         */
-        inline constexpr Value::Any get(Runtime::Isolate* isolate, Value::Symbol symbol) {
-            if (m_values.contains(symbol)) return m_values.at(symbol);
-            $_UNUSED $_AUTO = $::Lock::guard(m_mutex);  // ensure thread-safe before continuing
-            return m_values.emplace(symbol, m_factories.at(symbol)(isolate)).first->second;
-        }
-    };
+  /**
+   * @brief Allow getting cached persitent globals.
+   * @param isolate               Runtime Isolate.
+   * @param symbol                Global symbol.
+   * @param factory               Factory to use.
+   */
+  template <std::derived_from<Value::Any> T>
+  inline constexpr T internal(Runtime::Isolate *isolate, const Value::Symbol &symbol, Factory &&factory) {
+    return internal(isolate, symbol, std::move(factory)).as<T>();
+  }
 
-}  // namespace Talos::Globals
+  /**
+   * @brief Allow getting cached persitent globals.
+   * @param isolate               Runtime Isolate.
+   * @param symbol                Global symbol.
+   * @param factory               Factory to use.
+   */
+  inline constexpr Value::Any internal(Runtime::Isolate *isolate, const Value::Symbol &symbol, Factory &&factory) {
+    if (m_internal.contains(symbol)) return m_internal.at(symbol);
+    $_UNUSED $_AUTO = $::Lock::guard(m_mutex); // ensure thread-safe
+    return m_internal.emplace(symbol, factory(isolate)).first->second;
+  }
+
+  /**
+   * @brief Handles defining internal natives.
+   * @param isolate               Runtime Isolate.
+   * @param describe              Symbol to describe.
+   * @param callback              Callback to bind.
+   */
+  Function::Native internal(Runtime::Isolate *isolate, const $::String::View &name, Function::Callback callback);
+
+  /**
+   * @brief Ensures that we can set a global variable.
+   * @param isolate               Runtime Isolate.
+   * @param symbol                Global symbol.
+   */
+  inline constexpr Value::Any get(Runtime::Isolate *isolate, const Value::Symbol &symbol) {
+    if (m_values.contains(symbol)) return m_values.at(symbol);
+    $_UNUSED $_AUTO = $::Lock::guard(m_mutex); // ensure thread-safe before continuing
+    return m_values.emplace(symbol, m_factories.at(symbol)(isolate)).first->second;
+  }
+};
+
+} // namespace Talos::Globals
 
 #endif

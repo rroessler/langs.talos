@@ -1,7 +1,7 @@
-//!
-//! Example: "modules/values.tal"
-//! Description: Exports a variety of values for testing.
-//!
+///
+/// @example "modules/values.tal"
+/// @describe Exports a variety of values for testing.
+///
 
 export let numeric = 42;
 export mut text = "abc";

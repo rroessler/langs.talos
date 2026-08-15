@@ -1,42 +1,42 @@
 #ifndef _TALOS_BYTECODE_LOOP_HPP
 #define _TALOS_BYTECODE_LOOP_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/bytecode/binder.hpp"
 
 namespace Talos::Bytecode {
 
-    /// @brief Bytecode Loop Scope.
-    class Loop {
-        //  PROPERTIES  //
+/// @brief Bytecode Loop Scope.
+class Loop {
+  //  PROPERTIES  //
 
-        Label m_head;  // Header label.
-        Label m_exit;  // Exit label.
+  Label m_head; // Header label.
+  Label m_exit; // Exit label.
 
-        /// @brief Associated labels binder.
-        Binder* m_labels;
+  /// @brief Associated labels binder.
+  Binder *m_labels;
 
-        /// @brief The underlying compiler instance.
-        Compiler* m_compiler;
+  /// @brief The underlying compiler instance.
+  Compiler *m_compiler;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a loop instance.
-         * @param compiler              Compiler to bind.
-         */
-        explicit Loop(Compiler* compiler);
+  /**
+   * @brief Constructs a loop instance.
+   * @param compiler              Compiler to bind.
+   */
+  explicit Loop(Compiler *compiler);
 
-        /// @brief Handles closing a loop instance.
-        ~Loop();
+  /// @brief Handles closing a loop instance.
+  ~Loop();
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        inline constexpr Label head() const noexcept { return m_head; }
-        inline constexpr Label exit() const noexcept { return m_exit; }
-    };
+  inline constexpr Label head() const noexcept { return m_head; }
+  inline constexpr Label exit() const noexcept { return m_exit; }
+};
 
-}  // namespace Talos::Bytecode
+} // namespace Talos::Bytecode
 
 #endif

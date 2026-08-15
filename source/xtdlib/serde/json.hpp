@@ -2,44 +2,39 @@
 #define _XTDLIB_SERDE_JSON_HPP
 
 /// Library Includes
-#include "xtdlib/serde/reflect.hpp"
-#include "xtdlib/serde/value.hpp"
+#include "xtdlib/serde/codec.hpp"
 
 namespace $::JSON {
 
-    /**
-     * @brief Handles parsing JSON values.
-     * @param json                      JSON to parse.
-     * @param comments                  Comments flag.
-     */
-    Serde::Expected<Serde::Value> parse(const String::View& json, bool comments = false);
+//  TYPEDEFS  //
 
-    /**
-     * @brief Handles parsing JSON values.
-     * @param json                      JSON to parse.
-     * @param comments                  Comments flag.
-     */
-    template <class T>
-    static inline Serde::Expected<T> parse(const String::View& json, bool comments = false) {
-        return parse(json, comments).transform([](const Serde::Value& value) { return Reflect::decode<T>(value); });
-    }
+/// @brief Available JSON Encoder Options.
+struct Options {
+  bool comments = true;
+};
 
-    /**
-     * @brief Handles stringifying JSON values.
-     * @param value                     Value to stringify.
-     */
-    Serde::Expected<Serde::Text> stringify(const Serde::Value& value);
+//  PUBLIC METHODS  //
 
-    /**
-     * @brief Handles stringifying JSON values.
-     * @param value                     Value to stringify.
-     */
-    template <class T>
-    static inline Serde::Expected<Serde::Text> stringify(const T& value) {
-        if constexpr (std::convertible_to<T, Serde::Value>) return stringify(Serde::Value(value));
-        else return stringify(Reflect::encode(value));  // otherwise must encode the value now
-    }
+/**
+ * @brief Handles encoding values.
+ * @param value                 Value to encode.
+ * @param options               Encoding Options.
+ */
+Serde::Result<Serde::Text> Encode(const Serde::Value &value, const Options &options = {});
+template <class T> inline constexpr Serde::Result<Serde::Text> Encode(const T &value, const Options &options = {}) {
+  return Encode(Serde::Encode(value), options);
+}
 
-}  // namespace $::JSON
+/**
+ * @brief Handles decoding values.
+ * @param input                 Input to decode.
+ * @param options               Encoding Options.
+ */
+Serde::Result<Serde::Value> Decode(const String::View &input, const Options &options = {});
+template <class T> inline constexpr Serde::Result<T> Decode(const String::View &input, const Options &options = {}) {
+  return Decode(input, options).transform([](const Serde::Value &value) { return Serde::Decode<T>(value); });
+}
+
+} // namespace $::JSON
 
 #endif

@@ -1,7 +1,7 @@
-//!
-//! Example: "resources.tal"
-//! Description: Showcases explicit resource management through 'use' statements.
-//!
+///
+/// @example "resources.tal"
+/// @describe Showcases explicit resource management through 'use' statements.
+///
 
 // Let's define a resource generator.
 let scoped = fn (label: String): Any {
@@ -13,7 +13,9 @@ let scoped = fn (label: String): Any {
 
     // Attaching a disposal callback to the resource directly.
     #[Operator.dispose resource]
-    let callback = fn { Debug.println("Disposed '{0}'".fmt(label)); };
+    let callback = fn {
+        Debug.println("Disposed '{0}'".fmt(label));
+    };
 
     // Return the constructed resource.
     return resource;

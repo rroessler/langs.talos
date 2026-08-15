@@ -1,12 +1,12 @@
 #ifndef _TALOS_RUNTIME_OPTIONS_HPP
 #define _TALOS_RUNTIME_OPTIONS_HPP
 
-/// Talos Modules
-#include "talos/forward/async.hpp"
+/// Talos Includes
 #include "talos/forward/runtime.hpp"
 
-/// Talos Options
+/// Options Includes
 #include "talos/diagnostic/options.hpp"
+#include "talos/forward/async.hpp"
 #include "talos/garbage/options.hpp"
 #include "talos/heap/options.hpp"
 #include "talos/locale/options.hpp"
@@ -15,71 +15,64 @@
 
 namespace Talos::Runtime {
 
-    /// @brief Runtime Options.
-    struct Options : public XI::Define<Options, XI::Shared> {
-        //  PROPERTIES  //
+/// @brief Runtime Services Container.
+struct Options : public XI::Singleton {
+  //  PROPERTIES  //
 
-        /// @brief Available Runtime Flags.
-        struct {
-            bool lint = false;      // Enables linting.
-            bool verbose = false;   // Hide verbose output.
-            bool unstable = false;  // Enable unstable APIs.
+  /// @brief Available Runtime Flags.
+  struct {
+    bool lint = false;     // Enables linting.
+    bool verbose = false;  // Hide verbose output.
+    bool unstable = false; // Enable unstable APIs.
 
-            bool small = false;     // Enforce stricter GC.
-            bool optless = false;   // Disable all optimizations.
-            bool jitless = false;   // Disable JIT compilation.
-            bool typeless = false;  // Disable all type-checks.
-        } flags;
+    bool optless = false;  // Disable all optimizations.
+    bool jitless = false;  // Disable JIT compilation.
+    bool typeless = false; // Disable all type-checks.
+  } flags;
 
-        /// @brief Available Runtime Dumps.
-        struct {
-            bool syntax = false;     // Show syntax dumps.
-            bool types = false;      // Show type dumps.
-            bool graphs = false;     // Show CFG dumps.
-            bool bytecode = false;   // Show bytecode dumps.
-            bool machine = false;    // Show machine-code dumps.
-            bool execution = false;  // Show profiling dumps.
-        } dump;
+  /// @brief Available Runtime Dumps.
+  struct {
+    bool syntax = false;   // Show syntax dumps.
+    bool types = false;    // Show type dumps.
+    bool graphs = false;   // Show CFG dumps.
+    bool bytecode = false; // Show bytecode dumps.
+    bool assembly = false; // Show machine-code dumps.
+  } dump;
 
-        /// @brief Available Runtime Limits.
-        struct {
-            size_t backtraces = 10;  // Explicit backtraces limit.
-        } limits;
+  /// @brief Entry-script options.
+  struct {
+    $::String::Buffer entry = ".";              // Entry-script.
+    std::vector<$::String::Buffer> argv = {};   // Variadic arguments.
+    std::vector<$::String::Buffer> dotenv = {}; // Environment files.
+  } script;
 
-        /// @brief Entry-script options.
-        struct {
-            $::String::Buffer entry = ".";               // Entry-script.
-            std::vector<$::String::Buffer> argv = {};    // Variadic arguments.
-            std::vector<$::String::Buffer> dotenv = {};  // Environment files.
-        } script;
+  /// @brief Heap runtime options.
+  Heap::Options heap = {};
 
-        /// @brief Heap runtime options.
-        Heap::Options heap = {};
+  /// @brief Asynchronous runtime options.
+  Async::Options async = {};
 
-        /// @brief Asynchronous runtime options.
-        Async::Options async = {};
+  /// @brief Linter analysis options.
+  Relint::Options linter = {};
 
-        /// @brief Linter analysis options.
-        Relint::Options linter = {};
+  /// @brief Locale runtime options.
+  Locale::Options locale = {};
 
-        /// @brief Locale runtime options.
-        Locale::Options locale = {};
+  /// @brief Garbage collection options.
+  Garbage::Options garbage = {};
 
-        /// @brief Garbage collection options.
-        Garbage::Options garbage = {};
+  /// @brief Unit testing options.
+  Testing::Options testing = {};
 
-        /// @brief Unit testing options.
-        Testing::Options testing = {};
+  /// @brief Diagnostic reporter options.
+  Diagnostic::Options diagnostics = {};
 
-        /// @brief Diagnostic reporter options.
-        Diagnostic::Options diagnostics = {};
+  //  CONSTRUCTORS  //
 
-        //  CONSTRUCTORS  //
+  /// @brief Constructs a set of defaulted options.
+  constexpr Options() = default;
+};
 
-        /// @brief Constructs a set of defaulted options.
-        constexpr Options() = default;
-    };
-
-}  // namespace Talos::Runtime
+} // namespace Talos::Runtime
 
 #endif

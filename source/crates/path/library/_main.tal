@@ -1,6 +1,6 @@
-//!
-//! Crate: "paths"
-//! Description: Helpers for working with filesystem paths.
-//!
+///
+/// @crate "paths"
+/// @describe Helpers for working with filesystem paths.
+///
 
 Todo("Unimplemented Crate - 'talos:path'");

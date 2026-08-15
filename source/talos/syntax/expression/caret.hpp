@@ -1,30 +1,19 @@
 #ifndef _TALOS_EXPRESSION_CARET_HPP
 #define _TALOS_EXPRESSION_CARET_HPP
 
-/// Talos Modules
+/// Talos Includes
 #include "talos/syntax/node.hpp"
 
 namespace Talos::Syntax {
 
-    /// @brief Caret Expression Node.
-    struct Caret : public Abstract<Caret, Expression> {
-        //  CONSTRUCTORS  //
+/// @brief Caret Expression Node.
+struct Caret : public Mixin<Caret, Expression> {
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs a caret expression.
-         * @param token                 Caret token.
-         */
-        explicit Caret(const Lexer::Token* token) : Caret(token->location()) {
-            $_ASSERT(token->kind() == Lexer::Kind::BINOP_XOR);
-        }
+  /// @brief Constructs a caret expression.
+  explicit Caret() = default;
+};
 
-        /**
-         * @brief Constructs a caret expression.
-         * @param location              Optional location.
-         */
-        explicit Caret(const Bounds& location = {}) : Abstract(location) {}
-    };
-
-}  // namespace Talos::Syntax
+} // namespace Talos::Syntax
 
 #endif

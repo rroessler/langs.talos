@@ -1,58 +1,51 @@
 #ifndef _TALOS_BYTECODE_TRACE_HPP
 #define _TALOS_BYTECODE_TRACE_HPP
 
-/// C++ Modules
-#include <stack>
-
-/// Talos Modules
+/// Talos Includes
 #include "talos/forward/bytecode.hpp"
-#include "talos/linker/records.hpp"
 
 namespace Talos::Bytecode {
 
-    /// @brief Bytecode Source Trace.
-    struct Trace {
-        //  TYPEDEFS  //
+/// @brief Bytecode Source Trace.
+class Trace {
+  //  PROPERTIES  //
 
-        /// @brief Stack of traces.
-        using Stack = std::stack<Linker::Position>;
+  /// @brief Bound trace position.
+  XLSP::Position m_position = {};
 
-       private:
-        //  PROPERTIES  //
+  /// @brief Compilation stack.
+  std::stack<XLSP::Position> *m_stack = nullptr;
 
-        /// @brief Compilation stack.
-        Stack* m_stack = nullptr;
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Bound trace position.
-        Linker::Position m_position = {};
+  /// @brief Constructs an empty trace.
+  explicit constexpr Trace() = default;
 
-       public:
-        //  CONSTRUCTORS  //
+  /**
+   * @brief Constructs a bytecode-trace.
+   * @param stack             Stack to append to.
+   * @param position          Current position.
+   */
+  explicit constexpr Trace(std::stack<XLSP::Position> *stack, const XLSP::Position &position = {}) :
+      m_position(position), m_stack(stack) {
+    if (valid()) m_stack->push(m_position);
+  }
 
-        /// @brief Constructs an empty trace.
-        explicit constexpr Trace() = default;
+  /// @brief Handles removing the trace instance.
+  constexpr ~Trace() {
+    if (valid()) $_ASSERT(m_stack->top() == m_position), m_stack->pop();
+  }
 
-        /**
-         * @brief Constructs a bytecode-trace.
-         * @param stack             Stack to append to.
-         * @param position          Current position.
-         */
-        explicit constexpr Trace(Stack* stack, const Linker::Position& position = {}) :
-            m_stack(stack), m_position(position) {
-            if (valid()) m_stack->push(m_position);
-        }
+  //  PUBLIC METHODS  //
 
-        /// @brief Handles removing the trace instance.
-        constexpr ~Trace() {
-            if (valid()) $_ASSERT(m_stack->top() == m_position), m_stack->pop();
-        }
+  /// @brief Gets the current trace position.
+  inline constexpr const XLSP::Position &position() const noexcept { return m_position; }
 
-        //  PUBLIC METHODS  //
+  /// @brief Checks if this position is valid.
+  inline constexpr bool valid() const noexcept { return m_stack && m_position != XLSP::Position(); }
+};
 
-        inline constexpr const Linker::Position& position() const noexcept { return m_position; }
-        inline constexpr bool valid() const noexcept { return m_stack && m_position != Linker::Position(); }
-    };
-
-}  // namespace Talos::Bytecode
+} // namespace Talos::Bytecode
 
 #endif

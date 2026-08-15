@@ -16,15 +16,26 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 
 ## Runtime
 
-| Status | Feature | Description                          | Todo                     |
-| :----: | ------- | ------------------------------------ | ------------------------ |
-|   💀   | `@...`  | Implement runtime decorators.        | -                        |
-|   💀   | `#...`  | Implement compile-time attributes.   | Overloads not yet done   |
-|   ⚪   | `use`   | Implement explicit resources.        | Requires attribute hooks |
-|   ⚪   | `enum`  | Implement enumeration declarations.  | -                        |
-|   ⚪   | `class` | Implement class-based inheritance.   | -                        |
-|   💀   | `xasm`  | Implement jitted runtime functions.  | -                        |
-|   💀   | `Debug` | Implement debug `breakpoint` method. | Implement a DAP manager  |
+| Status | Feature | Description                          | Todo                    |
+| :----: | ------- | ------------------------------------ | ----------------------- |
+|   💀   | `@...`  | Implement runtime decorators.        | Needs better typing     |
+|   💀   | `#...`  | Implement compile-time attributes.   | Overloads not yet done  |
+|   ✅   | `use`   | Implement explicit resources.        | -                       |
+|   ✅   | `enum`  | Implement enumeration declarations.  | -                       |
+|   ⚪   | `class` | Implement class-based inheritance.   | Needs a testing suite   |
+|   ❌   | `Debug` | Implement debug `breakpoint` method. | Implement a DAP manager |
+
+## Testing
+
+| Status | Suite             | Description                 | Todo |
+| :----: | ----------------- | --------------------------- | ---- |
+|   🚀   | `builtins/list`   | Testing of `List` builtin   | -    |
+|   🚀   | `builtins/number` | Testing of `Number` builtin | -    |
+|   🚀   | `builtins/result` | Testing of `Result` builtin | -    |
+|   🚀   | `builtins/string` | Testing of `String` builtin | -    |
+|   🚀   | `syntax/class`    | Testing of `class` syntax   | -    |
+|   🚀   | `syntax/enum`     | Testing of `enum` syntax    | -    |
+|   🚀   | `syntax/match`    | Testing of `match` syntax   | -    |
 
 ## Libraries
 
@@ -34,18 +45,18 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 |   ❌   | `talos:async`  | Asynchronous utilities.         | -                              |
 |   ❌   | `talos:chrono` | Temporal utilities.             | -                              |
 |   ❌   | `talos:codec`  | Encoding/decoding function.     | -                              |
-|   🚀   | `talos:ffi`    | Native library utilities.       | -                              |
+|   ❌   | `talos:ffi`    | Native library utilities.       | -                              |
 |   ❌   | `talos:fsys`   | Filesystem utilities.           | -                              |
 |   ✅   | `talos:gc`     | Garbage collection hooks.       | Additional statistics?         |
-|   💀   | `talos:jit`    | Experimental JIT hooks.         | -                              |
 |   🚀   | `talos:json`   | JSON/JSONC parsing/serializing. | -                              |
+|   ❌   | `talos:lint`   | Linting plugin bindings.        | -                              |
 |   ❌   | `talos:math`   | Mathematics utilities.          | -                              |
 |   ⚪   | `talos:mem`    | Virtual memory utilities.       | Buffers, allocators, ...       |
 |   ❌   | `talos:path`   | Filesystem path utilities.      | -                              |
 |   ❌   | `talos:rng`    | Random number generators.       | -                              |
 |   ⚪   | `talos:test`   | Testing suite framework.        | Skipping, lifecycle hooks, ... |
 |   🚀   | `talos:toml`   | TOML parsing/serializing.       | -                              |
-|   ✅   | `talos:uuid`   | UUID generators/validators.     | Show there be a validator?     |
+|   ✅   | `talos:uuid`   | UUID generators/validators.     | Should there be a validator?   |
 |   🚀   | `talos:yaml`   | YAML parsing/serializing.       | -                              |
 
 ## Tooling
@@ -58,15 +69,17 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 |   💀   | `lint`    | Runs extra analysis of scripts/projects.  | Recommended rules, plugins?   |
 |   ⚪   | `bundle`  | Packages scripts/projects in executables. | Requires codesigning (Win32)  |
 |   ✅   | `format`  | Formats scripts with a builtin styler.    | More configurable options     |
-|   ⚪   | `serve`   | Starts a language-server instance.        | More code-editor features     |
-|   ⚪   | `upgrade` | Upgrades to the latest version of Talos.  | Needs a release to fully test |
+|   ✅   | `serve`   | Starts a language-server instance.        | Code completion is missing    |
+|   ✅   | `upgrade` | Upgrades to the latest version of Talos.  | Needs a release to fully test |
 
 ## Documentation
 
-| Status | Section  | Description                         |
-| :----: | -------- | ----------------------------------- |
-|   🚀   | Crates   | Only stub pages have been made.     |
-|   🚀   | Builtins | Only stub pages have been made.     |
-|   ⚪   | Language | Toolkit, advanced concepts, ...     |
-|   ⚪   | Project  | Contribution points, dashboard, ... |
-|   ⚪   | Tour     | Some steps are not yet finished.    |
+| Status | Section   | Description                          |
+| :----: | --------- | ------------------------------------ |
+|   ⚪   | Blog      | Still need to implement `feed.xml`   |
+|   ⚪   | Crates    | Only stub pages have been made.      |
+|   ⚪   | Builtins  | Only stub pages have been made.      |
+|   ⚪   | Language  | Fundamentals, advanced concepts, ... |
+|   ⚪   | Project   | Contribution points, dashboard, ...  |
+|   💀   | Proposals | Only a baseline specification, ...   |
+|   ⚪   | Tour      | Some steps are not yet finished.     |

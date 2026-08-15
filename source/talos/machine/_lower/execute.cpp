@@ -1,41 +1,26 @@
-/// Talos Modules
-#include "talos/runtime/isolate.hpp"
-#include "talos/signal/service.hpp"
-
-/// Inline Modules
+/// Machine Includes
 #include "talos/machine/_inline/macros.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Machine::Dispatch, void abort(Runtime::Isolate *, int32_t))
-$_FWD(Talos::Machine::Dispatch, void raise(Runtime::Isolate *, int32_t))
-$_FWD(Talos::Machine::Dispatch, void panic(Runtime::Isolate *, Reference))
+//  EMITTER METHODS  //
 
-//  PUBLIC METHODS  //
+TALOS_MM_MACHINE_EMIT(EXEC_NOOP, , ) { $_ABORT("Unreachable Bytecode Operation 'EXEC_NOOP'"); }
+TALOS_MM_MACHINE_EMIT(EXEC_INVALID, , ) { $_ABORT("Unreachable Bytecode Operation 'EXEC_INVALID'"); }
 
-void Talos::Machine::Dispatch::abort(Runtime::Isolate *isolate, int32_t code) { isolate->thread()->shutdown(code); }
-void Talos::Machine::Dispatch::panic(Runtime::Isolate *isolate, Reference value) { isolate->panic(Value::Any(value)); }
-void Talos::Machine::Dispatch::raise(Runtime::Isolate *isolate, int32_t code) {
-    isolate->service<Signal::Service>()->raise(static_cast<Signal::Code>(code));
-}
-
-//  PRIVATE METHODS  //
-
-TALOS_MM_MACHINE_EMIT(EXEC_INVALID, , ) { $::System::unreachable(); }
-
-TALOS_MM_MACHINE_EMIT(EXEC_NOOP, builder, ) { __ee__ noop(); }
-TALOS_MM_MACHINE_EMIT(EXEC_RETURN, builder, ) { __ee__ returns(); }
-TALOS_MM_MACHINE_EMIT(EXEC_CANCEL, builder, ) { __ee__ interrupt(); }
+TALOS_MM_MACHINE_EMIT(EXEC_RETURN, builder, ) { __ee__ ret(); }
+TALOS_MM_MACHINE_EMIT(EXEC_CANCEL, builder, ) { __ee__ irq(); }
 
 TALOS_MM_MACHINE_EMIT(EXEC_ABORT, builder, instruction) {
-    __ee__ invoke(Dispatch::abort, builder->isolate, instruction->get<0>().encode());
+  auto errc = instruction->get<0>().encode();
+  __ee__ call(Glue::abort, builder->isolate, errc);
 }
 
 TALOS_MM_MACHINE_EMIT(EXEC_RAISE, builder, instruction) {
-    __ee__ invoke(Dispatch::raise, builder->isolate, instruction->get<0>().encode());
+  auto code = instruction->get<0>().encode();
+  __ee__ call(Glue::raise, builder->isolate, code);
 }
 
 TALOS_MM_MACHINE_EMIT(EXEC_PANIC, builder, ) {
-    auto tx = __ee__ resolve(Engine::Accumulator());
-    __ee__ invoke(Dispatch::panic, builder->isolate, tx);
-    __ee__ returns(Value::Failure());  // and force exit
+  auto tx = __ee__ slot(Register::Accumulator);
+  __ee__ call(Glue::panic, builder->isolate, tx);
+  __ee__ ret(Constants::Fail); // force failure
 }

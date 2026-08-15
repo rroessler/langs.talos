@@ -1,62 +1,45 @@
 #ifndef _TALOS_BUILTINS_ITERATOR_HPP
 #define _TALOS_BUILTINS_ITERATOR_HPP
 
-/// Talos Modules
-#include "talos/builtins/traits.hpp"
-#include "talos/iterable/iterator.hpp"
+/// Talos Includes
+#include "talos/builtins/wrapper.hpp"
 
 namespace Talos::Builtins {
 
-    /// @brief Iterator Builtin Traits.
-    template <>
-    struct Traits<Iterable::Iterator> : public Define<Iterable::Iterator, "Iterator">,
-                                        public Features<Adapter::FIELDS, Adapter::GLOBALS, Adapter::TYPEDEFS> {
-       protected:
-        //  TYPEDEFS  //
+/// @brief Iterator Builtin Traits.
+template <> struct Wrapper<Iterable::Iterator> : public Blueprint<Iterable::Iterator, "Iterator"> {
+  //  PUBLIC METHODS  //
 
-        /// @brief Helper for constructing outputs.
-        struct Apply;
-        struct Field;
-        struct Static;
+  /// @brief Gets the generic typing for this builtin.
+  static $::Shared::Pointer<Type::Generic> generic();
 
-       private:
-        //  PROPERTIES  //
+  /// @brief Gets the baseline list type-class.
+  static $::Shared::Pointer<Type::Prototype> typeclass();
 
-        /// @brief Available field descriptors.
-        static Member::Storage m_members;
+protected:
+  //  PRIVATE METHODS  //
 
-       public:
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Handles defining global type definitions.
+   * @param globals                     Global type-world.
+   */
+  static void m_typedefs(Type::World *globals);
 
-        /// @brief Gets the underlying "Iterator" typing.
-        static Type::Erased typing();
+  /**
+   * @brief Handles instantiating globals.
+   * @param isolate                   Runtime isolate.
+   * @param prototype                 Prototype instance.
+   */
+  static Value::Any m_globals(Isolate *isolate, const Object::Class &prototype);
 
-        /// @brief Gets the underlying "Generator" typing.
-        static $::Ptr::Shared<Type::Generic> generator();
+  /**
+   * @brief Handles looking up value fields.
+   * @param self                      Value instance.
+   * @param symbol                    Field symbol.
+   */
+  static Member::View m_attribute(const Iterable::Iterator &self, const Value::Symbol &symbol);
+};
 
-       protected:
-        //  PRIVATE METHODS  //
-
-        /**
-         * @brief Allows instantiating global types.
-         * @param globals                   Global type-world.
-         */
-        static void m_typedefs(Type::World* globals);
-
-        /**
-         * @brief Handles instantiating globals.
-         * @param isolate                   Runtime isolate.
-         */
-        static Value::Any m_globals(Runtime::Isolate* isolate);
-
-        /**
-         * @brief Handles looking up value fields.
-         * @param self                      Self value.
-         * @param symbol                    Field symbol.
-         */
-        static Member::View m_attributes(const Iterable::Iterator& self, Value::Symbol symbol);
-    };
-
-}  // namespace Talos::Builtins
+} // namespace Talos::Builtins
 
 #endif

@@ -1,7 +1,7 @@
-//!
-//! Crate: "gc"
-//! Description: Setup functions for garbage collection.
-//!
+///
+/// @crate "gc"
+/// @describe Setup functions for garbage collection.
+///
 
 // Dynamic Modules
 import "dylib:gc" as gc;
@@ -11,14 +11,14 @@ import "talos:_detail" as Detail;
 
 // - HELPERS - //
 
-//! Brief: Internal helper to reduce bytecode output.
+//! @brief Internal helper to reduce bytecode output.
 let m_cast = Detail.Unsafe.cast;
 
 // - PUBLIC METHODS - //
 
-//! Brief: Gets the total GC cycles that have occurred.
+//! @brief Gets the total GC cycles that have occurred.
 export let cycles = m_cast[fn -> Number](gc.cycles);
 
-//! Brief: Forcibly executes garbage collection.
-//! Param: major                Senior mode flag.
+//! @brief Forcibly executes garbage collection.
+//! @param major                Senior mode flag.
 export let collect = m_cast[fn (major?: Boolean) -> Void](gc.collect);

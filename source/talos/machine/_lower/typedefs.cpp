@@ -1,54 +1,40 @@
-/// Talos Modules
-#include "talos/engine/dispatch.hpp"
-#include "talos/value/boolean.hpp"
-
-/// Inline Modules
+/// Machine Includes
 #include "talos/machine/_inline/macros.ipp"
 
-//  PRIVATE METHODS  //
+//  EMITTER METHODS  //
 
 TALOS_MM_MACHINE_EMIT(TYPE_CAST, builder, instruction) {
-    // prepare the registers to be used
-    auto dv = instruction->get<0>();
-    auto value = instruction->get<1>();
-    auto guard = instruction->get<2>();
+  // prepare all the registers required
+  auto dx = __ee__ slot(instruction->get<0>());
+  auto vx = __ee__ slot(instruction->get<1>());
+  auto gx = __ee__ slot(instruction->get<2>());
 
-    // prepare the output registers now
-    auto dx = __ee__ resolve(dv);
-    auto vx = __ee__ resolve(value);
-    auto gx = __ee__ resolve(guard);
+  // attempt invoking the type-cast handler
+  __ee__ call(Glue::ensure, dx, builder->isolate, vx, gx);
 
-    // attempt invoking the type-cast handler
-    __ee__ invoke(Engine::Dispatch::ensure, dx, builder->isolate, vx, gx);
-
-    // and fast-exit depending on the result
-    __ee__ validate(dx, Validate::FAST);
+  // and fast-exit depending on the result
+  __ee__ test(dx, Validate::FAST);
 }
 
 TALOS_MM_MACHINE_EMIT(TYPE_GUARD, builder, instruction) {
-    // otherwise we check the incoming extension details
-    auto dv = instruction->get<0>();
-    auto value = instruction->get<1>();
-    auto guard = instruction->get<2>();
+  // prepare all the registers required
+  auto dx = __ee__ slot(instruction->get<0>());
+  auto vx = __ee__ slot(instruction->get<1>());
+  auto gx = __ee__ slot(instruction->get<2>());
 
-    // prepare the output registers now
-    auto dx = __ee__ resolve(dv);
-    auto vx = __ee__ resolve(value);
-    auto gx = __ee__ resolve(guard);
-    auto tx = __cc__ new_gp64("@tx");
+  // prepare a label for setting a result
+  auto tx = __cc__ new_gp64();
+  auto bail = __cc__ new_label();
 
-    // prepare a label for setting a result
-    auto bail = __cc__ new_label();
+  // attempt invoking the type-cast handler
+  __ee__ call(Glue::extends, tx, vx, gx);
 
-    // attempt getting the extension result
-    __ee__ invoke(Engine::Dispatch::extends, tx, vx, gx);
+  // set the baseline result now
+  __ee__ load(dx, Value::True);
 
-    // set the baseline result now
-    __ee__ load(dx, Value::Boolean(false));
+  // convert the result to a boolean now
+  __cc__ j(bail, asmjit::ujit::cmp_ne(tx, Engine::Subtype::SUCCESS));
 
-    // convert the resulting to a boolean now
-    __cc__ j(bail, asmjit::ujit::cmp_ne(tx, Engine::Subtype::SUCCESS));
-
-    // if we did not jump then resolve the necessary value instead
-    __ee__ load(dx, Value::Boolean(true)), __cc__ bind(bail);
+  // if we did not jump, then resolve the necessary value instead
+  __ee__ load(dx, Value::False), __cc__ bind(bail);
 }

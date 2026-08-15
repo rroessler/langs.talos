@@ -1,76 +1,86 @@
 #ifndef _TALOS_ENGINE_FRAME_HPP
 #define _TALOS_ENGINE_FRAME_HPP
 
-/// Talos Modules
-#include "talos/forward/engine.hpp"
-#include "talos/forward/linker.hpp"
-#include "talos/forward/runtime.hpp"
+/// Talos Includes
+#include "talos/engine/interrupt.hpp"
+#include "talos/forward/image.hpp"
+#include "talos/globals/roots.hpp"
 #include "talos/resource/trace.hpp"
+#include "talos/value/pointer.hpp"
 
 namespace Talos::Engine {
 
-    /// @brief Abstract Engine Frame.
-    struct $_ABSTRACT Frame : public $::RTTI::Dynamic {
-        //  TYPEDEFS  //
+/// @brief Abstract Engine Frame.
+struct $_ABSTRACT Frame : public $::RTTI::Dynamic {
+  //  TYPEDEFS  //
 
-        /// @brief Frame Abstraction Typing.
-        template <class T>
-        using Abstract = $::RTTI::Extends<T, Frame>;
+  /// @brief Frame Abstraction Typing.
+  template <class T> using Mixin = $::RTTI::Mixin<T, Frame>;
 
-       protected:
-        //  PROPERTIES  //
+private:
+  //  PROPERTIES  //
 
-        bool m_interrupt;    // Interrupt flag.
-        uint32_t m_depth;    // Current depth.
-        Frame* m_parent;     // Parent frame.
-        Isolate* m_isolate;  // Runtime isolate.
+  /// @brief Runtime isolate.
+  Pointer::Underlying m_encoded;
 
-       public:
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs an engine frame.
-         * @param isolate           Runtime isolate.
-         */
-        explicit Frame(Isolate* isolate);
+  /**
+   * @brief Constructs an engine frame.
+   * @param isolate           Runtime isolate.
+   */
+  explicit Frame(Isolate *isolate);
 
-        /// @brief Handles destructing frames.
-        virtual ~Frame();
+  /// @brief Handles destructing frames.
+  virtual ~Frame();
 
-        //  PUBLIC METHODS  //
+  //  PUBLIC METHODS  //
 
-        /// @brief Attempts forcing the frame into an interrupt state.
-        inline constexpr bool& interrupted() noexcept { return m_interrupt; }
-        inline constexpr bool interrupted() const noexcept { return m_interrupt; }
+  /// @brief The underlying frame resource.
+  virtual inline $::URI::View resource() const noexcept { return {}; }
 
-        /// @brief Gets the depth of the frame.
-        inline constexpr size_t depth() const noexcept { return m_depth; }
+  /// @brief Handles getting a frames backtrace.
+  virtual inline Resource::Trace backtrace() const noexcept { return Resource::Trace(resource()); }
 
-        /// @brief Gets the parent of the frame.
-        inline constexpr Frame* parent() const noexcept { return m_parent; }
+  /// @brief Gets the associated function arena.
+  virtual inline const Image::Arena *arena() const noexcept { return nullptr; }
 
-        /// @brief The underlying frame resource.
-        virtual inline $::URI::View resource() const noexcept { return $::URI::Anonymous(); }
+  /// @brief Yields all the available frame roots.
+  virtual inline void roots(Globals::Each &) noexcept {};
 
-        /// @brief Gets the associated arena for a frame.
-        virtual inline const Linker::Arena* arena() const noexcept { return nullptr; }
+  /// @brief Handles getting the current interrupted state.
+  inline constexpr $::Enum::Flags<Interrupt> modes() const noexcept { return m_modes(); }
 
-        /// @brief Handles getting a frames backtrace.
-        virtual inline Resource::Trace backtrace() const noexcept { return Resource::Trace(resource()); }
+  /// @brief Sets a current interrupt for the frame.
+  inline constexpr void interrupt(Interrupt mode = Interrupt::BAILOUT) noexcept { m_interrupt(mode); }
 
-        /// @brief Allows casting to derived values.
-        template <std::derived_from<Frame> T>
-        inline constexpr T* as() noexcept {
-            return $::RTTI::Assert<T>(this), static_cast<T*>(this);
-        }
+  /// @brief Allows casting to derived values.
+  template <std::derived_from<Frame> T> inline constexpr T *as() noexcept { return $::RTTI::Cast<T>(this); }
 
-        /// @brief Allows casting to derived values.
-        template <std::derived_from<Frame> T>
-        inline constexpr const T* as() const noexcept {
-            return $::RTTI::Assert<T>(this), static_cast<const T*>(this);
-        }
-    };
+  /// @brief Allows casting to derived values.
+  template <std::derived_from<Frame> T> inline constexpr const T *as() const noexcept { return $::RTTI::Cast<T>(this); }
 
-}  // namespace Talos::Engine
+protected:
+  //  PRIVATE METHODS  //
+
+  /// @brief Gets the currently set interrupt flags.
+  inline constexpr $::Enum::Flags<Interrupt> m_modes() const noexcept {
+    auto flags = m_encoded & Pointer::Mask::IMM; // decode details
+    return *reinterpret_cast<$::Enum::Flags<Interrupt> *>(&flags);
+  }
+
+  /// @brief Handles setting an interrupt flag.
+  inline constexpr void m_interrupt(Interrupt mode) noexcept {
+    m_encoded = (m_encoded & ~Pointer::Mask::IMM) | m_modes().set(mode).value();
+  }
+
+  /** Gets the internal isolate value. */
+  inline constexpr Isolate *m_isolate() noexcept {
+    return reinterpret_cast<Isolate *>(m_encoded & ~Pointer::Mask::IMM);
+  }
+};
+
+} // namespace Talos::Engine
 
 #endif

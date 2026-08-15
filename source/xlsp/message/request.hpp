@@ -2,70 +2,84 @@
 #define _XLSP_MESSAGE_REQUEST_HPP
 
 /// XLSP Includes
-#include "xlsp/message/error.hpp"
-
-//  MACROS  //
-
-/// @brief Helper for building requests.
-#define XLSP_REQUEST(N, ...) ::XLSP::Request::Handle<::XLSP::Message::Type::N $_PP_VARGS(__VA_ARGS__)>
-
-/// @brief Helper for building responses.
-#define XLSP_RESPONSE(N, ...) ::XLSP::Response::Value<::XLSP::Message::Type::N>(__VA_ARGS__)
-
-//  NAMESPACES  //
+#include "xlsp/message/channel.hpp"
+#include "xlsp/params/special.hpp"
 
 namespace XLSP::Request {
 
-    /// @brief Potential identifiers available.
-    using Identifier = $::String::Buffer;
+/// @brief Request Identifier Typing.
+using Identifier = $::String::Buffer;
 
-    /// @brief Handles validating notifications.
-    template <Message::Type T>
-    concept Validate = T > Message::Type::$_REQUEST;
+/// @brief Request Cancellation Parameters.
+using Cancel = Notification::Params<Notification::Channel::QUERY_CANCEL>;
 
-    /// @brief Available Notification Parameters.
-    template <Message::Type T>
-    requires Validate<T> struct Params;
+/// @brief Request Parameters Declaration.
+template <Message::Channel> struct Params;
 
-}  // namespace XLSP::Request
+/// @brief Request Result Declaration.
+template <Message::Channel> struct Result;
 
-namespace XLSP::Response {
+/// @brief Denotes Empty Request Parameters.
+template <Message ::Channel C> using Empty = Message::Empty<Params<C>>;
 
-    /// @brief Declares explicit response values.
-    template <Message::Type T>
-    struct Value;
+/// @brief Denotes Nullish Request Result.
+template <Message::Channel C> using Nullish = Message::Nullish<Result<C>>;
 
-}  // namespace XLSP::Response
+/// @brief Response Callback Typing.
+template <Message::Channel C> using Callback = $::Unique::Functor<void(const Message::Result<Result<C>> &) const>;
 
-namespace XLSP::Request {
+/// @brief Request Handle Structure.
+template <Message::Channel C, class R = Callback<C>, class P = Params<C>> class Handle {
+  //  TYPEDEFS  //
 
-    /// @brief Request Responder Callback.
-    template <Message::Type T>
-    using Callback = $::Functor::Unique<void(const Message::Result<Response::Value<T>>&)>;
+  /// @brief Allow the event-binder internal access.
+  friend class Event::Binder;
 
-    /// @brief Request Handle Container.
-    template <Message::Type T, class C = Callback<T>, class P = Params<T>>
-    struct Handle {
-        //  PROPERTIES  //
+  //  PROPERTIES  //
 
-        C reply;   // Handles response values.
-        P params;  // Incoming parameters value.
+  R m_reply;
+  P m_params;
 
-        //  CONSTRUCTORS  //
+public:
+  //  CONSTRUCTORS  //
 
-        /**
-         * @brief Constructs an empty handle.
-         * @param params                Parameters to bind.
-         * @param reply                 Reply to bind.
-         */
-        constexpr Handle(const P& params, C&& reply = nullptr) : reply(std::move(reply)), params(params) {}
+  /**
+   * @brief Constructs a request handle.
+   * @param reply                   Callback to bind.
+   */
+  constexpr Handle(R &&reply = nullptr) : m_reply(std::move(reply)) {}
 
-        //  PUBLIC METHODS  //
+  /**
+   * @brief Constructs a request handle.
+   * @param params                  Params to bind.
+   * @param reply                   Callback to bind.
+   */
+  constexpr Handle(const P &params, R &&reply = nullptr) : m_reply(std::move(reply)), m_params(params) {}
 
-        /// @brief Handles cancelling the response.
-        inline constexpr void cancel() const noexcept { reply(XLSP_ERROR(SERVER_CANCELLED)); }
-    };
+  //  PUBLIC METHODS  //
 
-}  // namespace XLSP::Request
+  /// @brief Allows getting the underlying parameters.
+  inline constexpr const P &params() const noexcept { return m_params; }
+
+  /// @brief Cancels the parent request.
+  inline constexpr void cancel() const noexcept { m_reply(Error::Code::SERVER_CANCELLED); }
+
+  /**
+   * @brief Prepares a baseline result to be returned.
+   * @param args                    Result arguments.
+   */
+  template <class... As> inline constexpr Result<C> prepare(As &&...args) const noexcept {
+    return Result<C>(std::forward<As>(args)...);
+  }
+
+  /**
+   * @brief Responds to the request with a result.
+   * @param result                  Result to reply.
+   */
+  inline constexpr void reply() const { m_reply(prepare()); }
+  inline constexpr void reply(const Message::Result<Result<C>> &result) const { m_reply(result); }
+};
+
+} // namespace XLSP::Request
 
 #endif

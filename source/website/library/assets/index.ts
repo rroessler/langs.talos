@@ -1,49 +1,21 @@
 /// Node Modules
 import * as path from 'node:path';
 
-/** Contains Internal Asset Paths. */
+/** Internal Asset Paths. */
 export type Assets = typeof path.resolve;
 export namespace Assets {
     //  PROPERTIES  //
 
-    /** The project directory. */
-    const m_project = process.cwd();
-
-    /** The root directory. */
-    const m_root = path.resolve(m_project, '..', '..');
-
-    /** The scripts directory. */
-    const m_scripts = path.resolve(m_root, 'scripts');
-
-    /** The source directory. */
-    const m_source = path.resolve(m_root, 'source');
-
-    /** The crates directory. */
-    const m_crates = path.resolve(m_source, 'crates');
-
-    /** The builtins directory. */
-    const m_builtins = path.resolve(m_source, 'talos', 'builtins');
-
-    /** The examples directory. */
-    const m_examples = path.resolve(m_root, 'examples');
-
-    /** The syntaxes directory. */
-    const m_syntaxes = path.resolve(m_root, 'syntaxes');
-
-    /** The documentation directory. */
-    const m_documentation = path.resolve(m_root, 'docs');
-
-    /** The contents directory. */
-    const m_content = path.resolve(m_project, 'content');
-
-    /** The blog directory. */
-    const m_blog = path.resolve(m_content, 'blog');
-
-    /** The proposals directory. */
-    const m_proposals = path.resolve(m_content, 'proposals');
-
-    /** The language tour directory. */
-    const m_tour = path.resolve(m_documentation, 'tour');
+    const m_project = /* turbopackIgnore: true */ process.cwd();
+    const m_root = path.resolve(/* turbopackIgnore: true */ m_project, '..', '..');
+    const m_docs = path.resolve(/* turbopackIgnore: true */ m_root, 'docs');
+    const m_blog = path.resolve(/* turbopackIgnore: true */ m_docs, 'blog');
+    const m_scripts = path.resolve(/* turbopackIgnore: true */ m_root, 'scripts');
+    const m_source = path.resolve(/* turbopackIgnore: true */ m_root, 'source');
+    const m_examples = path.resolve(/* turbopackIgnore: true */ m_root, 'examples');
+    const m_syntaxes = path.resolve(/* turbopackIgnore: true */ m_root, 'syntaxes');
+    const m_crates = path.resolve(/* turbopackIgnore: true */ m_source, 'crates');
+    const m_builtins = path.resolve(/* turbopackIgnore: true */ m_source, 'talos', 'builtins');
 
     //  PUBLIC METHODS  //
 
@@ -60,13 +32,10 @@ export namespace Assets {
     export const syntaxes = m_bind(m_syntaxes);
 
     /** The documentation folder. */
-    export const documentation = m_bind(m_documentation);
+    export const docs = m_bind(m_docs);
 
     /** The blogs folder. */
     export const blog = m_bind(m_blog);
-
-    /** The proposals folder. */
-    export const proposals = m_bind(m_proposals);
 
     /** The underlying examples path. */
     export const examples = m_bind(m_examples);
@@ -76,9 +45,6 @@ export namespace Assets {
 
     /** The underlying builtins path. */
     export const builtins = m_bind(m_builtins);
-
-    /** The underlying tour path. */
-    export const tour = m_bind(m_tour);
 
     //  PRIVATE METHODS  //
 

@@ -1,162 +1,159 @@
 #ifndef _TALOS_TYPE_PROTOTYPE_HPP
 #define _TALOS_TYPE_PROTOTYPE_HPP
 
-/// Type Modules
+/// Type Includes
 #include "talos/type/compound/callable.hpp"
-#include "talos/type/compound/protocol.hpp"
+#include "talos/type/compound/structure.hpp"
 #include "talos/type/utility/union.hpp"
 
 namespace Talos::Type {
 
-    /// @brief Constructor Applicator Callback.
-    using Constructor = $::Functor::Shared<Erased(const Prototype*)>;
+/// @brief Constructor Applicator Callback.
+using Constructor = $::Shared::Functor<Erased(const Prototype *) const>;
 
-    /// @brief Operation Applicator Callback.
-    using Apply = $::Functor::Shared<Erased(const Protocol*, Operator::Kind, const Erased&)>;
+/// @brief Type Class Node.
+class Prototype : public Mixin<Prototype> {
+  //  TYPEDEFS  //
 
-    /// @brief Type Class Node.
-    class Prototype : public Abstract<Prototype> {
-        //  TYPEDEFS  //
+  /// @brief Allow instances internal access.
+  friend class Instance;
 
-        /// @brief Allow instances internal access.
-        friend class Instance;
+  //  PROPERTIES  //
 
-        //  PROPERTIES  //
+  /// @brief Underlying shape.
+  Shape::Underlying m_shape;
 
-        /// @brief Underlying shape.
-        Shape::Underlying m_shape;
+  /// @brief Super-class typing to inherit.
+  Erased m_super = New::none();
 
-        /// @brief The associated protocol value.
-        $::Ptr::Shared<Protocol> m_protocol;
+  /// @brief The associated structure value.
+  $::Shared::Pointer<Structure> m_structure;
 
-        /// @brief Super-class typing to inherit.
-        Erased m_super = $::New().shared<None>();
+  /// @brief The underlying base constructor.
+  Constructor m_constructor = nullptr;
 
-        /// @brief The underlying base constructor.
-        Constructor m_constructor = nullptr;
+  /// @brief Static field properties available.
+  $::Map::Record<Entity> m_statics = {};
 
-        /// @brief Class operators handler.
-        Apply m_operators = nullptr;
+public:
+  //  CONSTRUCTORS  //
 
-        /// @brief Static field properties available.
-        $::Record<Entity> m_statics = {};
+  /**
+   * @brief Constructs a class instance.
+   * @param name                      Name of class.
+   * @param shape                     Underlying shape.
+   * @param fields                    Initial fields.
+   */
+  explicit Prototype(const $::String::View &name, Shape::Underlying shape, const Algorithm &fields = {}) :
+      m_shape(shape), m_structure($::Shared::New<Structure>(name, fields)) {}
 
-       public:
-        //  CONSTRUCTORS  //
+  //  PUBLIC METHODS  //
 
-        /**
-         * @brief Constructs a class instance.
-         * @param name                      Name of class.
-         * @param shape                     Underlying shape.
-         * @param fields                    Initial fields.
-         */
-        explicit Prototype(const $::String::View& name, Shape::Underlying shape, const Algorithm& fields = {}) :
-            m_shape(shape), m_protocol($::New().shared<Protocol>(name, fields)) {}
+  /// @brief Gets the shape of the prototype.
+  inline constexpr Shape::Underlying shape() const noexcept final { return Shape::Lookup<Object::Class>(); }
 
-        //  PUBLIC METHODS  //
+  /// @brief Gets the name of the prototype.
+  inline constexpr $::String::View name() const noexcept { return m_structure->name(); }
 
-        /// @brief Handles instantiating the class instance.
-        $::Ptr::Shared<Instance> instantiate();
+  /// @brief Gets the associated truthiness of the prototype.
+  inline constexpr $::Unit::Ternary truthiness() const noexcept final { return true; }
 
-        inline constexpr Shape::Underlying shape() const noexcept { return m_shape; }
-        inline constexpr $::String::View name() const noexcept { return m_protocol->name(); }
+  /// @brief Gets the super typing.
+  inline constexpr Erased &super() noexcept { return m_super; }
+  inline constexpr const Erased &super() const noexcept { return m_super; }
 
-        inline constexpr $::Ternary truthiness() const noexcept final { return true; }
-        inline constexpr Lattice lattice() const noexcept final { return Fact::OBJ_ANY; }
+  /// @brief The available class fields.
+  inline constexpr Algorithm &fields() noexcept { return m_structure->fields(); }
+  inline constexpr const Algorithm &fields() const noexcept { return m_structure->fields(); }
 
-        inline constexpr Erased& super() noexcept { return m_super; }
-        inline constexpr const Erased& super() const noexcept { return m_super; }
+  /// @brief The available metaclass fields.
+  inline constexpr $::Map::Record<Entity> &statics() noexcept { return m_statics; }
+  inline constexpr const $::Map::Record<Entity> &statics() const noexcept { return m_statics; }
 
-        inline constexpr Algorithm& fields() noexcept { return m_protocol->fields(); }
-        inline constexpr const Algorithm& fields() const noexcept { return m_protocol->fields(); }
+  /// @brief The available class operators.
+  inline constexpr Apply &operators() noexcept { return m_structure->operators(); }
+  inline constexpr const Apply &operators() const noexcept { return m_structure->operators(); }
 
-        inline constexpr $::Record<Entity>& statics() noexcept { return m_statics; }
-        inline constexpr const $::Record<Entity>& statics() const noexcept { return m_statics; }
+  /// @brief The available class constructor.
+  inline constexpr Constructor &constructor() noexcept { return m_constructor; }
+  inline constexpr const Constructor &constructor() const noexcept { return m_constructor; }
 
-        inline constexpr Apply& operators() noexcept { return m_operators; }
-        inline constexpr const Apply& operators() const noexcept { return m_operators; }
+  /// @brief The available class generics.
+  inline constexpr std::vector<Erased> &constraints() noexcept { return m_structure->constraints(); }
+  inline constexpr const std::vector<Erased> &constraints() const noexcept { return m_structure->constraints(); }
 
-        inline constexpr Constructor& constructor() noexcept { return m_constructor; }
-        inline constexpr const Constructor& constructor() const noexcept { return m_constructor; }
+  /// @brief Handles instantiating the class instance.
+  inline constexpr $::Shared::Pointer<Instance> instantiate() const { return m_instantiate(); }
 
-        inline constexpr std::vector<Erased>& constraints() noexcept { return m_protocol->constraints(); }
-        inline constexpr const std::vector<Erased>& constraints() const noexcept { return m_protocol->constraints(); }
+  /// @brief The baseline handler for constructing prototypes.
+  inline constexpr Erased callable() const noexcept { return m_constructor ? m_constructor(this) : New::any(); }
 
-        /// @brief The baseline handler for constructing prototypes.
-        inline constexpr Erased callable() const noexcept {
-            return m_constructor ? m_constructor(this) : $::New().shared<None>();
-        }
+  /**
+   * @brief Handles looking up static fields.
+   * @param field                     Field to look up.
+   */
+  inline Entity lookup(const $::String::View &field) const final {
+    if (m_statics.contains(field)) return m_statics.at(field);
+    if (!m_super->is<Prototype>()) return Entity();
+    return m_super->as<Prototype>()->lookup(field);
+  }
 
-        /**
-         * @brief Handles looking up static fields.
-         * @param field                     Field to look up.
-         */
-        inline Entity lookup(const $::String::View& field) const final {
-            if (m_statics.contains(field)) return m_statics.at(field);
-            if (!m_super->is<Prototype>()) return Entity();
-            return m_super->as<Prototype>()->lookup(field);
-        }
+protected:
+  //  PRIVATE METHODS  //
 
-       protected:
-        //  PRIVATE METHODS  //
+  /// @brief Gets the base shape value.
+  inline constexpr Shape::Underlying m_base() const noexcept {
+    return m_super->is<Prototype>() ? m_super->as<Prototype>()->m_base() : m_shape;
+  }
 
-        /// @brief Gets the base shape value.
-        inline constexpr Shape::Underlying m_base() const noexcept {
-            return m_super->is<Prototype>() ? m_super->as<Prototype>()->m_base() : m_shape;
-        }
+  /**
+   * @brief Checks if this class contains the given shape.
+   * @param shape                     Shape to check.
+   */
+  inline constexpr bool m_extends(Shape::Underlying shape) const noexcept {
+    if (m_shape == shape) return true;
+    if (!m_super->is<Prototype>()) return false;
+    return m_super->as<Prototype>()->m_extends(shape);
+  }
 
-        /**
-         * @brief Checks if this class contains the given shape.
-         * @param shape                     Shape to check.
-         */
-        inline constexpr bool m_derived(Shape::Underlying shape) const noexcept {
-            if (m_shape == shape) return true;
-            if (!m_super->is<Prototype>()) return false;
-            return m_super->as<Prototype>()->m_derived(shape);
-        }
+  /**
+   * @brief Handles looking up member fields.
+   * @param field                     Field to look up.
+   */
+  inline Entity m_lookup(const $::String::View &field) const {
+    // attempt getting the baseline entity
+    auto entity = m_structure->lookup(field);
+    if (!entity.unset()) return entity;
 
-        /**
-         * @brief Checks if we have a class-based typing.
-         * @param shape                     Shape to check.
-         */
-        inline constexpr bool m_extends(Shape::Underlying shape) const noexcept final {
-            return shape == Shape::Lookup<Object::Class>();
-        }
+    // otherwise check against the super handler now
+    if (!m_super->is<Prototype>()) return m_super->lookup(field);
+    return m_super->as<Prototype>()->m_lookup(field);
+  }
 
-        /**
-         * @brief Handles looking up member fields.
-         * @param field                     Field to look up.
-         */
-        inline Entity m_lookup(const $::String::View& field) const {
-            // attempt getting the baseline entity
-            auto entity = m_protocol->lookup(field);
-            if (!entity.unset()) return entity;
+  /// @brief Handles constructing a class instantiation.
+  $::Shared::Pointer<Instance> m_instantiate() const;
 
-            // otherwise check against the super handler now
-            if (!m_super->is<Prototype>()) return m_super->lookup(field);
-            return m_super->as<Prototype>()->m_lookup(field);
-        }
+  /**
+   * @brief Handles inferring class types.
+   * @param constraints               Generic constraints.
+   */
+  Erased m_infer(Constraints *constraints) const final;
 
-        /**
-         * @brief Handles inferring class types.
-         * @param constraints               Generic constraints.
-         */
-        Erased m_infer(const Constraints& constraints) const final;
+  /**
+   * @brief Handles running a unification pass.
+   * @param candidate                 Candidate to unify.
+   * @param constraints               Generic parameter constraints.
+   */
+  bool m_unify(const Erased &candidate, Constraints *constraints) const final;
 
-        /**
-         * @brief Handles running a unification pass.
-         * @param candidate                 Candidate to unify.
-         * @param constraints               Generic parameter constraints.
-         */
-        bool m_unify(const Erased& candidate, const Constraints& constraints) const final;
+  /**
+   * @brief Handles printing the type.
+   * @param os                        Output stream.
+   * @param self                      Prototype instance.
+   */
+  static void m_print(std::ostream &os, const Prototype &self);
+};
 
-        /**
-         * @brief Handles printing the type.
-         * @param os                        Output stream.
-         */
-        void m_print($::Stream::Output& os) const final;
-    };
-
-}  // namespace Talos::Type
+} // namespace Talos::Type
 
 #endif

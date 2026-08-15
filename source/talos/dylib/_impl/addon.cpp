@@ -1,30 +1,30 @@
-/// Talos Modules
+/// Talos Includes
 #include "talos/dylib/addon.hpp"
 #include "talos/runtime/isolate.hpp"
 
-//  PUBLIC METHODS  //
+//  PRIVATE METHODS  //
 
-Talos::Value::Any Talos::Dylib::Addon::preload(Runtime::Isolate *isolate) {
-    // ensure that we lock our instance when entering
-    $_UNUSED $_AUTO = $::Lock::guard(m_mutex);
+Talos::Value::Any Talos::Dylib::Addon::m_preload(Runtime::Isolate *isolate) {
+  // ensure that we lock our instance when entering
+  $_UNUSED $_AUTO = $::Lock::guard(m_mutex);
 
-    // ignore loading if already loaded
-    if (ready()) return m_exports;
+  // ignore loading if already loaded
+  if (ready()) return m_exports;
 
-    // construct the exports to be used
-    auto exports = isolate->create<Exports>();
+  // construct the exports to be used
+  auto exports = isolate->create<Exports>();
 
-    // and load the library instance now
-    if (m_loader) m_loader(isolate, exports);
+  // and load the library instance now
+  if (m_loader) m_loader(isolate, exports);
 
-    // return our resulting exports now
-    return m_exports = exports;
+  // return our resulting exports now
+  return m_exports = exports;
 }
 
-void Talos::Dylib::Addon::unload(Runtime::Isolate *) {
-    // ensure that we lock our instance when entering
-    $_UNUSED $_AUTO = $::Lock::guard(m_mutex);
+void Talos::Dylib::Addon::m_unload(Runtime::Isolate *) {
+  // ensure that we lock our instance when entering
+  $_UNUSED $_AUTO = $::Lock::guard(m_mutex);
 
-    // only handle if exports have been constructed
-    if (ready()) m_exports = Value::Void();
+  // only handle if exports have been constructed
+  if (ready()) m_exports = Value::Void();
 }

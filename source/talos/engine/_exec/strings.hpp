@@ -3,23 +3,17 @@
 
 //  PRIVATE METHODS  //
 
-$_INLINE_FORCE Talos::Value::Any Talos::Engine::Dispatch::m_concat(
-    Isolate* isolate, Value::Any left, Value::Any right) {
-    // get the incoming views to be used
-    auto lv = left.as<String::Dynamic>();
-    auto rv = right.as<String::Dynamic>();
-
-    // construct the resulting string-buffer now
-    return String::Dynamic(isolate, "{0}{1}", lv, rv);
+TALOS_MM_ENGINE_EXECUTE(STRING_MAKE, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::STRING_MAKE>();
+  const auto &intern = frame->intern(instruction->get<1>());
+  frame->store(instruction->get<0>(), String::Any(isolate, intern));
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
 }
 
-TALOS_MM_ENGINE_EXECUTE(STRING_MAKE, isolate, frame, instruction) {
-    auto intern = frame->intern(instruction->get<1>());
-    auto string = String::Dynamic(isolate, intern);
-    return frame->store(instruction->get<0>(), string), Mode::NEXT;
-}
-
-TALOS_MM_ENGINE_EXECUTE(STRING_CONCAT, isolate, frame, instruction) {
-    auto left = frame->load(instruction->get<1>()), right = frame->load(instruction->get<2>());
-    return frame->store(instruction->get<0>(), m_concat(isolate, left, right)), Mode::NEXT;
+TALOS_MM_ENGINE_EXECUTE(STRING_CONCAT, isolate, frame, unqualified) {
+  auto *instruction = unqualified->cast<Glyph::STRING_CONCAT>();
+  auto left = frame->load(instruction->get<1>());
+  auto right = frame->load(instruction->get<2>());
+  frame->store(instruction->get<0>(), concat(isolate, left, right));
+  $_MUSTTAIL return tailcall(isolate, frame, unqualified);
 }

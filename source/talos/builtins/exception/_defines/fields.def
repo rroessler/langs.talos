@@ -1,3 +1,6 @@
+/// Builtins Includes
+#include "talos/builtins/_inline/defines.ipp"
+
 //  MACROS  //
 
 TALOS_XX_FIELDS_HEADER()
@@ -11,3 +14,8 @@ TALOS_XX_FIELDS_DEFINE(message)
 TALOS_XX_FIELDS_TYPEDEF("fn -> String")
 TALOS_XX_FIELDS_DESCRIBE("Gets the human-readable description of the exception.")
 TALOS_XX_FIELDS_FOOTER()
+
+//  UNDEFINES  //
+
+/// Builtins Includes
+#include "talos/builtins/_inline/undefs.ipp"

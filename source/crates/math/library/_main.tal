@@ -1,6 +1,6 @@
-//!
-//! Crate: "math"
-//! Description: Advanced mathematical utility functions.
-//!
+///
+/// @crate "math"
+/// @describe Advanced mathematical utility functions.
+///
 
 Todo("Unimplemented Crate - 'talos:math'");

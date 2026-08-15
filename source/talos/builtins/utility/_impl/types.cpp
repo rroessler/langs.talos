@@ -1,11 +1,24 @@
-/// Talos Modules
-#include "talos/type/builder.hpp"
+/// Builtin Includes
+#include "talos/builtins/_inline/builtins.ipp"
 
-/// Forward Declarations
-$_FWD(Talos::Builtins, namespace TB = Type::Builder)
+/// Type Includes
+#include "talos/type/_inline/type.ipp"
+
+/// Forward Definitions
+$_FWD(Talos::Builtins, using TN = Type::New)
 
 //  PRIVATE METHODS  //
 
-void TALOS_BUILTIN_TRAITS(Builtins::Custom::Utility)::m_typedefs(Type::World*) {
-    /// TODO: assign different utility types (eg: Union, ...)
+void Talos::Builtins::Wrapper<Talos::Builtins::Custom::Utility>::m_typedefs(Type::World *globals) {
+  // prepare the baseline intrinsic types to be used
+  globals->types().declare("Any", TN::any());
+  globals->types().declare("Never", TN::never());
+
+  // define the generic "Maybe" typing using a required generic
+  auto M = Talos::Builtins::TN::constraint("T", TN::any());
+  globals->types().declare("Maybe", TN::generic(TN::maybe(M), M));
+
+  // define the generic "Record" typing using a suitable generic
+  auto R = Talos::Builtins::TN::constraint("T", TN::any());
+  globals->types().declare("Record", TN::generic(TN::record(R), R));
 }
