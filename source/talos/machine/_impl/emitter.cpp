@@ -110,7 +110,7 @@ void Talos::Machine::Emitter::swap(const Register::Slot &dst, const Register::Ho
 void Talos::Machine::Emitter::swap(const Register::Host &dst, const Register::Slot &src) { swap(dst, slot(src)); }
 void Talos::Machine::Emitter::swap(const Register::Host &dst, const Register::Host &src) {
 #if defined(ASMJIT_UJIT_AARCH64)
-  m_compiler->swp(dst, src);
+  m_compiler->cc->swp(dst, src);
 #elif defined(ASMJIT_UJIT_X86)
   m_compiler->cc->xchg(dst, src);
 #endif
