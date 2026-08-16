@@ -6,7 +6,7 @@ on:
         inputs:
             suffix:
                 type: string
-                default: ''
+                default: ""
                 required: false
                 description: Version Suffix
             release:
@@ -23,7 +23,7 @@ jobs:
         steps:
             - uses: actions/checkout@v6
             - id: version # define a suitable output for the version value
-              run: echo "version=$(cat ${{ github.workspace }}/configs/version.txt | xargs)${{ inputs.suffix }}" >> "$GITHUB_OUTPUT"
+              run: echo "version=v$(cat ${{ github.workspace }}/configs/version.txt | xargs)${{ inputs.suffix }}" >> "$GITHUB_OUTPUT"
 
     publish-release:
         runs-on: ubuntu-latest
@@ -34,9 +34,9 @@ jobs:
             - name: Generate Changelog
               uses: elieahd/templater@v1
               with:
-                  file: 'CHANGELOG.md'
-                  variables: 'version=${{ needs.publish-version.outputs.version }}'
-                  template: '.github/templates/release-${{ inputs.release }}.md'
+                  file: "CHANGELOG.md"
+                  variables: "version=${{ needs.publish-version.outputs.version }}"
+                  template: ".github/templates/release-${{ inputs.release }}.md"
 
             - name: Download Artifacts
               uses: actions/download-artifact@v8
