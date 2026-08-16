@@ -29,6 +29,7 @@ jobs:
             - name: Merge Branch '${{ inputs.release }}'
               run: |
                   git merge origin/main -X theirs --allow-unrelated-histories -m "Automated merge of '${{ inputs.release }}'"
+                  git push origin ${{ inputs.release }}
 
             - uses: oven-sh/setup-bun@v2
             - name: Update Versioning
