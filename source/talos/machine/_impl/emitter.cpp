@@ -109,10 +109,16 @@ void Talos::Machine::Emitter::swap(const Register::Slot &dst, const Register::Sl
 void Talos::Machine::Emitter::swap(const Register::Slot &dst, const Register::Host &src) { swap(slot(dst), src); }
 void Talos::Machine::Emitter::swap(const Register::Host &dst, const Register::Slot &src) { swap(dst, slot(src)); }
 void Talos::Machine::Emitter::swap(const Register::Host &dst, const Register::Host &src) {
-#if defined(ASMJIT_UJIT_AARCH64)
-  m_compiler->cc->swp(dst, src);
-#elif defined(ASMJIT_UJIT_X86)
+#if defined(ASMJIT_UJIT_X86)
   m_compiler->cc->xchg(dst, src);
+#else
+  // prepare a temporary register
+  auto tmp = m_compiler->new_gp64();
+
+  // and swap as necessary
+  m_compiler->mov(tmp, dst);
+  m_compiler->mov(dst, src);
+  m_compiler->mov(src, tmp);
 #endif
 }
 
