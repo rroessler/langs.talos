@@ -17,7 +17,7 @@ set(MONO_OPTION_ONLY OFF)
 FetchContent_Declare(
     talos
     GIT_SHALLOW ON
-    GIT_TAG "stable" # "version", or "nightly"
+    GIT_TAG "latest"
     GIT_REPOSITORY "https://github.com/rroessler/langs.talos.git"
 )
 

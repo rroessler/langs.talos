@@ -4,11 +4,6 @@ description: Workflow for publishing Talos releases to GitHub
 on:
     workflow_call:
         inputs:
-            suffix:
-                type: string
-                default: ""
-                required: false
-                description: Version Suffix
             release:
                 type: string
                 required: true
@@ -16,16 +11,20 @@ on:
 
 jobs:
     publish-version:
-        name: Parse Version
+        name: Parse Release Version
         runs-on: ubuntu-latest
         outputs:
             version: ${{ steps.version.outputs.version }}
         steps:
             - uses: actions/checkout@v6
             - id: version # define a suitable output for the version value
-              run: echo "version=v$(cat ${{ github.workspace }}/configs/version.txt | xargs)${{ inputs.suffix }}" >> "$GITHUB_OUTPUT"
+              run: |
+                  VERSION_SUFFIX=${{ inputs.release == 'stable' && '' || format('-{0}', inputs.release) }}
+                  VERSION_SEMANTIC=$(cat ${{ github.workspace }}/configs/version.txt | xargs)
+                  echo "version=v$VERSION_SEMANTIC$VERSION_SUFFIX" >> "$GITHUB_OUTPUT"
 
     publish-release:
+        name: Create GitHub Release
         runs-on: ubuntu-latest
         needs: [publish-version]
         steps:
@@ -45,8 +44,8 @@ jobs:
                   pattern: talos-*
                   merge-multiple: true
 
-            - name: Deduplicate Nightly
-              if: inputs.release == 'nightly'
+            - name: Deduplicate Canary
+              if: inputs.release == 'canary'
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   VERSION_TAG: ${{ needs.publish-version.outputs.version }}

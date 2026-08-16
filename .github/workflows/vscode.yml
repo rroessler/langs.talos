@@ -9,6 +9,7 @@ permissions:
 
 jobs:
     vscode-publish:
+        name: VSCE Dispatch
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6

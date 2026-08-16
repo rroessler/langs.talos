@@ -1,0 +1,9 @@
+name: Release Canary
+description: Workflow for publishing Talos canary releases
+on: [workflow_dispatch]
+
+jobs:
+    canary-release:
+        name: Canary Dispatch
+        with: { release: canary }
+        uses: ./.github/workflows/release.yml

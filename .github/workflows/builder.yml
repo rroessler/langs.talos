@@ -1,6 +1,14 @@
 name: Build Runtime
 description: Workflow for building Talos artifacts
-on: [workflow_call]
+
+on:
+    workflow_call:
+        inputs:
+            release:
+                type: string
+                required: false
+                default: canary
+                description: Release Type
 
 jobs:
     target-build:
@@ -16,8 +24,8 @@ jobs:
                     - { label: linux, arch: x64, host: ubuntu-latest }
                     - { label: linux, arch: arm64, host: ubuntu-24.04-arm }
                     - { label: windows, arch: x64, host: windows-latest }
-                    # excluding windows-arm for now until ready for development
-                    # - { label: windows, arch: arm64, host: windows-11-arm }
+                    # # excluding windows-arm for now until ready for development
+                    # # - { label: windows, arch: arm64, host: windows-11-arm }
 
         steps:
             - uses: actions/checkout@v6
@@ -25,9 +33,6 @@ jobs:
 
             - uses: ZhongRuoyu/setup-llvm@v0
               with: { llvm-version: 22 }
-
-            - uses: mozilla-actions/sccache-action@v0.0.9
-              env: { SCCACHE_GHA_ENABLED: true }
 
             - name: Building '${{ matrix.label }}-${{ matrix.arch }}'
               run: ${{ github.workspace }}/scripts/compile/target.${{ runner.os == 'Windows' && 'ps1' || 'sh' }} ${{ matrix.label }} ${{ matrix.arch }} build

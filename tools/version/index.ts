@@ -1,7 +1,6 @@
 /// Node Modules
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as cp from 'node:child_process';
 
 /// Vendor Modules
 import * as YAML from 'yaml';
@@ -15,8 +14,7 @@ import { Assets } from '@/tools/assets';
 
 /** Resolves the current version to assign. */
 function m_version() {
-    const nightly = cp.execSync('git branch --show-current').toString().trim() === 'nightly';
-    return fs.readFileSync(Assets.configs('version.txt'), 'utf-8').trim() + `${nightly ? '-nightly' : ''}`;
+    return fs.readFileSync(Assets.configs('version.txt'), 'utf-8').trim();
 }
 
 /**
@@ -75,7 +73,7 @@ async function m_replace(version: string, target: string) {
 
 (async () => {
     // get the current version to be assigned
-    const version = m_version();
+    const version = process.argv.at(2) ?? m_version();
 
     // note to the user what version we are assigning now
     console.log(`Setting Version: '${version}'`);
@@ -85,8 +83,6 @@ async function m_replace(version: string, target: string) {
         .readdirSync(Assets.crates())
         .concat([Assets.examples()])
         .map((name) => path.resolve(Assets.crates(), name, '_crate.jsonc'));
-
-    /// TODO: prepare all the source packages to resolve
 
     // prepare all the necessary targets to be replaced
     const targets = [Assets.root('_crate.jsonc'), Assets.root('package.json')].concat(crates);

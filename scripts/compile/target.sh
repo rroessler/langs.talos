@@ -15,6 +15,7 @@ fi
 target_dir=$3
 target_arch=$2
 target_system=$1
+target_release=$4
 
 # ensure we have a directory rebuilt from scratch
 mkdir -p $target_dir
@@ -24,6 +25,7 @@ target_cache="$target_dir/CMakeCache.txt"
 
 # determine if using a post-build response
 target_post=$(if [ $target_dir = "build" ]; then echo "ON"; else echo "OFF"; fi)
+target_canary=$(if [ $target_release = "canary"]; then echo "ON"; else echo "OFF"; fi)
 target_toolchain="cmake/mono/toolchains/$target_system-$target_arch.cmake"
 
 # remove the incoming cache file now as well
@@ -31,6 +33,7 @@ rm -f $target_cache
 
 # configure the cmake project we require now
 cmake -S $(pwd) -B $target_dir -G Ninja \
+    -DTALOS_OPTION_CANARY:BOOL=$target_canary \
     -DTALOS_OPTION_POSTBUILD:BOOL=$target_post \
     -DFETCHCONTENT_BASE_DIR="build/_deps" \
     -DCMAKE_BUILD_TYPE:STRING=Release \

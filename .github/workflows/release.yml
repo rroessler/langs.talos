@@ -4,20 +4,18 @@ description: Workflow for publishing a Talos release
 on:
     workflow_call:
         inputs:
-            suffix:
-                type: string
-                default: ''
-                required: false
-                description: Version Suffix
             release:
                 type: string
-                required: true
+                required: false
+                default: canary
                 description: Release Type
 
 jobs:
     release-build:
         name: Build Release
         uses: ./.github/workflows/builder.yml
+        with:
+            release: ${{ inputs.release }}
 
     release-vscode:
         name: Publish VSCE
@@ -36,5 +34,4 @@ jobs:
         needs: [release-build]
         uses: ./.github/workflows/publish.yml
         with:
-            suffix: ${{ inputs.suffix }}
             release: ${{ inputs.release }}

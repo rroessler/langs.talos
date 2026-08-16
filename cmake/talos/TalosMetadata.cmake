@@ -13,7 +13,13 @@ set(TALOS_DIRENT_SCRIPT "${TALOS_DIRENT_ROOT}/scripts" CACHE INTERNAL "")
 set(TALOS_DIRENT_CONFIG "${TALOS_DIRENT_ROOT}/configs" CACHE INTERNAL "")
 
 # Resolve the versioning to be used
-mono_version_read(TALOS_VERSION "${TALOS_DIRENT_CONFIG}/version.txt" COMMIT BRANCH_TRIM "main")
+if (DEFINED CACHE{TALOS_OPTION_CANARY} AND NOT ${TALOS_OPTION_CANARY})
+    # We have been requested to define a non-canary build
+    mono_version_read(TALOS_VERSION "${TALOS_DIRENT_CONFIG}/version.txt" COMMIT)
+else ()
+    # We define canary builds by default (since this declares custom configurations)
+    mono_version_read(TALOS_VERSION "${TALOS_DIRENT_CONFIG}/version.txt" COMMIT SUFFIX "canary")
+endif ()
 
 # Prepare all the baseline properties
 set(TALOS_TOOLCHAIN_TITLE "Talos" CACHE INTERNAL "")
@@ -39,6 +45,7 @@ set(TALOS_TARGET_SUPER "talos" CACHE INTERNAL "")
 # --  OPTIONS  -- #
 
 # Prepare some options to be used
+option(TALOS_OPTION_CANARY "Enable canary builds" ON)
 option(TALOS_OPTION_STRICT "Enable strict warnings" OFF)
 option(TALOS_OPTION_TESTING "Enable building tests" OFF)
 option(TALOS_OPTION_SANITIZE "Enable address sanitizer" OFF)
