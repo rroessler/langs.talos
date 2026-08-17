@@ -35,7 +35,7 @@ jobs:
               with: { llvm-version: 22 }
 
             - name: Building '${{ matrix.label }}-${{ matrix.arch }}'
-              run: ${{ github.workspace }}/scripts/compile/target.${{ runner.os == 'Windows' && 'ps1' || 'sh' }} ${{ matrix.label }} ${{ matrix.arch }} build
+              run: ${{ github.workspace }}/scripts/compile/target.${{ runner.os == 'Windows' && 'ps1' || 'sh' }} ${{ matrix.label }} ${{ matrix.arch }} build ${{ inputs.release }}
 
             - name: Testing '${{ matrix.label }}-${{ matrix.arch }}'
               timeout-minutes: 1 # should never go longer than this

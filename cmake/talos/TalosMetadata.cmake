@@ -15,7 +15,7 @@ set(TALOS_DIRENT_CONFIG "${TALOS_DIRENT_ROOT}/configs" CACHE INTERNAL "")
 # Resolve the versioning to be used
 if (DEFINED CACHE{TALOS_OPTION_CANARY} AND NOT ${TALOS_OPTION_CANARY})
     # We have been requested to define a non-canary build
-    mono_version_read(TALOS_VERSION "${TALOS_DIRENT_CONFIG}/version.txt" COMMIT)
+    mono_version_read(TALOS_VERSION "${TALOS_DIRENT_CONFIG}/version.txt" COMMIT SUFFIX "stable")
 else ()
     # We define canary builds by default (since this declares custom configurations)
     mono_version_read(TALOS_VERSION "${TALOS_DIRENT_CONFIG}/version.txt" COMMIT SUFFIX "canary")

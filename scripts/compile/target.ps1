@@ -17,7 +17,7 @@ $target_cache = "$target_dir/CMakeCache.txt"
 
 # prepare whether or not we should run a post-build at all
 $target_post = if ($target_dir -eq "build") { "ON" } else { "OFF" }
-$target_canary = if ($target_release -eq "canary") { "ON" } else { "OFF" }
+$target_canary = if ($target_release -eq "stable") { "OFF" } else { "ON" }
 $target_toolchain = "cmake/mono/toolchains/$target_system-$target_arch.cmake"
 
 # ensure we have a directory rebuilt from scratch
