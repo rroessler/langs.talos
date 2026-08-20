@@ -21,7 +21,7 @@ TALOS_MM_CHECK_NODE(Decorator, node, analyzer) {
   // prepare a baseline decorator callback that we expect
   auto callback = Type::New::function(target, target);
 
-  /// TODO: conduct more rigorous type-checking for decorators
+  /// TODO: conduct more rigorous type-checking for decorators (eg: metadata)
 
   // ensure that the incoming decorator safely type-checks
   if (callback->unify(candidate)) return analyzer->passable();
