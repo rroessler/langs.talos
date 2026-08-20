@@ -122,16 +122,16 @@ set(SPDLOG_INSTALL ON)
 set(SPDLOG_FMT_EXTERNAL ON)
 
 # Declare all the necessary repositories
-__talos_vendors_declare(ankerl v4.8.1 REPO "martinus/unordered_dense.git")
+__talos_vendors_declare(ankerl v4.9.2 REPO "martinus/unordered_dense.git")
 __talos_vendors_declare(asmjit v1.21.0 REPO "asmjit/asmjit.git" TAG master)
 __talos_vendors_declare(aster v1.1.3 REPO "rroessler/cpp.aster.git")
 __talos_vendors_declare(CLI11 v2.7.2 REPO "CLIUtils/CLI11.git")
 __talos_vendors_declare(fmt 12.2.0 REPO "fmtlib/fmt.git")
 __talos_vendors_declare(function2 4.2.5 REPO "naios/function2.git")
-__talos_vendors_declare(glaze v8.0.0 REPO "stephenberry/glaze.git")
+__talos_vendors_declare(glaze v8.1.0 REPO "stephenberry/glaze.git")
 __talos_vendors_declare(lief 1.0.0 REPO "lief-project/LIEF.git")
 __talos_vendors_declare(muuid v2.5.0 REPO "gershnik/modern-uuid.git" TAG v2.3)
 __talos_vendors_declare(spdlog v1.17.0 REPO "gabime/spdlog.git")
 
 # Also expose "boost" as a vendor
-__talos_vendors_declare(boost 1.91.0 REPO "boostorg/boost.git.git" TAG 1.91.0-1)
+__talos_vendors_declare(boost 1.92.0 REPO "boostorg/boost.git.git" TAG 1.92.0)
