@@ -8,6 +8,7 @@ endif ()
 # --  INCLUDES  -- #
 
 # Include all the "talos" base modules
+include("${CMAKE_CURRENT_LIST_DIR}/TalosOptions.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/TalosMetadata.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/TalosMessage.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/TalosLibrary.cmake")

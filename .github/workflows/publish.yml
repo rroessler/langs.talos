@@ -33,9 +33,9 @@ jobs:
             - name: Generate Changelog
               uses: elieahd/templater@v1
               with:
-                  file: 'CHANGELOG.md'
-                  variables: 'version=${{ needs.publish-version.outputs.version }}'
-                  template: '.github/templates/release-${{ inputs.release }}.md'
+                  file: "CHANGELOG.md"
+                  variables: "version=${{ needs.publish-version.outputs.version }}"
+                  template: ".github/templates/release-${{ inputs.release }}.md"
 
             - name: Download Artifacts
               uses: actions/download-artifact@v8
@@ -63,3 +63,10 @@ jobs:
                     --notes-file "CHANGELOG.md" \
                     --repo "${{ github.repository }}" \
                     --latest=${{ inputs.release == 'stable' && 'true' || 'false' }}
+
+            - name: Update Canary
+              if: inputs.release == 'canary'
+              run: gh release edit $VERSION_TAG --prerelease
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  VERSION_TAG: ${{ needs.publish-version.outputs.version }}

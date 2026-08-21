@@ -13,7 +13,7 @@ set(TALOS_DIRENT_SCRIPT "${TALOS_DIRENT_ROOT}/scripts" CACHE INTERNAL "")
 set(TALOS_DIRENT_CONFIG "${TALOS_DIRENT_ROOT}/configs" CACHE INTERNAL "")
 
 # Resolve the versioning to be used
-if (DEFINED CACHE{TALOS_OPTION_CANARY} AND NOT $CACHE{TALOS_OPTION_CANARY})
+if (NOT TALOS_OPTION_CANARY)
     # We have been requested to define a non-canary build
     mono_version_read(TALOS_VERSION "${TALOS_DIRENT_CONFIG}/version.txt" COMMIT SUFFIX "stable")
 else ()
@@ -41,15 +41,3 @@ endif ()
 
 # Define the primary targets to be available
 set(TALOS_TARGET_SUPER "talos" CACHE INTERNAL "")
-
-# --  OPTIONS  -- #
-
-# Prepare some options to be used
-option(TALOS_OPTION_CANARY "Enable canary builds" ON)
-option(TALOS_OPTION_STRICT "Enable strict warnings" OFF)
-option(TALOS_OPTION_TESTING "Enable building tests" OFF)
-option(TALOS_OPTION_SANITIZE "Enable address sanitizer" OFF)
-option(TALOS_OPTION_POSTBUILD "Enables post-build outputs" ON)
-
-# Define the core compilation options to be used
-set(TALOS_OPTION_CXXSTD "26" CACHE INTERNAL "The CXX standard library")
