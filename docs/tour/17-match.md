@@ -44,3 +44,12 @@ match ("a") {
     *: Debug.println("Did not match a valid type"),
 }
 ```
+
+However, some care should be taken with this as `match` statements attempt their matches greedily from top-to-bottom.
+
+```talos
+match (True) {
+    Boolean: Debug.println("Value is a boolean"), // Matched first in declaration order
+    True: Debug.println("Value is boolean true"), // Ignored when declared after above guard
+}
+```

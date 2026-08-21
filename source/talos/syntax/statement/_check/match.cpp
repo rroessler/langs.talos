@@ -22,9 +22,6 @@ Talos::Type::Control Talos::Type::Dispatch::query(Analyzer *analyzer, const Synt
 
     // branching guards should be handled specially for matching
 
-    // we then update the flow based on whether a guard always fails
-    if (!branch->unify(match.result.type)) {}
-
     // ignore handling further if we do not have a fallback guard
     if (!guard->is<Syntax::Fallback>()) continue;
 

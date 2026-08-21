@@ -5,21 +5,72 @@ author: Reuben Roessler
 title: Talos v0.2.0
 ---
 
+import { Callout } from '@/website/components';
+
 ## Runtime Updates
 
-Todo...
+As the past few months of work comes to pass, various wide-sweeping updates have been applied to the Talos runtime. Looking back at the [initial progress report](/blog/2026-05-progress) in May, only tasks related to testing are still to be addressed. Without further ado, here are the newest features to Talos:
 
 ## Match Statements
 
-Todo...
+This release introduces the foundations for the `match` statement, which evaluates an expression and matches it to a selection of given guards.
+
+```talos
+// Suppose that `value` could be the `String` type.
+match (value) {
+    "a": Debug.println("First latin character"),
+    "z": Debug.println("Last latin character"),
+    *: Debug.println("Some other character"),
+}
+```
+
+If `value` contained the letter "z" it would then print "Last latin character" then continue execution _after_ the `match` statement. Unlike other languages, cases do not fall-through to the next after completion and should be treated as separate. However, multiple guards can be grouped together:
+
+```talos
+match (value) {
+    "a", "A": Debug.println("Found letter 'a'"),
+    *: Debug.println("Value was not the letter 'a' or 'A'"),
+}
+```
+
+Values can also be matched against their builtin classes as type-guards.
+
+```talos
+match (value) {
+    String: Debug.println("Value was a string"),
+    Number: Debug.println("Value was a number"),
+    *: Debug.println("Did not match a valid type"),
+}
+```
+
+However, some care should be taken with this as `match` statements attempt their matches greedily from top-to-bottom.
+
+```talos
+match (True) {
+    Boolean: Debug.println("Value is a boolean"), // Matched first in declaration order
+    True: Debug.println("Value is boolean true"), // Ignored when declared after above guard
+}
+```
+
+<Callout title="Note:">
+    Declaration order of `match` statements currently matters, though this may change with future versions of Talos.
+</Callout>
 
 ## Faster Functions
 
-Todo...
+Along with updating the runtime, an opt-in attribute was added to allow compilation to machine-code for faster performance.
+
+```talos
+// This function will be compiled to an equivalent version of the `ret Number(42)` shorthand.
+#[Internal.Optimize]
+let foo = fn => 42;
+```
+
+This has been made opt-in as compilation to machine-code will take up more memory than that of regular bytecode functions, so care should be taken when applying this attribute. The core reasoning for exposing this feature is for the future work to the builtin crates which will allow improving the performance of critical code sections.
 
 ## Upcoming Work
 
-Todo..
+Following on from this release will be the improvements to testing. This next goal is to improve the currently available testing to ensure stability before releases. It will also hopefully include the foundations for more builtin crates for Talos.
 
 ---
 

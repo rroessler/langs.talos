@@ -36,6 +36,7 @@
         "advanced/concurrency",
         "advanced/exceptions",
         "advanced/resources",
+        "advanced/iterators",
         "advanced/type-system",
         "advanced/memory",
         "advanced/policies",

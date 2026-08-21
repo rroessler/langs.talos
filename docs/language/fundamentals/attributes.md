@@ -24,7 +24,13 @@ Debug.println(value); // [!code deprecated:value]
 Although limited, some operators can be added/altered to provide custom functionality. The operators that currently allow being defined include:
 
 - `dispose` &nbsp;&mdash;&nbsp; Utilized by [explicit resource management](/language/advanced/resources).
-- `iterator` &nbsp;&mdash;&nbsp; Allows defining [custom object iterators](#).
+- `iterator` &nbsp;&mdash;&nbsp; Allows defining [custom object iterators](/language/advanced/iterators).
+
+## Feature Flags
+
+There are some compilation features that can be accessed through the use of the `#[Internal]` attribute.
+
+- `Optimize` &nbsp;&mdash;&nbsp; Forcibly optimizes functions to native machine-code.
 
 ## Additional Support
 

@@ -23,6 +23,7 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 |   ✅   | `use`   | Implement explicit resources.        | -                       |
 |   ✅   | `enum`  | Implement enumeration declarations.  | -                       |
 |   ⚪   | `class` | Implement class-based inheritance.   | Needs a testing suite   |
+|   ⚪   | `match` | Implement `match` statements.        | Needs better typing     |
 |   ❌   | `Debug` | Implement debug `breakpoint` method. | Implement a DAP manager |
 
 ## Testing

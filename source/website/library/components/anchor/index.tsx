@@ -45,6 +45,6 @@ export namespace Anchor {
     export function Footnote({ index, ...props }: Footnote) {
         const id = `note-${index}`;
         const href = `#mark-${index}`;
-        return <Anchor id={id} href={href} children={`⚔️&nbsp;${index}`} {...props} />;
+        return <Anchor id={id} href={href} children={`⚔️ ${index}`} {...props} />;
     }
 }
