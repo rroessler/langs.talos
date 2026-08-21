@@ -19,7 +19,7 @@ jobs:
             - uses: actions/checkout@v6
             - id: version # define a suitable output for the version value
               run: |
-                  VERSION_SUFFIX=${{ inputs.release == 'stable' && '' || format('-{0}', inputs.release) }}
+                  VERSION_SUFFIX=${{ inputs.release != 'stable' && format('-{0}', inputs.release) || '' }}
                   VERSION_SEMANTIC=$(cat ${{ github.workspace }}/configs/version.txt | xargs)
                   echo "version=v$VERSION_SEMANTIC$VERSION_SUFFIX" >> "$GITHUB_OUTPUT"
 
@@ -33,9 +33,9 @@ jobs:
             - name: Generate Changelog
               uses: elieahd/templater@v1
               with:
-                  file: "CHANGELOG.md"
-                  variables: "version=${{ needs.publish-version.outputs.version }}"
-                  template: ".github/templates/release-${{ inputs.release }}.md"
+                  file: 'CHANGELOG.md'
+                  variables: 'version=${{ needs.publish-version.outputs.version }}'
+                  template: '.github/templates/release-${{ inputs.release }}.md'
 
             - name: Download Artifacts
               uses: actions/download-artifact@v8
