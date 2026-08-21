@@ -13,7 +13,7 @@ set(TALOS_DIRENT_SCRIPT "${TALOS_DIRENT_ROOT}/scripts" CACHE INTERNAL "")
 set(TALOS_DIRENT_CONFIG "${TALOS_DIRENT_ROOT}/configs" CACHE INTERNAL "")
 
 # Resolve the versioning to be used
-if (DEFINED CACHE{TALOS_OPTION_CANARY} AND NOT ${TALOS_OPTION_CANARY})
+if (DEFINED CACHE{TALOS_OPTION_CANARY} AND NOT $CACHE{TALOS_OPTION_CANARY})
     # We have been requested to define a non-canary build
     mono_version_read(TALOS_VERSION "${TALOS_DIRENT_CONFIG}/version.txt" COMMIT SUFFIX "stable")
 else ()
