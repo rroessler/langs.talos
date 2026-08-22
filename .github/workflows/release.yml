@@ -19,6 +19,7 @@ jobs:
 
     release-vscode:
         name: Publish VSCE
+        secrets: inherit
         needs: [release-build]
         if: inputs.release == 'stable'
         uses: ./.github/workflows/vscode.yml
