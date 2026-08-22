@@ -41,7 +41,7 @@ jobs:
               timeout-minutes: 1 # should never go longer than this
               run: |
                   ${{ github.workspace }}/dist/bin/talos --version
-                  ${{ github.workspace }}/dist/bin/talos task tools:test
+                  ${{ github.workspace }}/dist/bin/talos test
 
             - name: Compress Artifacts
               uses: thedoctor0/zip-release@0.7.5
