@@ -25,7 +25,7 @@ target_cache="$target_dir/CMakeCache.txt"
 
 # determine if using a post-build response
 target_post=$(if [ $target_dir = "build" ]; then echo "ON"; else echo "OFF"; fi)
-target_canary=$(if [ $target_release = "stable"]; then echo "OFF"; else echo "ON"; fi)
+target_canary=$(if [ $target_release = "stable" ]; then echo "OFF"; else echo "ON"; fi)
 target_toolchain="cmake/mono/toolchains/$target_system-$target_arch.cmake"
 
 # remove the incoming cache file now as well
