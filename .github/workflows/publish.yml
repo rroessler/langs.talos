@@ -10,31 +10,25 @@ on:
                 description: Release Type
 
 jobs:
-    publish-version:
-        name: Parse Release Version
-        runs-on: ubuntu-latest
-        outputs:
-            version: ${{ steps.version.outputs.version }}
-        steps:
-            - uses: actions/checkout@v6
-            - id: version # define a suitable output for the version value
-              run: |
-                  VERSION_SUFFIX=${{ inputs.release != 'stable' && format('-{0}', inputs.release) || '' }}
-                  VERSION_SEMANTIC=$(cat ${{ github.workspace }}/configs/version.txt | xargs)
-                  echo "version=v$VERSION_SEMANTIC$VERSION_SUFFIX" >> "$GITHUB_OUTPUT"
-
     publish-release:
         name: Create GitHub Release
         runs-on: ubuntu-latest
-        needs: [publish-version]
         steps:
             - uses: actions/checkout@v6
+
+            - name: Parse Release Version
+              id: version
+              run: |
+                  VERSION_SUFFIX=${{ inputs.release != 'stable' && format('-{0}', inputs.release) || '' }}
+                  VERSION_SEMANTIC=$(cat ${{ github.workspace }}/configs/version.txt | xargs)
+                  echo "short=v$VERSION_SEMANTIC$VERSION_SUFFIX" >> $GITHUB_OUTPUT
+                  echo "full=v$VERSION_SEMANTIC${{ inputs.release }}" >> $GITHUB_OUTPUT
 
             - name: Generate Changelog
               uses: elieahd/templater@v1
               with:
                   file: "CHANGELOG.md"
-                  variables: "version=${{ needs.publish-version.outputs.version }}"
+                  variables: "version=${{ steps.version.outputs.short }}"
                   template: ".github/templates/release-${{ inputs.release }}.md"
 
             - name: Download Artifacts
@@ -48,7 +42,7 @@ jobs:
               if: inputs.release == 'canary'
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  VERSION_TAG: ${{ needs.publish-version.outputs.version }}
+                  VERSION_TAG: ${{ steps.version.outputs.long }}
               run: |
                   if gh release view "$VERSION_TAG" &>/dev/null; then
                       gh release delete "$VERSION_TAG" --cleanup-tag --yes
@@ -58,8 +52,8 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  gh release create ${{ needs.publish-version.outputs.version }} "./dist/*" \
-                    --title "Talos ${{ needs.publish-version.outputs.version }}" \
+                  gh release create ${{ steps.version.outputs.long }} "./dist/*" \
+                    --title "Talos ${{ steps.version.outputs.long }}" \
                     --notes-file "CHANGELOG.md" \
                     --repo "${{ github.repository }}" \
                     --latest=${{ inputs.release == 'stable' && 'true' || 'false' }}
@@ -69,4 +63,4 @@ jobs:
               run: gh release edit $VERSION_TAG --prerelease
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  VERSION_TAG: ${{ needs.publish-version.outputs.version }}
+                  VERSION_TAG: ${{ steps.version.outputs.long }}
