@@ -16,5 +16,32 @@ Test.suite("Traits", fn {
     Test.case("Equality '!='", fn => Assert.differs("foo", "bar"));
 });
 
-Test.todo("Methods", fn => Todo());
-Test.todo("Statics", fn => Todo());
+Test.suite("Methods", fn {
+    Test.todo("String.size '()'");
+    Test.todo("String.empty '()'");
+    Test.todo("String.bytes '()'");
+    Test.todo("String.symbol '()'");
+
+    Test.todo("String.at '()'");
+    Test.todo("String.slice '()'");
+
+    Test.todo("String.compare '()'");
+    Test.todo("String.contains '()'");
+    Test.todo("String.starts_with '()'");
+    Test.todo("String.ends_with '()'");
+
+    Test.todo("String.to_lower '()'");
+    Test.todo("String.to_upper '()'");
+    Test.todo("String.trim_both '()'");
+    Test.todo("String.trim_leading '()'");
+    Test.todo("String.trim_trailing '()'");
+    Test.todo("String.pad_leading '()'");
+    Test.todo("String.pad_trailing '()'");
+
+    Test.todo("String.fmt '()'");
+});
+
+Test.suite("Statics", fn {
+    Test.todo("String.from 'Any'");
+    Test.todo("String.codepoint 'Number'");
+});

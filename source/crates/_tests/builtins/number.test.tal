@@ -11,10 +11,38 @@ import "talos:assert" as Assert;
 
 Test.suite("Traits", fn {
     Test.case("Operator '+'", fn => Assert.equals(1 + 2, 3));
+    Test.todo("Operator '-'");
+    Test.todo("Operator '/'");
+    Test.todo("Operator '*'");
+    Test.todo("Operator '%'");
+    Test.todo("Operator '**'");
+
+    Test.todo("Operator '^'");
+    Test.todo("Operator '<<'");
+    Test.todo("Operator '>>'");
+
+    Test.todo("Operator '|'");
+    Test.todo("Operator '&'");
 
     Test.case("Equality '=='", fn => Assert.equals(123.456, 123.456));
     Test.case("Equality '!='", fn => Assert.differs(0.1 + 0.2, 0.3));
 });
 
-Test.todo("Methods", fn => Todo());
-Test.todo("Statics", fn => Todo());
+Test.suite("Methods", fn {
+    Test.todo("Number.sign '()'");
+    Test.todo("Number.abs '()'");
+    Test.todo("Number.ceil '()'");
+    Test.todo("Number.floor '()'");
+    Test.todo("Number.round '()'");
+    Test.todo("Number.trunc '()'");
+    Test.todo("Number.clamp '...Number'");
+    Test.todo("Number.is_nan '()'");
+    Test.todo("Number.is_fin '()'");
+    Test.todo("Number.is_inf '()'");
+    Test.todo("Number.to_precision 'Number?'");
+    Test.todo("Number.to_scientific 'Number?'");
+});
+
+Test.suite("Statics", fn {
+    Test.todo("Number.parse 'String'");
+});

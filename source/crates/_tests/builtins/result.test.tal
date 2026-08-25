@@ -47,4 +47,8 @@ Test.suite("Methods", fn {
     });
 });
 
-Test.todo("Statics", fn => Todo());
+Test.suite("Statics", fn {
+    Test.todo("Result.okay 'Any'");
+    Test.todo("Result.error 'Any'");
+    Test.todo("Result.wrap 'Future'");
+});

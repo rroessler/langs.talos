@@ -19,9 +19,9 @@ Debug.println("Last element of list is: {}", list.get(-1));
 Debug.println("Number of elements in list: {}", list.length());
 
 // Can use the safe-access method `at` which returns an optional value.
-for List.range(list.length() + 1) as (ii: Number) {
-    let value = list.at(ii); // get the current value safely
-    if (value.empty()) Debug.println("{}: {}", ii, value.unwrap());
+for (nn in List.range(list.length() + 1)) {
+    let value = list.at(nn); // get the current value safely
+    if (value.empty()) Debug.println("{}: {}", nn, value.unwrap());
     else if (value.some()) Debug.println("Exceeded list length!");
 }
 ```

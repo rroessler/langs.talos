@@ -1,6 +1,6 @@
 ///
-/// @testing Syntax "class" Declaration.
-/// @describe Coordinates testing the builtin "class" declaration.
+/// @testing Syntax "@..." Declaration.
+/// @describe Coordinates testing builtin decorator syntax.
 ///
 
 // Talos Modules

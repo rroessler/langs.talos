@@ -28,15 +28,18 @@ description: A brief outline of the current bug-fixes, goals and other milestone
 
 ## Testing
 
-| Status | Suite             | Description                 | Todo |
-| :----: | ----------------- | --------------------------- | ---- |
-|   🚀   | `builtins/list`   | Testing of `List` builtin   | -    |
-|   🚀   | `builtins/number` | Testing of `Number` builtin | -    |
-|   🚀   | `builtins/result` | Testing of `Result` builtin | -    |
-|   🚀   | `builtins/string` | Testing of `String` builtin | -    |
-|   🚀   | `syntax/class`    | Testing of `class` syntax   | -    |
-|   🚀   | `syntax/enum`     | Testing of `enum` syntax    | -    |
-|   🚀   | `syntax/match`    | Testing of `match` syntax   | -    |
+| Status | Suite              | Description                 | Todo       |
+| :----: | ------------------ | --------------------------- | ---------- |
+|   🚀   | `builtins/list`    | Testing of `List` builtin   | Stubs only |
+|   🚀   | `builtins/number`  | Testing of `Number` builtin | Stubs only |
+|   🚀   | `builtins/result`  | Testing of `Result` builtin | Stubs only |
+|   🚀   | `builtins/string`  | Testing of `String` builtin | Stubs only |
+|   🚀   | `syntax/class`     | Testing of `class` syntax   | -          |
+|   🚀   | `syntax/enum`      | Testing of `enum` syntax    | -          |
+|   🚀   | `syntax/match`     | Testing of `match` syntax   | -          |
+|   🚀   | `syntax/use`       | Testing of `use` syntax     | -          |
+|   🚀   | `syntax/attribute` | Testing of `#...` syntax    | -          |
+|   🚀   | `syntax/decorator` | Testing of `@...` syntax    | -          |
 
 ## Libraries
 

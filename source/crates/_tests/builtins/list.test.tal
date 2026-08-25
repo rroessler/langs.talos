@@ -7,8 +7,74 @@
 import "talos:test" as Test;
 import "talos:assert" as Assert;
 
+// - TEST MOCKS - //
+
+namespace Mock {
+    //! Prepare an empty list.
+    export let none = List.empty();
+
+    //! Prepare a ranged list.
+    export let some: List[Any] = [0, 1, 2, 3, 4];
+};
+
 // - TEST CASES - //
 
-Test.todo("Traits", fn => Todo());
-Test.todo("Methods", fn => Todo());
-Test.todo("Statics", fn => Todo());
+Test.suite("Traits", fn {
+    Test.case("For '[...]'", fn {
+        for (nn, ii in Mock.some) Assert.equals(nn, ii);
+    });
+});
+
+Test.suite("Methods", fn {
+    Test.case("List.empty '()'", fn {
+        Assert.truthy(Mock.none.empty());
+        Assert.falsey(Mock.some.empty());
+    });
+
+    Test.case("List.size '()'", fn {
+        Assert.equals(Mock.none.size(), 0);
+        Assert.differs(Mock.some.size(), 0);
+    });
+
+    Test.case("List.back '()'", fn {
+        Assert.panics(fn => Mock.none.back());
+        Assert.equals(Mock.some.back(), 4);
+    });
+
+    Test.case("List.front '()'", fn {
+        Assert.panics(fn => Mock.none.front());
+        Assert.equals(Mock.some.front(), 0);
+    });
+
+    Test.case("List.get 'Number'", fn {
+        Assert.panics(fn => Mock.none.get(0));
+        Assert.equals(Mock.some.get(0), 0);
+        Assert.equals(Mock.some.get(3), 3);
+        Assert.panics(fn => Mock.some.get(5));
+    });
+
+    Test.todo("List.set 'Number, Any'");
+
+    Test.todo("List.map 'Function'");
+    Test.todo("List.filter 'Function'");
+    Test.todo("List.fold 'Any, Function'");
+
+    Test.todo("List.reverse '()'");
+    Test.todo("List.slice '...Number'");
+    Test.todo("List.erase '...Number'");
+
+    Test.todo("List.pop_back '...Any'");
+    Test.todo("List.pop_front '...Any'");
+    Test.todo("List.push_back '...Any'");
+    Test.todo("List.push_front '...Any'");
+
+    Test.todo("List.last_index_of 'Any'");
+    Test.todo("List.first_index_of 'Any'");
+});
+
+Test.suite("Statics", fn {
+    Test.todo("List.from '...Any'");
+    Test.todo("List.empty '()'");
+    Test.todo("List.range '..Number'");
+    Test.todo("List.filled, 'Number, Any");
+});

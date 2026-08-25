@@ -17,7 +17,7 @@ TALOS_XX_STATICS_FOOTER()
 
 TALOS_XX_STATICS_HEADER()
 TALOS_XX_STATICS_DEFINE(range)
-TALOS_XX_STATICS_TYPEDEF("fn (start?: Number, end?: Number, step?: Number) -> List[Number]")
+TALOS_XX_STATICS_TYPEDEF("fn (start?: Number, end?: Number, step?: Number) -> Iterator[Number]")
 TALOS_XX_STATICS_DESCRIBE("Creates a ranged `List` value.")
 TALOS_XX_STATICS_FOOTER()
 
