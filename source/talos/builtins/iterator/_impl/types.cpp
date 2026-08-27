@@ -56,6 +56,13 @@ Talos::Type::Entity Talos::Builtins::Static::from() {
   return TN::generic(TN::function(TN::iterable(T), T), T);
 }
 
+Talos::Type::Entity Talos::Builtins::Static::range() {
+  auto index = TN::optional(TN::number());
+  auto instance = TN::iterator(TN::number());
+  auto args = std::vector<Type::Entity>({index, index, index});
+  return TN::function(instance, args); // bind the function
+}
+
 const $::Shared::Pointer<Talos::Type::Generic> &Talos::Builtins::Static::generator() {
   // prepare the baseline typing to output
   static auto s_generator = $::Shared::Pointer<Type::Generic>();

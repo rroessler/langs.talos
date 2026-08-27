@@ -34,41 +34,25 @@ Talos::Value::Any Talos::Builtins::Static::empty(Isolate *isolate, const Args &)
 }
 
 Talos::Value::Any Talos::Builtins::Static::range(Isolate *isolate, const Args &args) {
-  // attempt pulling out necessary range values now as prescribed
-  Value::Any start = Number::Tagged(0), end = Number::Tagged(0), step = Number::Tagged(1);
+  // prepare the basic interval details
+  auto interval = Iterable::Stepper(isolate, args);
 
-  // handle the incoming number of arguments available
-  switch (args.size()) {
-  case 0: break;
-  case 1: end = args.at(0); break;
-  default: step = args.at(2); $_FALLTHROUGH;
-  case 2: start = args.at(0), end = args.at(1); break;
-  }
+  // ensure some certain conditions about the interval
+  if (!interval.has_value()) return Value::Failure();
+  else if (!interval->finite()) return isolate->panic(6000603);
 
-  // ensure each of out items are valid now as well
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, start);
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, end);
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, step);
+  // prepare the iteration values to use now
+  auto vs = interval->start(), ve = interval->stop(), vx = interval->step();
 
-  // attempt preparing the list containing iterable values now
-  std::vector<Value::Any> passthrough = {start, end, step};
+  // attempt constructing the expected size to be used
+  int32_t size = std::abs(vs - ve) / std::abs(vx);
 
-  // construct a suitable range iterator now
-  Iterable::Callback<Iterable::List> callback = [](auto *, const Iterable::List &self, size_t) -> Value::Any {
-    // pull out the context values being used now
-    Number::Floating current = self.get(0).as<Number::Tagged>();
-    Number::Floating condition = self.get(1).as<Number::Tagged>();
-    Number::Floating step = self.get(2).as<Number::Tagged>();
+  // construct the resulting set of integers and numerics required now
+  auto callback = [vs, vx](int32_t ii) -> Value::Any { return Number::Tagged(vs + (ii * vx)); };
+  auto range = $::Ranges::To(std::views::iota(0, size) | std::views::transform(callback));
 
-    // we handle our condition based on the step
-    if (step > 0 ? current >= condition : current <= condition) return Value::Sentinel();
-
-    // update the current initial value being used
-    return self.set(0, Number::Tagged(current + step)), Number::Tagged(current);
-  };
-
-  // and construct the resulting iterator now
-  return isolate->create<Iterable::Iterator>(isolate->create<Iterable::List>(passthrough), std::move(callback));
+  // construct the resulting list instance now
+  return isolate->create<Iterable::List>(range);
 }
 
 Talos::Value::Any Talos::Builtins::Static::filled(Isolate *isolate, const Args &args) {

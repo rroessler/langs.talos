@@ -16,6 +16,12 @@ TALOS_XX_STATICS_DESCRIBE("Creates an empty `Iterator` value.")
 TALOS_XX_STATICS_FOOTER()
 
 TALOS_XX_STATICS_HEADER()
+TALOS_XX_STATICS_DEFINE(range)
+TALOS_XX_STATICS_TYPEDEF("fn (start?: Number, end?: Number, step?: Number) -> Iterator[Number]")
+TALOS_XX_STATICS_DESCRIBE("Creates a ranged `Iterator` value.")
+TALOS_XX_STATICS_FOOTER()
+
+TALOS_XX_STATICS_HEADER()
 TALOS_XX_STATICS_DEFINE(dynamic)
 TALOS_XX_STATICS_TYPEDEF("fn [T = Any](generator: Generator[T]) -> Iterator[T]")
 TALOS_XX_STATICS_DESCRIBE("Creates an `Iterator` from a generator context.")

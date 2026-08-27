@@ -7,5 +7,6 @@
 /// Forward Declarations
 $_FWD(Talos::Iterable, struct List)
 $_FWD(Talos::Iterable, struct Iterator)
+$_FWD(Talos::Iterable, class Interval)
 
 #endif

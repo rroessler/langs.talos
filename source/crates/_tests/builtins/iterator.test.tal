@@ -14,18 +14,18 @@ import "talos:_detail" as Detail;
 
 Test.suite("Traits", fn {
     // construct a stateful iterator
-    let iterator = List.range(42);
+    let iterator = Iterator.range(42);
 
     // test iterating over the available range
     Test.case("For '[...]'", fn {
         Assert.okay(iterator is Iterator[Number]);
-        for (nn, ii in List.range(42)) Assert.equals(nn, ii);
+        for (nn, ii in iterator) Assert.equals(nn, ii);
     });
 });
 
 Test.suite("Methods", fn {
     // construct a stateful iterator
-    let iterator = List.range(1);
+    let iterator = Iterator.range(1);
 
     // test the incoming expected sequence now
     Test.case("Iterator.index '0'", fn => Assert.equals(iterator.index(), 0));

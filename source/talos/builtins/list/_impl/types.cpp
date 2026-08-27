@@ -115,7 +115,7 @@ Talos::Type::Entity Talos::Builtins::Static::empty() {
 
 Talos::Type::Entity Talos::Builtins::Static::range() {
   auto index = TN::optional(TN::number());
-  auto instance = TN::iterator(TN::number());
+  auto instance = TN::list(TN::number());
   auto args = std::vector<Type::Entity>({index, index, index});
   return TN::function(instance, args); // bind the function
 }

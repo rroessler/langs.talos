@@ -41,6 +41,36 @@ Talos::Value::Any Talos::Builtins::Static::from(Isolate *isolate, const Args &ar
   return attribute.pointer().okay() ? attribute : isolate->panic(6000502, args[0].brand());
 }
 
+Talos::Value::Any Talos::Builtins::Static::range(Isolate *isolate, const Args &args) {
+  // prepare the basic interval details
+  auto interval = Iterable::Stepper(isolate, args);
+  if (!interval.has_value()) return Value::Failure();
+
+  // attempt preparing the list containing iterable values now
+  std::vector<Value::Any> passthrough = {
+      Number::Tagged(interval->start()),
+      Number::Tagged(interval->stop()),
+      Number::Tagged(interval->step()),
+  };
+
+  // construct a suitable range iterator now
+  Iterable::Callback<Iterable::List> callback = [](auto *, const Iterable::List &self, size_t) -> Value::Any {
+    // pull out the context values being used now
+    Number::Floating current = self.get(0).as<Number::Tagged>();
+    Number::Floating condition = self.get(1).as<Number::Tagged>();
+    Number::Floating step = self.get(2).as<Number::Tagged>();
+
+    // we handle our condition based on the step
+    if (step > 0 ? current >= condition : current <= condition) return Value::Sentinel();
+
+    // update the current initial value being used
+    return self.set(0, Number::Tagged(current + step)), Number::Tagged(current);
+  };
+
+  // and construct the resulting iterator now
+  return isolate->create<Iterable::Iterator>(isolate->create<Iterable::List>(passthrough), std::move(callback));
+}
+
 Talos::Value::Any Talos::Builtins::Static::dynamic(Isolate *isolate, const Args &args) {
   // ensure we have been given a suitable set of arguments
   TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);

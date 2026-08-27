@@ -1,0 +1,47 @@
+---
+draft: true
+date: 1970-01-01
+author: Reuben Roessler
+title: Talos v0.2.1
+---
+
+import { Callout } from '@/website/components';
+
+## Improved Ranges
+
+With this release comes a minor improvement to how numeric ranges are produced in Talos. Previously the `List.range` factory could be used to construct an `Iterator[Number]` that would generate ranged numerics on the fly. This was counter-intuitive to the other `List` factory methods which all produced lists.
+
+To address this, the previous functionality for `List.range` was replicated with the `Iterator.range` factory and `List.range` now produces _finite_ `List[Number]` ranges.
+
+```talos
+let list = List.range(42);          // Will create a `List[Number]`
+let iterator = Iterator.range(42);  // Will create a `Iterator[Number]`
+
+// Both items are still accepted by for-loops.
+for (nn in list) { ... }
+for (nn in iterator) { ... }
+```
+
+In terms of performance, although `List.range` will incur a minor performance cost to construction, they should be faster in iteration to an `Iterator.range` which does its computation on the fly. Conversely, a `List.range` will require more memory than that produced by an `Iterator.range` value.
+
+<Callout title="Note:">
+    Since `List.range` needs to build the range on construction, infinite lists are impossible to be defined as a `List`
+    value.
+</Callout>
+
+## Further Testing
+
+Todo...
+
+## Upcoming Work
+
+Todo...
+
+---
+
+## Bug Fixes
+
+<h4>Toolkit / talos run</h4>
+
+- Added: Added `Iterator.range` method that mimics previous releases `List.range` method.
+- Fixed: Changed `List.range` to now produce a `List[Number]` instead of an `Iterator[Number]` for clarity.

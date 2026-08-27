@@ -211,6 +211,7 @@ TALOS_XX_DIAGNOSTIC_RUNTIME(6000506, ERROR, "Cannot yield when 'Generator' is al
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000600, ERROR, "{0}() argument must be between 0 and 100")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000601, ERROR, "Numeric value must be less than {0}")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000602, ERROR, "Numeric value must be greater than {0}")
+TALOS_XX_DIAGNOSTIC_RUNTIME(6000603, ERROR, "Cannot create list from an infinite numeric range")
 
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000700, ERROR, "{0}")
 TALOS_XX_DIAGNOSTIC_RUNTIME(6000701, ERROR, "Unwrapping 'Result' value failed")

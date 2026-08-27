@@ -16,7 +16,7 @@ export let sieve = fn (n: Number): List[Boolean] {
     if (n < 2) return primes;
 
     // iterate over the available numbers now
-    for (ii in List.range(2, n)) {
+    for (ii in Iterator.range(2, n)) {
         // prepare an accumulator
         mut sum = 2 * ii;
 

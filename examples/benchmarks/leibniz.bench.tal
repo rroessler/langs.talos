@@ -12,7 +12,7 @@ export let leibniz = fn (iterations: Number): Number {
     mut pi = 1; // prepare output
     mut sign = 1; // and the sign
 
-    for (ii in List.range(2, iterations)) {
+    for (ii in Iterator.range(2, iterations)) {
         sign = -sign; // update
         pi += sign / (2 * ii - 1);
     }
