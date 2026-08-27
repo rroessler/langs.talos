@@ -14,7 +14,7 @@ namespace Mock {
     export let none = List.empty();
 
     //! Prepare a ranged list.
-    export let some: List[Any] = [0, 1, 2, 3, 4];
+    export let some = List.range(42);
 };
 
 // - TEST CASES - //
@@ -50,31 +50,37 @@ Test.suite("Methods", fn {
         Assert.panics(fn => Mock.none.get(0));
         Assert.equals(Mock.some.get(0), 0);
         Assert.equals(Mock.some.get(3), 3);
-        Assert.panics(fn => Mock.some.get(5));
+        Assert.panics(fn => Mock.some.get(43));
     });
 
-    Test.todo("List.set 'Number, Any'");
+    Test.case("List.set 'Number, Any'", fn {
+        let other = 20;
+        let temp = List.range(5);
 
-    Test.todo("List.map 'Function'");
-    Test.todo("List.filter 'Function'");
-    Test.todo("List.fold 'Any, Function'");
+        Assert.equals(temp.set(0, other), other);
+        Assert.equals(temp.get(0), other);
+    });
 
-    Test.todo("List.reverse '()'");
-    Test.todo("List.slice '...Number'");
-    Test.todo("List.erase '...Number'");
+    Test.case("List.map 'Function'", fn {});
+    Test.case("List.filter 'Function'", fn {});
+    Test.case("List.fold 'Any, Function'", fn {});
 
-    Test.todo("List.pop_back '...Any'");
-    Test.todo("List.pop_front '...Any'");
-    Test.todo("List.push_back '...Any'");
-    Test.todo("List.push_front '...Any'");
+    Test.case("List.reverse '()'", fn {});
+    Test.case("List.slice '...Number'", fn {});
+    Test.case("List.erase '...Number'", fn {});
 
-    Test.todo("List.last_index_of 'Any'");
-    Test.todo("List.first_index_of 'Any'");
+    Test.case("List.pop_back '...Any'", fn {});
+    Test.case("List.pop_front '...Any'", fn {});
+    Test.case("List.push_back '...Any'", fn {});
+    Test.case("List.push_front '...Any'", fn {});
+
+    Test.case("List.last_index_of 'Any'", fn {});
+    Test.case("List.first_index_of 'Any'", fn {});
 });
 
 Test.suite("Statics", fn {
-    Test.todo("List.from '...Any'");
-    Test.todo("List.empty '()'");
-    Test.todo("List.range '..Number'");
-    Test.todo("List.filled, 'Number, Any");
+    Test.case("List.from '...Any'", fn {});
+    Test.case("List.empty '()'", fn {});
+    Test.case("List.range '..Number'", fn {});
+    Test.case("List.filled, 'Number, Any", fn {});
 });
