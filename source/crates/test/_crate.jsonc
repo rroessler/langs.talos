@@ -1,5 +1,5 @@
 {
-    "version": "0.2.1",
+    "version": "0.3.0",
     "name": "@talos/test",
     "main": "library/_main.tal",
     "describe": "Tools for describing and mocking testing files"

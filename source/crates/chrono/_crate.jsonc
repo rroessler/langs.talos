@@ -1,5 +1,5 @@
 {
-    "version": "0.2.1",
+    "version": "0.3.0",
     "name": "@talos/chrono",
     "main": "library/_main.tal",
     "describe": "Support for date and time manipulation"

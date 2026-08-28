@@ -1,5 +1,5 @@
 {
-    "version": "0.2.1",
+    "version": "0.3.0",
     "name": "@talos/assert",
     "main": "library/_main.tal",
     "describe": "Common assertion functions for invariants and testing"
