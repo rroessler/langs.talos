@@ -123,7 +123,7 @@ Talos::Value::Any Talos::Package::Assert::m_test(
 
   // otherwise we resolve a suitable error message
   if (message.is<String::Any>()) return m_panic(isolate, 7000000, message);
-  return m_panic(isolate, 7000001, state ? "truthy" : "falsey"); // reason
+  return m_panic(isolate, 7000001, state ? "falsey" : "truthy"); // reason
 }
 
 Talos::Value::Any Talos::Package::Assert::m_panic(Runtime::Isolate *isolate, const Object::Exception &exception) {

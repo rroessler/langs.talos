@@ -64,6 +64,9 @@ struct Iterable::List : public Object::Mixin<Iterable::List> {
   inline constexpr std::span<Value::Any> span() const { return {data(), size()}; }
   inline constexpr std::vector<Value::Any> &values() const { return m_wrapper()->values; }
 
+  /// @brief Handles clearing the list of values.
+  inline constexpr const Iterable::List &clear() const { return values().clear(), *this; }
+
   /// @brief Gets the front-most value.
   inline constexpr Value::Any front() const { return get(0); }
 

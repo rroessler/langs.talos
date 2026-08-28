@@ -52,15 +52,27 @@ TALOS_XX_FIELDS_DESCRIBE("Reduces all elements in a `List` to an accumulated val
 TALOS_XX_FIELDS_FOOTER()
 
 TALOS_XX_FIELDS_HEADER()
+TALOS_XX_FIELDS_DEFINE(clear)
+TALOS_XX_FIELDS_TYPEDEF("fn -> List[T]")
+TALOS_XX_FIELDS_DESCRIBE("Removes all elements from a `List` collection.")
+TALOS_XX_FIELDS_FOOTER()
+
+TALOS_XX_FIELDS_HEADER()
+TALOS_XX_FIELDS_DEFINE(drop)
+TALOS_XX_FIELDS_TYPEDEF("fn (index: Number) -> T")
+TALOS_XX_FIELDS_DESCRIBE("Removes an element by index from a `List`.")
+TALOS_XX_FIELDS_FOOTER()
+
+TALOS_XX_FIELDS_HEADER()
 TALOS_XX_FIELDS_DEFINE(erase)
-TALOS_XX_FIELDS_TYPEDEF("fn (start?: Number, end?: Number) -> List[T]")
+TALOS_XX_FIELDS_TYPEDEF("fn (start: Number, end: Number) -> List[T]")
 TALOS_XX_FIELDS_DESCRIBE("Removes elements from a `List` indicated by a given range.")
 TALOS_XX_FIELDS_FOOTER()
 
 TALOS_XX_FIELDS_HEADER()
 TALOS_XX_FIELDS_DEFINE(slice)
 TALOS_XX_FIELDS_TYPEDEF("fn (start?: Number, end?: Number) -> List[T]")
-TALOS_XX_FIELDS_DESCRIBE("Creates a section of a `List` indicated by a given range.")
+TALOS_XX_FIELDS_DESCRIBE("Creates a view of a `List` indicated by a given range.")
 TALOS_XX_FIELDS_FOOTER()
 
 TALOS_XX_FIELDS_HEADER()

@@ -74,7 +74,18 @@ Talos::Type::Entity Talos::Builtins::Field::fold(const Self *self) {
   return TN::generic(TN::function(V, V, callback), V);
 }
 
-Talos::Type::Entity Talos::Builtins::Field::erase(const Self *self) { return slice(self); }
+Talos::Type::Entity Talos::Builtins::Field::clear(const Self *self) {
+  return TN::function(TN::list(self->constraints(0)));
+}
+
+Talos::Type::Entity Talos::Builtins::Field::drop(const Self *self) {
+  return TN::function(TN::list(self->constraints(0)), TN::number());
+}
+
+Talos::Type::Entity Talos::Builtins::Field::erase(const Self *self) {
+  return TN::function(TN::list(self->constraints(0)), TN::number(), TN::number());
+}
+
 Talos::Type::Entity Talos::Builtins::Field::slice(const Self *self) {
   auto start = TN::optional(TN::number()), end = TN::optional(TN::number());
   return TN::function(TN::list(self->constraints(0)), start, end);

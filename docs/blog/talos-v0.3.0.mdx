@@ -47,3 +47,4 @@ Todo...
 - Fixed: Changed `List.range` to now produce a `List[Number]` instead of an `Iterator[Number]` for clarity.
 - Added: New `Iterator.collect` method that allows the conversion of an iterator to the corresponding `List[T]` value.
 - Fixed: The typings for the `List.from` factory were incorrect. It now receives an `Iterator[T]` value.
+- Fixed: Split overloads of `List.erase` into seperate methods. `List.clear` now removes all elements, and `List.drop` removes a single element by index.

@@ -139,32 +139,53 @@ Talos::Value::Any Talos::Builtins::Field::fold(Isolate *isolate, const Args &arg
   return result;
 }
 
-Talos::Value::Any Talos::Builtins::Field::erase(Isolate *isolate, const Args &args) {
-  // ensure some conditions about the function call
+Talos::Value::Any Talos::Builtins::Field::clear(Isolate *isolate, const Args &args) {
+  TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::List, args.self());
+  return args.self<Iterable::List>().clear(); // erase now
+}
+
+Talos::Value::Any Talos::Builtins::Field::drop(Isolate *isolate, const Args &args) {
+  TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);
+  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, args[0]);
   TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::List, args.self());
 
-  // if no arguments are given, then clear the list
-  if (args.empty()) return isolate->create<Iterable::List>();
+  // pull out our necessary items now
+  auto self = args.self<Iterable::List>();
+  auto numeric = args.at<Number::Tagged>(0);
+
+  // attempt resolving a suitable index value now
+  auto index = static_cast<int64_t>(numeric);
+  auto size = static_cast<int64_t>(self.size());
+
+  // attempt updating the index if negative at all
+  if (index < 0) index += size;
+
+  // fail if the index is out of the available bounds
+  TALOS_MM_ASSERT_INDEX(isolate, size, index);
+
+  // and finally drop the resulting value
+  auto dropped = self.get(index);
+  auto &values = self.values();
+  values.erase(values.begin() + index);
+  return dropped; // return the value
+}
+
+Talos::Value::Any Talos::Builtins::Field::erase(Isolate *isolate, const Args &args) {
+  // ensure some conditions about the function call
+  TALOS_MM_ASSERT_ARGC(isolate, args.size(), 2);
+  TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::List, args.self());
 
   // pull out the incoming list now
   auto self = args.self<Iterable::List>();
   auto size = static_cast<int64_t>(self.size());
 
-  // otherwise attempt pulling out our sections to be erased
-  auto initial = args.at(0, Value::Void());
-  auto secondary = args.at(1, Value::Void());
-
-  // update our values with the correct details now
-  if (initial.is<Value::Void>()) initial = Number::Tagged(0);
-  if (secondary.is<Value::Void>()) secondary = Number::Tagged(-1);
-
   // prepare our starting and ending points now
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, initial);
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, secondary);
+  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, args[0]);
+  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, args[1]);
 
   // cast the incoming values now
-  Number::Integral start = initial.as<Number::Tagged>();
-  Number::Integral end = secondary.as<Number::Tagged>();
+  Number::Integral start = args.at<Number::Tagged>(0);
+  Number::Integral end = args.at<Number::Tagged>(1);
 
   // if the arguments are less than zero
   if (start < 0) start += size;
@@ -172,34 +193,36 @@ Talos::Value::Any Talos::Builtins::Field::erase(Isolate *isolate, const Args &ar
 
   // validate the incoming values now
   TALOS_MM_ASSERT_INDEX(isolate, size, start);
-  TALOS_MM_ASSERT_INDEX(isolate, size, end);
 
   // ignore if the start is equivalent to the end
-  if (start == end) return isolate->create<Iterable::List>();
+  if (start == end) return self;
 
   // otherwise swap our values to ensure correct
   else if (start > end) std::swap(start, end);
 
-  // attempt removing this section now
-  auto values = std::vector(self.values());
+  // ensure the ending value can only be the maximum
+  if (end > size) end = size;
 
-  // erase the necessary values now
-  values.erase(values.begin() + start, values.begin() + end + 1);
+  // attempt removing this section now
+  auto &values = self.values();
+
+  // handle removing our range of values as required
+  values.erase(values.begin() + start, values.begin() + end);
 
   // and finally construct the resulting list now
-  return isolate->create<Iterable::List>(values);
+  return self;
 }
 
 Talos::Value::Any Talos::Builtins::Field::slice(Isolate *isolate, const Args &args) {
   // ensure some conditions about the function call
   TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::List, args.self());
 
-  // if no arguments are given, then clear the list
-  if (args.empty()) return isolate->create<Iterable::List>();
-
   // pull out the incoming list now
   auto self = args.self<Iterable::List>();
   auto size = static_cast<int64_t>(self.size());
+
+  // if no arguments are given, then clear the list
+  if (args.empty()) return isolate->create<Iterable::List>(self.span());
 
   // otherwise attempt pulling out our sections to be erased
   auto initial = args.at(0, Value::Void());
@@ -258,7 +281,7 @@ Talos::Value::Any Talos::Builtins::Field::filter(Isolate *isolate, const Args &a
 
   // iterate over the available values now
   for (size_t ii = 0; ii < values.size(); ++ii) {
-    auto span = values.subspan(ii, 1);
+    auto span = values.subspan(ii, 1); // to invoke
     auto result = isolate->invoke(callback, span);
     if (!result.pointer().okay()) return result;
     else if (!result.truthiness()) continue;
@@ -331,7 +354,7 @@ Talos::Value::Any Talos::Builtins::Field::pop_back(Isolate *isolate, const Args 
   TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::List, args.self());
 
   // pull out the necessary arguments
-  auto values = args.self<Iterable::List>().values();
+  auto &values = args.self<Iterable::List>().values();
 
   // if the list is empty, the throw an exception
   if (values.empty()) return isolate->panic(6000505);
