@@ -120,8 +120,8 @@ $::Shared::Pointer<Talos::Type::Transform> Talos::Type::New::asyncify(const Eras
   return transform(target, Utility::Asyncify());
 }
 
-$::Shared::Pointer<Talos::Type::Transform> Talos::Type::New::iterable(const Erased &target) {
-  return transform(target, Utility::Loopable());
+$::Shared::Pointer<Talos::Type::Transform> Talos::Type::New::iterable(const Erased &target, bool outer) {
+  return transform(target, Utility::Loopable(outer));
 }
 
 $::Shared::Pointer<Talos::Type::Transform> Talos::Type::New::invocation(const Erased &target, bool async) {

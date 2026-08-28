@@ -5,8 +5,8 @@
 
 TALOS_XX_STATICS_HEADER()
 TALOS_XX_STATICS_DEFINE(from)
-TALOS_XX_STATICS_TYPEDEF("fn [T](...values: T) -> List[T]")
-TALOS_XX_STATICS_DESCRIBE("Creates a `List` from a collection of values.")
+TALOS_XX_STATICS_TYPEDEF("fn [T](value: Iterable[T]) -> List[T]")
+TALOS_XX_STATICS_DESCRIBE("Creates a `List` from an iterable or array-like value.")
 TALOS_XX_STATICS_FOOTER()
 
 TALOS_XX_STATICS_HEADER()

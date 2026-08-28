@@ -137,7 +137,13 @@ struct New : public $::Ensure::Static {
    */
   static $::Shared::Pointer<Transform> awaited(const Erased &target);
   static $::Shared::Pointer<Transform> asyncify(const Erased &target);
-  static $::Shared::Pointer<Transform> iterable(const Erased &target);
+
+  /**
+   * @brief Constructs the result of an iterable type.
+   * @param target                    Target to wrap.
+   * @param outer                     Wrap outside.
+   */
+  static $::Shared::Pointer<Transform> iterable(const Erased &target, bool outer = true);
 
   /**
    * @brief Constructs an invocation transform (for binding).

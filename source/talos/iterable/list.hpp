@@ -40,7 +40,7 @@ template <> struct Object::Wrapper<Iterable::List> {
    * @param iterator              Generator value.
    */
   explicit Wrapper(Runtime::Isolate *isolate, const Iterable::Iterator &iterator) {
-    while (iterator.next(isolate)) values.emplace_back(iterator.value());
+    while (!iterator.next(isolate)) values.emplace_back(iterator.value());
   }
 };
 

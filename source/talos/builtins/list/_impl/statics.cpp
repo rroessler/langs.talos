@@ -15,12 +15,15 @@ Talos::Value::Any Talos::Builtins::Static::from(Isolate *isolate, const Args &ar
   // pull out the incoming iterable value now
   auto value = args[0];
 
+  // fast-path iterator values if given at all
+  if (value.is<Iterable::Iterator>()) return isolate->create<Iterable::List>(value.as<Iterable::Iterator>());
+
   // prepare the incoming descriptor to be used
   auto *descriptor = value.attribute(Operator::Kind::ITER);
 
   // attempt getting the iterable to be used
   auto attribute = descriptor ? descriptor->getter(isolate, value) : Value::Missing();
-  if (!attribute.pointer().okay()) return isolate->panic(6000502, attribute.brand());
+  if (!attribute.pointer().okay()) return isolate->panic(6000502, value.brand());
 
   // should be able to cast and convert to a suitable array now
   return isolate->create<Iterable::List>(attribute.as<Iterable::Iterator>());

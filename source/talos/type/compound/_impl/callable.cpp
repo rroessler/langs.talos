@@ -16,7 +16,7 @@ Talos::Type::Entity Talos::Type::Callable::m_lookup(const $::String::View &field
 
 Talos::Type::Erased Talos::Type::Callable::m_infer(Constraints *constraints) const {
   // prepare the cloned callable instance
-  auto callable = $::Shared::New<Callable>(*this);
+  $::Shared::Pointer<Callable> callable = packed() ? $::Shared::New<Variadic>(*this) : $::Shared::New<Callable>(*this);
 
   // ignore if not given any generics
   if (constraints == nullptr) return callable;

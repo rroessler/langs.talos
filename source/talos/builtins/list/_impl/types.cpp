@@ -104,8 +104,9 @@ Talos::Type::Entity Talos::Builtins::Field::last_index_of(const Self *self) {
 }
 
 Talos::Type::Entity Talos::Builtins::Static::from() {
-  auto T = TN::constraint("T"); // prepare the constraints
-  return TN::generic(TN::variadic(TN::list(T), T), T);
+  auto T = TN::constraint("T"); // bind "T"
+  auto R = TN::list(TN::iterable(T, false));
+  return TN::generic(TN::function(R, T), T);
 }
 
 Talos::Type::Entity Talos::Builtins::Static::empty() {

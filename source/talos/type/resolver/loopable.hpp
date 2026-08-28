@@ -7,11 +7,17 @@
 namespace Talos::Type::Utility {
 
 /// @brief Loopable Type Resolver.
-struct Loopable {
+class Loopable {
+  //  PROPERTIES  //
+
+  /// @brief Wrap with an `Iterator` typing.
+  bool m_outer = true;
+
+public:
   //  CONSTRUCTORS  //
 
   /// @brief Default constructor.
-  explicit Loopable() = default;
+  explicit Loopable(bool outer = true) : m_outer(outer) {}
 
   //  OPERATOR METHODS  //
 

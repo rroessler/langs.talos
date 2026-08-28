@@ -125,6 +125,13 @@ struct Variadic : public Callable {
   //  CONSTRUCTORS  //
 
   /**
+   * @brief Allow construction from other values.
+   * @param other                     Callable value.
+   */
+  explicit Variadic(const Callable &other) : Callable(other) {}
+  explicit Variadic(Callable &&other) : Callable(std::move(other)) {}
+
+  /**
    * @brief Constructs a defaulted variadic function.
    * @param returns                   Return typing.
    */

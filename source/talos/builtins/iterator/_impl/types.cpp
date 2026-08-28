@@ -54,9 +54,10 @@ Talos::Type::Entity Talos::Builtins::Static::empty() {
 Talos::Type::Entity Talos::Builtins::Static::from() {
   // prepare the constraints to be used
   auto T = TN::constraint("T");
+  auto R = TN::iterable(T, true);
 
   // construct the signature that resolves a suitable iterable
-  return TN::generic(TN::function(TN::iterable(T), T), T);
+  return TN::generic(TN::function(R, T), T);
 }
 
 Talos::Type::Entity Talos::Builtins::Static::range() {

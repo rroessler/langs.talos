@@ -15,5 +15,5 @@ Talos::Type::Utility::Loopable::m_resolve(const Erased &target, Constraints *con
   auto inferred = target->infer(constraints);
   auto value = inferred->apply(Operator::Kind::ITER);
   if (value->is<Unset>()) return New::never();
-  return New::iterator(value); // valid iterator
+  return m_outer ? New::iterator(value) : value;
 }
