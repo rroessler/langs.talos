@@ -21,6 +21,12 @@ TALOS_XX_FIELDS_TYPEDEF("fn -> Number")
 TALOS_XX_FIELDS_DESCRIBE("Gets the current iteration index of an `Iterator`.")
 TALOS_XX_FIELDS_FOOTER()
 
+TALOS_XX_FIELDS_HEADER()
+TALOS_XX_FIELDS_DEFINE(collect)
+TALOS_XX_FIELDS_TYPEDEF("fn -> List[T]")
+TALOS_XX_FIELDS_DESCRIBE("Transforms an iterator into a `List`.")
+TALOS_XX_FIELDS_FOOTER()
+
 //  UNDEFINES  //
 
 /// Builtins Includes

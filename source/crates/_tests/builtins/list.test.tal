@@ -20,6 +20,11 @@ namespace Mock {
 // - TEST CASES - //
 
 Test.suite("Traits", fn {
+    Test.case("Empty '[]'", fn {
+        Assert.truthy([].empty());
+        Assert.equals([].size(), 0);
+    });
+
     Test.case("For '[...]'", fn {
         for (nn, ii in Mock.some) Assert.equals(nn, ii);
     });
@@ -79,8 +84,17 @@ Test.suite("Methods", fn {
 });
 
 Test.suite("Statics", fn {
-    Test.case("List.from '...Any'", fn {});
-    Test.case("List.empty '()'", fn {});
+    Test.case("List.from '...Any'", fn {
+        let list = List.from();
+    });
+
+    Test.case("List.empty '()'", fn {
+        let list = List.empty();
+        Assert.truthy(list.empty());
+        Assert.equals(list.size(), 0);
+    });
+
     Test.case("List.range '..Number'", fn {});
+
     Test.case("List.filled, 'Number, Any", fn {});
 });

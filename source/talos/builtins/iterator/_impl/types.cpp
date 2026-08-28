@@ -42,6 +42,9 @@ $::Shared::Pointer<Talos::Type::Prototype> Talos::Builtins::Wrapper<Talos::Itera
 Talos::Type::Entity Talos::Builtins::Field::done(const Self *) { return TN::function(TN::boolean()); }
 Talos::Type::Entity Talos::Builtins::Field::next(const Self *) { return TN::function(TN::boolean()); }
 Talos::Type::Entity Talos::Builtins::Field::index(const Self *) { return TN::function(TN::number()); }
+Talos::Type::Entity Talos::Builtins::Field::collect(const Self *self) {
+  return TN::function(TN::list(self->constraints(0)));
+}
 
 Talos::Type::Entity Talos::Builtins::Static::empty() {
   auto T = TN::constraint("T", TN::any(), TN::any());

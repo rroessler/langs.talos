@@ -15,9 +15,6 @@ Talos::Value::Any Talos::Builtins::Static::from(Isolate *isolate, const Args &ar
   // pull out the incoming iterable value now
   auto value = args[0];
 
-  // fast-path construction here if given an iterable straight away
-  if (value.is<Iterable::Iterator>()) return isolate->create<Iterable::List>(value.as<Iterable::Iterator>());
-
   // prepare the incoming descriptor to be used
   auto *descriptor = value.attribute(Operator::Kind::ITER);
 

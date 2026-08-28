@@ -37,6 +37,11 @@ Talos::Value::Any Talos::Builtins::Field::index(Isolate *isolate, const Args &ar
   return Number::Tagged(args.self<Iterable::Iterator>().index());
 }
 
+Talos::Value::Any Talos::Builtins::Field::collect(Isolate *isolate, const Args &args) {
+  TALOS_MM_ASSERT_TYPEOF(isolate, Iterable::Iterator, args.self());
+  return isolate->create<Iterable::List>(args.self<Iterable::Iterator>());
+}
+
 //  PRIVATE METHODS  //
 
 Talos::Member::View Talos::Builtins::Wrapper<Talos::Iterable::Iterator>::m_attribute(

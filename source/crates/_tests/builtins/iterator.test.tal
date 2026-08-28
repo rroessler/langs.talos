@@ -33,6 +33,16 @@ Test.suite("Methods", fn {
     Test.case("Iterator.next '()'", fn => Assert.equals(iterator.next(), False));
     Test.case("Iterator.next '()'", fn => Assert.equals(iterator.next(), True));
     Test.case("Iterator.done 'True'", fn => Assert.truthy(iterator.done()));
+
+    // the ".collect" method takes a little extra testing
+    Test.case("Iterator.collect '()'", fn {
+        let size = 5; // prepare a size to use
+        let range = Iterator.range(size);
+        let list = range.collect();
+
+        Assert.truthy(range.done());
+        Assert.equals(list.size(), size);
+    });
 });
 
 Test.suite("Statics", fn {
