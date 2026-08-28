@@ -85,7 +85,10 @@ Test.suite("Methods", fn {
 
 Test.suite("Statics", fn {
     Test.case("List.from '...Any'", fn {
-        let list = List.from();
+        let value = "A string value";
+        let list = List.from(value);
+        Assert.equals(list.size(), value.size());
+        for (cc, ii in list) Assert.equals(cc, value.at(ii));
     });
 
     Test.case("List.empty '()'", fn {
@@ -94,7 +97,20 @@ Test.suite("Statics", fn {
         Assert.equals(list.size(), 0);
     });
 
-    Test.case("List.range '..Number'", fn {});
+    Test.case("List.range '...Number'", fn {
+        let size = 42; // base size
+        let range = List.range(size);
+        Assert.equals(range.size(), size);
+        for (nn, ii in range) Assert.equals(nn, ii);
+    });
 
-    Test.case("List.filled, 'Number, Any", fn {});
+    Test.case("List.filled, 'Number, Any", fn {
+        let none = List.filled(0, Void);
+        Assert.truthy(none.empty());
+
+        let size = 5; // prepare size
+        let filled = List.filled(size, Void);
+        Assert.equals(filled.size(), size);
+        for (vv in filled) Assert.equals(vv, Void);
+    });
 });
