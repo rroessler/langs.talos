@@ -3,10 +3,13 @@
 - [x] Constant Load Propagation (eg: add a constant variable extent for local variables with constant values, so they can propogate instead of moving registers)
 - [ ] Decorator command-line switch (eg: to disable/enable decorators based on a given profile, which could be used to enable profiling/logging dynamically)
 - [x] Improve JIT compilation by removing as many `Glue::*` callbacks as possible. Should also look into exposing the frame pointer to help with this as well (eg: get encoded isolate/interrupts)
-- [ ] Need to investigate a way to both streamline function/machine frame-stack generation so that construction is fast, similar for both and in a small memory footprint as well.
+- [ ] Need to investigate a way to both streamline function/machine frame-stack generation so that construction is fast, similar for both and in a small memory footprint as well
 - [x] Split `Variable::Captures` into the parsing phase instead of the type-checking phase (this will enable typeless compilation whilst keep performance instead of adding additional visitor overhead)
 - [ ] Running `hyperfine "talos test"` sometimes leads to hangs/runtime blocking. This needs some investigation to see why this occurs (most likely something to do with the scheduler in `talos::xsio`)
-    - Changed from using `$::Unique::Pointer` to `$::Shared::Pointer` in `XSIO::Virtual::Thread` for tasks. This does help but now the same race condition occurs more infrequently.
+    - Changed from using `$::Unique::Pointer` to `$::Shared::Pointer` in `XSIO::Virtual::Thread` for tasks. This does help but now the same race condition occurs more infrequently
+- [ ] Replace all released asset installation scripts to _not_ remove the `-stable` suffix from release tags. It would be good to convert this into a script that can target all current releases
+    - Essentially download all the assets, unzip their contents, replace the installation scripts, zip the result and upload with the `--clobber` flag to that release
+    - After which all release tags should be modified to always include the suffix, same as the one that is shown in `talos --version`. This way release tags are clearly marked
 
 ## Rewrite Items
 
