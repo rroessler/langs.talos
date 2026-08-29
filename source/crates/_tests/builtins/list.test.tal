@@ -165,13 +165,10 @@ Test.suite("Methods", fn {
     Test.case("List.push_front '...Any'", fn {
         let values: List[Number] = [];
 
+        // push our values seperately
         values.push_front(10);
         values.push_front(20);
         values.push_front(30);
-
-        Debug.println(values.get(0));
-        Debug.println(values.get(1));
-        Debug.println(values.get(2));
 
         Assert.equals(values.size(), 3);
         Assert.equals(values.get(0), 30);

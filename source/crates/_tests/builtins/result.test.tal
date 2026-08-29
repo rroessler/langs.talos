@@ -48,7 +48,35 @@ Test.suite("Methods", fn {
 });
 
 Test.suite("Statics", fn {
-    Test.todo("Result.okay 'Any'");
-    Test.todo("Result.error 'Any'");
-    Test.todo("Result.wrap 'Future'");
+    Test.case("Result.okay 'Any'", fn {
+        let result = Result.okay(Mock.value);
+        Assert.truthy(result.is_okay());
+        Assert.panics(fn => result.unwrap_error());
+        Assert.equals(result.unwrap_okay(), Mock.value);
+    });
+
+    Test.case("Result.error 'Any'", fn {
+        let result = Result.error(Mock.error);
+        Assert.truthy(result.is_error());
+        Assert.panics(fn => result.unwrap_okay());
+        Assert.equals(result.unwrap_error(), Mock.error);
+    });
+
+    Test.case("Result.wrap 'Future'", fn {
+        // prepare some futures to wrap
+        let noop = (fn => Mock.value)::async();
+        let panics = (fn => panic)::async();
+
+        // wrap the incoming futures
+        let success = Result.wrap(noop);
+        let failure = Result.wrap(panics);
+
+        // and test them against expected results
+        Assert.truthy(success.is_okay());
+        Assert.truthy(failure.is_error());
+
+        // check the resulting values as well
+        Assert.equals(success.unwrap_okay(), Mock.value);
+        Assert.truthy(failure.unwrap_error() is Exception);
+    });
 });

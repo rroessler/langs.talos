@@ -17,7 +17,7 @@ Talos::Value::Any Talos::Builtins::Static::wrap(Isolate *isolate, const Args &ar
   Async::Result result = std::unexpected(Value::Failure());
 
   // attempt resolve a result whilst possible
-  for (auto future = args[0]; future.is<Async::Future>();) {
+  for (auto future = args[0]; future.is<Async::Future>(); future = *result) {
     result = future.as<Async::Future>().await(isolate->thread());
     if (!result.has_value()) break; // break on invalid results
   }
