@@ -5,10 +5,44 @@
 #include "talos/runtime/isolate.hpp"
 
 /// Forward Declarations
+$_FWD(Talos::String::Literal, void push(Args &, const Value::Any &))
+$_FWD(Talos::String::Literal, void push(std::stringstream &, Args &, const Value::Any &))
 $_FWD(Talos::String::Literal, Value::Any report(Runtime::Isolate *, const std::exception &))
 $_FWD(Talos::String::Literal, Value::Any report(Runtime::Isolate *, const $::String::View &))
 
 //  PUBLIC METHODS  //
+
+void Talos::String::Literal::push(Args &store, const Value::Any &value) {
+  std::stringstream oss = {};
+  push(oss, store, value);
+}
+
+void Talos::String::Literal::push(std::stringstream &oss, Args &store, const Value::Any &value) {
+  if (value.is<Number::Tagged>()) store.push_back(value.as<Number::Tagged>().value());
+  else oss << value, store.push_back(oss.str()), std::stringstream().swap(oss);
+}
+
+Talos::Value::Any Talos::String::Literal::style(Runtime::Isolate *isolate, const Value::Any &value) {
+  return style(isolate, "{0}", value);
+}
+
+Talos::Value::Any
+Talos::String::Literal::style(Runtime::Isolate *isolate, const String::Any &message, const Value::Any &value) {
+  return style(isolate, message.view(), value);
+}
+
+Talos::Value::Any
+Talos::String::Literal::style(Runtime::Isolate *isolate, const $::String::View &message, const Value::Any &value) {
+  // fast-path where a string is already valid
+  if (value.is<String::Any>()) return value;
+
+  // and construct the args to be used
+  auto store = Args();
+  push(store, value);
+
+  // finally finish formatting the instance
+  return style(isolate, message, std::move(store));
+}
 
 Talos::Value::Any
 Talos::String::Literal::style(Runtime::Isolate *isolate, const String::Any &message, const Function::Args &args) {
@@ -25,10 +59,7 @@ Talos::String::Literal::style(Runtime::Isolate *isolate, const $::String::View &
   store.reserve(args.size(), 0);
 
   // emplace each of the store values now
-  for (const auto &value : args.span()) {
-    if (value.is<Number::Tagged>()) store.push_back(value.as<Number::Tagged>().value());
-    else oss << value, store.push_back(oss.str()), std::stringstream().swap(oss);
-  }
+  for (const auto &value : args.span()) push(oss, store, value);
 
   // and finally request styling now
   return style(isolate, message, std::move(store));

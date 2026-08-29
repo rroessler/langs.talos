@@ -5,6 +5,8 @@
 
 TALOS_MM_FORMAT_PREFIX(Numeric, reader) {
   switch (auto *numeric = reader->advance(); numeric->kind()) {
+  case Lexer::Kind::LTRL_NAN: $_FALLTHROUGH;
+  case Lexer::Kind::LTRL_INF: $_FALLTHROUGH;
   case Lexer::Kind::LTRL_FLT: $_FALLTHROUGH;
   case Lexer::Kind::LTRL_INT: $_FALLTHROUGH;
   case Lexer::Kind::LTRL_BIN: $_FALLTHROUGH;

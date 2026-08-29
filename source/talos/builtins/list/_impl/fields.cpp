@@ -403,7 +403,7 @@ Talos::Value::Any Talos::Builtins::Field::last_index_of(Isolate *isolate, const 
 
   // should be able to safely resolve the index of the value
   if (iter == haystack.rend()) return Number::Tagged(-1);
-  return Number::Tagged(std::distance(iter, haystack.rend()));
+  return Number::Tagged(std::distance(iter, haystack.rend()) - 1);
 }
 
 //  PRIVATE METHODS  //

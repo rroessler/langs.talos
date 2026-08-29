@@ -4,10 +4,6 @@
 /// Crate Includes
 #include "crates/assert/source/addon.hpp"
 
-/// Forward Declarations
-$_FWD(Talos::Package::Dispatch, bool equals(const Value::Any &, const Value::Any &))
-$_FWD(Talos::Package::Dispatch, bool differs(const Value::Any &, const Value::Any &))
-
 //  PROPERTIES  //
 
 /// @brief The underlying assertion addon installer.
@@ -47,9 +43,6 @@ TALOS_MM_DYLIB_METHOD(Assert, equals, isolate, args) {
   auto actual = args.at(0), expected = args.at(1);
   if (actual == expected) return Value::Void();
 
-  // check against string-based comparisons now
-  if (Dispatch::equals(actual, expected) == 0) return Value::Void();
-
   // get the incoming message to be shown now
   auto message = args.at<Value::Any>(2, Value::Void());
 
@@ -64,9 +57,6 @@ TALOS_MM_DYLIB_METHOD(Assert, differs, isolate, args) {
   // validate the incoming arguments now
   auto actual = args.at(0), expected = args.at(1);
   if (actual != expected) return Value::Void();
-
-  // check against string-based comparisons now
-  if (Dispatch::differs(actual, expected)) return Value::Void();
 
   // get the incoming message to be shown now
   auto message = args.at<Value::Any>(2, Value::Void());
@@ -93,18 +83,6 @@ TALOS_MM_DYLIB_METHOD(Assert, panics, isolate, args) {
 
   // otherwise we resolve a suitable error message for when no panic occurs
   return message.is<String::Any>() ? m_panic(isolate, 7000000, message) : m_panic(isolate, 7000005);
-}
-
-//  PUBLIC METHODS  //
-
-bool Talos::Package::Dispatch::equals(const Value::Any &left, const Value::Any &right) {
-  if (!left.is<String::Any>() || !right.is<String::Any>()) return false;
-  return left.as<String::Any>().compare(right.as<String::Any>()) == 0;
-}
-
-bool Talos::Package::Dispatch::differs(const Value::Any &left, const Value::Any &right) {
-  if (!left.is<String::Any>() || !right.is<String::Any>()) return false;
-  return left.as<String::Any>().compare(right.as<String::Any>()) != 0;
 }
 
 //  PRIVATE METHODS  //

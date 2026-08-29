@@ -105,16 +105,24 @@ Talos::Value::Any Talos::Builtins::Field::stringify(Isolate *isolate, const Args
   if (exceeds) return isolate->panic(6000600, fmt::format("Number.{0}", method));
 
   // format our output as necessary now
-  auto format = fmt::runtime(method.ends_with("precision") ? "{0:.{1}F}" : "{0:.{1}G}");
+  auto format = fmt::runtime(method.ends_with("precision") ? "{0:.{1}f}" : "{0:.{1}g}");
   return String::Any(isolate, fmt::format(format, value, static_cast<size_t>(fraction)));
 }
 
 Talos::Value::Any Talos::Builtins::Field::to_precision(Isolate *isolate, const Args &args) {
-  return stringify(isolate, args, "to_precision");
+  if (!args.empty()) return stringify(isolate, args, "to_precision");
+  return String::Literal::style(isolate, args.self()); // simple value
 }
 
 Talos::Value::Any Talos::Builtins::Field::to_scientific(Isolate *isolate, const Args &args) {
-  return stringify(isolate, args, "to_scientific");
+  // handle as normal if actually given a digit
+  if (!args.empty()) return stringify(isolate, args, "to_scientific");
+
+  // otherwise we need to do something different here
+  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, args.self());
+
+  // and convert as normal when given here
+  return String::Any(isolate, fmt::format("{0:e}", args.self<Number::Tagged>().value()));
 }
 
 //  PRIVATE METHODS  //

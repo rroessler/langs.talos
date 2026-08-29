@@ -15,6 +15,9 @@ namespace Talos::String::Literal {
  * @param message                   Message to format.
  * @param args                      Format arguments.
  */
+Value::Any style(Runtime::Isolate *isolate, const Value::Any &value);
+Value::Any style(Runtime::Isolate *isolate, const String::Any &message, const Value::Any &value);
+Value::Any style(Runtime::Isolate *isolate, const $::String::View &message, const Value::Any &value);
 Value::Any style(Runtime::Isolate *isolate, const String::Any &message, Args &&args);
 Value::Any style(Runtime::Isolate *isolate, const $::String::View &message, Args &&args);
 Value::Any style(Runtime::Isolate *isolate, const String::Any &message, const Function::Args &args);

@@ -26,12 +26,17 @@ public:
    */
   explicit Numeric(const Lexer::Token *token) : m_token(token) {
     switch (token->kind()) {
+    case Lexer::Kind::LTRL_NAN: m_value = NAN; break;
+    case Lexer::Kind::LTRL_INF: m_value = INFINITY; break;
+
     case Lexer::Kind::LTRL_FLT: m_value = std::stod(buffer(), nullptr); break;
     case Lexer::Kind::LTRL_BIN: m_value = std::stoull(buffer(), nullptr, 2); break;
     case Lexer::Kind::LTRL_OCT: m_value = std::stoull(buffer(), nullptr, 8); break;
     case Lexer::Kind::LTRL_INT: m_value = std::stoull(buffer(), nullptr, 10); break;
     case Lexer::Kind::LTRL_HEX: m_value = std::stoull(buffer(), nullptr, 16); break;
-    default: $_ABORT("Unexpected numeric token"); // invalid token received
+
+    // invalid token received
+    default: $_ABORT("Unexpected numeric token");
     }
   }
 

@@ -67,7 +67,7 @@ Talos::Value::Any Talos::Builtins::Static::filled(Isolate *isolate, const Args &
 
   // prepare the list and set all values as needed
   auto list = isolate->create<Iterable::List>(size);
-  std::memset(list.data(), args[0].pointer(), size);
+  std::ranges::fill_n(list.data(), size, args[1]);
 
   // return the resulting list now
   return list;

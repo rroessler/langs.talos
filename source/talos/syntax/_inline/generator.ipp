@@ -36,6 +36,8 @@ struct Generator {
     s_table[_(K::LTRL_HEX)] = R(D::template m_prefix<Syntax::Numeric>);
     s_table[_(K::LTRL_INT)] = R(D::template m_prefix<Syntax::Numeric>);
     s_table[_(K::LTRL_FLT)] = R(D::template m_prefix<Syntax::Numeric>);
+    s_table[_(K::LTRL_NAN)] = R(D::template m_prefix<Syntax::Numeric>);
+    s_table[_(K::LTRL_INF)] = R(D::template m_prefix<Syntax::Numeric>);
 
     // prepare all the specialized expressions to be bound
     s_table[_(K::FLOW_PANIC)] = R(D::template m_prefix<Syntax::Panic>);

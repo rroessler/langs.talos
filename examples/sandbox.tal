@@ -4,3 +4,9 @@
 ///
 
 Debug.println("Hello, 🦄");
+
+let value = 123456.789; // basic value to use
+Debug.println(value.to_scientific(), "1.234568e+05");
+Debug.println(value.to_scientific(0), "1e+05");
+Debug.println(value.to_scientific(2), "1.2e+05");
+Debug.println(value.to_scientific(4), "1.2345e+05");

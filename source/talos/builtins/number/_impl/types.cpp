@@ -113,4 +113,8 @@ void Talos::Builtins::Wrapper<Talos::Number::Tagged>::m_typedefs(Type::World *gl
   // define the baseline types
   globals->values().declare(name(), prototype);
   globals->types().declare(name(), TN::number());
+
+  // and generate the "NaN" and "Infinity" typings as well
+  globals->values().declare("NaN", TN::boolean());
+  globals->values().declare("Infinity", TN::boolean());
 }
