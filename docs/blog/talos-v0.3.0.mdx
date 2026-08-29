@@ -9,7 +9,7 @@ import { Callout } from '@/website/components';
 
 ## Improved Ranges
 
-With this release comes a minor improvement to how numeric ranges are produced in Talos. Previously the `List.range` factory could be used to construct an `Iterator[Number]` that would generate ranged numerics on the fly. This was counter-intuitive to the other `List` factory methods which all produced lists.
+With this release comes a minor improvements to how numeric ranges are constructed in Talos. Previously the `List.range` factory could be used to construct an `Iterator[Number]` that would generate ranged numerics on the fly. This was counter-intuitive to the other `List` factory methods which all produced lists.
 
 To address this, the previous functionality for `List.range` was replicated with the `Iterator.range` factory and `List.range` now produces _finite_ `List[Number]` ranges.
 
@@ -29,9 +29,27 @@ In terms of performance, although `List.range` will incur a minor performance co
     value.
 </Callout>
 
-## Further Testing
+## Collection Erasure
+
+Whilst adding further testing for the `List` builtin, a reasonable upheaval of its methods was done. More specifically for breaking changes, the `List.erase` overloads were split into three distinct methods.
+
+### `List.clear`
 
 Todo...
+
+### `List.drop`
+
+Todo...
+
+### `List.erase`
+
+Todo..
+
+## Further Testing
+
+This release came with a major upgrade to the baseline testing for Talos syntax and builtins. By dogfooding these tests directly in Talos (using the `talos:assert` and `talos:test` internal crates), we ensure the hardening of the language. It allows us to catch edge cases when desiging language support, validate the type-system ahead of releases and track regressions by standardizing the expected functionality for Talos. Additionally, it allows us to play with the developer experience of Talos to make the language better for developers.
+
+Todo (write about tests added)...
 
 ## Upcoming Work
 

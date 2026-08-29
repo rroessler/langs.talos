@@ -66,21 +66,125 @@ Test.suite("Methods", fn {
         Assert.equals(temp.get(0), other);
     });
 
-    Test.case("List.map 'Function'", fn {});
-    Test.case("List.filter 'Function'", fn {});
-    Test.case("List.fold 'Any, Function'", fn {});
+    Test.case("List.map 'Function'", fn {
+        let values = [10, 20, 30];
+        let doubled = values.map(fn (nn) => nn * 2);
+        for (nn, ii in values) Assert.equals(nn * 2, doubled.get(ii));
+    });
 
-    Test.case("List.reverse '()'", fn {});
-    Test.case("List.slice '...Number'", fn {});
-    Test.case("List.erase '...Number'", fn {});
+    Test.case("List.filter 'Function'", fn {
+        let values = [10, 20, 30, 40, 50];
+        let any = fn (_: Any): Boolean => True;
+        let clear = fn (_: Any): Boolean => False;
+        let gt30 = fn (nn: Number): Boolean => nn > 30;
+        let gt50 = fn (nn: Number): Boolean => nn > 50;
 
-    Test.case("List.pop_back '...Any'", fn {});
-    Test.case("List.pop_front '...Any'", fn {});
-    Test.case("List.push_back '...Any'", fn {});
-    Test.case("List.push_front '...Any'", fn {});
+        Assert.equals(values.filter(gt30).size(), 2);
+        Assert.truthy(values.filter(gt50).empty());
+        Assert.truthy(values.filter(clear).empty());
+        Assert.equals(values.filter().size(), values.size());
+        Assert.equals(values.filter(any).size(), values.size());
+    });
 
-    Test.case("List.last_index_of 'Any'", fn {});
-    Test.case("List.first_index_of 'Any'", fn {});
+    Test.case("List.fold 'Any, Function'", fn {
+        let values = [10, 20, 30];
+        let sum = values.fold(0, fn (aa, nn) => aa + nn);
+        Assert.equals(sum, 60); // should be same value
+    });
+
+    Test.case("List.reverse '()'", fn {
+        let values = [10, 20, 30];
+        let reversed = values.reverse();
+
+        Assert.equals(values.get(0), reversed.get(2));
+        Assert.equals(values.get(1), reversed.get(1));
+        Assert.equals(values.get(2), reversed.get(0));
+    });
+
+    Test.case("List.slice '...Number'", fn {
+        let values = [10, 20, 30, 40];
+        let none = values.slice(0, 0);
+        let slice = values.slice(1, 3);
+
+        Assert.truthy(none.empty());
+        Assert.equals(slice.size(), 3);
+        Assert.equals(slice.front(), 10);
+    });
+
+    Test.case("List.clear '()", fn {
+        Assert.truthy([10, 20, 30].clear().empty());
+    });
+
+    Test.case("List.drop 'Number'", fn {
+        let values = [10, 20, 30, 40, 50];
+        Assert.equals(values.drop(1), 20);
+        Assert.equals(values.drop(2), 40);
+        Assert.equals(values.size(), 3);
+    });
+
+    Test.case("List.erase 'Number, Number'", fn {
+        let values = [10, 20, 30, 40, 50];
+
+        // remove the value of "20"
+        Assert.equals(values.erase(1, 3).size(), 4);
+        Assert.equals(values.first_index_of(20), -1);
+
+        // remove values "30" and "40"
+        Assert.equals(values.erase(1, 4).size(), 2);
+        Assert.equals(values.first_index_of(30), -1);
+        Assert.equals(values.first_index_of(40), -1);
+
+        // clear the set of values (typically range first -> last)
+        Assert.truthy(values.erase(0, values.size()).empty());
+    });
+
+    Test.case("List.pop_back '...Any'", fn {
+        let values = [10, 20]; // prepare
+        Assert.equals(values.pop_back(), 20);
+        Assert.equals(values.pop_back(), 10);
+        Assert.panics(fn => values.pop_back());
+    });
+
+    Test.case("List.pop_front '...Any'", fn {
+        let values = [10, 20]; // prepare
+        Assert.equals(values.pop_front(), 10);
+        Assert.equals(values.pop_front(), 20);
+        Assert.panics(fn => values.pop_front());
+    });
+
+    Test.case("List.push_back '...Any'", fn {
+        let values: List[Number] = [];
+        values.push_back(10, 20, 30);
+
+        Assert.equals(values.size(), 3);
+        Assert.equals(values.get(0), 10);
+        Assert.equals(values.get(1), 20);
+        Assert.equals(values.get(2), 30);
+    });
+
+    Test.case("List.push_front '...Any'", fn {
+        let values: List[Number] = [];
+        values.push_front(10, 20, 30);
+
+        Assert.equals(values.size(), 3);
+        Assert.equals(values.get(0), 30);
+        Assert.equals(values.get(1), 20);
+        Assert.equals(values.get(2), 10);
+    });
+
+    Test.case("List.last_index_of 'Any'", fn {
+        Assert.equals([].last_index_of(10), -1);
+        Assert.equals([10, 20, 30].last_index_of(20), 1);
+        Assert.equals([10, 20, 10].last_index_of(10), 2);
+        Assert.equals([10, 20, 30].last_index_of(40), -1);
+    });
+
+    Test.case("List.first_index_of 'Any'", fn {
+        Assert.equals([].first_index_of(10), -1);
+        Assert.equals([10, 20, 30].first_index_of(20), 1);
+        Assert.equals([10, 20, 10].first_index_of(10), 0);
+        Assert.equals([10, 20, 30].first_index_of(40), -1);
+    });
 });
 
 Test.suite("Statics", fn {
