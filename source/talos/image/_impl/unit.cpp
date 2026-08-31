@@ -18,7 +18,7 @@ void Talos::Image::Arena::m_print(std::ostream &os, const Arena &self) {
   if (self.constants.size()) os << '\n'; // print the intern pool
   os << "\n<Interns Pool (size: " << self.strings.size() << ")>";
   for (const auto &[ii, intern] : $::Ranges::Each(self.strings)) {
-    $_UNUSED $_AUTO = $::Manip::Indent(os); // prepare indentation
-    os << "\n[" << ii << "]: " << $::Dye::green("\"{0}\"", intern);
+    $_UNUSED $_AUTO = $::Manip::Indent(os); // prepare indentation before printing
+    os << "\n[" << ii << "]: " << $::Dye::green(*$::Serde::Escape(intern.view()));
   }
 }

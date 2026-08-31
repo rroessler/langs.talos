@@ -39,8 +39,8 @@ Talos::Iterable::Deduce::slice(Runtime::Isolate *isolate, const Function::Args &
   if (start == end) return Slice();
 
   // validate the incoming values now
-  start = std::clamp(start, 0z, size);
-  end = std::clamp(end, 0z, size);
+  start = std::clamp(start, Number::Integral(0), size);
+  end = std::clamp(end, Number::Integral(0), size);
 
   // swap our values to ensure correct
   if (start > end) std::swap(start, end);

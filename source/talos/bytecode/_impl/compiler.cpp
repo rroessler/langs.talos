@@ -26,7 +26,11 @@ Talos::Bytecode::Index Talos::Bytecode::Compiler::constant(const Value::Any &val
   return constants.emplace_back(value), constants.size() - 1;
 }
 
-Talos::Bytecode::Index Talos::Bytecode::Compiler::string(const $::String::View &buffer) {
+Talos::Bytecode::Index Talos::Bytecode::Compiler::string(const $::String::View &raw) {
+  // make sure to unescape the incoming string now
+  auto buffer = $::Serde::Unescape(raw).value_or($::String::Buffer(raw));
+
+  // prepare our details to be used
   auto &table = m_arena->strings;
   auto symbol = Value::Symbol(buffer);
   auto begin = table.cbegin(), end = table.cend();

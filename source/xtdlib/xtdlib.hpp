@@ -96,8 +96,11 @@
 
 /// Serde Includes
 #include "xtdlib/serde/codec.hpp"
+#include "xtdlib/serde/escape.hpp"
 #include "xtdlib/serde/json.hpp"
+#include "xtdlib/serde/toml.hpp"
 #include "xtdlib/serde/value.hpp"
+#include "xtdlib/serde/yaml.hpp"
 
 /// Signal Includes
 #include "xtdlib/signal/code.hpp"

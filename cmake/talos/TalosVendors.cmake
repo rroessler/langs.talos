@@ -82,6 +82,9 @@ macro(__talos_vendors_boost)
     mono_boost_multithreaded(ON)
     mono_boost_libraries(context interprocess locale)
 
+    # ensure we ignore using ICU for locale
+    set(BOOST_LOCALE_ENABLE_ICU OFF)
+
     # and require boost as necessary
     mono_boost_require()
 endmacro()

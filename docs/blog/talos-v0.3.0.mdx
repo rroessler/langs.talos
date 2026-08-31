@@ -68,6 +68,7 @@ Todo...
 
 <h4>Toolkit / talos run</h4>
 
+- Fixed: Removed an erroneous print condition that was evident in the runtime.
 - Added: New `Iterator.range` factory that mimics previous releases `List.range` method.
 - Fixed: Changed `List.range` to now produce a `List[Number]` instead of an `Iterator[Number]` for clarity.
 - Added: New `Iterator.collect` method that allows the conversion of an iterator to the corresponding `List[T]` value.
@@ -78,3 +79,4 @@ Todo...
 - Added: New numeric constants of `NaN` and `Infinity` have been added for further completeness of basic numeric representations.
 - Fixed: The `Result.wrap` factory would never return as the internal future was awaited on ad finitum.
 - Fixed: The `String.to_lower` and `String.to_upper` methods did not work for UTF-8 characters. Now the current locale is respected.
+- Fixed: Previously, there was no logic to handle unescaping `String` literals. Now they are unescaped correctly before interning.
