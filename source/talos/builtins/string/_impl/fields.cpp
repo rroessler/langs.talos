@@ -96,8 +96,12 @@ Talos::Value::Any Talos::Builtins::Field::compare(Isolate *isolate, const Args &
   auto needle = args.at<String::Any>(0);
   auto haystack = args.self<String::Any>();
 
+  // instead of using the base "compare" method we do locale comparison
+  Locale::Service *locales = *isolate->service();
+  auto result = locales->compare(haystack.view(), needle.view());
+
   // return the resulting comparison value now
-  return Number::Tagged(haystack.compare(needle));
+  return Number::Tagged(result);
 }
 
 Talos::Value::Any Talos::Builtins::Field::contains(Isolate *isolate, const Args &args) {

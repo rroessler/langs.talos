@@ -80,3 +80,4 @@ Todo...
 - Fixed: The `Result.wrap` factory would never return as the internal future was awaited on ad finitum.
 - Fixed: The `String.to_lower` and `String.to_upper` methods did not work for UTF-8 characters. Now the current locale is respected.
 - Fixed: Previously, there was no logic to handle unescaping `String` literals. Now they are unescaped correctly before interning.
+- Fixed: The numerical ordering of `Number` values did not work when comparing negatives to positives. This has been corrected.

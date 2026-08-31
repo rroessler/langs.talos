@@ -66,11 +66,22 @@ public:
   }
 
   /**
-   * @brief Handles updating a values case.
-   * @param input                     Input to transform.
+   * @brief Compares two strings using the base locale.
+   * @param left                      Left-most string.
+   * @param right                     Right-most string.
    */
-  inline $::String::Buffer lowercase(const $::String::View &input) const noexcept {
-    return m_lower(input, std::locale());
+  inline int64_t compare(const $::String::View &left, const $::String::View &right) const {
+    return m_compare(left, right, m_generator());
+  }
+
+  /**
+   * @brief Compares two strings using the base locale.
+   * @param left                      Left-most string.
+   * @param right                     Right-most string.
+   * @param locale                    Locale to inherit.
+   */
+  inline int64_t compare(const $::String::View &left, const $::String::View &right, const std::locale &locale) const {
+    return m_compare(left, right, locale);
   }
 
   /**
@@ -78,24 +89,18 @@ public:
    * @param input                     Input to transform.
    * @param locale                    Locale to inherit.
    */
-  inline $::String::Buffer lowercase(const $::String::View &input, const std::locale &locale) const noexcept {
+  inline $::String::Buffer lowercase(const $::String::View &input) const { return m_lower(input, m_generator()); }
+  inline $::String::Buffer lowercase(const $::String::View &input, const std::locale &locale) const {
     return m_lower(input, locale);
   }
 
   /**
    * @brief Handles updating a values case.
    * @param input                     Input to transform.
-   */
-  inline $::String::Buffer uppercase(const $::String::View &input) const noexcept {
-    return m_upper(input, std::locale());
-  }
-
-  /**
-   * @brief Handles updating a values case.
-   * @param input                     Input to transform.
    * @param locale                    Locale to inherit.
    */
-  inline $::String::Buffer uppercase(const $::String::View &input, const std::locale &locale) const noexcept {
+  inline $::String::Buffer uppercase(const $::String::View &input) const { return m_upper(input, m_generator()); }
+  inline $::String::Buffer uppercase(const $::String::View &input, const std::locale &locale) const {
     return m_upper(input, locale);
   }
 
@@ -107,8 +112,16 @@ private:
    * @param input                     Input to transform.
    * @param locale                    Locale to inherit.
    */
-  $::String::Buffer m_lower(const $::String::View &input, const std::locale &locale) const noexcept;
-  $::String::Buffer m_upper(const $::String::View &input, const std::locale &locale) const noexcept;
+  $::String::Buffer m_lower(const $::String::View &input, const std::locale &locale) const;
+  $::String::Buffer m_upper(const $::String::View &input, const std::locale &locale) const;
+
+  /**
+   * @brief Compares two strings using the base locale.
+   * @param left                      Left-most string.
+   * @param right                     Right-most string.
+   * @param locale                    Locale to inherit.
+   */
+  int64_t m_compare(const $::String::View &left, const $::String::View &right, const std::locale &locale) const;
 };
 
 } // namespace Talos::Locale

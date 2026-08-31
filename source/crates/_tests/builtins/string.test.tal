@@ -77,16 +77,16 @@ Test.suite("Methods", fn {
 
     Test.case("String.compare 'String'", fn {
         Assert.equals("".compare(""), 0);
-        Assert.equals("".compare("a"), -1);
-        Assert.equals("a".compare(""), 1);
+        Assert.truthy("".compare("a") < 0);
+        Assert.truthy("a".compare("") > 0);
         Assert.equals("a".compare("a"), 0);
-        Assert.equals("a".compare("b"), -1);
-        Assert.equals("c".compare("b"), 1);
-        Assert.equals("aaa".compare("bbb"), -1);
-        Assert.equals("aaa".compare("bb"), -1);
-        Assert.equals("aa".compare("aab"), -1);
-        Assert.equals("aab".compare("aa"), 1);
-        Assert.equals("zzz".compare("a"), 25);
+        Assert.truthy("a".compare("b") < 0);
+        Assert.truthy("c".compare("b") > 0);
+        Assert.truthy("aaa".compare("bbb") < 0);
+        Assert.truthy("aaa".compare("bb") < 0);
+        Assert.truthy("aa".compare("aab") < 0);
+        Assert.truthy("aab".compare("aa") > 0);
+        Assert.truthy("zzz".compare("a") > 0);
     });
 
     Test.case("String.contains 'String'", fn {

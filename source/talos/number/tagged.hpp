@@ -46,7 +46,7 @@ struct Tagged : public Value::Any {
 
   inline constexpr bool operator==(double value) const noexcept { return m_pointer == Tagged(value).m_pointer; }
   inline constexpr bool operator!=(double value) const noexcept { return m_pointer != Tagged(value).m_pointer; }
-  inline constexpr auto operator<=>(const Tagged &other) const noexcept { return m_pointer <=> other.m_pointer; }
+  inline constexpr auto operator<=>(const Tagged &other) const noexcept { return value() <=> other.value(); }
 
   MM_APPLY_UNOP(-, value)
   MM_APPLY_UNOP(~, m_integral)
