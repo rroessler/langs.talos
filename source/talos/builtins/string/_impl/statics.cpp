@@ -11,7 +11,7 @@
 Talos::Value::Any Talos::Builtins::Static::from(Isolate *isolate, const Args &args) {
   TALOS_MM_ASSERT_ARGC(isolate, args.size(), 1);
   if (args[0].is<String::Any>()) return args[0];
-  return String::Any(isolate, fmt::to_string(args[0]));
+  return String::Literal::style(isolate, args[0]);
 }
 
 Talos::Value::Any Talos::Builtins::Static::codepoint(Isolate *isolate, const Args &args) {

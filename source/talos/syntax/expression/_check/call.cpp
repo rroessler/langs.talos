@@ -102,10 +102,7 @@ TALOS_MM_CHECK_NODE(Call, node, analyzer) {
   auto code = arity != adicity ? 3000501 : 3000502; // prepare code
 
   // ensure the total is suitably valid
-  if (total < arity || total > adicity) {
-    $::Debug::eprintln("FAILED!\n");
-    return analyzer->report(node->callee(), code, arity, total);
-  }
+  if (total < arity || total > adicity) return analyzer->report(node->callee(), code, arity, total);
 
   // ensure all our arguments have been type-checked now
   for (const auto &[ii, argument] : $::Ranges::Each(node->arguments())) {
