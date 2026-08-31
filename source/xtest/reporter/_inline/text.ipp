@@ -82,8 +82,12 @@ public:
     else if (trivia->todo) m_stream << $::Dye::magenta("Unimplemented");
     else m_stream << $::Dye::cyan("Testing"); // otherwise valid
 
-    m_stream << ": " << $::Dye::italic(trivia->title); // and show the final details now
-    if (!trivia->location.anonymous()) m_stream << $::Dye::dim(" -> {0}", trivia->location);
+    // prepare the location to be used and whether we need to show it
+    auto location = fmt::to_string(trivia->location);
+    auto pinpoint = trivia->title != location && !trivia->location.anonymous();
+
+    m_stream << ": " << $::Dye::italic(trivia->title); // and show now
+    if (pinpoint) m_stream << $::Dye::dim(" -> {0}", trivia->location);
     m_stream << std::endl; // and close the location now
   }
 

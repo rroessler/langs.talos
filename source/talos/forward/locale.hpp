@@ -7,5 +7,6 @@
 /// Forward Declarations
 $_FWD(Talos::Locale, class Service)
 $_FWD(Talos::Locale, struct Options)
+$_FWD(Talos::Locale, class Generator)
 
 #endif

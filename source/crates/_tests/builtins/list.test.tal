@@ -107,7 +107,7 @@ Test.suite("Methods", fn {
         let slice = values.slice(1, 3);
 
         Assert.truthy(none.empty());
-        Assert.equals(slice.size(), 3);
+        Assert.equals(slice.size(), 2);
         Assert.equals(slice.front(), 20);
     });
 

@@ -2,11 +2,12 @@
 #define _TALOS_ITERABLE_UTILITIES_HPP
 
 /// Talos Includes
+#include "talos/iterable/interval.hpp"
 #include "talos/iterable/list.hpp"
 
 namespace Talos::Iterable {
 
-/// @brief Handles
+/// @brief Handles unpacking a value to a span.
 static inline struct {
   //  OPERATOR METHODS  //
 
@@ -20,5 +21,25 @@ static inline struct {
 } Unpack;
 
 } // namespace Talos::Iterable
+
+namespace Talos::Iterable::Deduce {
+//  PUBLIC METHODS  //
+
+/**
+ * @brief Handles deducing interval values.
+ * @param isolate                 Runtime isolate.
+ * @param args                    Function arguments.
+ */
+std::optional<Interval> interval(Runtime::Isolate *isolate, const Function::Args &args);
+
+/**
+ * @brief Handles deducing slice values.
+ * @param isolate                 Runtime isolate.
+ * @param args                    Function arguments.
+ * @param size                    Expected size value.
+ */
+std::optional<Slice> slice(Runtime::Isolate *isolate, const Function::Args &args, int64_t size);
+
+} // namespace Talos::Iterable::Deduce
 
 #endif

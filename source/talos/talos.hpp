@@ -136,6 +136,7 @@
 #include "talos/lifecycle/service.hpp"
 
 /// Locale Includes
+#include "talos/locale/generator.hpp"
 #include "talos/locale/options.hpp"
 #include "talos/locale/service.hpp"
 

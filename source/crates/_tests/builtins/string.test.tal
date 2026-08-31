@@ -7,6 +7,25 @@
 import "talos:test" as Test;
 import "talos:assert" as Assert;
 
+// - TEST MOCKS - //
+
+namespace Mock {
+    //! Prepare an empty value.
+    export let none = "";
+
+    //! Prepare an ASCII value.
+    export let ascii = "abcdef";
+
+    //! Prepare a Unicode value.
+    export let unicode = "maçã";
+
+    //! Prepare some emoji value.
+    export let emoji = "🦄";
+
+    //! Prepare a larger phrase.
+    export let phrase = "Hello, World!";
+};
+
 // - TEST CASES - //
 
 Test.suite("Traits", fn {
@@ -17,31 +36,73 @@ Test.suite("Traits", fn {
 });
 
 Test.suite("Methods", fn {
-    Test.todo("String.size '()'");
-    Test.todo("String.empty '()'");
-    Test.todo("String.bytes '()'");
-    Test.todo("String.symbol '()'");
+    Test.case("String.size '()'", fn {
+        Assert.equals(Mock.none.size(), 0);
+        Assert.equals(Mock.ascii.size(), 6);
+        Assert.equals(Mock.unicode.size(), 4);
+        Assert.equals(Mock.emoji.size(), 1);
+    });
 
-    Test.todo("String.at '()'");
-    Test.todo("String.slice '()'");
+    Test.case("String.empty '()'", fn {
+        Assert.truthy(Mock.none.empty());
+        Assert.falsey(Mock.ascii.empty());
+        Assert.falsey(Mock.unicode.empty());
+        Assert.falsey(Mock.emoji.empty());
+    });
 
-    Test.todo("String.compare '()'");
-    Test.todo("String.contains '()'");
-    Test.todo("String.starts_with '()'");
-    Test.todo("String.ends_with '()'");
+    Test.case("String.bytes '()'", fn {
+        Assert.equals(Mock.none.bytes(), 0);
+        Assert.equals(Mock.ascii.bytes(), 6);
+        Assert.equals(Mock.unicode.bytes(), 6);
+        Assert.equals(Mock.emoji.bytes(), 4);
+    });
 
-    Test.todo("String.to_lower '()'");
-    Test.todo("String.to_upper '()'");
-    Test.todo("String.trim_both '()'");
-    Test.todo("String.trim_leading '()'");
-    Test.todo("String.trim_trailing '()'");
-    Test.todo("String.pad_leading '()'");
-    Test.todo("String.pad_trailing '()'");
+    Test.case("String.symbol '()'", fn {
+        Assert.equals(Mock.none.symbol(), Symbol.from(Mock.none));
+        Assert.equals(Mock.ascii.symbol(), Symbol.from(Mock.ascii));
+        Assert.equals(Mock.unicode.symbol(), Symbol.from(Mock.unicode));
+        Assert.equals(Mock.emoji.symbol(), Symbol.from(Mock.emoji));
+    });
 
-    Test.todo("String.fmt '()'");
+    Test.case("String.at '()'", fn {
+        Assert.panics(fn => Mock.none.at(0));
+        Assert.equals(Mock.emoji.at(0), Mock.emoji);
+    });
+
+    Test.case("String.slice '()'", fn {
+        Assert.equals(Mock.none.slice(), Mock.none);
+        Assert.equals(Mock.phrase.slice(), Mock.phrase);
+        Assert.equals(Mock.phrase.slice(0), Mock.phrase);
+    });
+
+    Test.case("String.compare '()'", fn {});
+    Test.case("String.contains '()'", fn {});
+    Test.case("String.starts_with '()'", fn {});
+    Test.case("String.ends_with '()'", fn {});
+
+    Test.case("String.to_lower '()'", fn {
+        Assert.equals("Ä".to_lower(), "ä");
+        Assert.equals("AÄ".to_lower(), "aä");
+        Assert.equals("HELLO".to_lower(), "hello");
+    });
+
+    Test.case("String.to_upper '()'", fn {
+        Assert.equals("ä".to_upper(), "Ä");
+        Assert.equals("aä".to_upper(), "AÄ");
+        Assert.equals("hello".to_upper(), "HELLO");
+    });
+
+    Test.case("String.trim_both '()'", fn {});
+    Test.case("String.trim_leading '()'", fn {});
+    Test.case("String.trim_trailing '()'", fn {});
+
+    Test.case("String.pad_leading '()'", fn {});
+    Test.case("String.pad_trailing '()'", fn {});
+
+    Test.case("String.fmt '()'", fn {});
 });
 
 Test.suite("Statics", fn {
-    Test.todo("String.from 'Any'");
-    Test.todo("String.codepoint 'Number'");
+    Test.case("String.from 'Any'", fn {});
+    Test.case("String.codepoint 'Number'", fn {});
 });

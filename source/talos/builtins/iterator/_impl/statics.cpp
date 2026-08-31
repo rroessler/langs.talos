@@ -43,7 +43,7 @@ Talos::Value::Any Talos::Builtins::Static::from(Isolate *isolate, const Args &ar
 
 Talos::Value::Any Talos::Builtins::Static::range(Isolate *isolate, const Args &args) {
   // prepare the basic interval details
-  auto interval = Iterable::Stepper(isolate, args);
+  auto interval = Iterable::Deduce::interval(isolate, args);
   if (!interval.has_value()) return Value::Failure();
 
   // attempt preparing the list containing iterable values now

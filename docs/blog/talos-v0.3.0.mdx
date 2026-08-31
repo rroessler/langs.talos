@@ -77,3 +77,4 @@ Todo...
 - Fixed: Numeric stringification of `to_scientific` without arguments returns the base scientific representation.
 - Added: New numeric constants of `NaN` and `Infinity` have been added for further completeness of basic numeric representations.
 - Fixed: The `Result.wrap` factory would never return as the internal future was awaited on ad finitum.
+- Fixed: The `String.to_lower` and `String.to_upper` methods did not work for UTF-8 characters. Now the current locale is respected.

@@ -3,6 +3,9 @@
 # Attempt requiring the desired packages
 talos_package_require(xasm xinv xlsp xpc xjct xsio xtdlib xtest)
 
+# Prepare all the vendors to be required
+talos_vendors_require(boost)
+
 # --  PACKAGE PROPERTIES  -- #
 
 # Define the target to be used
@@ -28,6 +31,7 @@ talos_library_declare(${TALOS_TARGET_SUPER} AUTOGEN SOURCES ${TALOS_SOURCES_SUPE
     talos::xsio
     talos::xtest
     talos::xtdlib
+    Boost::locale
 )
 
 # Ensure we allow injecting vendors as well

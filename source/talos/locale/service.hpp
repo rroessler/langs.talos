@@ -2,6 +2,7 @@
 #define _TALOS_LOCALE_SERVICE_HPP
 
 /// Talos Includes
+#include "talos/locale/generator.hpp"
 #include "talos/locale/options.hpp"
 
 namespace Talos::Locale {
@@ -13,8 +14,11 @@ class Service : public XI::Singleton, public XI::Immediate {
   /// @brief Underlying options available.
   const Options *m_options;
 
+  /// @brief The bound locale generator.
+  Generator m_generator = {};
+
   /// @brief Keep a copy of the base locale.
-  std::locale m_classic = std::locale::classic();
+  std::locale m_classic = m_generator();
 
 public:
   //  CONSTRUCTORS  //
@@ -40,26 +44,71 @@ public:
   inline constexpr const Options *options() const noexcept { return m_options; }
 
   /// @brief Handles resetting the current locale.
-  inline void reset() { update(m_classic); }
+  inline void reset() { change(m_classic); }
 
   /**
    * @brief Handles updating the locale with construction.
    * @tparam As                       Argument types.
    * @param args                      Locale arguments.
    */
-  template <class... As> inline void update(As &&...args) {
-    const auto &locale = std::locale(std::forward<As>(args)...);
-    return update(locale); // and forcibly update from overload
+  template <class... As> inline void change(As &&...args) {
+    const auto &locale = m_generator(std::forward<As>(args)...);
+    return change(locale); // and forcibly update from overload
   }
 
   /**
    * @brief Sets the current global locale.
    * @param locale                    Locale to be bound.
    */
-  inline void update(const std::locale &locale) {
+  inline void change(const std::locale &locale) {
     auto color = $::Color::Enabled(std::cout); // get the color enablement
     std::locale::global(std::locale(locale, new $::Color::Facet(color)));
   }
+
+  /**
+   * @brief Handles updating a values case.
+   * @param input                     Input to transform.
+   */
+  inline $::String::Buffer lowercase(const $::String::View &input) const noexcept {
+    return m_lower(input, std::locale());
+  }
+
+  /**
+   * @brief Handles updating a values case.
+   * @param input                     Input to transform.
+   * @param locale                    Locale to inherit.
+   */
+  inline $::String::Buffer lowercase(const $::String::View &input, const std::locale &locale) const noexcept {
+    return m_lower(input, locale);
+  }
+
+  /**
+   * @brief Handles updating a values case.
+   * @param input                     Input to transform.
+   */
+  inline $::String::Buffer uppercase(const $::String::View &input) const noexcept {
+    return m_upper(input, std::locale());
+  }
+
+  /**
+   * @brief Handles updating a values case.
+   * @param input                     Input to transform.
+   * @param locale                    Locale to inherit.
+   */
+  inline $::String::Buffer uppercase(const $::String::View &input, const std::locale &locale) const noexcept {
+    return m_upper(input, locale);
+  }
+
+private:
+  //  PRIVATE METHODS  //
+
+  /**
+   * @brief Handles updating a values case.
+   * @param input                     Input to transform.
+   * @param locale                    Locale to inherit.
+   */
+  $::String::Buffer m_lower(const $::String::View &input, const std::locale &locale) const noexcept;
+  $::String::Buffer m_upper(const $::String::View &input, const std::locale &locale) const noexcept;
 };
 
 } // namespace Talos::Locale

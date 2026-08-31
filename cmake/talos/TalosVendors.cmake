@@ -80,7 +80,7 @@ macro(__talos_vendors_boost)
     # Prepare boost features
     mono_boost_static(ON)
     mono_boost_multithreaded(ON)
-    mono_boost_libraries(context interprocess)
+    mono_boost_libraries(context interprocess locale)
 
     # and require boost as necessary
     mono_boost_require()

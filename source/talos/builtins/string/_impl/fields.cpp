@@ -1,3 +1,6 @@
+/// Talos Includes
+#include "talos/locale/service.hpp"
+
 /// Builtin Includes
 #include "talos/builtins/_inline/assert.ipp"
 
@@ -66,41 +69,21 @@ Talos::Value::Any Talos::Builtins::Field::slice(Isolate *isolate, const Args &ar
   auto self = args.self<String::Any>();
   auto size = static_cast<int64_t>(self.size());
 
-  // otherwise attempt pulling out our sections to be erased
-  auto initial = args.at(0, Value::Void());
-  auto secondary = args.at(1, Value::Void());
+  // if not actually given any arguments, return self instead
+  if (args.empty()) return self;
 
-  // update our values with the correct details now
-  if (initial.is<Value::Void>()) initial = Number::Tagged(0);
-  if (secondary.is<Value::Void>()) secondary = Number::Tagged(-1);
+  // otherwise pull out our arguments needed
+  auto slice = Iterable::Deduce::slice(isolate, args, size);
+  if (!slice.has_value()) return Value::Failure();
 
-  // prepare our starting and ending points now
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, initial);
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, secondary);
-
-  // cast the incoming values now
-  Number::Integral start = initial.as<Number::Tagged>();
-  Number::Integral end = secondary.as<Number::Tagged>();
-
-  // if the arguments are less than zero
-  if (start < 0) start += size;
-  if (end < 0) end += size;
-
-  // validate the incoming values now
-  TALOS_MM_ASSERT_INDEX(isolate, size, start);
-  TALOS_MM_ASSERT_INDEX(isolate, size, end);
-
-  // ignore if the start is equivalent to the end
-  if (start == end) return String::Any();
-
-  // otherwise swap our values to ensure correct
-  else if (start > end) std::swap(start, end);
+  // stop early if the slice is potentially empty
+  if (slice->empty()) return String::Any();
 
   // resolve the base indices from the runes
-  start = self.offset(start), end = self.offset(end);
+  auto start = self.offset(slice->start()), stop = self.offset(slice->stop());
 
   // and finally construct the resulting slice now
-  return String::Any(isolate, self.view().substr(start, end - start + 1));
+  return String::Any(isolate, self.view().substr(start, stop - start));
 }
 
 Talos::Value::Any Talos::Builtins::Field::compare(Isolate *isolate, const Args &args) {
@@ -167,14 +150,7 @@ Talos::Value::Any Talos::Builtins::Field::to_upper(Isolate *isolate, const Args 
   auto self = args.self<String::Any>();
 
   // prepare a wide-string to conduct the conversion
-  auto buffer = $::String::Buffer();
-
-  // emplace each of the incoming characters with its equivalent
-  for (size_t uu = 0; uu < self.size(); ++uu) {
-    auto rune = self.rune(uu);
-    rune = ::towupper(rune);
-    buffer += $::Encoding::UTF8::from(rune);
-  }
+  auto buffer = isolate->service<Locale::Service>()->uppercase(self.view());
 
   // return the resulting upper-case result now
   return String::Any(isolate, buffer);
@@ -188,14 +164,7 @@ Talos::Value::Any Talos::Builtins::Field::to_lower(Isolate *isolate, const Args 
   auto self = args.self<String::Any>();
 
   // prepare a wide-string to conduct the conversion
-  auto buffer = $::String::Buffer();
-
-  // emplace each of the incoming characters with its equivalent
-  for (size_t uu = 0; uu < self.size(); ++uu) {
-    auto rune = self.rune(uu);
-    rune = ::towlower(rune);
-    buffer += $::Encoding::UTF8::from(rune);
-  }
+  auto buffer = isolate->service<Locale::Service>()->lowercase(self.view());
 
   // return the resulting upper-case result now
   return String::Any(isolate, buffer);

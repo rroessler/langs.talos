@@ -179,38 +179,19 @@ Talos::Value::Any Talos::Builtins::Field::erase(Isolate *isolate, const Args &ar
   auto self = args.self<Iterable::List>();
   auto size = static_cast<int64_t>(self.size());
 
-  // prepare our starting and ending points now
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, args[0]);
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, args[1]);
-
-  // cast the incoming values now
-  Number::Integral start = args.at<Number::Tagged>(0);
-  Number::Integral end = args.at<Number::Tagged>(1);
-
-  // if the arguments are less than zero
-  if (start < 0) start += size;
-  if (end < 0) end += size;
-
-  // validate the incoming values now
-  TALOS_MM_ASSERT_INDEX(isolate, size, start);
-
-  // ignore if the start is equivalent to the end
-  if (start == end) return self;
-
-  // otherwise swap our values to ensure correct
-  else if (start > end) std::swap(start, end);
-
-  // ensure the ending value can only be the maximum
-  if (end > size) end = size;
+  // pull out the slice definition to be used
+  auto slice = Iterable::Deduce::slice(isolate, args, size);
+  if (!slice.has_value()) return Value::Failure();
 
   // attempt removing this section now
   auto &values = self.values();
 
-  // handle removing our range of values as required
-  values.erase(values.begin() + start, values.begin() + end);
+  // pull out the suitable details to use
+  auto start = values.begin() + slice->start();
+  auto stop = values.begin() + slice->stop();
 
-  // and finally construct the resulting list now
-  return self;
+  // handle removing our range of values as required
+  return values.erase(start, stop), self;
 }
 
 Talos::Value::Any Talos::Builtins::Field::slice(Isolate *isolate, const Args &args) {
@@ -224,38 +205,15 @@ Talos::Value::Any Talos::Builtins::Field::slice(Isolate *isolate, const Args &ar
   // if no arguments are given, then clear the list
   if (args.empty()) return isolate->create<Iterable::List>(self.span());
 
-  // otherwise attempt pulling out our sections to be erased
-  auto initial = args.at(0, Value::Void());
-  auto secondary = args.at(1, Value::Void());
+  // otherwise pull out our arguments needed
+  auto slice = Iterable::Deduce::slice(isolate, args, size);
+  if (!slice.has_value()) return Value::Failure();
 
-  // update our values with the correct details now
-  if (initial.is<Value::Void>()) initial = Number::Tagged(0);
-  if (secondary.is<Value::Void>()) secondary = Number::Tagged(-1);
-
-  // prepare our starting and ending points now
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, initial);
-  TALOS_MM_ASSERT_TYPEOF(isolate, Number::Tagged, secondary);
-
-  // cast the incoming values now
-  Number::Integral start = initial.as<Number::Tagged>();
-  Number::Integral end = secondary.as<Number::Tagged>();
-
-  // if the arguments are less than zero
-  if (start < 0) start += size;
-  if (end < 0) end += size;
-
-  // validate the incoming values now
-  TALOS_MM_ASSERT_INDEX(isolate, size, start);
-  TALOS_MM_ASSERT_INDEX(isolate, size, end);
-
-  // ignore if the start is equivalent to the end
-  if (start == end) return isolate->create<Iterable::List>();
-
-  // otherwise swap our values to ensure correct
-  else if (start > end) std::swap(start, end);
+  // resolve the base places to be used
+  auto start = slice->start(), stop = slice->stop();
 
   // and finally construct the resulting slice now
-  return isolate->create<Iterable::List>(self.slice(start, end - start + 1));
+  return isolate->create<Iterable::List>(self.slice(start, stop - start));
 }
 
 Talos::Value::Any Talos::Builtins::Field::filter(Isolate *isolate, const Args &args) {

@@ -11,7 +11,7 @@ struct Options {
   //  PROPERTIES  //
 
   /// @brief Denotes the initial locale.
-  const char *initial = nullptr;
+  $::String::Buffer initial = {};
 
   //  CONSTRUCTORS  //
 

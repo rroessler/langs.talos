@@ -13,8 +13,44 @@
 
 //  PUBLIC METHODS  //
 
+std::optional<Talos::Iterable::Slice>
+Talos::Iterable::Deduce::slice(Runtime::Isolate *isolate, const Function::Args &args, int64_t size) {
+  // otherwise attempt pulling out our sections to be erased
+  auto initial = args.at(0, Value::Void());
+  auto secondary = args.at(1, Value::Void());
+
+  // update our values with the correct details now
+  if (initial.is<Value::Void>()) initial = Number::Tagged(0);
+  if (secondary.is<Value::Void>()) secondary = Number::Tagged(size);
+
+  // prepare our starting and ending points now
+  MM_ASSERT_NUMERIC(isolate, initial);
+  MM_ASSERT_NUMERIC(isolate, secondary);
+
+  // cast the incoming values now
+  Number::Integral start = initial.as<Number::Tagged>();
+  Number::Integral end = secondary.as<Number::Tagged>();
+
+  // if the arguments are less than zero
+  if (start < 0) start += size;
+  if (end < 0) end += size;
+
+  // if our values are equal, then stop
+  if (start == end) return Slice();
+
+  // validate the incoming values now
+  start = std::clamp(start, 0z, size);
+  end = std::clamp(end, 0z, size);
+
+  // swap our values to ensure correct
+  if (start > end) std::swap(start, end);
+
+  // should be able to return the expected slice
+  return Slice(start, end);
+}
+
 std::optional<Talos::Iterable::Interval>
-Talos::Iterable::Stepper(Runtime::Isolate *isolate, const Function::Args &args) {
+Talos::Iterable::Deduce::interval(Runtime::Isolate *isolate, const Function::Args &args) {
   // prepare a suitable selection of values to be used
   Number::Floating start = 0, stop = 0, step = 1;
 

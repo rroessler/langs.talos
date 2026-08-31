@@ -7,6 +7,35 @@
 
 namespace Talos::Iterable {
 
+/// @brief Range Slice Typing.
+class Slice {
+  //  PROPERTIES  //
+
+  Number::Integral m_start = 0;
+  Number::Integral m_stop = 0;
+
+public:
+  //  CONSTRUCTORS  //
+
+  /**
+   * @brief Constructs a slice.
+   * @param start               Starting value.
+   * @param stop                Ending value.
+   */
+  constexpr Slice() = default;
+  constexpr Slice(Number::Integral start) : m_start(start) {}
+  constexpr Slice(Number::Integral start, Number::Integral stop) : m_start(start), m_stop(stop) {}
+
+  //  PUBLIC METHODS  //
+
+  /// @brief Get the core details for the interval.
+  inline constexpr Number::Integral start() const noexcept { return m_start; }
+  inline constexpr Number::Integral stop() const noexcept { return m_stop; }
+
+  /// @brief Denotes if the slice is empty.
+  inline constexpr bool empty() const noexcept { return m_start == m_stop; }
+};
+
 /// @brief Range Interval Typing.
 class Interval {
   //  PROPERTIES  //
@@ -58,13 +87,6 @@ public:
   inline constexpr bool forward() const noexcept { return m_start < m_stop; }
   inline constexpr bool backward() const noexcept { return m_start > m_stop; }
 };
-
-/**
- * @brief Constructs an interval from given arguments.
- * @param isolate                   Runtime isolate.
- * @param args                      Function arguments.
- */
-std::optional<Interval> Stepper(Runtime::Isolate *isolate, const Function::Args &args);
 
 } // namespace Talos::Iterable
 
