@@ -22,7 +22,7 @@ jobs:
                   VERSION_SUFFIX=${{ inputs.release != 'stable' && format('-{0}', inputs.release) || '' }}
                   VERSION_SEMANTIC=$(cat ${{ github.workspace }}/configs/version.txt | xargs)
                   echo "short=v$VERSION_SEMANTIC$VERSION_SUFFIX" >> $GITHUB_OUTPUT
-                  echo "full=v$VERSION_SEMANTIC${{ inputs.release }}" >> $GITHUB_OUTPUT
+                  echo "long=v$VERSION_SEMANTIC-${{ inputs.release }}" >> $GITHUB_OUTPUT
 
             - name: Generate Changelog
               uses: elieahd/templater@v1
