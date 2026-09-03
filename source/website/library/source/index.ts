@@ -1,5 +1,5 @@
 /// Vendor Modules
-import { loader } from 'fumadocs-core/source';
+import { loader, update, VirtualFile } from 'fumadocs-core/source';
 import { toFumadocsSource } from 'fumadocs-mdx/runtime/server';
 import { DocsCollectionEntry } from 'fumadocs-mdx/runtime/server';
 import { lucideIconsPlugin } from 'fumadocs-core/source/plugins/lucide-icons';
@@ -10,6 +10,7 @@ import * as Collections from '@/collections/server';
 /// Website Modules
 import { Crate } from '@/website/crate';
 import { Builtins } from '@/website/builtins';
+import { Product } from '../product';
 
 /** Source Loaders Available. */
 export namespace Source {
@@ -18,14 +19,17 @@ export namespace Source {
     /** Available source plugins. */
     const m_plugins = [lucideIconsPlugin()];
 
-    export const blog = loader(toFumadocsSource(Collections.blog, []), m_options('/blog'));
-    export const proposals = loader(toFumadocsSource(Collections.proposals, []), m_options('/proposals'));
+    export const blog = loader(m_filter(toFumadocsSource(Collections.blog, [])), m_options('/blog'));
+    export const proposals = loader(m_filter(toFumadocsSource(Collections.proposals, [])), m_options('/proposals'));
 
     export const builtins = m_rebuild('builtins', Collections.builtins);
     export const crates = m_rebuild('crates', Collections.crates);
 
     /** Documentation Loader. */
-    export const docs = loader({ builtins, crates, docs: Collections.docs.toFumadocsSource() }, m_options('/'));
+    export const docs = loader(
+        { builtins, crates, docs: m_filter(Collections.docs.toFumadocsSource()) },
+        m_options('/'),
+    );
 
     //  PRIVATE METHODS  //
 
@@ -51,6 +55,25 @@ export namespace Source {
         if (baseDir === 'builtins') Builtins.Registry.transform(source);
 
         // finally return the resolved source
-        return source;
+        return m_filter(source);
+    }
+
+    /**
+     * Handles filtering sources.
+     * @param source                    Source to filter.
+     */
+    function m_filter<T>(source: T): T {
+        // prepare the internal draft filter
+        const filter = (file: VirtualFile) => {
+            if (file.type === 'meta') return true;
+            if (Product.development) return true;
+            if (!('draft' in file.data)) return true;
+            return !file.data.draft; // final validation
+        };
+
+        // and rebuild our incoming source now
+        return update(source as unknown as any)
+            .files((files) => files.filter(filter))
+            .build() as T;
     }
 }
