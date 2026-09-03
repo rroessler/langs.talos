@@ -1,5 +1,5 @@
 ---
-icon: RotateCCW
+icon: RotateCcw
 title: Iterators
 description: Defining sequences through custom iterators.
 ---
