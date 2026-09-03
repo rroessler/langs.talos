@@ -4,7 +4,7 @@ author: Reuben Roessler
 title: Progress / June 2026
 ---
 
-import { Anchor, Aside } from '@/website/components';
+import { Anchor } from '@/website/components';
 
 ## Status Update
 
@@ -30,8 +30,6 @@ For a small side-tangent, I wanted to revamp the website implementation and have
 ## Upcoming Work
 
 With the more foundational work completed, I will be soon moving onto the compilation and runtime reworks. For the most part these consist of porting over the previous implementations, with the exception of integrating a baseline JIT interpreter. The goal here is to keep the current bytecode compiler/interpreter but implement a template JIT that can glue bytecode outputs to more performant code generation. Currently, JIT compilation is possible in the previous design and I will aim to use this in generating templated compilation outputs.
-
-<Aside.Rewrite />
 
 ## Footnotes
 

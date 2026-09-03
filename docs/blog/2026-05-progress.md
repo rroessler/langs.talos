@@ -4,8 +4,6 @@ author: Reuben Roessler
 title: Progress / May 2026
 ---
 
-import { Aside } from '@/website/components';
-
 ## Reflection
 
 With May behind us and a new release of v0.1.2, I figured it is a good time to reflect on what has been built so far for Talos. With this release, Talos now has some astounding functionality which includes the following:
@@ -45,5 +43,3 @@ Looking ahead, I am currently in the process of rewriting portions of Talos in m
 Although this will appear to be a large amount of work (and it probably is), these updates will enhance the codebase and give Talos the foundations it needs to be ready for library support. Over this next period, I plan to give monthly updates on the current progress of these rewrites. So far I have been working on the improved AST and formatter upgrades, after which I will tackle getting the foundations and abstract scheduling ready to then rebuild the runtime fully.
 
 As for a timeline of these upgrades, I really cannot say. My ideal timeline is to have these changes ready by December for a v0.2.0 release, in which I hope to do [Advent of Code](https://adventofcode.com/) with Talos. Until then, follow along with these monthly blog posts to see what progress is made!
-
-<Aside.Rewrite />
