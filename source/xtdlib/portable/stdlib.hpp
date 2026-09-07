@@ -29,6 +29,7 @@
 #include <memory>
 #include <mutex>
 #include <new>
+#include <numeric>
 #include <queue>
 #include <ranges>
 #include <shared_mutex>

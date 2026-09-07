@@ -110,7 +110,7 @@ protected:
 
     // iterate over the available nodes to be used
     for (const auto *node : nodes) {
-      acc = std::saturating_add(acc, node->width(wrapped, force));
+      acc = Math::Saturating::add(acc, node->width(wrapped, force));
       if (acc == SIZE_MAX) return SIZE_MAX; // stop early now
     }
 
