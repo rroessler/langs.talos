@@ -9,17 +9,19 @@ import { Product } from '@/website/product';
 export interface Modified extends Modified.Props {}
 export async function Modified({ path, options = {}, className, ...props }: Modified) {
     // revise the outgoing options to be used and get the necessary last-modified details
-    const input = { path, owner: 'rroessler', repo: 'langs.talos', ...options };
+    const input = { path: `docs/${path}`, owner: 'rroessler', repo: 'langs.talos', ...options };
     const edited = Product.development ? null : await getGithubLastEdit(input).catch(() => null);
 
     // prepare a suitable format to be used as well
-    const format: Intl.DateTimeFormatOptions = { month: '2-digit', day: '2-digit', year: 'numeric' };
+    const format: Intl.DateTimeFormatOptions = { month: 'long', day: '2-digit', year: 'numeric' };
 
     // and construct a suitable last-updated timestamp to be used
     return (
-        <div className={cn('text-fd-muted-foreground border-t mt-5 py-5', className)} {...props}>
-            Last updated on {(edited ?? new Date()).toLocaleString('default', format)}
-        </div>
+        edited && (
+            <div className={cn('text-fd-muted-foreground border-t mt-5 py-5', className)} {...props}>
+                Last updated on {edited.toLocaleString('default', format)}
+            </div>
+        )
     );
 }
 
