@@ -10,7 +10,7 @@ import { Crate } from '@/website/crate';
 import { Source } from '@/website/source';
 import { Builtins } from '@/website/builtins';
 import { Markdown } from '@/website/markdown';
-import { Anchor } from '@/website/components';
+import { Anchor, Modified } from '@/website/components';
 
 //  PROPERTIES  //
 
@@ -50,13 +50,13 @@ export default async function Docs(props: PageProps<'/[...slug]'>) {
     });
 
     // prepare each of our components to be used
+    const modified = <Modified key="modified" path={page.path} />;
     const title = <DocsTitle key="title" children={page.data.title} />;
     const body = <DocsBody key="body" children={<Content components={components} />} />;
-    const description = <DocsDescription key="description" className="mb-2" children={m_describe(page)} />;
-    const actions = <div key="actions" className="border-b" />;
+    const description = <DocsDescription key="subtitle" className="border-b mb-4 pb-4" children={m_describe(page)} />;
 
     // and finally construct the resulting page
-    return <DocsPage toc={toc} tableOfContent={{ style: 'clerk' }} children={[title, description, actions, body]} />;
+    return <DocsPage toc={toc} tableOfContent={{ style: 'clerk' }} children={[title, description, body, modified]} />;
 }
 
 //  PRIVATE METHODS  //

@@ -8,17 +8,17 @@ title: Progress / May 2026
 
 With May behind us and a new release of v0.1.2, I figured it is a good time to reflect on what has been built so far for Talos. With this release, Talos now has some astounding functionality which includes the following:
 
-- [Full Featured Dynamic Runtime](/docs/language/toolkit/runtime)
-- [Baseline JIT Compilation](/docs/crates/jit)
-- [Type-Checking and Extended Linting](/docs/language/advanced/type-system)
-- [Modularized Project Configurations](/docs/language/development/configuration)
-- [Extensive Integrated Tooling](/docs/language/toolkit/commands)
-- [Colorless Functions via Policies](/docs/language/advanced/policies)
-- [Concurrency via Green-Threads](/docs/language/advanced/concurrency)
-- [Testing/Benchmarking Framework](/docs/language/toolkit/testing)
-- [Runtime Decorators](/docs/language/fundamentals/decorators)
-- [Compile-Time Attributes](/docs/language/fundamentals/attributes)
-- [Explicit Resource Management](/docs/language/advanced/resources)
+- [Full Featured Dynamic Runtime](/language/toolkit/runtime)
+- [Baseline JIT Compilation](/language/advanced/performance)
+- [Type-Checking and Extended Linting](/language/advanced/type-system)
+- [Modularized Project Configurations](/language/development/configuration)
+- [Extensive Integrated Tooling](/language/toolkit/commands)
+- [Colorless Functions via Policies](/language/advanced/policies)
+- [Concurrency via Green-Threads](/language/advanced/concurrency)
+- [Testing/Benchmarking Framework](/language/toolkit/testing)
+- [Runtime Decorators](/language/fundamentals/decorators)
+- [Compile-Time Attributes](/language/fundamentals/attributes)
+- [Explicit Resource Management](/language/advanced/resources)
 
 These are some incredible features, however many of these are still in their early stages of development. For example, the runtime is still fully dependent on the underlying type-checker. Arguably this is necessary for type-safety and correctness, however being able to run a program with the `--typeless` flag can be useful in some contexts. Additionally, there is much work to be done to improve the internal codebase for better language-server outputs and to make the codebase friendlier to contributors.
 

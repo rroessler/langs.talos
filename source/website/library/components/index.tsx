@@ -11,6 +11,7 @@ export * from './hero';
 export * from './icon';
 export * from './install';
 export * from './intrinsic';
+export * from './modified';
 export * from './portal';
 export * from './search';
 export * from './steps';
