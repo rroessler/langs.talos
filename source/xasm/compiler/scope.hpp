@@ -41,8 +41,8 @@ public:
     // prepare the output functor
     T functor = {};
 
-#define MM_EXPECT(...)                                                                                                \
-  if (auto errc = __VA_ARGS__; errc != asmjit::Error::kOk) $_ABORT("{0}", asmjit::DebugUtils::error_as_string(errc));
+#define MM_EXPECT(...)                                                                                    \
+  if (auto errc = __VA_ARGS__; errc != asmjit::Error::kOk) $_ABORT("{0}", asmjit::stringify_error(errc));
 
     // attempt finalizing the incoming callback
     MM_EXPECT(end_func());

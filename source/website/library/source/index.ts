@@ -9,8 +9,8 @@ import * as Collections from '@/collections/server';
 
 /// Website Modules
 import { Crate } from '@/website/crate';
+import { Product } from '@/website/product';
 import { Builtins } from '@/website/builtins';
-import { Product } from '../product';
 
 /** Source Loaders Available. */
 export namespace Source {

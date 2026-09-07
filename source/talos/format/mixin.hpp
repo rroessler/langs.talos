@@ -110,8 +110,8 @@ protected:
 
     // iterate over the available nodes to be used
     for (const auto *node : nodes) {
-      acc = std::add_sat(acc, node->width(wrapped, force));
-      if (acc == SIZE_MAX) return SIZE_MAX; // stop early
+      acc = std::saturating_add(acc, node->width(wrapped, force));
+      if (acc == SIZE_MAX) return SIZE_MAX; // stop early now
     }
 
     // and return the final accumulator now

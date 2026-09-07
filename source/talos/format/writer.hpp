@@ -85,7 +85,7 @@ public:
    * @param size                  Size to check.
    */
   inline constexpr bool exceeds(size_t size) const noexcept {
-    return std::add_sat(m_width, size) > m_options->line_width;
+    return std::saturating_add(m_width, size) > m_options->line_width;
   }
 
   /**
