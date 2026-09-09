@@ -5,7 +5,7 @@ set -euo pipefail
 
 # get some incoming details about talos
 talos_target="talos-"
-talos_repo="rroessler/langs.talos"
+talos_repo="rroessler/talos-lang"
 talos_binary=$(command -v talos 2>&1 || true)
 talos_dest=${TALOS_DIRECTORY_ROOT:-$HOME/.talos}
 talos_upgrade=$([ -z $talos_binary ] && echo false || echo true)

@@ -18,7 +18,7 @@ FetchContent_Declare(
     talos
     GIT_SHALLOW ON
     GIT_TAG "latest"
-    GIT_REPOSITORY "https://github.com/rroessler/langs.talos.git"
+    GIT_REPOSITORY "https://github.com/rroessler/talos-lang.git"
 )
 
 # Make the content available

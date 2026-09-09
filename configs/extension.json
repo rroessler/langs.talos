@@ -6,7 +6,7 @@
     "icon": "icons/talos.png",
     "author": "Reuben Roessler",
     "displayName": "Talos Programming Language",
-    "repository": "https://github.com/rroessler/langs.talos",
+    "repository": "https://github.com/rroessler/talos-lang",
     "description": "Support for the Talos programming language",
 
     "activationEvents": [],

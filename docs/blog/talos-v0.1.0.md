@@ -42,4 +42,4 @@ Realistically, this release contains the baseline implementation of Talos and sh
 
 ## Want More...
 
-Check out [the documentation](/language) for Talos, or view the project on [GitHub](https://github.com/rroessler/langs.talos).
+Check out [the documentation](/language) for Talos, or view the project on [GitHub](https://github.com/rroessler/talos-lang).

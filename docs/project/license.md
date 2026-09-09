@@ -4,7 +4,7 @@ title: License
 description: Talos itself is MIT-licensed
 ---
 
-The license for Talos can be viewed [here](https://github.com/rroessler/langs.talos/blob/main/LICENSE).
+The license for Talos can be viewed [here](https://github.com/rroessler/talos-lang/blob/main/LICENSE).
 
 ## Linked Libraries
 
@@ -14,7 +14,7 @@ Talos statically links these libraries:
 | -------------------------------------------------------- | ------------------------------------------------------------------------- |
 | [`ankerl`](https://github.com/martinus/unordered_dense)  | [MIT](https://github.com/martinus/unordered_dense/blob/main/LICENSE)      |
 | [`asmjit`](https://github.com/asmjit/asmjit)             | [zlib](https://github.com/asmjit/asmjit/blob/master/LICENSE.md)           |
-| [`aster`](https://github.com/rroessler/cpp.aster)        | [MIT](https://github.com/rroessler/cpp.aster/blob/main/LICENSE)           |
+| [`aster`](https://github.com/rroessler/aster)            | [MIT](https://github.com/rroessler/aster/blob/main/LICENSE)               |
 | [`boost`](https://github.com/boostorg/boost)             | [BSL-1.0](https://github.com/boostorg/boost/blob/main/LICENSE)            |
 | [`CLI11`](https://github.com/CLIUtils/CLI11)             | [BSD 3-Clause](https://github.com/CLIUtils/CLI11/blob/main/LICENSE)       |
 | [`fmt`](https://github.com/fmtlib/fmt)                   | [MIT](https://github.com/fmtlib/fmt/blob/main/LICENSE)                    |

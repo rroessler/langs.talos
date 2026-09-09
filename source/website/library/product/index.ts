@@ -13,7 +13,7 @@ export namespace Product {
     export const extension = '.tal';
 
     /** The baseline github URL. */
-    export const github = 'https://github.com/rroessler/langs.talos';
+    export const github = 'https://github.com/rroessler/talos-lang';
 
     /** Assign the associated website description. */
     export const description = d;

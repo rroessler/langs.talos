@@ -20,7 +20,7 @@ $C_RED = if ($C_NONE) { "" } else { [char]27 + "[1;31m"; };
 $C_GREEN = if ($C_NONE) { "" } else { [char]27 + "[32m"; };
 
 # check if Talos already exists currently
-$TalosRepo = "rroessler/langs.talos";
+$TalosRepo = "rroessler/talos-lang";
 $TalosBinary = try { (Get-Command "talos" -ErrorAction Stop).Path; } catch {};
 $TalosVersion = try { & $TalosBinary --version } catch {};
 $TalosUpgrade = $TalosBinary.Count -ne 0; # denote if we are upgrading

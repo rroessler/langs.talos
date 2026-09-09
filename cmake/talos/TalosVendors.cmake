@@ -127,7 +127,7 @@ set(SPDLOG_FMT_EXTERNAL ON)
 # Declare all the necessary repositories
 __talos_vendors_declare(ankerl v4.9.2 REPO "martinus/unordered_dense.git")
 __talos_vendors_declare(asmjit v1.21.0 REPO "asmjit/asmjit.git" TAG master)
-__talos_vendors_declare(aster v1.1.3 REPO "rroessler/cpp.aster.git")
+__talos_vendors_declare(aster v1.1.3 REPO "rroessler/aster.git")
 __talos_vendors_declare(CLI11 v2.7.2 REPO "CLIUtils/CLI11.git")
 __talos_vendors_declare(fmt 12.2.0 REPO "fmtlib/fmt.git")
 __talos_vendors_declare(function2 4.2.5 REPO "naios/function2.git")

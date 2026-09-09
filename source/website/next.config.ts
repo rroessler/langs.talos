@@ -25,7 +25,7 @@ export default fumadocs.createMDX()({
 
 function m_version() {
     // prepare the command to be used for getting current release version
-    const command = 'gh release view --repo rroessler/langs.talos --json tagName --jq .tagName';
+    const command = 'gh release view --repo rroessler/talos-lang --json tagName --jq .tagName';
 
     try {
         return cp.execSync(command, { stdio: 'ignore' }).toString().trim();
