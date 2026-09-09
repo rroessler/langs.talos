@@ -12,8 +12,8 @@ namespace Talos::Async {
 class Worker : public Runtime::Executor {
   //  PROPERTIES  //
 
-  /// @brief Underlying resource frame (for backtraces)
-  $::Unique::Pointer<Resource::Frame> m_caller = nullptr;
+  /// @brief Underlying resource trace.
+  Resource::Trace m_trace = {};
 
 public:
   //  CONSTRUCTORS  //
@@ -24,11 +24,8 @@ public:
    * @param future            Future to bind.
    * @param trace             Resource trace.
    */
-  explicit Worker(XI::Container *services, const Future &future) : Executor(services, future) {}
-  explicit Worker(XI::Container *services, const Future &future, const Resource::Trace &trace) :
-      Worker(services, future) {
-    if (!trace.anonymous()) m_caller = $::Unique::New<Resource::Frame>(this, trace);
-  }
+  explicit Worker(XI::Container *services, const Future &future, const Resource::Trace &trace = {}) :
+      Executor(services, future), m_trace(trace) {}
 
 protected:
   //  PRIVATE METHODS  //

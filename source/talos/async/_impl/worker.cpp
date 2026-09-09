@@ -11,6 +11,12 @@ void Talos::Async::Worker::m_execute() {
   auto local_future = local_scope(m_data.as<Async::Future>());
   if (local_future->m_wrapper()->worker == nullptr) return;
 
+  // ensure the worker is the same as the current one
+  $_ASSERT(local_future->m_wrapper()->worker == this);
+
+  // prepare a suitable trace to be used if needed
+  $_UNUSED $_AUTO = m_trace.anonymous() ? nullptr : $::Unique::New<Resource::Frame>(this, m_trace);
+
   // destructure the callback and details to be used
   auto *local_thenable = local_future->thenable();
   auto local_callback = local_scope(local_future->callback());
